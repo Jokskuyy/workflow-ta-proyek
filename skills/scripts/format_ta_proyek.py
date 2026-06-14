@@ -313,7 +313,7 @@ def center_and_scale_drawings(p, namespaces):
                         except ValueError:
                             pass
 
-def build_toc_entry(caption_text, page_num):
+def build_toc_entry(caption_text, page_num, bookmark_name):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     
     def set_child_element(parent, tag_name, attrs=None):
@@ -359,24 +359,30 @@ def build_toc_entry(caption_text, page_num):
     sort_element_children(pPr, PPR_ORDER)
     p.append(pPr)
     
+    # Hyperlink element
+    hyperlink = lxml.etree.SubElement(p, f'{{{ns_uri}}}hyperlink', {'{'+ns_uri+'}anchor': bookmark_name, '{'+ns_uri+'}history': '1'})
+    
     # Caption text run
-    r = lxml.etree.SubElement(p, f'{{{ns_uri}}}r')
+    r = lxml.etree.SubElement(hyperlink, f'{{{ns_uri}}}r')
     rPr = lxml.etree.SubElement(r, f'{{{ns_uri}}}rPr')
+    set_child_element(rPr, 'rStyle', {'val': 'Hyperlink'})
     set_child_element(rPr, 'noProof', {})
     t = lxml.etree.SubElement(r, f'{{{ns_uri}}}t')
     t.text = caption_text
     t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
     
     # Tab run (for dot leader)
-    tab_r = lxml.etree.SubElement(p, f'{{{ns_uri}}}r')
+    tab_r = lxml.etree.SubElement(hyperlink, f'{{{ns_uri}}}r')
     tab_rPr = lxml.etree.SubElement(tab_r, f'{{{ns_uri}}}rPr')
     set_child_element(tab_rPr, 'noProof', {})
+    set_child_element(tab_rPr, 'webHidden', {})
     lxml.etree.SubElement(tab_r, f'{{{ns_uri}}}tab')
     
     # Page number run
-    page_r = lxml.etree.SubElement(p, f'{{{ns_uri}}}r')
+    page_r = lxml.etree.SubElement(hyperlink, f'{{{ns_uri}}}r')
     page_rPr = lxml.etree.SubElement(page_r, f'{{{ns_uri}}}rPr')
     set_child_element(page_rPr, 'noProof', {})
+    set_child_element(page_rPr, 'webHidden', {})
     page_t = lxml.etree.SubElement(page_r, f'{{{ns_uri}}}t')
     page_t.text = str(page_num)
     
@@ -579,7 +585,7 @@ def format_document_xmls(unpacked_dir):
         if bab1_idx_orig == -1:
             bab1_idx_orig = 60
             
-        def create_caption_paragraph_local(label, num, desc):
+        def create_caption_paragraph_local(label, num, desc, bookmark_id, bookmark_name):
             p = lxml.etree.Element(f'{{{ns_uri}}}p')
             pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
             set_child_element(pPr, 'pStyle', {'val': 'Caption'})
@@ -589,6 +595,9 @@ def format_document_xmls(unpacked_dir):
             sort_element_children(pPr, PPR_ORDER)
             p.append(pPr)
             
+            bms = lxml.etree.Element(f'{{{ns_uri}}}bookmarkStart', id=str(bookmark_id), name=bookmark_name)
+            p.append(bms)
+
             r = lxml.etree.Element(f'{{{ns_uri}}}r')
             t = lxml.etree.Element(f'{{{ns_uri}}}t')
             t.text = f"{label} {num} {desc}"
@@ -596,6 +605,10 @@ def format_document_xmls(unpacked_dir):
                 t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
             r.append(t)
             p.append(r)
+            
+            bme = lxml.etree.Element(f'{{{ns_uri}}}bookmarkEnd', id=str(bookmark_id))
+            p.append(bme)
+            
             return p
 
         # Find cover page end index (last paragraph before the SECOND drawing, which is Lembar Pengesahan)
@@ -671,14 +684,20 @@ def format_document_xmls(unpacked_dir):
                 if has_drawing:
                     if "Analisis Sistem yang Sedang Berjalan" in current_section_title and survey_idx < 7:
                         reconstructed_children.append(child)
-                        caption_p = create_caption_paragraph_local("Gambar", f"2.{survey_idx + 1}", survey_captions[survey_idx])
+                        bmid = 9000 + len(collected_captions)
+                        bmname = f"_TocGemini{bmid}"
+                        caption_p = create_caption_paragraph_local("Gambar", f"2.{survey_idx + 1}", survey_captions[survey_idx], bmid, bmname)
                         reconstructed_children.append(caption_p)
+                        collected_captions.append({"type": "Gambar", "text": f"Gambar 2.{survey_idx + 1} {survey_captions[survey_idx]}", "page": estimated_page, "bookmark": bmname})
                         print(f"  Generated survey caption Gambar 2.{survey_idx + 1}")
                         survey_idx += 1
                     elif "Integrasi Backend dengan Unity" in current_section_title:
                         reconstructed_children.append(child)
-                        caption_p = create_caption_paragraph_local("Gambar", "2.15", "Arsitektur Integrasi Sistem")
+                        bmid = 9000 + len(collected_captions)
+                        bmname = f"_TocGemini{bmid}"
+                        caption_p = create_caption_paragraph_local("Gambar", "2.15", "Arsitektur Integrasi Sistem", bmid, bmname)
                         reconstructed_children.append(caption_p)
+                        collected_captions.append({"type": "Gambar", "text": "Gambar 2.15 Arsitektur Integrasi Sistem", "page": estimated_page, "bookmark": bmname})
                         print("  Generated integration caption Gambar 2.15")
                     else:
                         reconstructed_children.append(child)
@@ -787,16 +806,27 @@ def format_document_xmls(unpacked_dir):
                             desc = m.group(3)
                             
                             cleaned_caption = f"{label.capitalize()} {num} {desc}"
+                            bmid = 9000 + len(collected_captions)
+                            bmname = f"_TocGemini{bmid}"
                             
                             collected_captions.append({
                                 "type": label.capitalize(),
                                 "text": cleaned_caption,
-                                "page": estimated_page
+                                "page": estimated_page,
+                                "bookmark": bmname
                             })
                             
                             # Replace runs
                             for r in p.findall(f'{{{ns_uri}}}r', namespaces):
                                 p.remove(r)
+                            
+                            # Remove existing bookmarks
+                            for b in p.findall(f'{{{ns_uri}}}bookmarkStart', namespaces): p.remove(b)
+                            for b in p.findall(f'{{{ns_uri}}}bookmarkEnd', namespaces): p.remove(b)
+                            
+                            # Insert bookmark and text
+                            bms = lxml.etree.Element(f'{{{ns_uri}}}bookmarkStart', id=str(bmid), name=bmname)
+                            p.append(bms)
                             new_r = lxml.etree.Element(f'{{{ns_uri}}}r')
                             new_t = lxml.etree.Element(f'{{{ns_uri}}}t')
                             new_t.text = cleaned_caption
@@ -804,6 +834,9 @@ def format_document_xmls(unpacked_dir):
                                 new_t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
                             new_r.append(new_t)
                             p.append(new_r)
+                            
+                            bme = lxml.etree.Element(f'{{{ns_uri}}}bookmarkEnd', id=str(bmid))
+                            p.append(bme)
                             text = cleaned_caption
                     
                 # Format Headings
@@ -941,7 +974,16 @@ def format_document_xmls(unpacked_dir):
 
                     break # Stop when we hit a non-TableofFigures element
 
-                print(f"Cleaned old TOC for {toc_type} (removed {entries_removed} stale entries). Native Word TOC instruction retained.")
+                # Inject the pre-built plain text TOC entries with hyperlinks
+                entries_added = 0
+                for cap in collected_captions:
+                    if cap["type"] == toc_type:
+                        entry_p = build_toc_entry(cap["text"], cap["page"], cap["bookmark"])
+                        body.insert(insert_idx, entry_p)
+                        insert_idx += 1
+                        entries_added += 1
+
+                print(f"Rebuilt TOC for {toc_type} statically with {entries_added} entries and hyperlinks. Old entries removed: {entries_removed}")
 
         fix_whitespace_preservation(root)
         tree.write(doc_path, encoding='utf-8', xml_declaration=True)
@@ -1014,12 +1056,10 @@ def force_field_update(unpacked_dir):
         tree = lxml.etree.parse(settings_path)
         root = tree.getroot()
         update_fields = root.find('w:updateFields', namespaces)
-        if update_fields is None:
-            update_fields = lxml.etree.Element(f'{{{ns_uri}}}updateFields')
-            root.insert(0, update_fields)
-        update_fields.set(f'{{{ns_uri}}}val', 'true')
-        tree.write(settings_path, encoding='utf-8', xml_declaration=True, standalone=True)
-        print("Enabled updateFields in settings.xml to allow Word to generate accurate page numbers and hyperlinks.")
+        if update_fields is not None:
+            root.remove(update_fields)
+            tree.write(settings_path, encoding='utf-8', xml_declaration=True, standalone=True)
+            print("Removed updateFields from settings.xml to prevent popup.")
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
