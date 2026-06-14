@@ -786,20 +786,6 @@ def format_document_xmls(unpacked_dir):
                             num = m.group(2)
                             desc = m.group(3)
                             
-                            is_new = desc.startswith("Hasil Kuesioner") or desc == "Arsitektur Integrasi Sistem"
-                            if label.capitalize() == "Gambar" and num.startswith("2.") and not is_new:
-                                try:
-                                    parts = num.split('.')
-                                    K = int(parts[-1])
-                                    if 1 <= K <= 7:
-                                        num = f"2.{K + 7}"
-                                    elif 8 <= K <= 22:
-                                        num = f"2.{K + 8}"
-                                    elif K > 22:
-                                        num = f"2.{K + 8}"
-                                except ValueError:
-                                    pass
-                                    
                             cleaned_caption = f"{label.capitalize()} {num} {desc}"
                             
                             collected_captions.append({
