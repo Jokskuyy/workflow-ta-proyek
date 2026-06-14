@@ -762,21 +762,38 @@ def format_document_xmls(unpacked_dir):
                 has_drawing = child.find('.//w:drawing', namespaces) is not None
                 
                 if has_drawing:
+                    already_captioned = False
+                    if idx + 1 < len(children):
+                        next_child = children[idx + 1]
+                        if next_child.tag.endswith('p'):
+                            next_pPr = next_child.find('w:pPr', namespaces)
+                            next_pStyle = next_pPr.find('w:pStyle', namespaces) if next_pPr is not None else None
+                            next_pStyle_val = next_pStyle.get(f'{{{ns_uri}}}val') if next_pStyle is not None else ""
+                            next_text = "".join(next_child.itertext()).strip()
+                            if next_pStyle_val == 'Caption' or re.match(r'^Gambar\s+2\b', next_text, re.IGNORECASE):
+                                already_captioned = True
+                                
                     if "Analisis Sistem yang Sedang Berjalan" in current_section_title and survey_idx < 7:
                         reconstructed_children.append(child)
-                        bmid = 9000 + len(collected_captions) + survey_idx
-                        bmname = f"_TocGemini{bmid}"
-                        caption_p = create_caption_paragraph_local("Gambar", "2.", "Gambar_2.", survey_idx + 1, survey_captions[survey_idx], bmid, bmname)
-                        reconstructed_children.append(caption_p)
-                        print(f"  Generated survey caption Gambar 2.{survey_idx + 1}")
+                        if not already_captioned:
+                            bmid = 9000 + len(collected_captions) + survey_idx
+                            bmname = f"_TocGemini{bmid}"
+                            caption_p = create_caption_paragraph_local("Gambar", "2.", "Gambar_2.", survey_idx + 1, survey_captions[survey_idx], bmid, bmname)
+                            reconstructed_children.append(caption_p)
+                            print(f"  Generated survey caption Gambar 2.{survey_idx + 1}")
+                        else:
+                            print(f"  Survey caption for Gambar 2.{survey_idx + 1} already exists, skipping generation.")
                         survey_idx += 1
                     elif "Integrasi Backend dengan Unity" in current_section_title:
                         reconstructed_children.append(child)
-                        bmid = 9000 + 100
-                        bmname = f"_TocGemini{bmid}"
-                        caption_p = create_caption_paragraph_local("Gambar", "2.", "Gambar_2.", 15, "Arsitektur Integrasi Sistem", bmid, bmname)
-                        reconstructed_children.append(caption_p)
-                        print("  Generated integration caption Gambar 2.15")
+                        if not already_captioned:
+                            bmid = 9000 + 100
+                            bmname = f"_TocGemini{bmid}"
+                            caption_p = create_caption_paragraph_local("Gambar", "2.", "Gambar_2.", 15, "Arsitektur Integrasi Sistem", bmid, bmname)
+                            reconstructed_children.append(caption_p)
+                            print("  Generated integration caption Gambar 2.15")
+                        else:
+                            print("  Integration caption Gambar 2.15 already exists, skipping generation.")
                     else:
                         reconstructed_children.append(child)
                 else:
