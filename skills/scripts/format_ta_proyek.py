@@ -365,7 +365,6 @@ def build_toc_entry(caption_text, page_num, bookmark_name):
     # Caption text run
     r = lxml.etree.SubElement(hyperlink, f'{{{ns_uri}}}r')
     rPr = lxml.etree.SubElement(r, f'{{{ns_uri}}}rPr')
-    set_child_element(rPr, 'rStyle', {'val': 'Hyperlink'})
     set_child_element(rPr, 'noProof', {})
     t = lxml.etree.SubElement(r, f'{{{ns_uri}}}t')
     t.text = caption_text
@@ -684,20 +683,18 @@ def format_document_xmls(unpacked_dir):
                 if has_drawing:
                     if "Analisis Sistem yang Sedang Berjalan" in current_section_title and survey_idx < 7:
                         reconstructed_children.append(child)
-                        bmid = 9000 + len(collected_captions)
+                        bmid = 9000 + len(collected_captions) + survey_idx
                         bmname = f"_TocGemini{bmid}"
                         caption_p = create_caption_paragraph_local("Gambar", f"2.{survey_idx + 1}", survey_captions[survey_idx], bmid, bmname)
                         reconstructed_children.append(caption_p)
-                        collected_captions.append({"type": "Gambar", "text": f"Gambar 2.{survey_idx + 1} {survey_captions[survey_idx]}", "page": estimated_page, "bookmark": bmname})
                         print(f"  Generated survey caption Gambar 2.{survey_idx + 1}")
                         survey_idx += 1
                     elif "Integrasi Backend dengan Unity" in current_section_title:
                         reconstructed_children.append(child)
-                        bmid = 9000 + len(collected_captions)
+                        bmid = 9000 + 100
                         bmname = f"_TocGemini{bmid}"
                         caption_p = create_caption_paragraph_local("Gambar", "2.15", "Arsitektur Integrasi Sistem", bmid, bmname)
                         reconstructed_children.append(caption_p)
-                        collected_captions.append({"type": "Gambar", "text": "Gambar 2.15 Arsitektur Integrasi Sistem", "page": estimated_page, "bookmark": bmname})
                         print("  Generated integration caption Gambar 2.15")
                     else:
                         reconstructed_children.append(child)
@@ -945,14 +942,19 @@ def format_document_xmls(unpacked_dir):
             if fldChar.get(f'{{{ns_uri}}}dirty'):
                 del fldChar.attrib[f'{{{ns_uri}}}dirty']
 
-        # Clean up stale TOC entries and leave instructions intact for Word to rebuild natively
+        # Replace native TOC blocks completely with our static TOC entries
+        # Since updateFields=false, Word won't hide the instructions if we leave them broken
         for p in list(body.findall('w:p', namespaces)):
             text = ''.join(p.itertext())
             if 'TOC ' in text and ('Gambar' in text or 'Tabel' in text):
                 toc_type = 'Gambar' if 'Gambar' in text else 'Tabel'
 
                 children = list(body)
-                insert_idx = children.index(p) + 1  # Start checking immediately AFTER the instruction paragraph
+                insert_idx = children.index(p)
+                
+                # Delete the instruction paragraph itself
+                body.remove(p)
+                children = list(body)
 
                 # Remove any existing TableofFigures paragraphs that immediately follow
                 entries_removed = 0
@@ -983,7 +985,7 @@ def format_document_xmls(unpacked_dir):
                         insert_idx += 1
                         entries_added += 1
 
-                print(f"Rebuilt TOC for {toc_type} statically with {entries_added} entries and hyperlinks. Old entries removed: {entries_removed}")
+                print(f"Rebuilt TOC for {toc_type} statically with {entries_added} entries. Removed raw instruction and {entries_removed} stale entries.")
 
         fix_whitespace_preservation(root)
         tree.write(doc_path, encoding='utf-8', xml_declaration=True)
