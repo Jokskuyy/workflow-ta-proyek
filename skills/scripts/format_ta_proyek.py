@@ -832,15 +832,21 @@ def format_document_xmls(unpacked_dir):
                 # Formats DAFTAR ISI paragraph inside the TOC sdt
                 sdtContent = child.find('w:sdtContent', namespaces)
                 if sdtContent is not None:
-                    toc_p = sdtContent.find('w:p', namespaces)
-                    if toc_p is not None:
-                        toc_pPr = toc_p.find('w:pPr', namespaces)
-                        if toc_pPr is None:
-                            toc_pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-                            toc_p.insert(0, toc_pPr)
-                        set_child_element(toc_pPr, 'pStyle', {'val': 'Heading1'})
-                        set_child_element(toc_pPr, 'pageBreakBefore', {})
-                        sort_element_children(toc_pPr, PPR_ORDER)
+                    sdtPr = child.find('w:sdtPr', namespaces)
+                    tag_elem = sdtPr.find('w:tag', namespaces) if sdtPr is not None else None
+                    tag_val = tag_elem.get(f'{{{ns_uri}}}val') if tag_elem is not None else ""
+                    if tag_val != 'MENDELEY_BIBLIOGRAPHY':
+                        toc_p = sdtContent.find('w:p', namespaces)
+                        if toc_p is not None:
+                            toc_text = "".join(toc_p.itertext()).strip()
+                            if 'DAFTAR ISI' in toc_text.upper():
+                                toc_pPr = toc_p.find('w:pPr', namespaces)
+                                if toc_pPr is None:
+                                    toc_pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                                    toc_p.insert(0, toc_pPr)
+                                set_child_element(toc_pPr, 'pStyle', {'val': 'Heading1'})
+                                set_child_element(toc_pPr, 'pageBreakBefore', {})
+                                sort_element_children(toc_pPr, PPR_ORDER)
                 continue
                 
             if child.tag.endswith('p'):
@@ -1001,6 +1007,72 @@ def format_document_xmls(unpacked_dir):
         for fldChar in body.iter(f'{{{ns_uri}}}fldChar'):
             if fldChar.get(f'{{{ns_uri}}}dirty'):
                 del fldChar.attrib[f'{{{ns_uri}}}dirty']
+
+        # Split and format nested TOC fields to remove the gap/jeda between Tabel 1.1 and Tabel 2.1
+        idx_t = 0
+        while idx_t < len(body):
+            child = body[idx_t]
+            if child.tag.endswith('p'):
+                instrs = child.findall('.//w:instrText', namespaces)
+                has_t1 = any('Tabel 1.' in instr.text for instr in instrs)
+                has_t2 = any('Tabel 2.' in instr.text for instr in instrs)
+                if has_t1 and has_t2:
+                    children_elems = list(child)
+                    p1_elems = []
+                    p2_elems = []
+                    found_second_begin = False
+                    
+                    for elem in children_elems:
+                        if elem.tag.endswith('pPr'):
+                            continue
+                        
+                        is_second_begin = False
+                        if elem.tag.endswith('r'):
+                            fldChar = elem.find('w:fldChar', namespaces)
+                            if fldChar is not None and fldChar.get(f'{{{ns_uri}}}fldCharType') == 'begin':
+                                if len(p1_elems) > 0:
+                                    is_second_begin = True
+                                    
+                        if is_second_begin:
+                            found_second_begin = True
+                            
+                        if not found_second_begin:
+                            p1_elems.append(elem)
+                        else:
+                            p2_elems.append(elem)
+                            
+                    if found_second_begin and len(p2_elems) > 0:
+                        for elem in list(child):
+                            if not elem.tag.endswith('pPr'):
+                                child.remove(elem)
+                        for elem in p1_elems:
+                            child.append(elem)
+                            
+                        # Build P2 (1pt spacing and font size)
+                        p2 = lxml.etree.Element(f'{{{ns_uri}}}p')
+                        pPr2 = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                        set_child_element(pPr2, 'pStyle', {'val': 'TableofFigures'})
+                        set_child_element(pPr2, 'spacing', {'before': '0', 'after': '0', 'line': '20', 'lineRule': 'auto'})
+                        
+                        rPr2 = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+                        set_child_element(rPr2, 'sz', {'val': '2'})
+                        set_child_element(rPr2, 'szCs', {'val': '2'})
+                        pPr2.append(rPr2)
+                        p2.append(pPr2)
+                        
+                        for elem in p2_elems:
+                            if elem.tag.endswith('r'):
+                                run_rPr = elem.find('w:rPr', namespaces)
+                                if run_rPr is None:
+                                    run_rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+                                    elem.insert(0, run_rPr)
+                                set_child_element(run_rPr, 'sz', {'val': '2'})
+                                set_child_element(run_rPr, 'szCs', {'val': '2'})
+                            p2.append(elem)
+                            
+                        body.insert(idx_t + 1, p2)
+                        print("  Split nested Table of Figures fields (Tabel 1. and Tabel 2.) and formatted second field as 1pt.")
+            idx_t += 1
 
         # Keep native Table of Figures fields so that they can be updated via COM automation.
         # This preserves the dynamic links and exact page numbering.

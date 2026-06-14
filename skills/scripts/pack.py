@@ -102,6 +102,7 @@ def pack_document(input_dir, output_file, validate=False):
                         print(f"Warning: COM field update failed:\n{result.stderr}\n{result.stdout}")
                     else:
                         print("COM field update completed successfully.")
+                        cleanup_post_com_update(output_file)
                 else:
                     print("Warning: update_fields_com.py not found, skipping field update.")
             except Exception as e:
@@ -176,6 +177,83 @@ def condense_xml(xml_file):
     # Write back the condensed XML
     with open(xml_file, "wb") as f:
         f.write(dom.toxml(encoding="UTF-8"))
+
+
+def cleanup_post_com_update(docx_path):
+    """Clean up empty TableofFigures paragraphs in document.xml after COM update."""
+    import zipfile
+    import tempfile
+    import shutil
+    import os
+    try:
+        import lxml.etree as ET
+    except ImportError:
+        import xml.etree.ElementTree as ET
+
+    temp_dir = tempfile.mkdtemp()
+    try:
+        docx_path = str(docx_path)
+        with zipfile.ZipFile(docx_path, 'r') as zin:
+            zin.extract('word/document.xml', temp_dir)
+            
+        xml_path = os.path.join(temp_dir, 'word', 'document.xml')
+        
+        tree = ET.parse(xml_path)
+        root = tree.getroot()
+        namespaces = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+        body = root.find('w:body', namespaces)
+        if body is None:
+            return
+            
+        children = list(body)
+        paragraphs_to_remove = []
+        
+        for idx in range(1, len(children)):
+            child = children[idx]
+            if child.tag.endswith('p'):
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                pStyle_val = pStyle.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val') if pStyle is not None else ""
+                
+                if pStyle_val == 'TableofFigures':
+                    text = "".join(child.itertext()).strip()
+                    if not text:
+                        runs = child.findall('w:r', namespaces)
+                        if runs:
+                            prev_p = children[idx - 1]
+                            if prev_p.tag.endswith('p'):
+                                print(f"Cleanup: Moving {len(runs)} run(s) from empty TableofFigures paragraph at index {idx} to preceding paragraph.")
+                                for run in runs:
+                                    child.remove(run)
+                                    prev_p.append(run)
+                                paragraphs_to_remove.append(child)
+                            else:
+                                print(f"Cleanup: Preceding sibling is not a paragraph at index {idx}, skipping move.")
+                        else:
+                            paragraphs_to_remove.append(child)
+                            print(f"Cleanup: Removing empty TableofFigures paragraph at index {idx}.")
+                            
+        if paragraphs_to_remove:
+            for p in paragraphs_to_remove:
+                body.remove(p)
+            
+            tree.write(xml_path, encoding='utf-8', xml_declaration=True)
+            
+            temp_zip_path = docx_path + '.temp'
+            with zipfile.ZipFile(docx_path, 'r') as zin:
+                with zipfile.ZipFile(temp_zip_path, 'w', zipfile.ZIP_DEFLATED) as zout:
+                    for item in zin.infolist():
+                        if item.filename == 'word/document.xml':
+                            zout.write(xml_path, 'word/document.xml')
+                        else:
+                            zout.writestr(item, zin.read(item.filename))
+            os.replace(temp_zip_path, docx_path)
+            print("Cleanup: Successfully cleaned up empty TableofFigures paragraphs in final docx.")
+            
+    except Exception as e:
+        print(f"Warning: Failed to cleanup empty TableofFigures paragraphs: {e}")
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 if __name__ == "__main__":
