@@ -912,22 +912,17 @@ def format_document_xmls(unpacked_dir):
             if fldChar.get(f'{{{ns_uri}}}dirty'):
                 del fldChar.attrib[f'{{{ns_uri}}}dirty']
 
-        # Inject TOC entries directly after the TOC fields
+        # Clean up stale TOC entries and leave instructions intact for Word to rebuild natively
         for p in list(body.findall('w:p', namespaces)):
             text = ''.join(p.itertext())
             if 'TOC ' in text and ('Gambar' in text or 'Tabel' in text):
                 toc_type = 'Gambar' if 'Gambar' in text else 'Tabel'
-                
-                # The paragraph `p` contains the TOC field definition.
-                # Find its index in the body
+
                 children = list(body)
-                insert_idx = children.index(p)
-                
-                # Remove the field paragraph itself
-                body.remove(p)
-                children = list(body)
-                
+                insert_idx = children.index(p) + 1  # Start checking immediately AFTER the instruction paragraph
+
                 # Remove any existing TableofFigures paragraphs that immediately follow
+                entries_removed = 0
                 while insert_idx < len(children):
                     next_p = children[insert_idx]
                     if next_p.tag == f'{{{ns_uri}}}p':
@@ -935,27 +930,18 @@ def format_document_xmls(unpacked_dir):
                         if pStyle is not None and pStyle.get(f'{{{ns_uri}}}val') == 'TableofFigures':
                             body.remove(next_p)
                             children = list(body)
+                            entries_removed += 1
                             continue
-                        
-                        # Also remove the "No table of figures entries found" paragraph if present
+
                         next_text = ''.join(next_p.itertext())
                         if 'No table of figures entries found' in next_text:
                             body.remove(next_p)
                             children = list(body)
                             continue
-                            
+
                     break # Stop when we hit a non-TableofFigures element
-                
-                # Inject the pre-built plain text TOC entries
-                entries_added = 0
-                for cap in collected_captions:
-                    if cap["type"] == toc_type:
-                        entry_p = build_toc_entry(cap["text"], cap["page"])
-                        body.insert(insert_idx, entry_p)
-                        insert_idx += 1
-                        entries_added += 1
-                        
-                print(f"Rebuilt TOC for {toc_type} with {entries_added} entries.")
+
+                print(f"Cleaned old TOC for {toc_type} (removed {entries_removed} stale entries). Native Word TOC instruction retained.")
 
         fix_whitespace_preservation(root)
         tree.write(doc_path, encoding='utf-8', xml_declaration=True)
@@ -1023,16 +1009,17 @@ def fix_all_fonts_lxml(directory):
 def force_field_update(unpacked_dir):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     namespaces = {'w': ns_uri}
-    settings_path = os.path.join(unpacked_dir, 'word/settings.xml')
+    settings_path = os.path.join(unpacked_dir, 'word', 'settings.xml')
     if os.path.exists(settings_path):
-        parser = lxml.etree.XMLParser(remove_blank_text=False)
-        tree = lxml.etree.parse(settings_path, parser)
+        tree = lxml.etree.parse(settings_path)
         root = tree.getroot()
         update_fields = root.find('w:updateFields', namespaces)
-        if update_fields is not None:
-            root.remove(update_fields)
-            tree.write(settings_path, encoding='utf-8', xml_declaration=True)
-            print("Removed updateFields from settings.xml (TOC generated statically).")
+        if update_fields is None:
+            update_fields = lxml.etree.Element(f'{{{ns_uri}}}updateFields')
+            root.insert(0, update_fields)
+        update_fields.set(f'{{{ns_uri}}}val', 'true')
+        tree.write(settings_path, encoding='utf-8', xml_declaration=True, standalone=True)
+        print("Enabled updateFields in settings.xml to allow Word to generate accurate page numbers and hyperlinks.")
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
