@@ -1,0 +1,300 @@
+=== PAGE 25 ===
+BAB IV 
+SISTEMATIKA PENULISAN PROPOSAL TUGAS AKHIR 
+4.1  Outline Proposal Tugas Akhir Jenis Skripsi 
+4.1.1 Outline Pengusulan Judul TA Jenis Skripsi (Diajukan ke Dosen Pembimbing 
+Akademik) 
+Berikut outline pengusulan judul TA jenis Skripsi kepada Dosen Pembimbing Akademik dan 
+Calon Dosen Pembimbing. 
+- Cover 
+- Form Proposal 
+- Konsep Ide Tugas Akhir (Judul, Latar Belakang, Metode, Referensi) 
+ 
+4.1.2  Outline Draf Proposal TA Jenis Skripsi 
+Penyusunan usulan/proposal TA/Skripsi pada dasarnya terbagi atas tiga bagian, yaitu bagian 
+awal, bagian utama, dan bagian akhir. Di dalam penyusunan ini, hendaknya dilakukan secara 
+sistematis dan terperinci. 
+1.1 Bagian Awal Proposal 
+- Cover 
+- Halaman Persetujuan Judul dan Pembimbing 
+- Daftar Isi 
+- Daftar Gambar 
+- Daftar Tabel 
+- Daftar Lampiran 
+1.2 Bagian Utama Proposal 
+BAB I PENDAHULUAN 
+1.1 Latar Belakang 
+1.2 Rumusan Masalah 
+1.3 Batasan Masalah 
+1.4 Tujuan dan Manfaat Penelitian 
+1.5 Sistematika Penulisan 
+BAB II TINJAUAN PUSTAKA 
+2.1 Kajian Teoretis (sesuai dengan masalah)  
+2.2 Perumusan Hipotesis (khusus penelitian kuantitatif) 
+2.3 Penelitian Terdahulu (berasal dari jurnal bereputasi dengan terbitan minimal 5 tahun 
+terakhir, minimal 5 jurnal (Nasional 3 jurnal, Internasional 2 jurnal) 
+BAB III METODE PENELITIAN 
+3.1 Tahapan Penelitian (Flowchart dan penjelasan masing-masing tahapan metode penelitian) 
+3.2 Pengujian Hipotesis (khusus penelitian kuantitatif) 
+3.3 Alat dan Bahan Penelitian 
+3.4 Jadwal Penelitian 
+1.3 Bagian Akhir 
+- Daftar Pustaka (minimal berasal dari Jurnal Nasional 5 publikasi, jurnal Internasional 
+5 publikasi dan buku referensi 5 buku (berdasarkan peraturan Rektor nomor 25 tahun 
+2020 tentang Pedoman Umum Penulisan, Pembimbingan, dan Pengujian Tugas Akhir 
+Mahasiswa Jenjang Sarjana Universitas Pembangunan Nasional Veteran Jakarta pasal 
+10) dan di dalamnya terdapat minimal 2 publikasi Dosen Fakultas Ilmu Komputer) 
+- Lampiran (jika ada) 
+ 
+
+=== PAGE 26 ===
+4.2  Outline Proposal Tugas Akhir Jenis Prototipe/Proyek 
+4.2.1 Outline Pengusulan Judul TA Jenis Prototipe/Proyek (Diajukan ke Dosen Pembimbing 
+Akademik) 
+Berikut outline pengusulan judul TA jenis Prototipe/Proyek kepada Dosen Pembimbing 
+Akademik dan Calon Dosen Pembimbing. 
+- Cover 
+- Form Proposal 
+- Konsep Ide Tugas Akhir (Judul, Latar Belakang, Metode, Referensi) 
+4.2.2      Outline Draf Proposal TA Jenis Prototipe/Proyek 
+Penyusunan usulan/proposal TA jenis Prototipe/Proyek pada dasarnya terbagi atas tiga 
+bagian, yaitu bagian awal, bagian utama, dan bagian akhir. Di dalam penyusunan ini, hendaknya 
+dilakukan secara sistematis dan terperinci. 
+1.1 Bagian Awal Proposal 
+- Cover 
+- Halaman Persetujuan Judul dan Pembimbing 
+- Daftar Isi 
+- Daftar Gambar 
+- Daftar Tabel 
+- Daftar Lampiran 
+1.2 Bagian Utama Proposal 
+BAB I PENDAHULUAN 
+1.1 Latar Belakang 
+1.2 Identifikasi Masalah 
+1.3 Batasan Masalah 
+1.4 Tujuan dan Manfaat  
+1.5 Jadwal Kegiatan 
+BAB II RANCANGAN PROYEK 
+Pendekatan yang digunakan dalam merancang proyek dapat berupa : (1) pendekatan 
+terstruktur ( Data Flow Diagram  (DFD), Entity Relationship Diagram  (ERD), dan Kamus 
+Data) atau (2) tidak terstruktur (Unified Modeling Language (UML)) beserta penjelasan 
+2.1 Observasi (Menggambarkan sistem yang sedang berjalan) 
+2.2 Usulan Solusi (menggambarkan sistem yang diusulkan) 
+2.3 Rancangan Proyek (berupa : User Interface dan User Experience (Need Analysis) atau 
+Desain Produk dan Fitur 
+2.4 Rencana Pengujian Proyek (contoh : White Box, Black Box) (Khusus Program Sarjana)1.3 
+Bagian Akhir 
+- Daftar Pustaka 
+- Lampiran (Dokumen hasil observasi dan wawancara, Surat Keterangan Riset dengan 
+Mitra) 
+ 
+  
+
+=== PAGE 27 ===
+4.3   Outline Proposal Tugas Akhir Jenis Artikel yang terpublikasi pada jurnal 
+Nasional/Internasional bereputasi 
+4.3.1 Outline Pengusulan Judul TA Jenis Artikel yang terpublikasi pada jurnal 
+Nasional/Internasional bereputasi (Diajukan ke Dosen Pembimbing Akademik) 
+Berikut outline pengusulan judul TA jenis Artikel yang terpublikasi pada jurnal 
+Nasional/Internasional bereputasi kepada Dosen Pembimbing Akademik dan Calon Dosen 
+Pembimbing. 
+- Cover 
+- Form Proposal 
+- Konsep Ide Tugas Akhir (Judul, Latar Belakang, Metode, Referensi) 
+4.4 4.3.2 Outline Draf Proposal TA Jenis Artikel yang terpublikasi pada jurnal 
+Nasional/Internasional bereputasi 
+Penyusunan usulan/proposal TA jenis Artikel yang terpublikasi pada jurnal 
+Nasional/Internasional bereputasi pada dasarnya terbagi atas tiga bagian, yaitu bagian awal, bagian 
+utama, dan bagian akhir. Di dalam penyusunan ini, hendaknya dilakukan secara siste matis dan 
+terperinci. 
+1.1 Bagian Awal Proposal 
+- Cover 
+- Halaman Persetujuan Judul dan Pembimbing 
+- Daftar Isi 
+- Daftar Gambar 
+- Daftar Tabel 
+- Daftar Lampiran 
+1.2 Bagian Utama Proposal 
+BAB I PENDAHULUAN 
+1.1 Latar Belakang 
+1.2 Rumusan Masalah 
+1.3 Batasan Masalah 
+1.4 Tujuan dan Manfaat Penelitian 
+1.5 Sistematika Penulisan 
+BAB II TINJAUAN PUSTAKA 
+2.1 Kajian Teoretis (sesuai dengan masalah)  
+2.2 Perumusan Hipotesis (khusus penelitian kuantitatif) 
+2.3 Penelitian Terdahulu (berasal dari jurnal bereputasi dengan terbitan minimal 5 tahun 
+terakhir, minimal 5 jurnal (Nasional 3 jurnal, Internasional 2 jurnal) 
+BAB III METODE PENELITIAN 
+3.1 Tahapan Penelitian (Flowchart dan penjelasan masing-masing tahapan metode penelitian) 
+3.2 Pengujian Hipotesis (khusus penelitian kuantitatif) 
+3.3 Alat dan Bahan Penelitian 
+3.4 Jadwal Penelitian 
+1.3 Bagian Akhir 
+- Daftar Pustaka (minimal berasal dari Jurnal Nasional 5 publikasi, jurnal Internasional 
+5 publikasi dan buku referensi 5 buku (berdasarkan peraturan Rektor nomor 25 tahun 
+2020 tentang Pedoman Umum Penulisan, Pembimbingan, dan Pengujian Tugas Akhir 
+Mahasiswa Jenjang Sarjana Universitas Pembangunan Nasional Veteran Jakarta pasal 
+10) dan di dalamnya terdapat minimal 2 publikasi Dosen Fakultas Ilmu Komputer) 
+- Lampiran 
+ 
+
+=== PAGE 28 ===
+BAB V 
+SISTEMATIKA PENULISAN LAPORAN TUGAS AKHIR 
+5.1 Outline Tugas Akhir Jenis Skripsi 
+Penyusunan laporan TA/Skripsi pada dasarnya terbagi atas tiga bagian, yaitu bagian awal, 
+bagian utama, dan bagian akhir. Di dalam penyusunan ini, hendaknya dilakukan secara sistematis 
+dan terperinci. 
+1.1 Bagian Awal Laporan TA 
+- Cover 
+- Halaman Persetujuan Judul dan Pembimbing 
+- Daftar Isi 
+- Daftar Gambar 
+- Daftar Tabel 
+- Daftar Lampiran 
+1.2 Bagian Utama  
+BAB I PENDAHULUAN 
+1.1 Latar Belakang 
+1.2 Rumusan Masalah 
+1.3 Batasan Masalah 
+1.4 Tujuan dan Manfaat Penelitian 
+1.5 Sistematika Penulisan 
+BAB II TINJAUAN PUSTAKA 
+2.1 Kajian Teoretis (sesuai dengan masalah)  
+2.2 Perumusan Hipotesis (khusus penelitian kuantitatif) 
+2.3 Penelitian Terdahulu (berasal dari jurnal bereputasi dengan terbitan minimal 5 tahun 
+terakhir, minimal 5 jurnal (Nasional 3 jurnal, Internasional 2 jurnal) 
+BAB III METODE PENELITIAN 
+3.1 Tahapan Penelitian (Flowchart dan penjelasan masing-masing tahapan metode penelitian) 
+3.2 Pengujian Hipotesis (khusus penelitian kuantitatif) 
+3.3 Alat dan Bahan Penelitian 
+3.4 Jadwal Penelitian 
+BAB IV HASIL DAN PEMBAHASAN 
+4.1 Profil Perusahaan 
+4.2 Analisis Sistem Berjalan 
+4.3 Rancangan Sistem Usulan (khusus penelitian TA pengembangan sistem) 
+4.4 Hasil dan Rekomendasi 
+BAB V PENUTUP 
+5.1 Kesimpulan 
+5.2 Saran 
+1.3 Bagian Akhir 
+- Daftar Pustaka (minimal berasal dari Jurnal Nasional 5 publikasi, jurnal Internasional 
+5 publikasi dan buku referensi 5 buku (berdasarkan peraturan Rektor nomor 25 tahun 
+2020 tentang Pedoman Umum Penulisan, Pembimbingan, dan Pengujian Tugas Akhir 
+Mahasiswa Jenjang Sarjana Universitas Pembangunan Nasional Veteran Jakarta pasal 
+10) dan di dalamnya terdapat minimal 2 publikasi Dosen Fakultas Ilmu Komputer) 
+- Lampiran 
+ 
+5.2 Outline Laporan Tugas Akhir Jenis Prototipe/Proyek 
+Laporan TA jenis Prototipe/Proyek pada dasarnya terbagi atas tiga bagian, yaitu bagian 
+awal, bagian utama, dan bagian akhir. Di dalam penyusunan ini, hendaknya dilakukan secara 
+sistematis dan terperinci. 
+ 
+
+=== PAGE 29 ===
+ 
+1.1 Bagian Awal  
+- Cover 
+- Halaman Persetujuan Judul dan Pembimbing 
+- Daftar Isi 
+- Daftar Gambar 
+- Daftar Tabel 
+- Daftar Lampiran 
+1.2 Bagian Utama  
+BAB I PENDAHULUAN 
+1.1 Latar Belakang 
+1.2 Identifikasi Masalah 
+1.3 Batasan Masalah 
+1.4 Tujuan dan Manfaat  
+1.5 Jadwal Kegiatan 
+BAB II RANCANGAN PROYEK 
+Pendekatan yang digunakan dalam merancang proyek dapat berupa : (1) pendekatan 
+terstruktur ( Data Flow Diagram  (DFD), Entity Relationship Diagram  (ERD), dan Kamus 
+Data) atau (2) tidak terstruktur (Unified Modeling Language (UML)) beserta penjelasan 
+2.1 Observasi (Menggambarkan sistem yang sedang berjalan) 
+2.2 Usulan Solusi (menggambarkan sistem yang diusulkan) 
+2.3 Rancangan Proyek (berupa : User Interface dan User Experience (Need Analysis) atau 
+Desain Produk dan Fitur 
+2.4 Rencana Pengujian Proyek (contoh : White Box, Black Box) (Khusus Program Sarjana) 
+BAB III IMPEMENTASI PROYEK 
+3.1 Profil Mitra (Tempat Implementasi) 
+3.2 Metode Implementasi (Khusus Program Sarjana) 
+3.3 Metadata (jika ada) 
+3.4 Laporan Implementasi Proyek ( Logbook implementasi proyek, berisi aktivitas -aktivitas 
+dalam implementasi proyek (terdapat validasi dari user/pengguna)) 
+3.5 Hasil Pengujian Proyek 
+BAB IV PENUTUP 
+4.1 Kesimpulan 
+4.2 Saran (Prospek keberlanjutan proyek) 
+1.3 Bagian Akhir 
+- Lampiran Proyek (Source code jika dalam bentuk Software atau Dokumentasi 
+Penyerahan Alat jika berbentuk Hardware/fisik) 
+- Surat Pernyataan Keaslian 
+- Surat Keterangan Implementasi Proyek dari Mitra (dilampirkan setelah pelaksanaan 
+implementasi pada Mitra setelah sidang Tugas Akhir) 
+5.3 Outline Laporan Tugas Akhir Jenis Artikel yang terpublikasi pada jurnal 
+Nasional/Internasional bereputasi 
+ Laporan TA jenis Artikel yang terpublikasi pada jurnal Nasional/Internasional bereputasi 
+pada dasarnya adalah artikel yang telah terpublikasi. Untuk memudahkan pendokumentasian, 
+beberapa berkas berikut perlu diserahkan ke Staf Program Studi. 
+- Cover 
+- Halaman Persetujuan Judul dan Pembimbing 
+- LoA/Korespondensi penerimaan Artikel 
+- Artikel Ilmiah yang terpublikasi  
+- Hasil Review proses submit jurnal 
+  
+
+=== PAGE 30 ===
+BAB VI 
+UJIAN TUGAS AKHIR 
+ 
+Ujian Tugas Akhir adalah ujian terakhir yang ditempuh mahasiswa sebagai syarat untuk 
+memperoleh gelar Sarjana Komputer (S. Kom.) dan Ahli Madya (Amd.Kom) yang bertujuan untuk 
+mengevaluasi mahasiswa dalam penguasaan terhadap Tugas Akhir yang dibuat, maupun terhadap 
+penguasaan ilmu pengetahuan dan teknologi sesuai dengan bidang ilmunya. Ujian Tugas Akhir 
+dibagi ke dalam dua jenis : 
+1) Sidang Tugas Akhir (untuk jenis TA Skripsi). Sidang Tugas Akhir dilaksanakan secara 
+Tertutup dan diikuti oleh Pembimbing dan Penguji. 
+2) Seminar Tugas Akhir (untuk jenis Prototipe/Proyek dan Artikel yang terpublikasi pada 
+jurnal Nasional/Internasional bereputasi pada dasarnya adalah artikel yang telah 
+terpublikasi). Seminar Tugas Akhir dilaksanakan secara Terbuka dan dihadiri oleh 
+Pembimbing, Penguji serta dapat dihadiri oleh Dosen dan Mahasiswa lain. 
+6.1 Syarat Ujian Tugas Akhir  
+ Mahasiswa yang telah selesai melaksanakan penelitian/proyek dan penyusunan laporan 
+Tugas Akhir dapat mengikuti ujian Tugas Akhir dengan syarat-syarat sebagai berikut: 
+1) Telah dinyatakan lulus pada ujian sidang proposal TA; 
+2) Telah memperbaiki/merevisi proposal TA sesuai saran/masukan dari tim penguji; 
+3) Terdaftar sebagai mahasiswa pada semester berjalan (dibuktikan dengan fotokopi KRS) 
+dan tidak memiliki tunggakan UKT; 
+4) Telah lulus semua mata kuliah sesuai kurikulum yang berlaku (tidak ada nilai D dan nilai 
+E) dibuktikan dengan semua KHS sampai semester terakhir; 
+5) IP Kumulatif (IPK) minimal 2,75 (dalam rentang 0-4); dan 
+6) Melampirkan legalisir nilai TOEFL 450 dan TOEFL 500 untuk program “fast track” dari 
+UPA Bahasa UPN “Veteran” Jakarta; dan 
+7) Melampirkan surat bebas peminjaman buku, jurnal, prosiding, dan dokumen lainnya dari 
+Perpustakaan UPNVJ. 
+8) Melampirkan 2 buah sertifikasi kompetensi yaitu 1 buah sertifikasi kompetensi Nasional 
+(LSP UPNVJ) dan 1 buah sertifikasi Internasional (contoh : Microsoft, Google Academy, 
+Cisco Academy, dll) 
+9) Pengambilan mata kuliah proposal dan Tugas Akhir dalam satu semester yang sama 
+hanya diperbolehkan minimal semester 8 dengan minimal jarak sidang proposal dan 
+Tugas akhir adalah 3 bulan 
+10) Program “fast track” merupakan program agar mahasiswa dapat lulus 7 semester dengan 
+syarat bahwa pada semester 6 sudah mengambil proposal Tugas Akhir dan telah terpenuhi 
+persyaratan nomor 1 sampai 8. 
+ 
+6.2 Prosedur Pendaftaran Ujian Tugas Akhir  
+ Mahasiswa yang telah memenuhi syarat seperti yang tercantum pada butir 6.1. tersebut di 
+atas, maka segera mendaftarkan diri ke Program Studi paling lambat 7 (tujuh) hari sebelum periode 
+ujian dilaksanakan dan mengunggah softcopy: 
+1) Tugas Akhir yang telah ditandatangani basah (bukan digital) oleh dosen pembimbing dan 
+Koordinator Program Studi; 
+2) Surat keterangan bebas peminjaman alat laboratorium komputer dari Kepala 
+Laboratorium Fakultas Ilmu Komputer UPN "Veteran" Jakarta; dan 
+3) Bukti butir 6.1. (1 sampai dengan 8) tersebut di atas. 
+ 
+6.3 Pelaksanaan Sidang Tugas Akhir 
+1) Ujian sidang Tugas Akhir dilaksanakan sesuai jadwal sidang yang telah ditentukan oleh 
+
