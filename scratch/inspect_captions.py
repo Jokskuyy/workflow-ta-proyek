@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 
 def main():
-    doc_path = "unpacked_fresh/word/document.xml"
+    doc_path = "unpacked_ta_proyek/word/document.xml"
     namespaces = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
     tree = ET.parse(doc_path)
     root = tree.getroot()
