@@ -84,6 +84,29 @@ def pack_document(input_dir, output_file, validate=False):
                 output_file.unlink()  # Delete the corrupt file
                 return False
 
+        # Update fields via COM automation (Windows only)
+        import platform
+        if platform.system() == 'Windows':
+            try:
+                # Find update_fields_com.py relative to this script
+                script_dir = Path(__file__).parent
+                com_script = script_dir / 'update_fields_com.py'
+                if com_script.exists():
+                    print("Updating fields via COM automation...")
+                    import subprocess
+                    result = subprocess.run(
+                        [sys.executable, str(com_script), str(output_file)],
+                        capture_output=True, text=True
+                    )
+                    if result.returncode != 0:
+                        print(f"Warning: COM field update failed:\n{result.stderr}\n{result.stdout}")
+                    else:
+                        print("COM field update completed successfully.")
+                else:
+                    print("Warning: update_fields_com.py not found, skipping field update.")
+            except Exception as e:
+                print(f"Warning: Failed to run COM field update: {e}")
+
     return True
 
 

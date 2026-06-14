@@ -92,6 +92,41 @@ def ensure_front_matter_heading_style(styles_root):
         sort_element_children(style, STYLE_ORDER)
         styles_root.append(style)
 
+def ensure_hyperlink_style(styles_root):
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    namespaces = {'w': ns_uri}
+    STYLE_ORDER = [
+        'name', 'aliases', 'basedOn', 'next', 'link', 'autoRedefine', 'hidden', 
+        'uiPriority', 'semiHidden', 'unhideWhenUsed', 'qFormat', 'locked', 
+        'personal', 'personalCompose', 'personalReply', 'rsid', 'pPr', 'rPr', 
+        'tblPr', 'trPr', 'tcPr', 'tblStylePr'
+    ]
+    style = styles_root.find("w:style[@w:styleId='Hyperlink']", namespaces)
+    if style is None:
+        style = lxml.etree.Element(f'{{{ns_uri}}}style')
+        style.set(f'{{{ns_uri}}}type', 'character')
+        style.set(f'{{{ns_uri}}}styleId', 'Hyperlink')
+        set_child_element(style, 'name', {'val': 'Hyperlink'})
+        set_child_element(style, 'basedOn', {'val': 'DefaultParagraphFont'})
+        set_child_element(style, 'uiPriority', {'val': '99'})
+        set_child_element(style, 'unhideWhenUsed', {})
+        
+        rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+        set_child_element(rPr, 'color', {'val': '000000', 'themeColor': 'text1'})
+        set_child_element(rPr, 'u', {'val': 'none'})
+        style.append(rPr)
+        
+        sort_element_children(style, STYLE_ORDER)
+        styles_root.append(style)
+    else:
+        rPr = style.find('w:rPr', namespaces)
+        if rPr is None:
+            rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+            style.append(rPr)
+        set_child_element(rPr, 'color', {'val': '000000', 'themeColor': 'text1'})
+        set_child_element(rPr, 'u', {'val': 'none'})
+
+
 def clean_heading_text_and_add_num(p, level, num_id):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     namespaces = {'w': ns_uri}
@@ -399,6 +434,7 @@ def format_document_xmls(unpacked_dir):
         tree = lxml.etree.parse(styles_path, parser)
         root = tree.getroot()
         ensure_front_matter_heading_style(root)
+        # ensure_hyperlink_style(root)
         for style in root.findall('w:style', namespaces):
             style_id = style.get(f'{{{ns_uri}}}styleId')
             style_type = style.get(f'{{{ns_uri}}}type')
@@ -422,7 +458,7 @@ def format_document_xmls(unpacked_dir):
                     tabs = set_child_element(pPr, 'tabs')
                     for child in list(tabs):
                         tabs.remove(child)
-                    set_child_element(tabs, 'tab', {'val': 'right', 'leader': 'dot', 'pos': '9072'})
+                    set_child_element(tabs, 'tab', {'val': 'right', 'leader': 'dot', 'pos': '7927'})
                 elif style_id.startswith('Heading'):
                     if style_id in ['Heading1', 'Heading2']:
                         set_child_element(pPr, 'spacing', {'before': '240', 'after': '120', 'line': '360', 'lineRule': 'auto'})
@@ -584,7 +620,7 @@ def format_document_xmls(unpacked_dir):
         if bab1_idx_orig == -1:
             bab1_idx_orig = 60
             
-        def create_caption_paragraph_local(label, num, desc, bookmark_id, bookmark_name):
+        def create_caption_paragraph_local(label, prefix, seq_name, default_val, desc, bookmark_id, bookmark_name):
             p = lxml.etree.Element(f'{{{ns_uri}}}p')
             pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
             set_child_element(pPr, 'pStyle', {'val': 'Caption'})
@@ -597,13 +633,55 @@ def format_document_xmls(unpacked_dir):
             bms = lxml.etree.Element(f'{{{ns_uri}}}bookmarkStart', id=str(bookmark_id), name=bookmark_name)
             p.append(bms)
 
-            r = lxml.etree.Element(f'{{{ns_uri}}}r')
-            t = lxml.etree.Element(f'{{{ns_uri}}}t')
-            t.text = f"{label} {num} {desc}"
-            if t.text.startswith(' ') or t.text.endswith(' '):
-                t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-            r.append(t)
-            p.append(r)
+            # Label and prefix, e.g. "Gambar 2."
+            r1 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            t1 = lxml.etree.Element(f'{{{ns_uri}}}t')
+            t1.text = f"{label} {prefix}"
+            if t1.text.startswith(' ') or t1.text.endswith(' '):
+                t1.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+            r1.append(t1)
+            p.append(r1)
+            
+            # fldChar begin
+            r2 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            fld2 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "begin"})
+            r2.append(fld2)
+            p.append(r2)
+            
+            # instrText
+            r3 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            ins3 = lxml.etree.Element(f'{{{ns_uri}}}instrText')
+            ins3.text = f" SEQ {seq_name} \\* ARABIC "
+            ins3.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+            r3.append(ins3)
+            p.append(r3)
+            
+            # fldChar separate
+            r4 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            fld4 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "separate"})
+            r4.append(fld4)
+            p.append(r4)
+            
+            # default value run
+            r5 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            t5 = lxml.etree.Element(f'{{{ns_uri}}}t')
+            t5.text = str(default_val)
+            r5.append(t5)
+            p.append(r5)
+            
+            # fldChar end
+            r6 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            fld6 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "end"})
+            r6.append(fld6)
+            p.append(r6)
+            
+            # description run
+            r7 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            t7 = lxml.etree.Element(f'{{{ns_uri}}}t')
+            t7.text = f" {desc}"
+            t7.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+            r7.append(t7)
+            p.append(r7)
             
             bme = lxml.etree.Element(f'{{{ns_uri}}}bookmarkEnd', id=str(bookmark_id))
             p.append(bme)
@@ -649,7 +727,10 @@ def format_document_xmls(unpacked_dir):
                     if child.tag.endswith('p'):
                         text = "".join(child.itertext()).strip()
                         has_drawing = child.find('.//w:drawing', namespaces) is not None
-                        if text or has_drawing:
+                        has_sectPr = child.find('.//w:sectPr', namespaces) is not None
+                        has_fldChar = child.find('.//w:fldChar', namespaces) is not None
+                        has_instr = child.find('.//w:instrText', namespaces) is not None
+                        if text or has_drawing or has_sectPr or has_fldChar or has_instr:
                             if has_drawing and not lembar_pengesahan_processed:
                                 pPr = child.find('w:pPr', namespaces)
                                 if pPr is None:
@@ -685,7 +766,7 @@ def format_document_xmls(unpacked_dir):
                         reconstructed_children.append(child)
                         bmid = 9000 + len(collected_captions) + survey_idx
                         bmname = f"_TocGemini{bmid}"
-                        caption_p = create_caption_paragraph_local("Gambar", f"2.{survey_idx + 1}", survey_captions[survey_idx], bmid, bmname)
+                        caption_p = create_caption_paragraph_local("Gambar", "2.", "Gambar_2.", survey_idx + 1, survey_captions[survey_idx], bmid, bmname)
                         reconstructed_children.append(caption_p)
                         print(f"  Generated survey caption Gambar 2.{survey_idx + 1}")
                         survey_idx += 1
@@ -693,7 +774,7 @@ def format_document_xmls(unpacked_dir):
                         reconstructed_children.append(child)
                         bmid = 9000 + 100
                         bmname = f"_TocGemini{bmid}"
-                        caption_p = create_caption_paragraph_local("Gambar", "2.15", "Arsitektur Integrasi Sistem", bmid, bmname)
+                        caption_p = create_caption_paragraph_local("Gambar", "2.", "Gambar_2.", 15, "Arsitektur Integrasi Sistem", bmid, bmname)
                         reconstructed_children.append(caption_p)
                         print("  Generated integration caption Gambar 2.15")
                     else:
@@ -793,6 +874,10 @@ def format_document_xmls(unpacked_dir):
                             pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
                             p.insert(0, pPr)
                         set_child_element(pPr, 'pStyle', {'val': 'Caption'})
+                        set_child_element(pPr, 'spacing', {'before': '120', 'after': '120', 'line': '240', 'lineRule': 'auto'})
+                        set_child_element(pPr, 'jc', {'val': 'center'})
+                        set_child_element(pPr, 'ind', {'firstLine': '0', 'left': '0'})
+                        sort_element_children(pPr, PPR_ORDER)
                         pStyle_val = 'Caption'
                         
                         # Clean trailing dot from caption numbers (e.g. 'Tabel 1.1.' -> 'Tabel 1.1')
@@ -803,37 +888,12 @@ def format_document_xmls(unpacked_dir):
                             desc = m.group(3)
                             
                             cleaned_caption = f"{label.capitalize()} {num} {desc}"
-                            bmid = 9000 + len(collected_captions)
-                            bmname = f"_TocGemini{bmid}"
                             
                             collected_captions.append({
                                 "type": label.capitalize(),
                                 "text": cleaned_caption,
-                                "page": estimated_page,
-                                "bookmark": bmname
+                                "page": estimated_page
                             })
-                            
-                            # Replace runs
-                            for r in p.findall(f'{{{ns_uri}}}r', namespaces):
-                                p.remove(r)
-                            
-                            # Remove existing bookmarks
-                            for b in p.findall(f'{{{ns_uri}}}bookmarkStart', namespaces): p.remove(b)
-                            for b in p.findall(f'{{{ns_uri}}}bookmarkEnd', namespaces): p.remove(b)
-                            
-                            # Insert bookmark and text
-                            bms = lxml.etree.Element(f'{{{ns_uri}}}bookmarkStart', id=str(bmid), name=bmname)
-                            p.append(bms)
-                            new_r = lxml.etree.Element(f'{{{ns_uri}}}r')
-                            new_t = lxml.etree.Element(f'{{{ns_uri}}}t')
-                            new_t.text = cleaned_caption
-                            if cleaned_caption.startswith(' ') or cleaned_caption.endswith(' '):
-                                new_t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-                            new_r.append(new_t)
-                            p.append(new_r)
-                            
-                            bme = lxml.etree.Element(f'{{{ns_uri}}}bookmarkEnd', id=str(bmid))
-                            p.append(bme)
                             text = cleaned_caption
                     
                 # Format Headings
@@ -942,50 +1002,8 @@ def format_document_xmls(unpacked_dir):
             if fldChar.get(f'{{{ns_uri}}}dirty'):
                 del fldChar.attrib[f'{{{ns_uri}}}dirty']
 
-        # Replace native TOC blocks completely with our static TOC entries
-        # Since updateFields=false, Word won't hide the instructions if we leave them broken
-        for p in list(body.findall('w:p', namespaces)):
-            text = ''.join(p.itertext())
-            if 'TOC ' in text and ('Gambar' in text or 'Tabel' in text):
-                toc_type = 'Gambar' if 'Gambar' in text else 'Tabel'
-
-                children = list(body)
-                insert_idx = children.index(p)
-                
-                # Delete the instruction paragraph itself
-                body.remove(p)
-                children = list(body)
-
-                # Remove any existing TableofFigures paragraphs that immediately follow
-                entries_removed = 0
-                while insert_idx < len(children):
-                    next_p = children[insert_idx]
-                    if next_p.tag == f'{{{ns_uri}}}p':
-                        pStyle = next_p.find(f'.//{{{ns_uri}}}pStyle')
-                        if pStyle is not None and pStyle.get(f'{{{ns_uri}}}val') == 'TableofFigures':
-                            body.remove(next_p)
-                            children = list(body)
-                            entries_removed += 1
-                            continue
-
-                        next_text = ''.join(next_p.itertext())
-                        if 'No table of figures entries found' in next_text:
-                            body.remove(next_p)
-                            children = list(body)
-                            continue
-
-                    break # Stop when we hit a non-TableofFigures element
-
-                # Inject the pre-built plain text TOC entries with hyperlinks
-                entries_added = 0
-                for cap in collected_captions:
-                    if cap["type"] == toc_type:
-                        entry_p = build_toc_entry(cap["text"], cap["page"], cap["bookmark"])
-                        body.insert(insert_idx, entry_p)
-                        insert_idx += 1
-                        entries_added += 1
-
-                print(f"Rebuilt TOC for {toc_type} statically with {entries_added} entries. Removed raw instruction and {entries_removed} stale entries.")
+        # Keep native Table of Figures fields so that they can be updated via COM automation.
+        # This preserves the dynamic links and exact page numbering.
 
         fix_whitespace_preservation(root)
         tree.write(doc_path, encoding='utf-8', xml_declaration=True)
