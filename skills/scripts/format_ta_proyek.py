@@ -598,16 +598,21 @@ def format_document_xmls(unpacked_dir):
             p.append(r)
             return p
 
-        # Find cover page end index (paragraph containing last drawing before bab1_idx_orig)
+        # Find cover page end index (last paragraph before the SECOND drawing, which is Lembar Pengesahan)
         collected_captions = []
         estimated_page = 1
         para_count = 0
         cover_end_idx = 0
+        drawing_count = 0
         for idx, child in enumerate(children):
             if idx < bab1_idx_orig and child.tag.endswith('p'):
                 if child.find('.//w:drawing', namespaces) is not None:
-                    cover_end_idx = idx
+                    drawing_count += 1
+                    if drawing_count == 2:
+                        break
+                cover_end_idx = idx
 
+        lembar_pengesahan_processed = False
         for idx, child in enumerate(children):
             para_count += 1
             if para_count > 25:
@@ -633,6 +638,16 @@ def format_document_xmls(unpacked_dir):
                         text = "".join(child.itertext()).strip()
                         has_drawing = child.find('.//w:drawing', namespaces) is not None
                         if text or has_drawing:
+                            if has_drawing and not lembar_pengesahan_processed:
+                                pPr = child.find('w:pPr', namespaces)
+                                if pPr is None:
+                                    pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                                    child.insert(0, pPr)
+                                set_child_element(pPr, 'pageBreakBefore', {})
+                                set_child_element(pPr, 'jc', {'val': 'center'})
+                                sort_element_children(pPr, PPR_ORDER)
+                                lembar_pengesahan_processed = True
+                                print(f"  Applied page break and centering to Lembar Pengesahan at index {idx}")
                             reconstructed_children.append(child)
                         else:
                             print(f"  Removing redundant empty paragraph in front-matter transition at index {idx}")
