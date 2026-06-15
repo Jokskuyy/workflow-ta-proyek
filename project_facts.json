@@ -7,10 +7,39 @@
     "faculty": "Fakultas Ilmu Komputer",
     "institution": "Universitas Pembangunan Nasional Veteran Jakarta",
     "academic_year": "2025/2026",
+    "advisors": {
+      "pembimbing_1": "Dr. Ridwan Raafi’udin, S.Kom, M.Kom.",
+      "pembimbing_2": "Dr. Ridwan Raafi’udin, S.Kom, M.Kom."
+    },
     "mitra": {
       "name": "UPA TIK UPN Veteran Jakarta",
       "representative": "Erly Krisnanik, S.Kom., M.M.",
       "role": "Kepala UPA TIK UPNVJ"
+    },
+    "stakeholder_interviews": [
+      {
+        "role": "Kepala UPA TIK UPNVJ",
+        "name": "Erly Krisnanik, S.Kom., M.M.",
+        "notes": "Membahas pembagian peran tim tugas akhir, merumuskan kebutuhan fungsional dan non-fungsional sistem."
+      },
+      {
+        "role": "Wakil Rektor II Bidang Keuangan dan Umum UPNVJ",
+        "notes": "Wawancara mengenai ketersediaan dan kebijakan pembagian data sarana prasarana. Kebijakan administratif membatasi pembagian data mentah demi keamanan informasi, memvalidasi pentingnya portal informasi terintegrasi dan aman."
+      }
+    ],
+    "documents": {
+      "pakta_integritas_upa_tik": {
+        "status": "signed",
+        "evidence": "dokumentasi/ttd pakta integritas UPA TIK.jpeg"
+      },
+      "wawancara_warek_2": {
+        "status": "completed",
+        "evidence": [
+          "dokumentasi/wawancara warek 2.jpeg",
+          "dokumentasi/wawancara warek 2(1).jpeg",
+          "dokumentasi/wawancara warek 2(2).jpeg"
+        ]
+      }
     }
   },
   "team_members": [

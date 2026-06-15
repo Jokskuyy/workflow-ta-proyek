@@ -35,6 +35,7 @@ Gambar 2.21 Bagian Statistik
 Gambar 2.22 Detail Data Dosen
 Gambar 2.23 Detail Data Mahasiswa
 Gambar 2.24 Bagian Footer
+Gambar 2.25 Dokumentasi Wawancara dan Penandatanganan Pakta Integritas
 
 # DAFTAR TABEL
 
@@ -240,6 +241,11 @@ Tahapan identifikasi kebutuhan sistem dilakukan melalui metode wawancara terstru
 Berdasarkan pembagian tugas strategis tersebut, disepakati penentuan batasan lingkup kerja penulis yang difokuskan secara eksklusif pada peran Full Stack Developer. Penulis dimandatkan untuk membangun arsitektur sistem yang tangguh guna menjamin skalabilitas dan ketersediaan data profil universitas secara real-time, yang nantinya akan dikonsumsi oleh engine simulasi yang dikembangkan anggota tim lain.
 
 Berdasarkan arahan narasumber, dirumuskanlah spesifikasi kebutuhan fungsional yang mencakup manajemen konten dinamis melalui Admin Dashboard serta penyediaan jalur distribusi data (API endpoints) untuk mendukung visualisasi pada Public Dashboard dan Denah Virtual. Lebih lanjut, narasumber menekankan krusialnya kebutuhan non-fungsional yang menitikberatkan pada aspek integritas data dan efisiensi waktu respons, mengingat backend sistem ini harus melayani permintaan data secara simultan dari antarmuka web dan engine 3D. Seluruh informasi teknis ini menjadi fondasi utama dalam penyusunan tiga skenario operasional sistem (Skenario A, B, dan C), yang dirancang sebagai strategi mitigasi risiko untuk menjaga reliabilitas sistem di tengah ketidakpastian ketersediaan data akademik eksternal.
+
+Selain wawancara dengan Kepala UPA TIK, penulis juga melakukan diskusi dan koordinasi dengan Wakil Rektor II Bidang Keuangan dan Umum UPN Veteran Jakarta guna memverifikasi kebijakan pembagian data sarana prasarana. Berdasarkan wawancara tersebut, disimpulkan bahwa data administratif tertentu bersifat tertutup demi alasan keamanan informasi. Pembatasan ini justru memperkuat urgensi proyek yang diusulkan, yaitu penyediaan portal integrasi data yang aman berbasis Row Level Security (RLS) serta arsitektur backend-centric. Sebagai bukti penjaminan komitmen pengerjaan dan validasi lapangan, penulis melakukan penandatanganan pakta integritas dengan mitra serta dokumentasi pertemuan dengan Wakil Rektor II seperti yang ditunjukkan oleh Gambar 2.25.
+
+Gambar 2.25 Dokumentasi Wawancara dan Penandatanganan Pakta Integritas
+
 
 ## 2.2 Usulan Solusi
 
