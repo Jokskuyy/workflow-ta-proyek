@@ -9,21 +9,22 @@
     "academic_year": "2025/2026",
     "advisors": {
       "pembimbing_1": "Dr. Ridwan Raafi’udin, S.Kom, M.Kom.",
-      "pembimbing_2": "Dr. Ridwan Raafi’udin, S.Kom, M.Kom."
+      "pembimbing_2": "Novi Trisman Hadi, S.Pd., M.Kom."
     },
     "mitra": {
       "name": "UPA TIK UPN Veteran Jakarta",
-      "representative": "Erly Krisnanik, S.Kom., M.M.",
+      "representative": "Asep Saeful Ridwan, S.Kom.",
       "role": "Kepala UPA TIK UPNVJ"
     },
     "stakeholder_interviews": [
       {
         "role": "Kepala UPA TIK UPNVJ",
-        "name": "Erly Krisnanik, S.Kom., M.M.",
+        "name": "Asep Saeful Ridwan, S.Kom",
         "notes": "Membahas pembagian peran tim tugas akhir, merumuskan kebutuhan fungsional dan non-fungsional sistem."
       },
       {
-        "role": "Wakil Rektor II Bidang Keuangan dan Umum UPNVJ",
+        "role": "Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi UPNVJ",
+        "name": "Dr. dr. Ria Maria Theresa, SpKJ., MH.",
         "notes": "Wawancara mengenai ketersediaan dan kebijakan pembagian data sarana prasarana. Kebijakan administratif membatasi pembagian data mentah demi keamanan informasi, memvalidasi pentingnya portal informasi terintegrasi dan aman."
       }
     ],
@@ -47,19 +48,40 @@
       "name": "Muhammad Iman Nugraha",
       "nim": "2210511129",
       "role": "Peran 1: Full Stack Web Developer & System Integrator",
-      "focus": ["React Frontend", "Serverless API", "Supabase Auth", "Umami Analytics Proxy", "System Integration", "Vitest"]
+      "focus": [
+        "React Frontend",
+        "Serverless API",
+        "Supabase Auth",
+        "Umami Analytics Proxy",
+        "System Integration",
+        "Vitest"
+      ]
     },
     {
       "name": "Muammar Faiz Khairul Anam",
       "nim": "TBD",
       "role": "Peran 2: 3D Simulator & Engine Developer",
-      "focus": ["Unity WebGL Engine", "NavMesh pathfinding", "Catmull-Rom Centripetal curve", "Building Culling", "Pointer Lock", "Virtual mobile joystick", "Editor tools"]
+      "focus": [
+        "Unity WebGL Engine",
+        "NavMesh pathfinding",
+        "Catmull-Rom Centripetal curve",
+        "Building Culling",
+        "Pointer Lock",
+        "Virtual mobile joystick",
+        "Editor tools"
+      ]
     },
     {
       "name": "Muhammad Dwikhi Deandra Purnianto",
       "nim": "TBD",
       "role": "Peran 3: 3D Asset Designer & Database/Asset Manager",
-      "focus": ["3D modeling and layout directly in Unity Editor", "PostgreSQL database schema design in Supabase Cloud", "RLS policies", "audit logs triggers", "data mapping/integrity"]
+      "focus": [
+        "3D modeling and layout directly in Unity Editor",
+        "PostgreSQL database schema design in Supabase Cloud",
+        "RLS policies",
+        "audit logs triggers",
+        "data mapping/integrity"
+      ]
     }
   ],
   "testing_status": {

@@ -232,7 +232,7 @@ Identifikasi kelemahan pada sistem yang sedang berjalan adalah sebagai berikut:
 
 ### 2.1.3 Wawancara dengan Stakeholder
 
-Tahapan identifikasi kebutuhan sistem dilakukan melalui metode wawancara terstruktur dan mendalam dengan Erly Krisnanik, S.Kom., M.M., yang bertindak sebagai pemangku kepentingan (stakeholder) sekaligus pakar domain di lingkungan Universitas Pembangunan Nasional Veteran Jakarta. Interaksi ini bertujuan untuk memetakan strategi pengembangan proyek yang bersifat lintas disiplin. Dalam diskusi ini, narasumber menegaskan bahwa realisasi sistem denah virtual yang ideal memerlukan sinergi teknis dari tiga peran spesifik, yaitu:
+Tahapan identifikasi kebutuhan sistem dilakukan melalui metode wawancara terstruktur dan mendalam dengan Asep Saeful Ridwan, S.Kom., yang bertindak sebagai pemangku kepentingan (stakeholder) sekaligus mitra pembangunan di lingkungan Universitas Pembangunan Nasional Veteran Jakarta. Interaksi ini bertujuan untuk memetakan strategi pengembangan proyek yang bersifat lintas disiplin. Dalam diskusi ini, narasumber menegaskan bahwa realisasi sistem denah virtual yang ideal memerlukan sinergi teknis dari tiga peran spesifik, yaitu:
 
 1. 3D Designer untuk visualisasi aset gedung.
 2. Simulator Developer untuk logika navigasi spasial.
@@ -242,7 +242,7 @@ Berdasarkan pembagian tugas strategis tersebut, disepakati penentuan batasan lin
 
 Berdasarkan arahan narasumber, dirumuskanlah spesifikasi kebutuhan fungsional yang mencakup manajemen konten dinamis melalui Admin Dashboard serta penyediaan jalur distribusi data (API endpoints) untuk mendukung visualisasi pada Public Dashboard dan Denah Virtual. Lebih lanjut, narasumber menekankan krusialnya kebutuhan non-fungsional yang menitikberatkan pada aspek integritas data dan efisiensi waktu respons, mengingat backend sistem ini harus melayani permintaan data secara simultan dari antarmuka web dan engine 3D. Seluruh informasi teknis ini menjadi fondasi utama dalam penyusunan tiga skenario operasional sistem (Skenario A, B, dan C), yang dirancang sebagai strategi mitigasi risiko untuk menjaga reliabilitas sistem di tengah ketidakpastian ketersediaan data akademik eksternal.
 
-Selain wawancara dengan Kepala UPA TIK, penulis juga melakukan diskusi dan koordinasi dengan Wakil Rektor II Bidang Keuangan dan Umum UPN Veteran Jakarta guna memverifikasi kebijakan pembagian data sarana prasarana. Berdasarkan wawancara tersebut, disimpulkan bahwa data administratif tertentu bersifat tertutup demi alasan keamanan informasi. Pembatasan ini justru memperkuat urgensi proyek yang diusulkan, yaitu penyediaan portal integrasi data yang aman berbasis Row Level Security (RLS) serta arsitektur backend-centric. Sebagai bukti penjaminan komitmen pengerjaan dan validasi lapangan, penulis melakukan penandatanganan pakta integritas dengan mitra serta dokumentasi pertemuan dengan Wakil Rektor II seperti yang ditunjukkan oleh Gambar 2.25.
+Selain wawancara dengan Kepala UPA TIK, penulis juga melakukan diskusi dan koordinasi dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi (Wakil Rektor III) UPN Veteran Jakarta guna memverifikasi kebijakan pembagian data sarana prasarana. Berdasarkan wawancara tersebut, disimpulkan bahwa data administratif tertentu bersifat tertutup demi alasan keamanan informasi. Pembatasan ini justru memperkuat urgensi proyek yang diusulkan, yaitu penyediaan portal integrasi data yang aman berbasis Row Level Security (RLS) serta arsitektur backend-centric. Sebagai bukti penjaminan komitmen pengerjaan dan validasi lapangan, penulis melakukan penandatanganan pakta integritas dengan mitra serta dokumentasi pertemuan dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi (Wakil Rektor III) seperti yang ditunjukkan oleh Gambar 2.25.
 
 Gambar 2.25 Dokumentasi Wawancara dan Penandatanganan Pakta Integritas
 
@@ -563,7 +563,7 @@ Tabel 3.2 Logbook Implementasi Proyek
 
 [TABLE]
 Minggu ke- | Aktivitas Pengembangan | Kontribusi Peran Full Stack | Validasi User
-1-4 | Requirement Gathering & UI Design | Menganalisis kebutuhan API, menyusun rancangan database ERD, merancang mockup Admin/Public Dashboard | Disetujui Stakeholder (Erly Krisnanik, S.Kom., M.M.)
+1-4 | Requirement Gathering & UI Design | Menganalisis kebutuhan API, menyusun rancangan database ERD, merancang mockup Admin/Public Dashboard | Disetujui Stakeholder (Asep Saeful Ridwan, S.Kom.)
 5-8 | Backend Development | Membangun database PostgreSQL di Supabase, menerapkan aturan keamanan RLS, membuat RESTful API serverless | Lulus validasi uji koneksi DB
 9-12 | Frontend Development | Memprogram komponen React SPA, mengintegrasikan Umami Analytics Proxy, menerapkan connection-aware | Antarmuka responsif di desktop
 13-16 | System Integration | Mengintegrasikan container Unity WebGL dengan React menggunakan react-unity-webgl, menguji bridge SendMessage | Navigasi terpemicu dari pencarian React
@@ -730,8 +730,8 @@ Nomor: 120/UN61.3/FIK/TA/2026
 
 Yang bertanda tangan di bawah ini, selaku perwakilan dari pihak Mitra Pengguna Sistem:
 
-Nama : Erly Krisnanik, S.Kom., M.M.
-Jabatan : Kepala Unit Pengelola Teknologi Informasi (UPA TIK)
+Nama : Asep Saeful Ridwan, S.Kom.
+Jabatan : Kepala Unit Penunjang Akademik Teknologi Informasi dan Komunikasi (UPA TIK)
 Instansi : Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu
 
 Menerangkan bahwa mahasiswa berikut:
@@ -752,8 +752,8 @@ Sistem tersebut telah terpasang, diuji coba secara fungsional melalui Black Box 
 Jakarta, 15 Juni 2026
 Pihak Mitra,
 
-Erly Krisnanik, S.Kom., M.M.
-NIM/NIDN. 0312047301
+Asep Saeful Ridwan, S.Kom.
+Kepala UPA TIK UPNVJ
 
 ---
 
