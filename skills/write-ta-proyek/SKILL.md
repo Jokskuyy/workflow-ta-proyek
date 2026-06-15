@@ -159,8 +159,11 @@ The report draft MUST follow the 4-chapter project outline structure. Below is t
 
 The writing process uses the following files in the workspace parent directory (`../`):
 1. **Master Draft (`Tugas_Akhir_Draft.md`)**: The single source of truth containing all written chapters, sub-chapters, and placeholders.
+   - **Why Markdown (.md) is used**: Text-based markdown is highly optimized for LLMs to read, edit, and track changes securely without causing file corruption. Directly editing `.docx` files is prone to XML/styling corruption.
+   - **Markdown-to-Docx Workflow**: Once the draft in `Tugas_Akhir_Draft.md` is approved, the text is imported or pasted into `Tugas_Akhir.docx`, and the formatting automation pipeline (unpacking, styling via python scripts, and repacking) is executed to compile `Tugas_Akhir_Formatted.docx`.
 2. **Terminology Registry (`term_registry.json`)**: Auto-generated dictionary of technical terms (e.g. `{"user interface": "user interface"}`) to enforce document-wide consistency.
 3. **Citations Tracker (`citations_to_download.md`)**: List of references generated during web searches that need their corresponding PDF files placed in the `journal/` directory.
+
 
 ## Group Project Settings (UPNVJ FIK 2025)
 
