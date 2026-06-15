@@ -76,7 +76,19 @@ To automate the formatting of your `.docx` document:
 
 8. **Figure and Table Narrative Mentions**:
    - Do NOT mention a figure or table as the first word of a paragraph or sentence (e.g., "Gambar 2.1 menunjukkan bahwa...", "Tabel 3.1 berisi...").
-   - Instead, mention the figure or table in the middle of a sentence (e.g., "Seperti yang ditunjukkan oleh Gambar 2.1, ...", "Peran pengembang secara rinci dapat dilihat pada Tabel 1.1.").
+   - Instead, mention the figure or table in the middle of a sentence (e.g., "Like as shown in Gambar 2.1, ...", "Peran pengembang secara rinci dapat dilihat pada Tabel 1.1.").
+
+9. **Appendices (Lampiran) Formatting**:
+   - Penomoran lampiran wajib menggunakan format angka Arab kapital dengan titik: **LAMPIRAN 1.**, **LAMPIRAN 2.**, dst.
+   - Setiap lampiran wajib diawali pada halaman baru terpisah (Page Isolation/Page Split menggunakan `---` di Markdown) untuk meminimalkan kegagalan pemformatan dokumen.
+   - Daftar lampiran wajib tercantum pada bagian awal dokumen setelah Daftar Tabel.
+   - Lampiran wajib menyertakan minimal:
+     * LAMPIRAN 1. Surat Pernyataan Keaslian
+     * LAMPIRAN 2. Surat Keterangan Implementasi Proyek dari Mitra
+     * LAMPIRAN 3. Kode Sumber Utama (Source Code)
+     * LAMPIRAN 4. Panduan Pengguna (User Manual) (disiapkan sebagai placeholder jika belum selesai)
+
+
 
 ## Formatting Specifications (UPNVJ FIK 2025)
 

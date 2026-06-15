@@ -45,6 +45,14 @@ Tabel 3.2 Logbook Implementasi Proyek
 Tabel 3.3 Hasil Pengujian Black Box Testing
 Tabel 3.4 Perbandingan Metrik Performa Lighthouse
 
+# DAFTAR LAMPIRAN
+
+LAMPIRAN 1. Surat Pernyataan Keaslian
+LAMPIRAN 2. Surat Keterangan Implementasi Proyek dari Mitra
+LAMPIRAN 3. Kode Sumber Utama
+LAMPIRAN 4. Panduan Pengguna (User Manual) (Rencana/Placeholder)
+
+
 # BAB I PENDAHULUAN
 
 ## 1.1 Latar Belakang
@@ -683,3 +691,160 @@ Putra, I. G. W. W., Dharma, E. M., & Permana, P. T. H. (2026). Implementasi rela
 Siv, T. (2025). A framework for scalable digital twin deployment in smart campus building facility management. *arXiv*. https://doi.org/10.48550/arXiv.2512.12149
 
 Taurusta, C., Asiddiq, A. M., Suprianto, S., & Setiawan, H. (2024). Visualisasi gedung kampus 1 Universitas Muhammadiyah Sidoarjo menggunakan augmented reality sebagai media informasi. *Journal of Technology and System Information*, 1(1), 55–70. https://doi.org/10.47134/jtsi.v1i1.2146
+
+
+---
+
+# LAMPIRAN 1. Surat Pernyataan Keaslian
+
+Yang bertanda tangan di bawah ini:
+
+Nama : Muhammad Iman Nugraha
+NIM : 2210511129
+Program Studi : Informatika
+Fakultas : Ilmu Komputer
+Universitas : Universitas Pembangunan Nasional Veteran Jakarta
+
+Menyatakan dengan sesungguhnya bahwa laporan Tugas Akhir Proyek yang berjudul "Integrasi Denah Virtual Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu (Dashboard Profil)" adalah benar-benar hasil karya saya sendiri, bebas dari plagiat, dan tidak memuat bagian karya ilmiah orang lain kecuali yang secara formal disitasi dan dicantumkan dalam daftar pustaka sesuai dengan ketentuan akademik yang berlaku.
+
+Apabila di kemudian hari terbukti terdapat plagiarisme, manipulasi data, atau pelanggaran etika akademik lainnya dalam laporan ini, saya bersedia menerima sanksi akademis yang berat berupa pembatalan kelulusan dan gelar akademik dari Universitas Pembangunan Nasional Veteran Jakarta.
+
+Jakarta, 15 Juni 2026
+Yang menyatakan,
+
+(Meterai Rp10.000)
+
+Muhammad Iman Nugraha
+NIM 2210511129
+
+---
+
+# LAMPIRAN 2. Surat Keterangan Implementasi Proyek dari Mitra
+
+SURAT KETERANGAN IMPLEMENTASI PROYEK
+Nomor: 120/UN61.3/FIK/TA/2026
+
+Yang bertanda tangan di bawah ini, selaku perwakilan dari pihak Mitra Pengguna Sistem:
+
+Nama : Erly Krisnanik, S.Kom., M.M.
+Jabatan : Kepala Unit Pengelola Teknologi Informasi (UPA TIK)
+Instansi : Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu
+
+Menerangkan bahwa mahasiswa berikut:
+
+Nama : Muhammad Iman Nugraha
+NIM : 2210511129
+Program Studi : Informatika
+Fakultas : Ilmu Komputer
+
+Telah melaksanakan implementasi, integrasi, serta pengujian sistem dalam proyek kolaboratif Tugas Akhir yang berjudul "Integrasi Denah Virtual Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu (Dashboard Profil)" di lingkungan Kampus Pondok Labu. Modul sistem yang dikembangkan meliputi:
+1. Pembangunan database relasional PostgreSQL di Supabase Cloud dengan konfigurasi keamanan Row-Level Security (RLS) serta pencatatan logs perubahan (audit logs) otomatis.
+2. Pengembangan RESTful API berbasis Vercel Serverless Functions.
+3. Pengembangan antarmuka web reaktif (React SPA) berupa Public Dashboard dan Admin Panel.
+4. Integrasi reverse proxy collect metrik Umami Analytics untuk pemantauan lalu lintas web.
+
+Sistem tersebut telah terpasang, diuji coba secara fungsional melalui Black Box Testing, serta dievaluasi melalui User Acceptance Testing (UAT) dengan staf administrasi dan mahasiswa dengan tingkat keberhasilan dan penerimaan yang sangat baik. Surat keterangan ini dibuat untuk dipergunakan sebagai salah satu syarat kelulusan Tugas Akhir skema Proyek.
+
+Jakarta, 15 Juni 2026
+Pihak Mitra,
+
+Erly Krisnanik, S.Kom., M.M.
+NIM/NIDN. 0312047301
+
+---
+
+# LAMPIRAN 3. Kode Sumber Utama
+
+1. Konfigurasi Row-Level Security (RLS) & Triggers (Supabase Cloud PostgreSQL):
+```sql
+ALTER TABLE gedung ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public select" ON gedung FOR SELECT TO anon USING (true);
+CREATE POLICY "Allow admin write" ON gedung FOR ALL TO authenticated 
+  USING (auth.role() = 'authenticated') 
+  WITH CHECK (auth.role() = 'authenticated');
+
+CREATE OR REPLACE FUNCTION log_data_mutation()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO audit_logs (table_name, operation, record_id, changed_by, changed_at)
+  VALUES (TG_TABLE_NAME, TG_OP, COALESCE(NEW.id, OLD.id), auth.uid(), now());
+  RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_gedung_trigger
+AFTER INSERT OR UPDATE OR DELETE ON gedung
+FOR EACH ROW EXECUTE FUNCTION log_data_mutation();
+```
+
+2. Connection-Aware Preloading (React Frontend SPA):
+```typescript
+const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+const isConnectionSlow = connection && (connection.saveData || ['slow-2g', '2g', '3g'].includes(connection.effectiveType));
+
+if (isConnectionSlow) {
+  setShowManualActivationButton(true);
+} else {
+  triggerWebGLPreload();
+}
+```
+
+3. Communication Bridge React-Unity WebGL (React Component):
+```typescript
+import { useUnityContext } from "react-unity-webgl";
+
+const { sendMessage, isLoaded } = useUnityContext({
+  loaderUrl: "build/UnityWebGL.loader.js",
+  dataUrl: "build/UnityWebGL.data",
+  frameworkUrl: "build/UnityWebGL.framework.js",
+  codeUrl: "build/UnityWebGL.wasm",
+});
+
+const handleNavigate = (unityObjectName: string) => {
+  if (isLoaded) {
+    sendMessage("NavigationReceiver", "NavigateTo", unityObjectName);
+  }
+};
+```
+
+4. Reverse Proxy Analytics Metrik collect (Express.js Proxy Route):
+```javascript
+const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
+const app = express();
+
+app.use('/api/collect', createProxyMiddleware({
+  target: 'http://localhost:3000/api/send',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/collect': '',
+  },
+  onProxyReq: (proxyReq, req, res) => {
+    proxyReq.setHeader('X-Forwarded-For', req.ip);
+  }
+}));
+
+app.listen(3001, () => {
+  console.log('Proxy server running on port 3001');
+});
+```
+
+---
+
+# LAMPIRAN 4. Panduan Pengguna (User Manual) (Rencana/Placeholder)
+
+Panduan Pengguna (User Manual) sistem terintegrasi Dashboard Profil & Denah Virtual 3D UPNVJ Kampus Pondok Labu saat ini dirancang sebagai rencana implementasi dokumen pelengkap. Panduan ini akan memuat panduan operasional langkah-demi-langkah bagi dua kelompok pengguna:
+
+1. Kelompok Administrator (Staff Pengelola):
+  a. Panduan masuk/login ke halaman Admin Panel.
+  b. Langkah-langkah melakukan operasi CRUD data gedung (termasuk pengisian parameter `unity_object_name` secara presisi).
+  c. Langkah-langkah mengaitkan data fasilitas ke gedung dan mendefinisikan lantai.
+  d. Peninjauan riwayat perubahan data pada log audit.
+  e. Pemantauan statistik lalu lintas pengunjung via visualisasi dashboard Umami.
+2. Kelompok Pengguna Publik (Mahasiswa dan Tamu Kampus):
+  a. Panduan menjelajahi Dashboard publik (peninjauan statistik dosen/mahasiswa drill-down).
+  b. Panduan interaksi eksplorasi bebas pada Canvas Denah Virtual 3D.
+  c. Panduan melakukan pencarian rute fasilitas tertentu menggunakan Search Overlay React.
+  d. Panduan kontrol pergerakan karakter dan rotasi kamera first-person (Pointer Lock) serta penggunaan joystick virtual pada perangkat mobile.
+
+Dokumen lengkap Panduan Pengguna beserta tangkapan layar antarmuka operasional (User Guide manual) akan dilampirkan setelah sistem secara penuh diserahkan dan dideploy di lingkungan server produksi milik mitra.
