@@ -121,24 +121,24 @@ Dengan demikian, urgensi pengembangan sistem tidak hanya didasarkan pada perspek
 
 Berdasarkan penjabaran latar belakang serta pengumpulan data awal yang telah diuraikan, identifikasi masalah dalam penelitian ini dirumuskan sebagai berikut:
 
-- Masih terdapat kesulitan bagi mahasiswa dan pengunjung dalam menemukan lokasi tertentu di lingkungan kampus, terutama akibat keterbatasan media navigasi yang masih bersifat konvensional, statis, dan tidak interaktif.
-- Informasi profil kampus, seperti data fasilitas, akademik, dan aset, masih tersebar di berbagai platform sehingga pengguna harus mengakses beberapa sumber secara terpisah untuk memperoleh informasi yang dibutuhkan.
-- Belum tersedia media visualisasi berbasis 3D yang mampu merepresentasikan lingkungan kampus secara realistis dan interaktif, sehingga pengguna kesulitan memahami hubungan spasial antar lokasi.
-- Belum terdapat sistem backend yang terpusat untuk mengelola dan menyediakan data secara dinamis melalui API yang dapat digunakan oleh berbagai komponen sistem, termasuk dashboard dan sistem visualisasi.
-- Belum tersedia mekanisme integrasi antara backend dan engine visualisasi seperti Unity, sehingga data yang tersimpan dalam sistem belum dapat dimanfaatkan secara langsung dalam lingkungan 3D interaktif.
+1. Masih terdapat kesulitan bagi mahasiswa dan pengunjung dalam menemukan lokasi tertentu di lingkungan kampus, terutama akibat keterbatasan media navigasi yang masih bersifat konvensional, statis, dan tidak interaktif.
+2. Informasi profil kampus, seperti data fasilitas, akademik, dan aset, masih tersebar di berbagai platform sehingga pengguna harus mengakses beberapa sumber secara terpisah untuk memperoleh informasi yang dibutuhkan.
+3. Belum tersedia media visualisasi berbasis 3D yang mampu merepresentasikan lingkungan kampus secara realistis dan interaktif, sehingga pengguna kesulitan memahami hubungan spasial antar lokasi.
+4. Belum terdapat sistem backend yang terpusat untuk mengelola dan menyediakan data secara dinamis melalui API yang dapat digunakan oleh berbagai komponen sistem, termasuk dashboard dan sistem visualisasi.
+5. Belum tersedia mekanisme integrasi antara backend dan engine visualisasi seperti Unity, sehingga data yang tersimpan dalam sistem belum dapat dimanfaatkan secara langsung dalam lingkungan 3D interaktif.
 
 ## 1.3 Batasan Masalah
 
 Untuk menjaga fokus, ruang lingkup, serta kelayakan penelitian, maka batasan masalah dalam pengembangan sistem integrasi denah virtual kampus dan dashboard profil Universitas Pembangunan Nasional “Veteran” Jakarta ditetapkan sebagai berikut:
 
-- Pengembangan sistem difokuskan pada integrasi antara backend, dashboard berbasis web, dan visualisasi denah virtual berbasis 3D, tanpa mencakup pengembangan sistem akademik utama seperti sistem perkuliahan atau keuangan.
-- Cakupan area visualisasi dan data dibatasi pada lingkungan Kampus Universitas Pembangunan Nasional “Veteran” Jakarta Kampus Pondok Labu.
-- Data profil kampus seperti statistik mahasiswa, dosen, dan akreditasi tidak dikelola secara langsung dalam sistem backend, melainkan diperoleh melalui mekanisme integrasi atau embed dari sistem yang telah dikembangkan oleh unit terkait (UPA TIK).
-- Pengembangan pada sisi backend difokuskan pada perancangan dan implementasi REST API, pengelolaan database, serta penyediaan data secara dinamis untuk mendukung kebutuhan dashboard dan integrasi dengan engine visualisasi.
-- Sistem API yang dikembangkan mendukung penyediaan data publik serta manipulasi data (Create, Read, Update, Delete) yang dibatasi hanya untuk administrator melalui mekanisme autentikasi berbasis Supabase Auth, sehingga tidak semua endpoint dapat diakses secara terbuka oleh pengguna umum.
-- Pengembangan visualisasi 3D dibatasi pada pembuatan aset dan lingkungan virtual oleh 3D Designer, tanpa membahas secara mendalam proses teknis pemodelan dalam laporan ini.
-- Pengembangan pada sisi Unity atau simulator difokuskan pada integrasi dengan backend melalui pemanggilan API serta implementasi interaksi dasar, tanpa membahas secara mendalam pengembangan engine atau optimasi grafis tingkat lanjut.
-- Sistem yang dikembangkan tidak mencakup integrasi real-time dengan seluruh sistem internal universitas, sehingga pembaruan data bergantung pada ketersediaan sumber data eksternal atau hasil pengelolaan internal sistem.
+1. Pengembangan sistem difokuskan pada integrasi antara backend, dashboard berbasis web, dan visualisasi denah virtual berbasis 3D, tanpa mencakup pengembangan sistem akademik utama seperti sistem perkuliahan atau keuangan.
+2. Cakupan area visualisasi dan data dibatasi pada lingkungan Kampus Universitas Pembangunan Nasional “Veteran” Jakarta Kampus Pondok Labu.
+3. Data profil kampus seperti statistik mahasiswa, dosen, dan akreditasi tidak dikelola secara langsung dalam sistem backend, melainkan diperoleh melalui mekanisme integrasi atau embed dari sistem yang telah dikembangkan oleh unit terkait (UPA TIK).
+4. Pengembangan pada sisi backend difokuskan pada perancangan dan implementasi REST API, pengelolaan database, serta penyediaan data secara dinamis untuk mendukung kebutuhan dashboard dan integrasi dengan engine visualisasi.
+5. Sistem API yang dikembangkan mendukung penyediaan data publik serta manipulasi data (Create, Read, Update, Delete) yang dibatasi hanya untuk administrator melalui mekanisme autentikasi berbasis Supabase Auth, sehingga tidak semua endpoint dapat diakses secara terbuka oleh pengguna umum.
+6. Pengembangan visualisasi 3D dibatasi pada pembuatan aset dan lingkungan virtual oleh 3D Designer, tanpa membahas secara mendalam proses teknis pemodelan dalam laporan ini.
+7. Pengembangan pada sisi Unity atau simulator difokuskan pada integrasi dengan backend melalui pemanggilan API serta implementasi interaksi dasar, tanpa membahas secara mendalam pengembangan engine atau optimasi grafis tingkat lanjut.
+8. Sistem yang dikembangkan tidak mencakup integrasi real-time dengan seluruh sistem internal universitas, sehingga pembaruan data bergantung pada ketersediaan sumber data eksternal atau hasil pengelolaan internal sistem.
 
 Pembagian Peran dan Tanggung Jawab Tim
 
@@ -160,10 +160,10 @@ Full Stack Developer (Dashboard Profile) | Merancang dan mengimplementasikan ars
 
 Berdasarkan rumusan masalah pada Subbab 1.2 yang berkaitan dengan inefisiensi navigasi spasial, kesenjangan kebutuhan informasi pengguna, fragmentasi informasi kampus, serta belum tersedianya sistem digital terintegrasi, maka tujuan dari penelitian ini adalah sebagai berikut:
 
-- Mengembangkan sistem navigasi spasial kampus berbasis visualisasi 3D interaktif yang mampu meningkatkan efisiensi proses orientasi dan pencarian lokasi di lingkungan Kampus UPNVJ Pondok Labu.
-- Menyediakan media informasi kampus yang intuitif, mudah diakses, dan interaktif untuk menjawab kebutuhan pengguna akan penyajian informasi yang cepat dan mudah dipahami.
-- Mengintegrasikan informasi profil akademik, fasilitas, dan lingkungan kampus ke dalam satu sistem terpusat guna mengatasi fragmentasi sumber informasi yang selama ini terjadi.
-- Merancang dan mengimplementasikan sistem digital terintegrasi yang menggabungkan denah virtual kampus berbasis 3D dengan dashboard profil kampus sebagai solusi Smart Campus yang saling terhubung dan berkelanjutan.
+1. Mengembangkan sistem navigasi spasial kampus berbasis visualisasi 3D interaktif yang mampu meningkatkan efisiensi proses orientasi dan pencarian lokasi di lingkungan Kampus UPNVJ Pondok Labu.
+2. Menyediakan media informasi kampus yang intuitif, mudah diakses, dan interaktif untuk menjawab kebutuhan pengguna akan penyajian informasi yang cepat dan mudah dipahami.
+3. Mengintegrasikan informasi profil akademik, fasilitas, dan lingkungan kampus ke dalam satu sistem terpusat guna mengatasi fragmentasi sumber informasi yang selama ini terjadi.
+4. Merancang dan mengimplementasikan sistem digital terintegrasi yang menggabungkan denah virtual kampus berbasis 3D dengan dashboard profil kampus sebagai solusi Smart Campus yang saling terhubung dan berkelanjutan.
 Penelitian ini diharapkan dapat dirasakan oleh berbagai pihak. Bagi sivitas akademika dan pengunjung, sistem integrasi denah virtual kampus dan dashboard profil diharapkan mampu meningkatkan efisiensi navigasi dan mempermudah akses terhadap informasi kampus secara terpadu dan interaktif, sehingga mengurangi pemborosan waktu serta membantu pengguna, khususnya mahasiswa baru dan tamu, dalam beradaptasi dengan lingkungan Kampus UPNVJ Pondok Labu. Bagi pihak manajemen dan pengelola fakultas, sistem ini menyediakan media informasi digital yang terpusat, mudah dikelola, dan mudah diperbarui untuk menyajikan profil akademik, fasilitas, dan data pendukung lainnya secara akurat, sehingga dapat mendukung proses diseminasi informasi dan pengambilan keputusan manajerial. Selain itu, bagi institusi UPNVJ secara keseluruhan, penelitian ini berkontribusi dalam meningkatkan citra dan daya saing universitas sebagai institusi pendidikan yang modern dan adaptif terhadap transformasi digital, sekaligus mendukung implementasi konsep Smart Campus secara berkelanjutan.
 
 
@@ -202,25 +202,25 @@ Dengan menggabungkan hasil kuesioner, observasi lapangan, wawancara stakeholder,
 
 Berdasarkan hasil observasi lapangan (Subbab 2.1.1), data kuesioner mahasiswa, serta analisis terhadap sistem digital yang saat ini digunakan di Universitas Pembangunan Nasional “Veteran” Jakarta, diperoleh beberapa temuan terkait kondisi sistem yang sedang berjalan sebagai berikut:
 
-- Keterbatasan Navigasi Spasial
-- Media navigasi masih mengandalkan papan penunjuk arah dan denah statis.
-- Berdasarkan hasil kuesioner, mayoritas mahasiswa pernah mengalami kesulitan dalam menemukan lokasi tertentu di lingkungan kampus.
-- Sistem yang ada belum mampu memberikan pengalaman navigasi yang interaktif dan intuitif.
-- Fragmentasi Informasi Kampus
-- Data profil kampus seperti fasilitas, akademik, dan statistik tersedia, namun tersebar di berbagai halaman atau sistem yang berbeda.
-- Pengguna harus mengakses beberapa sumber secara terpisah untuk mendapatkan informasi yang lengkap.
-- Hal ini menyebabkan inefisiensi dalam pencarian informasi.
-- Belum Tersedianya Visualisasi Interaktif
-- Sistem yang ada belum menyediakan media visualisasi berbasis 3D yang dapat membantu pengguna memahami tata letak kampus secara menyeluruh.
-- Keterbatasan ini berdampak pada rendahnya kemampuan pengguna dalam memahami hubungan spasial antar lokasi.
-- Keterbatasan Arsitektur Backend
+1. Keterbatasan Navigasi Spasial
+  a. Media navigasi masih mengandalkan papan penunjuk arah dan denah statis.
+  b. Berdasarkan hasil kuesioner, mayoritas mahasiswa pernah mengalami kesulitan dalam menemukan lokasi tertentu di lingkungan kampus.
+  c. Sistem yang ada belum mampu memberikan pengalaman navigasi yang interaktif dan intuitif.
+2. Fragmentasi Informasi Kampus
+  a. Data profil kampus seperti fasilitas, akademik, dan statistik tersedia, namun tersebar di berbagai halaman atau sistem yang berbeda.
+  b. Pengguna harus mengakses beberapa sumber secara terpisah untuk mendapatkan informasi yang lengkap.
+  c. Hal ini menyebabkan inefisiensi dalam pencarian informasi.
+3. Belum Tersedianya Visualisasi Interaktif
+  a. Sistem yang ada belum menyediakan media visualisasi berbasis 3D yang dapat membantu pengguna memahami tata letak kampus secara menyeluruh.
+  b. Keterbatasan ini berdampak pada rendahnya kemampuan pengguna dalam memahami hubungan spasial antar lokasi.
+4. Keterbatasan Arsitektur Backend
 
 
-- Belum terdapat sistem backend terpusat yang menyediakan data melalui API secara konsisten.
-- Data belum dapat didistribusikan secara dinamis ke berbagai komponen sistem seperti dashboard dan engine visualisasi.
-- Kondisi Integrasi Data Eksisting
-- Berdasarkan koordinasi dengan UPA TIK, sebagian data kampus telah dikelola dalam sistem terpisah yang sedang dikembangkan.
-- Oleh karena itu, pendekatan integrasi melalui embed atau konsumsi data eksternal menjadi lebih relevan dibandingkan pengelolaan data secara mandiri.
+  a. Belum terdapat sistem backend terpusat yang menyediakan data melalui API secara konsisten.
+  b. Data belum dapat didistribusikan secara dinamis ke berbagai komponen sistem seperti dashboard dan engine visualisasi.
+5. Kondisi Integrasi Data Eksisting
+  a. Berdasarkan koordinasi dengan UPA TIK, sebagian data kampus telah dikelola dalam sistem terpisah yang sedang dikembangkan.
+  b. Oleh karena itu, pendekatan integrasi melalui embed atau konsumsi data eksternal menjadi lebih relevan dibandingkan pengelolaan data secara mandiri.
 Berdasarkan temuan tersebut, dapat disimpulkan bahwa sistem yang sedang berjalan masih memiliki keterbatasan pada aspek navigasi, integrasi data, serta arsitektur sistem. Kondisi ini menjadi dasar dalam perumusan solusi yang diusulkan pada Subbab 2.2.
 
 
@@ -258,20 +258,20 @@ Berdasarkan hasil observasi lapangan (2.1.1) dan tinjauan pada aset digital kamp
 
 Identifikasi kelemahan pada sistem yang sedang berjalan adalah sebagai berikut:
 
-- Aspek Navigasi Spasial:
-- Sistem yang ada saat ini mengandalkan media konvensional, yaitu papan penunjuk arah fisik dan denah statis (berbasis gambar/PDF) yang terdapat di beberapa titik atau di situs web.
-- Kelemahan: Media ini bersifat pasif (tidak interaktif), dan sulit diperbarui. Hal ini secara langsung menyebabkan inefisiensi navigasi seperti yang diidentifikasi pada Bab 1.2.
-- Aspek Penyajian Data Profil (Lingkup Full Stack):
-- Sistem yang ada saat ini untuk penyajian data profil kampus (statistik, akreditasi, fasilitas) bersifat terfragmentasi. Informasi tersimpan di berbagai laman dan sub-situs yang tidak saling terhubung, menciptakan fenomena fragmentasi data.
-- Kelemahan: Tidak ada dashboard terpusat yang menyajikan data secara agregat dan interaktif. Pengguna harus membuka banyak halaman untuk mendapatkan gambaran utuh, dan administrator tidak memiliki satu "pintu" (Admin Dashboard) untuk mengelola data konten tersebut secara efisien.
+1. Aspek Navigasi Spasial:
+  a. Sistem yang ada saat ini mengandalkan media konvensional, yaitu papan penunjuk arah fisik dan denah statis (berbasis gambar/PDF) yang terdapat di beberapa titik atau di situs web.
+  b. Kelemahan: Media ini bersifat pasif (tidak interaktif), dan sulit diperbarui. Hal ini secara langsung menyebabkan inefisiensi navigasi seperti yang diidentifikasi pada Bab 1.2.
+2. Aspek Penyajian Data Profil (Lingkup Full Stack):
+  a. Sistem yang ada saat ini untuk penyajian data profil kampus (statistik, akreditasi, fasilitas) bersifat terfragmentasi. Informasi tersimpan di berbagai laman dan sub-situs yang tidak saling terhubung, menciptakan fenomena fragmentasi data.
+  b. Kelemahan: Tidak ada dashboard terpusat yang menyajikan data secara agregat dan interaktif. Pengguna harus membuka banyak halaman untuk mendapatkan gambaran utuh, dan administrator tidak memiliki satu "pintu" (Admin Dashboard) untuk mengelola data konten tersebut secara efisien.
 
 ### 2.1.3 Wawancara dengan Stakeholder
 
 Tahapan identifikasi kebutuhan sistem dilakukan melalui metode wawancara terstruktur dan mendalam dengan Erly Krisnanik, S.Kom., M.M., yang bertindak sebagai pemangku kepentingan (stakeholder) sekaligus pakar domain di lingkungan Universitas Pembangunan Nasional Veteran Jakarta. Interaksi ini bertujuan untuk memetakan strategi pengembangan proyek yang bersifat lintas disiplin. Dalam diskusi ini, narasumber menegaskan bahwa realisasi sistem denah virtual yang ideal memerlukan sinergi teknis dari tiga peran spesifik, yaitu:
 
-- 3D Designer untuk visualisasi aset gedung.
-- Simulator Developer untuk logika navigasi spasial.
-- Full Stack Developer untuk manajemen infrastruktur data.
+1. 3D Designer untuk visualisasi aset gedung.
+2. Simulator Developer untuk logika navigasi spasial.
+3. Full Stack Developer untuk manajemen infrastruktur data.
 Berdasarkan pembagian tugas strategis tersebut, disepakati penentuan batasan lingkup kerja penulis yang difokuskan secara eksklusif pada peran Full Stack Developer. Penulis dimandatkan untuk membangun arsitektur sistem yang tangguh guna menjamin skalabilitas dan ketersediaan data profil universitas secara real-time, yang nantinya akan dikonsumsi oleh engine simulasi yang dikembangkan anggota tim lain.
 
 Berdasarkan arahan narasumber, dirumuskanlah spesifikasi kebutuhan fungsional yang mencakup manajemen konten dinamis melalui Admin Dashboard serta penyediaan jalur distribusi data (API endpoints) untuk mendukung visualisasi pada Public Dashboard dan Denah Virtual. Lebih lanjut, narasumber menekankan krusialnya kebutuhan non-fungsional yang menitikberatkan pada aspek integritas data dan efisiensi waktu respons, mengingat backend sistem ini harus melayani permintaan data secara simultan dari antarmuka web dan engine 3D. Seluruh informasi teknis ini menjadi fondasi utama dalam penyusunan tiga skenario operasional sistem (Skenario A, B, dan C), yang dirancang sebagai strategi mitigasi risiko untuk menjaga reliabilitas sistem di tengah ketidakpastian ketersediaan data akademik eksternal.
@@ -285,27 +285,27 @@ Hasil analisis ini dikonversi menjadi serangkaian Kebutuhan Fungsional sistem ya
 
 Secara garis besar, kebutuhan fungsional sistem diklasifikasikan ke dalam tiga kategori utama:
 
-- Kebutuhan Fungsional Pengguna Publik (User):
-- Sistem harus dapat menyajikan data statistik kampus (dosen, mahasiswa).
-- Sistem harus dapat menyajikan data profil (akreditasi, fasilitas, aset).
-- Sistem harus dapat menyajikan data terperinci saat chart atau item fasilitas diklik.
-- Sistem harus dapat menampilkan viewport Denah Virtual (yang diintegrasikan oleh Simulator Developer menggunakan aset dari 3D Designer).
-- Kebutuhan Fungsional Administrator (Admin):
-- Sistem harus menyediakan halaman login yang aman (autentikasi) untuk Admin.
-- Sistem harus dapat menampilkan widget analitik dasar (kunjungan, page views).
-- Sistem harus menyediakan fungsionalitas CRUD (Create, Read, Update, Delete) untuk mengelola semua data konten dinamis (Dosen, Mahasiswa, Fakultas, Aset, Fasilitas, Akreditasi, dll.). Fungsionalitas ini juga krusial untuk implementasi Rencana B (Mitigasi Risiko).
-- Kebutuhan Fungsional Integrasi (API untuk 3D Engine): Selain kebutuhan interaksi manusia, backend API (lingkup Full Stack penulis) harus memenuhi kebutuhan teknis bagi 3D/VR Simulator Developer agar Denah Virtual dapat menampilkan informasi secara dinamis:
-- Sistem harus menyediakan endpoint API (misal: GET /api/gedung) yang menyajikan data spasial (nama gedung, deskripsi gedung).
-- Sistem harus menyediakan endpoint API (misal: GET /api/fasilitas) yang menyajikan data fasilitas (nama fasilitas, deskripsi, lokasi/gedung terkait).
-- Sistem harus menyediakan endpoint API (misal: GET /api/fakultas) yang menyajikan data profil fakultas dan program studi terkait.
-- API harus menyediakan data dalam format JSON yang terstruktur agar mudah di-parse oleh engine Unity/WebGL yang dikelola 3D Simulator Developer.
+1. Kebutuhan Fungsional Pengguna Publik (User):
+2. Sistem harus dapat menyajikan data statistik kampus (dosen, mahasiswa).
+3. Sistem harus dapat menyajikan data profil (akreditasi, fasilitas, aset).
+4. Sistem harus dapat menyajikan data terperinci saat chart atau item fasilitas diklik.
+5. Sistem harus dapat menampilkan viewport Denah Virtual (yang diintegrasikan oleh Simulator Developer menggunakan aset dari 3D Designer).
+6. Kebutuhan Fungsional Administrator (Admin):
+7. Sistem harus menyediakan halaman login yang aman (autentikasi) untuk Admin.
+8. Sistem harus dapat menampilkan widget analitik dasar (kunjungan, page views).
+9. Sistem harus menyediakan fungsionalitas CRUD (Create, Read, Update, Delete) untuk mengelola semua data konten dinamis (Dosen, Mahasiswa, Fakultas, Aset, Fasilitas, Akreditasi, dll.). Fungsionalitas ini juga krusial untuk implementasi Rencana B (Mitigasi Risiko).
+10. Kebutuhan Fungsional Integrasi (API untuk 3D Engine): Selain kebutuhan interaksi manusia, backend API (lingkup Full Stack penulis) harus memenuhi kebutuhan teknis bagi 3D/VR Simulator Developer agar Denah Virtual dapat menampilkan informasi secara dinamis:
+11. Sistem harus menyediakan endpoint API (misal: GET /api/gedung) yang menyajikan data spasial (nama gedung, deskripsi gedung).
+12. Sistem harus menyediakan endpoint API (misal: GET /api/fasilitas) yang menyajikan data fasilitas (nama fasilitas, deskripsi, lokasi/gedung terkait).
+13. Sistem harus menyediakan endpoint API (misal: GET /api/fakultas) yang menyajikan data profil fakultas dan program studi terkait.
+14. API harus menyediakan data dalam format JSON yang terstruktur agar mudah di-parse oleh engine Unity/WebGL yang dikelola 3D Simulator Developer.
 
 ### 2.1.5 Pengumpulan Data Konten dan Lokasi
 
 Tahap pengumpulan data awal bertujuan untuk menginventarisasi seluruh konten yang akan diintegrasikan ke dalam sistem. Data yang dikumpulkan dikategorikan menjadi dua jenis, selaras dengan batasan scope Full Stack penulis, yaitu:
 
-- Data Konten (untuk Database): Mencakup pengumpulan data tekstual dan tabular seperti nama fakultas, daftar program studi, data akreditasi, dan daftar fasilitas. Data ini akan menjadi input utama bagi Admin Dashboard dan selanjutnya didistribusikan melalui API.
-- Data Lokasi (untuk Integrasi): Mencakup pengumpulan data identitas lokasi gedung (misalnya: "Gedung Rektorat", "Fakultas Hukum"). Data ini berfungsi sebagai "kunci penghubung" (foreign key) yang menjembatani data pada database PostgreSQL dengan objek visual terkait pada engine 3D/VR.
+1. Data Konten (untuk Database): Mencakup pengumpulan data tekstual dan tabular seperti nama fakultas, daftar program studi, data akreditasi, dan daftar fasilitas. Data ini akan menjadi input utama bagi Admin Dashboard dan selanjutnya didistribusikan melalui API.
+2. Data Lokasi (untuk Integrasi): Mencakup pengumpulan data identitas lokasi gedung (misalnya: "Gedung Rektorat", "Fakultas Hukum"). Data ini berfungsi sebagai "kunci penghubung" (foreign key) yang menjembatani data pada database PostgreSQL dengan objek visual terkait pada engine 3D/VR.
 
 ## 2.2 Usulan Solusi
 
@@ -313,29 +313,29 @@ Berdasarkan hasil identifikasi permasalahan pada Subbab 2.1, khususnya yang dipe
 
 Secara umum, solusi yang diusulkan memiliki karakteristik sebagai berikut:
 
-- Pendekatan Berbasis API (Backend-Centric)
-- Backend berperan sebagai pusat distribusi data melalui REST API.
-- Data dapat diakses oleh berbagai komponen sistem secara konsisten, termasuk dashboard dan Unity WebGL.
-- Integrasi Multi-Platform
-- Sistem menghubungkan dashboard berbasis web dengan visualisasi denah virtual berbasis Unity.
-- Data yang sama dapat disajikan dalam bentuk informasi tekstual dan visualisasi spasial.
-- Penyajian Data Secara Dinamis
-- Informasi kampus seperti fasilitas, dosen, dan statistik disajikan secara dinamis melalui API.
-- Dashboard dan Unity tidak menggunakan data statis, melainkan data yang diambil secara langsung dari backend.
-- Strategi Integrasi Data Eksternal
-- Data tertentu seperti statistik dan akreditasi diperoleh melalui mekanisme embed dari sistem UPA TIK.
-- Sistem tidak menggantikan sistem yang sudah ada, tetapi berfungsi sebagai layer integrasi.
-- Pendekatan Kolaboratif Multi-Role
-- Sistem dikembangkan melalui kolaborasi antara:
-- 3D Designer (aset visual)
-- Unity/Simulator Developer (interaksi dan navigasi)
-- Full Stack Developer (backend, API, dan dashboard)
-- Fokus utama penelitian ini berada pada pengembangan backend dan integrasi sistem.
+1. Pendekatan Berbasis API (Backend-Centric)
+  a. Backend berperan sebagai pusat distribusi data melalui REST API.
+  b. Data dapat diakses oleh berbagai komponen sistem secara konsisten, termasuk dashboard dan Unity WebGL.
+2. Integrasi Multi-Platform
+  a. Sistem menghubungkan dashboard berbasis web dengan visualisasi denah virtual berbasis Unity.
+  b. Data yang sama dapat disajikan dalam bentuk informasi tekstual dan visualisasi spasial.
+3. Penyajian Data Secara Dinamis
+  a. Informasi kampus seperti fasilitas, dosen, dan statistik disajikan secara dinamis melalui API.
+  b. Dashboard dan Unity tidak menggunakan data statis, melainkan data yang diambil secara langsung dari backend.
+4. Strategi Integrasi Data Eksternal
+  a. Data tertentu seperti statistik dan akreditasi diperoleh melalui mekanisme embed dari sistem UPA TIK.
+  b. Sistem tidak menggantikan sistem yang sudah ada, tetapi berfungsi sebagai layer integrasi.
+5. Pendekatan Kolaboratif Multi-Role
+  a. Sistem dikembangkan melalui kolaborasi antara:
+    1) 3D Designer (aset visual)
+    2) Unity/Simulator Developer (interaksi dan navigasi)
+    3) Full Stack Developer (backend, API, dan dashboard)
+  b. Fokus utama penelitian ini berada pada pengembangan backend dan integrasi sistem.
 Dengan pendekatan tersebut, sistem yang diusulkan diharapkan mampu mengatasi permasalahan navigasi yang teridentifikasi melalui survei, sekaligus menyediakan platform informasi kampus yang terintegrasi, dinamis, dan interaktif.
 
-- 3D Designer: Bertanggung jawab atas pemodelan visual (3D modeling), tekstur, dan estetika seluruh aset gedung serta lingkungan kampus secara presisi menggunakan perangkat lunak Blender.
-- 3D/VR Simulator Developer: Bertanggung jawab menyusun logika interaksi spasial, mekanisme navigasi, dan merakit aset 3D ke dalam engine Unity berbasis WebGL agar dapat dijalankan di peramban web.
-- Full Stack Web Developer (Penulis): Bertanggung jawab membangun "tulang punggung" sistem yang mencakup manajemen basis data, pengembangan API (Application Programming Interface), serta antarmuka informasi (dashboard) berbasis web.
+  1. 3D Designer: Bertanggung jawab atas pemodelan visual (3D modeling), tekstur, dan estetika seluruh aset gedung serta lingkungan kampus secara presisi menggunakan perangkat lunak Blender.
+  2. 3D/VR Simulator Developer: Bertanggung jawab menyusun logika interaksi spasial, mekanisme navigasi, dan merakit aset 3D ke dalam engine Unity berbasis WebGL agar dapat dijalankan di peramban web.
+  3. Full Stack Web Developer (Penulis): Bertanggung jawab membangun "tulang punggung" sistem yang mencakup manajemen basis data, pengembangan API (Application Programming Interface), serta antarmuka informasi (dashboard) berbasis web.
 Sebelum merinci komponen teknis yang menjadi tanggung jawab penulis, Gambar 2.1 menyajikan diagram arsitektur sistem secara high-level. Diagram ini memetakan hubungan antara aset visual, logika simulasi, dan sistem informasi web.
 
 
@@ -343,10 +343,10 @@ Gambar 2.1 Diagram Arsitektur Sistem
 
 Sebagaimana diilustrasikan pada Gambar 2.1, arsitektur sistem dirancang dengan alur kerja yang saling terhubung antar ketiga peran tersebut:
 
-- Integrasi Aset Visual: Aset 3D yang dihasilkan oleh 3D Designer diekspor dan diimpor ke dalam sistem Denah Virtual yang dikelola oleh Simulator Developer.
-- Alur Pengguna Publik (User): Pengguna berinteraksi melalui Frontend Public Dashboard (lingkup penulis). Halaman ini berfungsi sebagai wadah (container) yang menampilkan Denah Virtual (Unity/WebGL) sekaligus menyajikan informasi profil kampus yang dinamis.
-- Alur Administrator (Admin): Administrator memiliki jalur akses khusus melalui Frontend Admin Dashboard  untuk mengelola data konten kampus (seperti data dosen, fasilitas, dan aset) melalui mekanisme CRUD.
-- Pusat Pertukaran Data: Seluruh interaksi data bermuara pada satu titik pusat, yaitu Backend: Main API. Komponen ini bertindak sebagai "otak" yang melayani permintaan data dari Denah Virtual (agar gedung dapat menampilkan informasi saat diklik) dan menyediakan data untuk kedua dashboard.
+  1. Integrasi Aset Visual: Aset 3D yang dihasilkan oleh 3D Designer diekspor dan diimpor ke dalam sistem Denah Virtual yang dikelola oleh Simulator Developer.
+  2. Alur Pengguna Publik (User): Pengguna berinteraksi melalui Frontend Public Dashboard (lingkup penulis). Halaman ini berfungsi sebagai wadah (container) yang menampilkan Denah Virtual (Unity/WebGL) sekaligus menyajikan informasi profil kampus yang dinamis.
+  3. Alur Administrator (Admin): Administrator memiliki jalur akses khusus melalui Frontend Admin Dashboard  untuk mengelola data konten kampus (seperti data dosen, fasilitas, dan aset) melalui mekanisme CRUD.
+  4. Pusat Pertukaran Data: Seluruh interaksi data bermuara pada satu titik pusat, yaitu Backend: Main API. Komponen ini bertindak sebagai "otak" yang melayani permintaan data dari Denah Virtual (agar gedung dapat menampilkan informasi saat diklik) dan menyediakan data untuk kedua dashboard.
 Fokus utama dari usulan solusi dalam laporan ini akan menitikberatkan pada pengembangan komponen Full Stack Web yang terdiri dari empat modul fungsional berikut:
 
 
@@ -356,35 +356,35 @@ Pengembangan backend dalam sistem ini berperan sebagai komponen inti yang berfun
 
 Secara umum, pengembangan backend dalam penelitian ini mencakup beberapa aspek utama sebagai berikut:
 
-- Perancangan RESTful API sebagai Data Hub
-- Backend dikembangkan untuk menyediakan endpoint API yang berfungsi sebagai jalur komunikasi utama antara database dan client.
-- Endpoint API dirancang untuk melayani kebutuhan data baik untuk dashboard maupun Unity, seperti data gedung, fasilitas, dan profil kampus.
-- Contoh endpoint yang digunakan antara lain:
-- GET /api/gedung
-- GET /api/fasilitas
-- GET /api/search?q=kata_kunci
-- Data yang dikirimkan menggunakan format JSON agar mudah diproses oleh frontend dan Unity.
-- Pengelolaan Database Relasional (PostgreSQL)
-- Sistem menggunakan database PostgreSQL untuk menyimpan data terstruktur seperti fakultas, program studi, dosen, mahasiswa, fasilitas, dan gedung.
-- Struktur database dirancang menggunakan pendekatan relasional untuk menjaga konsistensi dan integritas data.
-- Relasi antar tabel memungkinkan pengambilan data yang kompleks secara efisien, seperti keterkaitan antara fasilitas dan gedung.
-- Penyediaan Data untuk Multi-Client (Dashboard dan Unity)
-- Backend dirancang untuk melayani lebih dari satu jenis client, yaitu:
-- Dashboard berbasis web (React)
-- Engine visualisasi (Unity WebGL)
-- Untuk kebutuhan Unity, disediakan endpoint khusus yang menyajikan data dalam format yang lebih sederhana dan langsung dapat digunakan dalam proses rendering objek 3D.
-- Implementasi Fitur Pencarian (Search Feature)
-- Backend menyediakan fitur pencarian berbasis query parameter untuk mempermudah pengguna dalam menemukan data tertentu.
-- Mekanisme pencarian dilakukan dengan memanfaatkan query database menggunakan keyword tertentu, sehingga hasil yang ditampilkan bersifat dinamis dan relevan.
-- Pengelolaan Akses Data dan Keamanan
-- Backend mendukung dua jenis akses data, yaitu akses publik dan akses administratif.
-- Endpoint publik digunakan untuk menyediakan data yang dapat diakses oleh pengguna umum dan engine Unity, seperti data gedung, fasilitas, dan profil kampus.
-- Selain itu, sistem juga menyediakan endpoint untuk manipulasi data (Create, Read, Update, Delete) yang hanya dapat diakses oleh administrator.
-- Mekanisme keamanan pada endpoint administratif diimplementasikan menggunakan sistem autentikasi berbasis Supabase Auth, sehingga hanya pengguna yang memiliki hak akses yang dapat melakukan perubahan data.
-- Dengan pendekatan ini, sistem tetap terbuka untuk konsumsi data publik, namun tetap menjaga keamanan dan integritas data melalui pembatasan akses pada fungsi tertentu.
-- Arsitektur Backend Berbasis Modular
-- Backend dikembangkan dengan struktur modular yang memisahkan komponen seperti routing, controller, dan database access.
-- Pendekatan ini mempermudah pengembangan, pemeliharaan, serta pengujian sistem di masa mendatang.
+1. Perancangan RESTful API sebagai Data Hub
+  a. Backend dikembangkan untuk menyediakan endpoint API yang berfungsi sebagai jalur komunikasi utama antara database dan client.
+  b. Endpoint API dirancang untuk melayani kebutuhan data baik untuk dashboard maupun Unity, seperti data gedung, fasilitas, dan profil kampus.
+  c. Contoh endpoint yang digunakan antara lain:
+  d. GET /api/gedung
+  e. GET /api/fasilitas
+  f. GET /api/search?q=kata_kunci
+  g. Data yang dikirimkan menggunakan format JSON agar mudah diproses oleh frontend dan Unity.
+2. Pengelolaan Database Relasional (PostgreSQL)
+  a. Sistem menggunakan database PostgreSQL untuk menyimpan data terstruktur seperti fakultas, program studi, dosen, mahasiswa, fasilitas, dan gedung.
+  b. Struktur database dirancang menggunakan pendekatan relasional untuk menjaga konsistensi dan integritas data.
+  c. Relasi antar tabel memungkinkan pengambilan data yang kompleks secara efisien, seperti keterkaitan antara fasilitas dan gedung.
+3. Penyediaan Data untuk Multi-Client (Dashboard dan Unity)
+  a. Backend dirancang untuk melayani lebih dari satu jenis client, yaitu:
+  b. Dashboard berbasis web (React)
+  c. Engine visualisasi (Unity WebGL)
+  d. Untuk kebutuhan Unity, disediakan endpoint khusus yang menyajikan data dalam format yang lebih sederhana dan langsung dapat digunakan dalam proses rendering objek 3D.
+4. Implementasi Fitur Pencarian (Search Feature)
+  a. Backend menyediakan fitur pencarian berbasis query parameter untuk mempermudah pengguna dalam menemukan data tertentu.
+  b. Mekanisme pencarian dilakukan dengan memanfaatkan query database menggunakan keyword tertentu, sehingga hasil yang ditampilkan bersifat dinamis dan relevan.
+5. Pengelolaan Akses Data dan Keamanan
+  a. Backend mendukung dua jenis akses data, yaitu akses publik dan akses administratif.
+  b. Endpoint publik digunakan untuk menyediakan data yang dapat diakses oleh pengguna umum dan engine Unity, seperti data gedung, fasilitas, dan profil kampus.
+  c. Selain itu, sistem juga menyediakan endpoint untuk manipulasi data (Create, Read, Update, Delete) yang hanya dapat diakses oleh administrator.
+  d. Mekanisme keamanan pada endpoint administratif diimplementasikan menggunakan sistem autentikasi berbasis Supabase Auth, sehingga hanya pengguna yang memiliki hak akses yang dapat melakukan perubahan data.
+  e. Dengan pendekatan ini, sistem tetap terbuka untuk konsumsi data publik, namun tetap menjaga keamanan dan integritas data melalui pembatasan akses pada fungsi tertentu.
+6. Arsitektur Backend Berbasis Modular
+  a. Backend dikembangkan dengan struktur modular yang memisahkan komponen seperti routing, controller, dan database access.
+  b. Pendekatan ini mempermudah pengembangan, pemeliharaan, serta pengujian sistem di masa mendatang.
 Dengan perancangan tersebut, backend tidak hanya berfungsi sebagai penyimpan data, tetapi juga sebagai lapisan integrasi yang menghubungkan berbagai komponen sistem secara efisien. Peran ini menjadi krusial dalam memastikan bahwa data dapat disajikan secara konsisten, dinamis, dan dapat diakses oleh berbagai platform yang terlibat dalam sistem.
 
 
@@ -396,10 +396,10 @@ Dalam arsitektur sistem ini, Unity berperan sebagai client yang melakukan reques
 
 Secara umum, alur integrasi sistem dapat dijelaskan sebagai berikut:
 
-- Pengguna melakukan interaksi pada objek dalam lingkungan 3D (misalnya klik pada gedung).
-- Unity mengirimkan request ke endpoint API backend untuk mengambil data terkait objek tersebut.
-- Backend memproses permintaan dan mengembalikan data dalam format JSON.
-- Unity menerima data dan menampilkan informasi dalam bentuk panel atau elemen antarmuka pada lingkungan 3D.
+1. Pengguna melakukan interaksi pada objek dalam lingkungan 3D (misalnya klik pada gedung).
+2. Unity mengirimkan request ke endpoint API backend untuk mengambil data terkait objek tersebut.
+3. Backend memproses permintaan dan mengembalikan data dalam format JSON.
+4. Unity menerima data dan menampilkan informasi dalam bentuk panel atau elemen antarmuka pada lingkungan 3D.
 Untuk mendukung integrasi ini, backend menyediakan endpoint khusus yang dirancang agar mudah digunakan oleh Unity, dengan struktur data yang sederhana dan terfokus pada kebutuhan visualisasi. Pendekatan ini memastikan bahwa proses komunikasi antara backend dan Unity berjalan secara efisien dan tidak membebani performa sistem.
 
 Integrasi ini juga memungkinkan sistem untuk menampilkan data secara dinamis, sehingga perubahan data pada backend dapat langsung tercermin pada visualisasi tanpa perlu melakukan perubahan pada sisi Unity. Dengan demikian, backend berperan sebagai sumber data utama yang mendukung fleksibilitas dan skalabilitas sistem visualisasi.
@@ -407,7 +407,7 @@ Integrasi ini juga memungkinkan sistem untuk menampilkan data secara dinamis, se
 Melalui pendekatan ini, sistem yang dikembangkan tidak hanya berfungsi sebagai media informasi statis, tetapi juga sebagai platform interaktif yang menggabungkan data dan visualisasi dalam satu kesatuan sistem yang terintegrasi.
 
 
-Diagram pada Gambar 2.x menggambarkan arsitektur integrasi sistem yang dikembangkan dalam penelitian ini. Sistem terdiri dari tiga komponen utama, yaitu database, backend API, serta client yang terdiri dari dashboard berbasis web dan engine visualisasi Unity WebGL.
+Diagram pada Gambar 2.1 menggambarkan arsitektur integrasi sistem yang dikembangkan dalam penelitian ini. Sistem terdiri dari tiga komponen utama, yaitu database, backend API, serta client yang terdiri dari dashboard berbasis web dan engine visualisasi Unity WebGL.
 
 Database berfungsi sebagai penyimpan data utama yang mencakup informasi terkait gedung, fasilitas, serta data profil kampus lainnya. Data tersebut kemudian dikelola dan diakses melalui backend yang dikembangkan menggunakan pendekatan RESTful API. Backend bertindak sebagai perantara yang menghubungkan data dengan berbagai client yang membutuhkan.
 
@@ -442,31 +442,31 @@ Bab ini secara khusus membahas rancangan dan implementasi komponen Full Stack ya
 
 Rancangan proyek Full Stack ini terdiri dari empat komponen fungsional utama yang akan dikembangkan oleh penulis:
 
-- Sistem Backend dan API: Komponen inti yang berfungsi sebagai "otak" sistem. Mencakup:
-- RESTful API (Node.js) untuk melayani data ke frontend dan engine 3D/VR.
-- Database (PostgreSQL) sebagai penyimpan data terstruktur.
-- Antarmuka Pengguna (Frontend Dashboard): Komponen client-side yang berinteraksi langsung dengan pengguna. Mencakup:
-- Dashboard Profil dan Panel Informasi (React.js).
-- Sistem Administrasi (Admin Dashboard): Komponen backend internal untuk manajemen konten. Mencakup:
-- Antarmuka Create, Read, Update, Delete (CRUD) untuk mengelola data kampus (fasilitas, profil, dll.).
-- Fungsionalitas ini juga berfungsi sebagai Rencana B (Mitigasi Risiko) untuk data akademik.
-- Modul Analitik Dasar: Komponen untuk melacak penggunaan aplikasi, mencakup:
-- Pencatatan metrik dasar (kunjungan, page views, tipe perangkat).
+1. Sistem Backend dan API: Komponen inti yang berfungsi sebagai "otak" sistem. Mencakup:
+2. RESTful API (Node.js) untuk melayani data ke frontend dan engine 3D/VR.
+3. Database (PostgreSQL) sebagai penyimpan data terstruktur.
+4. Antarmuka Pengguna (Frontend Dashboard): Komponen client-side yang berinteraksi langsung dengan pengguna. Mencakup:
+5. Dashboard Profil dan Panel Informasi (React.js).
+6. Sistem Administrasi (Admin Dashboard): Komponen backend internal untuk manajemen konten. Mencakup:
+7. Antarmuka Create, Read, Update, Delete (CRUD) untuk mengelola data kampus (fasilitas, profil, dll.).
+8. Fungsionalitas ini juga berfungsi sebagai Rencana B (Mitigasi Risiko) untuk data akademik.
+9. Modul Analitik Dasar: Komponen untuk melacak penggunaan aplikasi, mencakup:
+10. Pencatatan metrik dasar (kunjungan, page views, tipe perangkat).
 
 ### 2.3.2 Teknologi yang Digunakan
 
 Untuk membangun keempat komponen proyek Full Stack yang telah dirinci dalam Bab 2.3.1, proyek ini akan mengandalkan tumpukan teknologi (tech stack) spesifik berikut:
 
-- Pengembangan Antarmuka (Frontend):
+1. Pengembangan Antarmuka (Frontend):
 Antarmuka Dashboard Profil Pengguna dan Admin Dashboard akan dikembangkan menggunakan library React.js. Teknologi ini dipilih karena kapabilitasnya dalam membangun Single Page Application (SPA) yang reaktif, cepat, dan modular, yang esensial untuk pengalaman pengguna yang modern.
 
-- Pengembangan Backend & API
+1. Pengembangan Backend & API
 Sisi server (logika bisnis) dan RESTful API akan dikembangkan menggunakan runtime environment Node.js (kemungkinan besar dengan framework seperti Express.js). Node.js dipilih karena arsitekturnya yang event-driven dan non-blocking I/O, yang sangat efisien untuk menangani permintaan API.
 
-- Manajemen Database
+1. Manajemen Database
 Untuk penyimpanan data terstruktur, proyek ini akan menggunakan PostgreSQL, sebuah sistem manajemen database relasional (Object-Relational DBMS) yang open-source dan kuat. PostgreSQL dipilih karena keandalannya (reliability), kemampuannya menangani query yang kompleks, dan skalabilitasnya yang teruji.
 
-- Konteks Teknologi Tim (Di Luar Lingkup Penulis)
+1. Konteks Teknologi Tim (Di Luar Lingkup Penulis)
 Untuk memberikan konteks integrasi, teknologi di luar lingkup penulis (seperti engine visualisasi 3D/VR, misal: Unity/WebGL, dan software pemodelan aset, misal: Blender) akan ditangani oleh anggota yang lain. Sistem Full Stack ini akan berinteraksi dengan engine tersebut melalui endpoint API yang telah disediakan (poin 2).
 
 
@@ -477,17 +477,17 @@ Gambar 2.2 Tahap Pengembangan
 
 Proses pengembangan proyek ini akan mengikuti alur kerja yang terstruktur dan sekuensial untuk memastikan setiap tahapan diselesaikan dengan matang sebelum melanjutkan ke tahap berikutnya. Alur proses ini, seperti yang diilustrasikan pada Gambar 2.2, dibagi menjadi beberapa tahapan utama:
 
-- Tahap Perencanaan: Tahap inisiasi ini berfokus pada pendefinisian ruang lingkup proyek. Kegiatan utamanya mencakup analisis kebutuhan fungsional (fitur-fitur sistem) dan non-fungsional (teknologi Full Stack), serta penyusunan Rencana Pengembangan (penjadwalan) dan Rencana Pengujian (perumusan skenario tes).
-- Tahap Desain: Pada tahap ini, semua "cetak biru" (blueprint) teknis sistem dirancang secara detail sebelum proses implementasi kode. Sesuai dengan scope Full Stack, tahap ini menghasilkan tiga artefak desain utama:
-- Perancangan Database (ERD): Merancang skema dan relasi database PostgreSQL.
-- Perancangan Fungsional (Use Case Diagram): Memetakan interaksi Aktor (Admin, User) dengan fungsionalitas sistem.
-- Perancangan User Interface (Mockup): Merancang mockup visual untuk Admin Dashboard dan Public Dashboard.
-- Tahap Pengodean: Tahap ini adalah implementasi dari semua artefak desain (dari Tahap 2) ke dalam kode program fungsional. Berdasarkan batasan masalah, tahap ini berfokus pada:
-- Implementasi Back-end: Membangun RESTful API (Node.js) dan database (PostgreSQL).
-- Implementasi Front-end: Membangun antarmuka Admin Dashboard dan Public Dashboard (React.js).
-- Integrasi API dengan Engine Denah Virtual: Menghubungkan endpoint API (dari Back-end) ke Front-end dan ke engine Denah Virtual (yang dikembangkan anggota yang lain).
-- Tahap Pengujian: Setelah prototipe fungsional selesai dikodekan, sistem akan diuji secara menyeluruh untuk memvalidasi fungsionalitasnya. Seperti yang diuraikan dalam diagram, metode pengujian utama yang digunakan adalah Black Box Testing, yang berfokus pada validasi skenario pengguna tanpa melihat kode internal. (Rincian skenario pengujian akan dijelaskan pada Bab 2.4).
-- Tahap Evaluasi/Iterasi Perbaikan: Hasil dari Tahap Pengujian akan dievaluasi. Jika "Pengujian Berhasil?" (semua skenario lulus), proyek dianggap selesai. Jika "Tidak" (ditemukan bug atau ketidaksesuaian fungsional), alur akan kembali ke Tahap "Pengodean" untuk perbaikan bug. Siklus Pengodean-Pengujian ini akan berulang hingga sistem dinyatakan stabil.
+1. Tahap Perencanaan: Tahap inisiasi ini berfokus pada pendefinisian ruang lingkup proyek. Kegiatan utamanya mencakup analisis kebutuhan fungsional (fitur-fitur sistem) dan non-fungsional (teknologi Full Stack), serta penyusunan Rencana Pengembangan (penjadwalan) dan Rencana Pengujian (perumusan skenario tes).
+2. Tahap Desain: Pada tahap ini, semua "cetak biru" (blueprint) teknis sistem dirancang secara detail sebelum proses implementasi kode. Sesuai dengan scope Full Stack, tahap ini menghasilkan tiga artefak desain utama:
+3. Perancangan Database (ERD): Merancang skema dan relasi database PostgreSQL.
+4. Perancangan Fungsional (Use Case Diagram): Memetakan interaksi Aktor (Admin, User) dengan fungsionalitas sistem.
+5. Perancangan User Interface (Mockup): Merancang mockup visual untuk Admin Dashboard dan Public Dashboard.
+6. Tahap Pengodean: Tahap ini adalah implementasi dari semua artefak desain (dari Tahap 2) ke dalam kode program fungsional. Berdasarkan batasan masalah, tahap ini berfokus pada:
+7. Implementasi Back-end: Membangun RESTful API (Node.js) dan database (PostgreSQL).
+8. Implementasi Front-end: Membangun antarmuka Admin Dashboard dan Public Dashboard (React.js).
+9. Integrasi API dengan Engine Denah Virtual: Menghubungkan endpoint API (dari Back-end) ke Front-end dan ke engine Denah Virtual (yang dikembangkan anggota yang lain).
+10. Tahap Pengujian: Setelah prototipe fungsional selesai dikodekan, sistem akan diuji secara menyeluruh untuk memvalidasi fungsionalitasnya. Seperti yang diuraikan dalam diagram, metode pengujian utama yang digunakan adalah Black Box Testing, yang berfokus pada validasi skenario pengguna tanpa melihat kode internal. (Rincian skenario pengujian akan dijelaskan pada Bab 2.4).
+11. Tahap Evaluasi/Iterasi Perbaikan: Hasil dari Tahap Pengujian akan dievaluasi. Jika "Pengujian Berhasil?" (semua skenario lulus), proyek dianggap selesai. Jika "Tidak" (ditemukan bug atau ketidaksesuaian fungsional), alur akan kembali ke Tahap "Pengodean" untuk perbaikan bug. Siklus Pengodean-Pengujian ini akan berulang hingga sistem dinyatakan stabil.
 
 ### 2.3.4 Rancangan Sistem dan Database
 
@@ -526,12 +526,12 @@ Gambar 2.5 Use Case Diagram
 
 Seperti yang diilustrasikan pada Gambar 2.5, diagram ini memetakan fungsionalitas dari perspektif dua aktor utama: 'User' (Pengguna Publik) dan 'Admin'. Diagram ini secara visual memvalidasi Batasan Masalah Full Stack yang telah ditetapkan:
 
-- Aktor 'User' memiliki akses read-only untuk melihat berbagai data (Dosen, Mahasiswa, Akreditasi, Fasilitas) dan 'Lihat Denah Virtual'. Ini adalah fungsionalitas yang akan dilayani oleh API dan ditampilkan di Public Dashboard.
-- Aktor 'Admin' memiliki fungsionalitas eksklusif untuk 'Manipulasi Data', yang merepresentasikan fungsionalitas CRUD (Create, Read, Update, Delete). Hubungan <<extend>> menunjukkan bahwa manipulasi data adalah fungsionalitas opsional yang memperluas kasus penggunaan 'Lihat Data', yang hanya dapat diakses oleh 'Admin'.
+1. Aktor 'User' memiliki akses read-only untuk melihat berbagai data (Dosen, Mahasiswa, Akreditasi, Fasilitas) dan 'Lihat Denah Virtual'. Ini adalah fungsionalitas yang akan dilayani oleh API dan ditampilkan di Public Dashboard.
+2. Aktor 'Admin' memiliki fungsionalitas eksklusif untuk 'Manipulasi Data', yang merepresentasikan fungsionalitas CRUD (Create, Read, Update, Delete). Hubungan <<extend>> menunjukkan bahwa manipulasi data adalah fungsionalitas opsional yang memperluas kasus penggunaan 'Lihat Data', yang hanya dapat diakses oleh 'Admin'.
 
 #### 2.3.4.3 Rancangan Alur Sistem (Activity Diagram)
 
-- Activity Diagram: Pengelolaan Data oleh Admin (CRUD)
+1. Activity Diagram: Pengelolaan Data oleh Admin (CRUD)
 
 Gambar 2.6 Activity Diagram: Pengelolaan Data oleh Admin
 
@@ -539,7 +539,7 @@ Keamanan dan integritas data profil pada sistem navigasi kampus sangat bergantun
 
 Proses ini mengintegrasikan fungsi autentikasi pada Frontend dengan validasi Backend melalui RESTful API guna mencegah akses yang tidak sah. Penggunaan modal form dalam alur ini bertujuan untuk menyederhanakan prosedur CRUD (Create, Read, Update, Delete), di mana setiap masukan data akan diproses secara asinkron dan disimpan ke dalam database PostgreSQL. Metodologi pengelolaan data terpusat ini menjamin bahwa informasi yang disajikan kepada pengguna akhir selalu akurat dan konsisten dengan kondisi fisik kampus.
 
-- Activity Diagram: Integrasi Data Denah (Mitigasi Skenario A/B/C)
+1. Activity Diagram: Integrasi Data Denah (Mitigasi Skenario A/B/C)
 
 Gambar 2.7 Activity Diagram: Integrasi Data Denah
 
@@ -569,12 +569,12 @@ Usulan jadwal kegiatan untuk penyelesaian proyek ini dirinci dalam bentuk Gantt 
 
 Alur pengerjaan dirancang secara sekuensial dan bertahap, selaras dengan proses pengembangan yang telah diuraikan pada Bab 2.3.3 . Tahapan-tahapan tersebut adalah:
 
-- Desain Arsitektur & UI (Bulan 1): Tahap fondasi yang berfokus pada perancangan blueprint sistem, termasuk ERD , Use Case Diagram , dan mockup UI.
-- Pengembangan Backend (Bulan 2-3): Tahap implementasi kode sisi server, mencakup pembangunan database PostgreSQL dan RESTful API Node.js.
-- Pengembangan Frontend (Bulan 3-4): Tahap implementasi kode sisi klien, berfokus pada pembangunan Admin Dashboard dan Public Dashboard menggunakan React.js. Tahap ini berjalan tumpang tindih (overlap) dengan backend untuk efisiensi.
-- Integrasi dan Pengujian Sistem (Bulan 4-5): Tahap validasi di mana frontend dan backend diintegrasikan dan diuji secara menyeluruh menggunakan skenario pengujian Black Box .
-- Revisi Final & Penulisan Laporan (Bulan 5): Alokasi waktu khusus untuk perbaikan bug akhir berdasarkan hasil pengujian dan penyusunan draf final laporan.
-- Dokumentasi (Bulan 1-5): Aktivitas ini akan dilakukan secara paralel sepanjang proyek untuk memastikan semua proses, desain, dan kode terdokumentasi dengan baik.
+1. Desain Arsitektur & UI (Bulan 1): Tahap fondasi yang berfokus pada perancangan blueprint sistem, termasuk ERD , Use Case Diagram , dan mockup UI.
+2. Pengembangan Backend (Bulan 2-3): Tahap implementasi kode sisi server, mencakup pembangunan database PostgreSQL dan RESTful API Node.js.
+3. Pengembangan Frontend (Bulan 3-4): Tahap implementasi kode sisi klien, berfokus pada pembangunan Admin Dashboard dan Public Dashboard menggunakan React.js. Tahap ini berjalan tumpang tindih (overlap) dengan backend untuk efisiensi.
+4. Integrasi dan Pengujian Sistem (Bulan 4-5): Tahap validasi di mana frontend dan backend diintegrasikan dan diuji secara menyeluruh menggunakan skenario pengujian Black Box .
+5. Revisi Final & Penulisan Laporan (Bulan 5): Alokasi waktu khusus untuk perbaikan bug akhir berdasarkan hasil pengujian dan penyusunan draf final laporan.
+6. Dokumentasi (Bulan 1-5): Aktivitas ini akan dilakukan secara paralel sepanjang proyek untuk memastikan semua proses, desain, dan kode terdokumentasi dengan baik.
 
 
 ### 2.3.6 User Interface
@@ -689,14 +689,14 @@ Sementara itu, User Acceptance Testing (UAT) diterapkan untuk memastikan bahwa s
 
 Tahap ini berfokus untuk memvalidasi "otak" sistem, yaitu RESTful API (Node.js) dan konektivitasnya ke database PostgreSQL.
 
-- Metode: Pengujian Integrasi API (sering disebut sebagai Grey Box Testing atau pengujian endpoint).
-- Alat: Software seperti Postman atau framework pengujian backend (misal: Jest).
-- Skenario Pengujian:
-- Validasi Koneksi: Memastikan backend dapat terhubung dengan benar ke database PostgreSQL.
-- Pengujian Endpoint API: Mengirimkan berbagai request HTTP ke endpoint API yang telah dibuat (misal: GET /api/fakultas, POST /api/dosen) untuk memvalidasi:
-- Apakah request yang valid mengembalikan status 200 OK (untuk GET) atau 201 Created (untuk POST) beserta data JSON yang benar?
-- Apakah request yang tidak valid (misal: data tidak lengkap) mengembalikan status error yang sesuai (misal: 400 Bad Request)?
-- Apakah request ke endpoint yang diamankan (misal: CRUD Admin) gagal jika tidak menyertakan token autentikasi?
+1. Metode: Pengujian Integrasi API (sering disebut sebagai Grey Box Testing atau pengujian endpoint).
+2. Alat: Software seperti Postman atau framework pengujian backend (misal: Jest).
+3. Skenario Pengujian:
+4. Validasi Koneksi: Memastikan backend dapat terhubung dengan benar ke database PostgreSQL.
+5. Pengujian Endpoint API: Mengirimkan berbagai request HTTP ke endpoint API yang telah dibuat (misal: GET /api/fakultas, POST /api/dosen) untuk memvalidasi:
+6. Apakah request yang valid mengembalikan status 200 OK (untuk GET) atau 201 Created (untuk POST) beserta data JSON yang benar?
+7. Apakah request yang tidak valid (misal: data tidak lengkap) mengembalikan status error yang sesuai (misal: 400 Bad Request)?
+8. Apakah request ke endpoint yang diamankan (misal: CRUD Admin) gagal jika tidak menyertakan token autentikasi?
 Pengujian backend difokuskan pada endpoint RESTful API yang melayani data akademik, spasial, dan analitik. Endpoint publik diuji untuk memastikan data dapat diakses tanpa autentikasi, sedangkan endpoint administratif diuji dengan validasi token autentikasi untuk memastikan kontrol akses berjalan dengan baik. Pendekatan ini bertujuan untuk menjamin keandalan layanan API dalam mendukung public dashboard maupun admin dashboard.
 
 
@@ -706,8 +706,8 @@ Black Box Testing, yang juga dikenal sebagai pengujian fungsional, merupakan met
 
 Implementasi Black Box Testing pada tahap ini berfokus untuk memvalidasi fungsionalitas antarmuka pengguna (frontend) dari perspektif pengguna, tanpa melihat kode internal. Pengujian ini memastikan bahwa semua alur kerja pada Admin Dashboard dan Public Dashboard berjalan sesuai mockup dan kebutuhan fungsional.
 
-- Metode: Black Box Testing.
-- Skenario Pengujian :
+1. Metode: Black Box Testing.
+2. Skenario Pengujian :
 Tabel 2.2 Skenario Black Box Testing
 
 
@@ -737,12 +737,12 @@ User Acceptance Testing (UAT) berfungsi sebagai tahapan validasi krusial dalam s
 
 Pada proyek ini, tahap pengujian akhir ini akan melibatkan pengguna asli untuk memvalidasi kegunaan (usability) dan penerimaan sistem.
 
-- Metode: Metode yang digunakan dalam tahap UAT ini adalah Usability Testing (Pengujian Ketergunaan).
-- Target Responden:
-- Admin Dashboard: Perwakilan staf administrasi atau pengelola data kampus.
-- Public Dashboard: Perwakilan mahasiswa (terutama mahasiswa baru) dan pengunjung.
-- Prosedur: Responden akan diberikan serangkaian skenario tugas (misal: "Tolong tambahkan data dosen baru bernama X" atau "Coba temukan informasi akreditasi Fakultas Hukum").
-- Metrik Evaluasi: Keberhasilan penyelesaian tugas dan umpan balik kualitatif akan dikumpulkan. Untuk mengukur usability secara kuantitatif, kuesioner standar seperti SUS (System Usability Scale) akan digunakan untuk mendapatkan skor ketergunaan sistem.
+1. Metode: Metode yang digunakan dalam tahap UAT ini adalah Usability Testing (Pengujian Ketergunaan).
+2. Target Responden:
+3. Admin Dashboard: Perwakilan staf administrasi atau pengelola data kampus.
+4. Public Dashboard: Perwakilan mahasiswa (terutama mahasiswa baru) dan pengunjung.
+5. Prosedur: Responden akan diberikan serangkaian skenario tugas (misal: "Tolong tambahkan data dosen baru bernama X" atau "Coba temukan informasi akreditasi Fakultas Hukum").
+6. Metrik Evaluasi: Keberhasilan penyelesaian tugas dan umpan balik kualitatif akan dikumpulkan. Untuk mengukur usability secara kuantitatif, kuesioner standar seperti SUS (System Usability Scale) akan digunakan untuk mendapatkan skor ketergunaan sistem.
 Skenario tugas pada tahap User Acceptance Testing dirancang berdasarkan fitur utama sistem, seperti menemukan lokasi fasilitas tertentu melalui public dashboard, menampilkan detail dosen berdasarkan fakultas, serta mengelola data fasilitas melalui dashboard admin. Penyusunan skenario ini bertujuan untuk memastikan bahwa sistem dapat digunakan secara intuitif oleh pengguna dengan latar belakang teknis yang berbeda.
 
 
@@ -777,38 +777,38 @@ Oleh karena itu, UPNVJ Kampus Pondok Labu menjadi lingkungan yang relevan sebaga
 
 Pengembangan sistem integrasi denah virtual kampus dan dashboard profil UPNVJ melibatkan keterkaitan langsung dengan mitra, yaitu Universitas Pembangunan Nasional “Veteran” Jakarta Kampus Pondok Labu, sebagai lingkungan implementasi dan sumber data utama. Hubungan antara mitra dan proyek dapat dijelaskan sebagai berikut:
 
-- Universitas Pembangunan Nasional “Veteran” Jakarta Kampus Pondok Labu
-- Peran:
-- Menjadi objek utama dalam pengembangan dan implementasi sistem, khususnya dalam penyediaan data spasial (gedung dan fasilitas) serta data profil kampus.
-- Menyediakan lingkungan nyata (real-world environment) sebagai dasar observasi, analisis kebutuhan, serta validasi sistem yang dikembangkan.
-- Mendukung proses pengembangan melalui koordinasi dengan stakeholder terkait, seperti pihak pengelola teknologi informasi (UPA TIK).
+1. Universitas Pembangunan Nasional “Veteran” Jakarta Kampus Pondok Labu
+  a. Peran:
+    1) Menjadi objek utama dalam pengembangan dan implementasi sistem, khususnya dalam penyediaan data spasial (gedung dan fasilitas) serta data profil kampus.
+    2) Menyediakan lingkungan nyata (real-world environment) sebagai dasar observasi, analisis kebutuhan, serta validasi sistem yang dikembangkan.
+    3) Mendukung proses pengembangan melalui koordinasi dengan stakeholder terkait, seperti pihak pengelola teknologi informasi (UPA TIK).
 
 
-- Manfaat:
-- Mendapatkan solusi sistem navigasi kampus berbasis visualisasi 3D yang lebih interaktif dibandingkan metode konvensional.
-- Memperoleh platform dashboard profil kampus yang terintegrasi, sehingga penyajian informasi menjadi lebih terpusat dan mudah diakses.
-- Mendukung implementasi konsep Smart Campus melalui integrasi teknologi backend, dashboard web, dan visualisasi 3D.
+  b. Manfaat:
+    1) Mendapatkan solusi sistem navigasi kampus berbasis visualisasi 3D yang lebih interaktif dibandingkan metode konvensional.
+    2) Memperoleh platform dashboard profil kampus yang terintegrasi, sehingga penyajian informasi menjadi lebih terpusat dan mudah diakses.
+    3) Mendukung implementasi konsep Smart Campus melalui integrasi teknologi backend, dashboard web, dan visualisasi 3D.
 
 
-- Sivitas Akademika dan Pengguna (Mahasiswa dan Pengunjung)
-- Peran:
-- Bertindak sebagai pengguna utama sistem (end-user) yang berinteraksi langsung dengan public dashboard dan denah virtual.
-- Menjadi sumber data kebutuhan sistem melalui kuesioner dan observasi pengalaman navigasi kampus.
+2. Sivitas Akademika dan Pengguna (Mahasiswa dan Pengunjung)
+  a. Peran:
+    1) Bertindak sebagai pengguna utama sistem (end-user) yang berinteraksi langsung dengan public dashboard dan denah virtual.
+    2) Menjadi sumber data kebutuhan sistem melalui kuesioner dan observasi pengalaman navigasi kampus.
 
 
-- Manfaat:
-- Mempermudah proses pencarian lokasi di lingkungan kampus melalui sistem navigasi berbasis visualisasi 3D.
-- Meningkatkan kemudahan akses terhadap informasi kampus yang sebelumnya tersebar di berbagai platform.
+  b. Manfaat:
+    1) Mempermudah proses pencarian lokasi di lingkungan kampus melalui sistem navigasi berbasis visualisasi 3D.
+    2) Meningkatkan kemudahan akses terhadap informasi kampus yang sebelumnya tersebar di berbagai platform.
 
 
-- Administrator Sistem (Pengelola Data Kampus)
-- Peran:
-- Mengelola data konten kampus melalui admin dashboard, termasuk data fasilitas, gedung, dan profil.
-- Menjaga konsistensi dan keakuratan data yang digunakan oleh sistem.
+3. Administrator Sistem (Pengelola Data Kampus)
+  a. Peran:
+    1) Mengelola data konten kampus melalui admin dashboard, termasuk data fasilitas, gedung, dan profil.
+    2) Menjaga konsistensi dan keakuratan data yang digunakan oleh sistem.
 
-- Manfaat:
-- Memperoleh sistem manajemen konten terpusat yang mempermudah pengelolaan data secara efisien.
-- Mendukung proses pembaruan informasi secara real-time tanpa perlu mengubah sistem secara keseluruhan.
+  b. Manfaat:
+    1) Memperoleh sistem manajemen konten terpusat yang mempermudah pengelolaan data secara efisien.
+    2) Mendukung proses pembaruan informasi secara real-time tanpa perlu mengubah sistem secara keseluruhan.
 
 
 ## Metode Implementasi
@@ -826,19 +826,19 @@ Pada sisi front-end, proses pengembangan mencakup perancangan serta implementasi
 
   Tahapan:
 
-- Requirement gathering
-- Prototype awal
-- Evaluasi
-- Iterasi
+1. Requirement gathering
+2. Prototype awal
+3. Evaluasi
+4. Iterasi
 
 
 ### Arsitektur Implementasi Sistem
 
   Jelaskan:
 
-- Backend sebagai data hub
-- Frontend sebagai interface
-- Unity sebagai visual layer
+1. Backend sebagai data hub
+2. Frontend sebagai interface
+3. Unity sebagai visual layer
   Bisa tambahkan diagram (kalau ada)
 
 
@@ -846,11 +846,11 @@ Pada sisi front-end, proses pengembangan mencakup perancangan serta implementasi
 
 Isi:
 
-- Struktur backend (MVC / modular)
-- Teknologi (Express, MySQL/PostgreSQL, dll)
-- Endpoint utama
-- Autentikasi (kalau ada)
-- Flow request-response
+1. Struktur backend (MVC / modular)
+2. Teknologi (Express, MySQL/PostgreSQL, dll)
+3. Endpoint utama
+4. Autentikasi (kalau ada)
+5. Flow request-response
 
 
 
@@ -906,10 +906,10 @@ Isi:
 
   Flow lengkap:
 
-- Admin input data
-- Data masuk DB
-- API expose data
-- Frontend & Unity consume
+1. Admin input data
+2. Data masuk DB
+3. API expose data
+4. Frontend & Unity consume
   Bisa dalam bentuk narasi atau diagram
 
 
