@@ -475,10 +475,18 @@ def format_document_xmls(unpacked_dir):
                         p_before = children[i-1]
                         txt_before = "".join([t.text for t in p_before.iter(f'{{{ns_uri}}}t') if t.text]).strip()
                         if txt_before.startswith('Gambar'):
-                            body.remove(p_before)
-                            body.insert(i, p_before)
-                            children = list(body)
-                            print(f"  Moved figure caption '{txt_before}' below the figure.")
+                            # CHECK if the caption is already immediately below a preceding drawing
+                            is_already_caption = False
+                            if i - 2 >= 0:
+                                p_before_before = children[i-2]
+                                if p_before_before.find('.//w:drawing', namespaces) is not None:
+                                    is_already_caption = True
+                            
+                            if not is_already_caption:
+                                body.remove(p_before)
+                                body.insert(i, p_before)
+                                children = list(body)
+                                print(f"  Moved figure caption '{txt_before}' below the figure.")
             i += 1
             
         # Remove manual page breaks that are immediately before Heading 1 (to prevent double page breaks)
@@ -825,6 +833,11 @@ def format_document_xmls(unpacked_dir):
                         set_child_element(pPr, 'pStyle', {'val': 'Caption'})
                         pStyle_val = 'Caption'
                         
+                        # Set keepNext for Table captions so they stay with their tables below
+                        if text_clean.capitalize().startswith('Tabel'):
+                            set_child_element(pPr, 'keepNext', {})
+                            sort_element_children(pPr, PPR_ORDER)
+                        
                         # Clean trailing dot from caption numbers (e.g. 'Tabel 1.1.' -> 'Tabel 1.1')
                         m = re.match(r'^(Tabel|Gambar)\s+([0-9]+(?:\.[0-9]+)*)\.?\s*(.*)$', text_clean, re.IGNORECASE)
                         if m:
@@ -934,6 +947,11 @@ def format_document_xmls(unpacked_dir):
                 if p.find('.//w:drawing', namespaces) is not None:
                     center_and_scale_drawings(p, namespaces)
                     pPr = p.find('w:pPr', namespaces)
+                    if pPr is None:
+                        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                        p.insert(0, pPr)
+                    set_child_element(pPr, 'keepNext', {})
+                    sort_element_children(pPr, PPR_ORDER)
                 
                 if pPr is not None: sort_element_children(pPr, PPR_ORDER)
                 
