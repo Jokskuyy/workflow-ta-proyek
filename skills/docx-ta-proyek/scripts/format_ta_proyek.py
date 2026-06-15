@@ -95,12 +95,12 @@ def ensure_front_matter_heading_style(styles_root):
 def ensure_appendix_heading_style(styles_root):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     namespaces = {'w': ns_uri}
-    style = styles_root.find("w:style[@w:styleId='AppendixHeading1']", namespaces)
+    style = styles_root.find("w:style[@w:styleId='taappendixheading']", namespaces)
     if style is None:
         style = lxml.etree.Element(f'{{{ns_uri}}}style')
         style.set(f'{{{ns_uri}}}type', 'paragraph')
-        style.set(f'{{{ns_uri}}}styleId', 'AppendixHeading1')
-        set_child_element(style, 'name', {'val': 'appendix heading 1'})
+        style.set(f'{{{ns_uri}}}styleId', 'taappendixheading')
+        set_child_element(style, 'name', {'val': 'taappendixheading'})
         set_child_element(style, 'basedOn', {'val': 'Normal'})
         set_child_element(style, 'next', {'val': 'Normal'})
         set_child_element(style, 'qFormat', {})
@@ -110,7 +110,7 @@ def ensure_appendix_heading_style(styles_root):
         set_child_element(pPr, 'pageBreakBefore', {})
         set_child_element(pPr, 'spacing', {'before': '240', 'after': '120'})
         set_child_element(pPr, 'jc', {'val': 'center'})
-        # Exclude outlineLvl to prevent inclusion in the main Table of Contents (Daftar Isi)
+        set_child_element(pPr, 'outlineLvl', {'val': '3'})
         sort_element_children(pPr, PPR_ORDER)
         style.append(pPr)
         rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
@@ -122,7 +122,7 @@ def ensure_appendix_heading_style(styles_root):
         style.append(rPr)
         sort_element_children(style, STYLE_ORDER)
         styles_root.append(style)
-        print("Successfully defined AppendixHeading1 style in styles.xml")
+        print("Successfully defined taappendixheading style in styles.xml")
 
 def ensure_hyperlink_style(styles_root):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
@@ -656,7 +656,10 @@ def format_caption_paragraph_clean(p, label, prefix, seq_name, default_val, desc
     
     r3 = lxml.etree.Element(f'{{{ns_uri}}}r')
     ins3 = lxml.etree.Element(f'{{{ns_uri}}}instrText')
-    ins3.text = f" SEQ {seq_name} \\* ARABIC "
+    if default_val == 1:
+        ins3.text = f" SEQ {seq_name} \\r 1 \\* ARABIC "
+    else:
+        ins3.text = f" SEQ {seq_name} \\* ARABIC "
     ins3.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
     r3.append(ins3)
     p.append(r3)
@@ -970,7 +973,10 @@ def format_document_xmls(unpacked_dir):
             # instrText
             r3 = lxml.etree.Element(f'{{{ns_uri}}}r')
             ins3 = lxml.etree.Element(f'{{{ns_uri}}}instrText')
-            ins3.text = f" SEQ {seq_name} \\* ARABIC "
+            if default_val == 1:
+                ins3.text = f" SEQ {seq_name} \\r 1 \\* ARABIC "
+            else:
+                ins3.text = f" SEQ {seq_name} \\* ARABIC "
             ins3.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
             r3.append(ins3)
             p.append(r3)
@@ -1218,7 +1224,7 @@ def format_document_xmls(unpacked_dir):
                     if is_gambar_caption:
                         m = re.match(r'^Gambar\s+[0-9]+(?:\.[0-9]+)*\.?\s*(.*)$', text_clean, re.IGNORECASE)
                         desc = m.group(1) if m else text_clean
-                        format_caption_paragraph_clean(p, "Gambar", "2.", "Gambar_2.", gambar_idx, desc, namespaces)
+                        format_caption_paragraph_clean(p, "Gambar", "2.", "Gambar", gambar_idx, desc, namespaces)
                         
                         new_caption_text = f"Gambar 2.{gambar_idx} {desc}"
                         collected_captions.append({
@@ -1242,7 +1248,7 @@ def format_document_xmls(unpacked_dir):
                                 chap_num = "2"
                                 seq_val = int(parts[0])
                             
-                            format_caption_paragraph_clean(p, "Tabel", f"{chap_num}.", f"Tabel_{chap_num}.", seq_val, desc, namespaces)
+                            format_caption_paragraph_clean(p, "Tabel", f"{chap_num}.", "Tabel", seq_val, desc, namespaces)
                             cleaned_caption = f"Tabel {chap_num}.{seq_val} {desc}"
                             text = cleaned_caption
                             
@@ -1267,10 +1273,10 @@ def format_document_xmls(unpacked_dir):
                 if pStyle_val == 'Heading1':
                     text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text]).strip()
                     if text.upper().startswith('LAMPIRAN'):
-                        pStyle.set(f'{{{ns_uri}}}val', 'AppendixHeading1')
-                        pStyle_val = 'AppendixHeading1'
+                        pStyle.set(f'{{{ns_uri}}}val', 'taappendixheading')
+                        pStyle_val = 'taappendixheading'
                         
-                if pStyle_val.startswith('Heading') or pStyle_val == 'AppendixHeading1':
+                if pStyle_val.startswith('Heading') or pStyle_val == 'taappendixheading':
                     text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text]).strip()
                     if not text:
                         if pPr is not None:
@@ -1278,11 +1284,11 @@ def format_document_xmls(unpacked_dir):
                             numPr = pPr.find(f'{{{ns_uri}}}numPr', namespaces)
                             if numPr is not None: pPr.remove(numPr)
                         continue
-                    if pStyle_val == 'AppendixHeading1':
+                    if pStyle_val == 'taappendixheading':
                         if pPr is None:
                             pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
                             p.insert(0, pPr)
-                        set_child_element(pPr, 'pStyle', {'val': 'AppendixHeading1'})
+                        set_child_element(pPr, 'pStyle', {'val': 'taappendixheading'})
                         set_child_element(pPr, 'pageBreakBefore', {})
                         numPr = pPr.find(f'{{{ns_uri}}}numPr', namespaces)
                         if numPr is not None:
@@ -1619,7 +1625,7 @@ def format_document_xmls(unpacked_dir):
             p_head.append(r_head)
             
             body.insert(insertion_idx, p_head)
-            insert_dynamic_toc_field(body, insertion_idx + 1, ' TOC \\t "AppendixHeading1,1" \\h \\z ', namespaces)
+            insert_dynamic_toc_field(body, insertion_idx + 1, ' TOC \\o "4-4" \\h \\z ', namespaces)
             print("Successfully inserted DAFTAR LAMPIRAN heading and TOF field.")
 
         fix_whitespace_preservation(root)

@@ -1,7 +1,10 @@
 unpacked_*/
 **/__pycache__/
 *.log
-scratch/
+scratch/*
+!scratch/validate_docx_structure.py
+!scratch/build_pipeline.py
+!scratch/test_tdd_formatting.py
 ~$*
 *.tmp
 Tugas_Akhir_Formatted_New.docx
