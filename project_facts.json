@@ -1,0 +1,75 @@
+{
+  "project_metadata": {
+    "title": "Integrasi Denah Virtual Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu (Dashboard Profil)",
+    "author": "Muhammad Iman Nugraha",
+    "nim": "2210511129",
+    "program_study": "S1 Informatika",
+    "faculty": "Fakultas Ilmu Komputer",
+    "institution": "Universitas Pembangunan Nasional Veteran Jakarta",
+    "academic_year": "2025/2026",
+    "mitra": {
+      "name": "UPA TIK UPN Veteran Jakarta",
+      "representative": "Erly Krisnanik, S.Kom., M.M.",
+      "role": "Kepala UPA TIK UPNVJ"
+    }
+  },
+  "team_members": [
+    {
+      "name": "Muhammad Iman Nugraha",
+      "nim": "2210511129",
+      "role": "Peran 1: Full Stack Web Developer & System Integrator",
+      "focus": ["React Frontend", "Serverless API", "Supabase Auth", "Umami Analytics Proxy", "System Integration", "Vitest"]
+    },
+    {
+      "name": "Muammar Faiz Khairul Anam",
+      "nim": "TBD",
+      "role": "Peran 2: 3D Simulator & Engine Developer",
+      "focus": ["Unity WebGL Engine", "NavMesh pathfinding", "Catmull-Rom Centripetal curve", "Building Culling", "Pointer Lock", "Virtual mobile joystick", "Editor tools"]
+    },
+    {
+      "name": "Muhammad Dwikhi Deandra Purnianto",
+      "nim": "TBD",
+      "role": "Peran 3: 3D Asset Designer & Database/Asset Manager",
+      "focus": ["3D modeling and layout directly in Unity Editor", "PostgreSQL database schema design in Supabase Cloud", "RLS policies", "audit logs triggers", "data mapping/integrity"]
+    }
+  ],
+  "testing_status": {
+    "black_box_testing": {
+      "completed": false,
+      "date_conducted": null,
+      "total_scenarios": 18,
+      "success_rate": null,
+      "details": "Belum dilaksanakan. Menunggu penyelesaian prototipe akhir."
+    },
+    "lighthouse_testing": {
+      "completed": false,
+      "date_conducted": null,
+      "metrics": {
+        "performance": "TBD",
+        "accessibility": "TBD",
+        "best_practices": "TBD",
+        "seo": "TBD"
+      },
+      "details": "Lighthouse baru berjalan pada tahap pengembangan awal. Pengujian resmi dengan optimasi final belum dilaksanakan."
+    },
+    "user_acceptance_test_uat": {
+      "completed": false,
+      "date_conducted": null,
+      "respondents": {
+        "total": 0,
+        "students": 0,
+        "admin_staff": 0
+      },
+      "likert_scale_rating": null,
+      "satisfaction_percentage": "TBD",
+      "details": "Belum dilaksanakan. UAT akan dilaksanakan setelah prototipe final dideploy dan diakses responden."
+    }
+  },
+  "reference_documents": {
+    "description": "Dokumen berikut HANYA digunakan sebagai referensi outline struktur bab dan tata cara penulisan, BUKAN sebagai sumber data empiris proyek.",
+    "files": [
+      "Tugas Akhir_Abimanyu Damarjati_2110511110.pdf",
+      "Outline Laporan Tugas Akhir Jenis Prototipe.docx"
+    ]
+  }
+}

@@ -561,7 +561,7 @@ Minggu ke- | Aktivitas Pengembangan | Kontribusi Peran Full Stack | Validasi Use
 5-8 | Backend Development | Membangun database PostgreSQL di Supabase, menerapkan aturan keamanan RLS, membuat RESTful API serverless | Lulus validasi uji koneksi DB
 9-12 | Frontend Development | Memprogram komponen React SPA, mengintegrasikan Umami Analytics Proxy, menerapkan connection-aware | Antarmuka responsif di desktop
 13-16 | System Integration | Mengintegrasikan container Unity WebGL dengan React menggunakan react-unity-webgl, menguji bridge SendMessage | Navigasi terpemicu dari pencarian React
-17-20 | Testing & Evaluation | Melakukan Black Box Testing pada 18 skenario, melaksanakan kuesioner UAT, menyusun laporan Tugas Akhir | Indeks kepuasan UAT mencapai 89.5%
+17-20 | Testing & Evaluation | Melakukan Black Box Testing pada 18 skenario, melaksanakan kuesioner UAT, menyusun laporan Tugas Akhir | [TBD: Evaluasi UAT Selesai]
 [/TABLE]
 
 ### 3.4.2 Hasil Implementasi Back-end
@@ -607,21 +607,21 @@ Frontend React SPA berhasil dideploy secara statis. Antarmuka pengguna menyajika
 
 ### 3.5.1 Black Box Testing
 
-Pengujian fungsionalitas asinkron pada dashboard admin dan public dashboard diuji pada 18 skenario uji. Rincian hasil pengujian Black Box dirangkum pada Tabel 3.3.
+Pengujian fungsionalitas asinkron pada dashboard admin dan public dashboard akan dilakukan untuk memvalidasi kelayakan fungsional antarmuka admin dashboard dan visualisasi 3D. Rencana pengujian fungsional dirangkum pada Tabel 3.3. [TBD: Pelaksanaan Uji]
 
 Tabel 3.3 Hasil Pengujian Black Box Testing
 
 [TABLE]
 ID Test | Fitur Uji | Skenario Pengujian | Hasil yang Diharapkan | Status
-BB-01 | Login Admin | Memasukkan kredensial admin yang valid. | Administrator berhasil login dan masuk ke Admin Dashboard | Lulus (100%)
-BB-02 | CRUD Gedung | Menambahkan data gedung baru melalui modal form admin. | Data tersimpan di Supabase dan unity_object_name terdaftar | Lulus (100%)
-BB-03 | Keamanan RLS | Mengakses endpoint POST /api/buildings secara anonim. | API menolak request dengan status HTTP 401 Unauthorized | Lulus (100%)
-BB-04 | Search Overlay | Mengetik kata kunci "Laboratorium" pada kotak pencarian React. | Menampilkan daftar fasilitas laboratorium dengan ikon yang sesuai | Lulus (100%)
-BB-05 | Navigation Bridge | Memilih lokasi tujuan pada pencarian React. | React mengirimkan nama objek via SendMessage dan memicu rute 3D | Lulus (100%)
-BB-06 | Connection Check | Membuka halaman pada kondisi jaringan internet lambat (3G). | Preload otomatis dilewati dan tombol aktivasi manual muncul | Lulus (100%)
+BB-01 | Login Admin | Memasukkan kredensial admin yang valid. | Administrator berhasil login dan masuk ke Admin Dashboard | [TBD]
+BB-02 | CRUD Gedung | Menambahkan data gedung baru melalui modal form admin. | Data tersimpan di Supabase dan unity_object_name terdaftar | [TBD]
+BB-03 | Keamanan RLS | Mengakses endpoint POST /api/buildings secara anonim. | API menolak request dengan status HTTP 401 Unauthorized | [TBD]
+BB-04 | Search Overlay | Mengetik kata kunci "Laboratorium" pada kotak pencarian React. | Menampilkan daftar fasilitas laboratorium dengan ikon yang sesuai | [TBD]
+BB-05 | Navigation Bridge | Memilih lokasi tujuan pada pencarian React. | React mengirimkan nama objek via SendMessage dan memicu rute 3D | [TBD]
+BB-06 | Connection Check | Membuka halaman pada kondisi jaringan internet lambat (3G). | Preload otomatis dilewati dan tombol aktivasi manual muncul | [TBD]
 [/TABLE]
 
-Hasil pengujian pada ke-18 skenario menunjukkan tingkat keberhasilan fungsionalitas sebesar **100% (Sukses)**.
+Hasil pengujian fungsionalitas sistem (Black Box Testing) akan dimasukkan setelah pengujian dilaksanakan secara menyeluruh pada prototipe final. [TBD: Hasil Pengujian Black Box]
 
 ### 3.5.2 Lighthouse Testing
 
@@ -631,25 +631,23 @@ Tabel 3.4 Perbandingan Metrik Performa Lighthouse
 
 [TABLE]
 Kategori Audit | Kondisi Awal (Tanpa Optimasi) | Kondisi Akhir (Dengan Optimasi)
-Performance | 68% | 91%
-Accessibility | 82% | 95%
-Best Practices | 75% | 100%
-SEO | 80% | 100%
+Performance | [TBD] | [TBD]
+Accessibility | [TBD] | [TBD]
+Best Practices | [TBD] | [TBD]
+SEO | [TBD] | [TBD]
 [/TABLE]
 
-Peningkatan skor performa didorong oleh penerapan code splitting (lazy loading) pada halaman Admin Panel serta implementasi Brotli compression untuk transfer data binary WebGL.
+[TBD: Analisis dan Optimasi Kinerja Lighthouse]
 
 ### 3.5.3 User Acceptance Test (UAT)
 
-UAT dilakukan terhadap 16 responden (12 mahasiswa dan 4 staf pengelola/admin) menggunakan skala Likert 5-titik untuk menilai aspek kegunaan (*usability*), kemudahan orientasi navigasi, dan performa antarmuka. 
+Pengujian UAT akan dilakukan setelah prototipe akhir dideploy. Pengujian direncanakan melibatkan responden dari kelompok mahasiswa dan staf pengelola/admin menggunakan skala Likert 5-titik untuk menilai aspek kegunaan (*usability*), kemudahan orientasi navigasi, dan performa antarmuka. [TBD: Metodologi UAT] 
 
-Hasil perhitungan skor kuantitatif kuesioner memperoleh nilai rata-rata indeks kepuasan sebesar **89.5% (Sangat Baik)**. Hal ini menunjukkan bahwa sistem integrasi denah virtual 3D dan dashboard profil web sangat membantu pengguna dalam memahami tata ruang fisik kampus UPNVJ.
+Hasil perhitungan kuesioner UAT dan tingkat kepuasan responden akan dimasukkan setelah pengujian dilaksanakan. [TBD: Hasil Indeks Kepuasan UAT]
 
 ### 3.5.4 Implementasi Hasil User Acceptance Test (UAT)
 
-Berdasarkan umpan balik kualitatif responden saat pengujian UAT, beberapa perbaikan minor diimplementasikan ke dalam sistem:
-1. Penyesuaian Responsivitas Virtual Joystick: Menambahkan deteksi otomatis tipe perangkat di engine Unity agar joystick virtual hanya ditampilkan saat diakses dari peramban mobile (smartphone).
-2. Penambahan Keterangan Jarak Real-Time: Menambahkan label penunjuk jarak dinamis (meter) di atas garis rute visual 3D agar pengguna mengetahui estimasi jarak tersisa menuju lokasi target.
+Berdasarkan umpan balik dari responden pengujian UAT, tindakan perbaikan sistem akan didokumentasikan pada bagian ini. [TBD: Tindak Lanjut Perbaikan Sistem]
 
 ---
 
@@ -662,7 +660,7 @@ Berdasarkan hasil pengembangan, implementasi, dan pengujian sistem integrasi den
 1. Sistem integrasi denah virtual berbasis visualisasi 3D interaktif dan dashboard profil kampus berhasil dirancang dan diimplementasikan secara Full Stack dengan mengintegrasikan frontend React SPA, serverless API Express, database PostgreSQL Supabase, dan engine Unity WebGL.
 2. Aturan keamanan data relasional berhasil diterapkan secara andal menggunakan Row-Level Security (RLS) di tingkat database serta mekanisme pencatatan audit logs yang menjamin akuntabilitas perubahan data oleh administrator.
 3. Integrasi data dinamis satu arah dari React ke Unity menggunakan metode `SendMessage` terbukti stabil dalam memicu NavMesh pathfinding rute visual 3D berdasarkan pencarian spasial pengguna di frontend web.
-4. Hasil pengujian fungsionalitas sistem (Black Box) sukses 100%, dan evaluasi penerimaan pengguna (UAT) memperoleh skor indeks kepuasan sebesar 89.5% yang membuktikan kegunaan sistem dalam menyajikan informasi dan rute navigasi kampus secara efektif.
+4. Evaluasi fungsionalitas sistem (Black Box) dan tingkat penerimaan pengguna (UAT) akan disimpulkan di sini setelah seluruh rangkaian pengujian selesai dilaksanakan. [TBD: Kesimpulan Hasil Uji]
 
 ## 4.2 Saran
 

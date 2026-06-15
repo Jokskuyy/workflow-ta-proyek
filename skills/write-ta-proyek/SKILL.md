@@ -88,6 +88,14 @@ To automate the formatting of your `.docx` document:
      * LAMPIRAN 3. Kode Sumber Utama (Source Code)
      * LAMPIRAN 4. Panduan Pengguna (User Manual) (disiapkan sebagai placeholder jika belum selesai)
 
+10. **Fact Verification & Registry Audit**:
+    - The agent MUST verify the existence of `project_facts.json` before drafting or modifying any report chapters.
+    - Under NO circumstances should the agent invent, guess, or copy empirical testing figures (like UAT percentages, participant counts, lighthouse load times, or specific database row counts) from reference materials (like senior theses).
+    - Check the `testing_status` within `project_facts.json`. If a testing stage (e.g. UAT or Black Box) is marked as `completed: false` or has `null` values, the agent MUST write clear placeholders (such as `[TBD: Jumlah Responden]` or `[TBD: Skor UAT]`) instead of realistic numbers.
+    - If `completed: true`, the agent must use the exact numbers stored in `project_facts.json` without any alterations.
+    - Verify that no details from `Tugas Akhir_Abimanyu Damarjati_2110511110.pdf` are used as facts for the user's project.
+
+
 
 
 ## Formatting Specifications (UPNVJ FIK 2025)
