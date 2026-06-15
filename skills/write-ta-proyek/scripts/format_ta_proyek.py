@@ -743,8 +743,21 @@ def format_document_xmls(unpacked_dir):
                         daftar_pustaka_heading_idx = idx
                         break
                         
+        estimated_page = 1
+        para_count = 0
         for idx, child in enumerate(children):
-            if child.tag.endswith('tbl'): continue
+            if idx == bab1_idx:
+                estimated_page = 1
+                para_count = 0
+                
+            if child.tag.endswith('tbl'):
+                # Estimate table takes space of 3 paragraphs
+                para_count += 3
+                if para_count > 25:
+                    estimated_page += 1
+                    para_count = 0
+                continue
+                
             if child.tag.endswith('sdt'):
                 if daftar_pustaka_heading_idx != -1 and idx > daftar_pustaka_heading_idx:
                     clean_bibliography_sdt(child)
@@ -772,6 +785,23 @@ def format_document_xmls(unpacked_dir):
                     if pStyle is not None: pStyle_val = pStyle.get(f'{{{ns_uri}}}val')
                     
                 is_section2 = (idx > section1_last_p_idx)
+                
+                # Page number estimation logic
+                is_page_break = False
+                if pStyle_val == 'Heading1':
+                    is_page_break = True
+                elif p.find('.//w:br[@w:type="page"]', namespaces) is not None:
+                    is_page_break = True
+                    
+                if is_page_break:
+                    if idx != bab1_idx:
+                        estimated_page += 1
+                        para_count = 0
+                else:
+                    para_count += 1
+                    if para_count > 25:
+                        estimated_page += 1
+                        para_count = 0
                 
                 # Correct in-text citations
                 text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text])
@@ -850,7 +880,7 @@ def format_document_xmls(unpacked_dir):
                             pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
                             p.insert(0, pPr)
                         set_child_element(pPr, 'pageBreakBefore', {})
-                        if 'DAFTAR' in text.upper() or 'KATA PENGANTAR' in text.upper() or 'ABSTRAK' in text.upper():
+                        if 'DAFTAR' in text.upper() or 'KATA PENGANTAR' in text.upper() or 'ABSTRAK' in text.upper() or 'LAMPIRAN' in text.upper():
                             set_child_element(pPr, 'pStyle', {'val': 'Heading1'})
                             numPr = pPr.find(f'{{{ns_uri}}}numPr', namespaces)
                             if numPr is not None: pPr.remove(numPr)
