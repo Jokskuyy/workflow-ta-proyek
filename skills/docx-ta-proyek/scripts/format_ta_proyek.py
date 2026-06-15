@@ -92,6 +92,38 @@ def ensure_front_matter_heading_style(styles_root):
         sort_element_children(style, STYLE_ORDER)
         styles_root.append(style)
 
+def ensure_appendix_heading_style(styles_root):
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    namespaces = {'w': ns_uri}
+    style = styles_root.find("w:style[@w:styleId='AppendixHeading1']", namespaces)
+    if style is None:
+        style = lxml.etree.Element(f'{{{ns_uri}}}style')
+        style.set(f'{{{ns_uri}}}type', 'paragraph')
+        style.set(f'{{{ns_uri}}}styleId', 'AppendixHeading1')
+        set_child_element(style, 'name', {'val': 'appendix heading 1'})
+        set_child_element(style, 'basedOn', {'val': 'Normal'})
+        set_child_element(style, 'next', {'val': 'Normal'})
+        set_child_element(style, 'qFormat', {})
+        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+        set_child_element(pPr, 'keepNext', {})
+        set_child_element(pPr, 'keepLines', {})
+        set_child_element(pPr, 'pageBreakBefore', {})
+        set_child_element(pPr, 'spacing', {'before': '240', 'after': '120'})
+        set_child_element(pPr, 'jc', {'val': 'center'})
+        # Exclude outlineLvl to prevent inclusion in the main Table of Contents (Daftar Isi)
+        sort_element_children(pPr, PPR_ORDER)
+        style.append(pPr)
+        rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+        set_child_element(rPr, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
+        set_child_element(rPr, 'b', {})
+        set_child_element(rPr, 'bCs', {})
+        set_child_element(rPr, 'sz', {'val': '28'})
+        set_child_element(rPr, 'szCs', {'val': '28'})
+        style.append(rPr)
+        sort_element_children(style, STYLE_ORDER)
+        styles_root.append(style)
+        print("Successfully defined AppendixHeading1 style in styles.xml")
+
 def ensure_hyperlink_style(styles_root):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     namespaces = {'w': ns_uri}
@@ -422,6 +454,292 @@ def build_toc_entry(caption_text, page_num, bookmark_name):
     
     return p
 
+def replace_mentions_in_paragraph(text):
+    # Rule 1: Wawancara / Mitra (Gambar 2.25 -> Gambar 2.8)
+    if "Wakil Rektor" in text and "pakta integritas" in text and "Gambar 2.25" in text:
+        text = text.replace("Gambar 2.25", "Gambar 2.8")
+        
+    # Rule 2: Diagram Arsitektur (Gambar 2.1 -> Gambar 2.9)
+    if "arsitektur sistem secara high-level" in text and "Gambar 2.1" in text:
+        text = text.replace("Gambar 2.1", "Gambar 2.9")
+    if "diilustrasikan pada Gambar 2.1" in text:
+        text = text.replace("Gambar 2.1", "Gambar 2.9")
+        
+    # Rule 3: Arsitektur Integrasi (Gambar 2.15 -> Gambar 2.10)
+    if "Arsitektur Integrasi" in text and "Gambar 2.15" in text:
+        text = text.replace("Gambar 2.15", "Gambar 2.10")
+    if "unity_object_name" in text and "Gambar 2.15" in text:
+        text = text.replace("Gambar 2.15", "Gambar 2.10")
+        
+    # Rule 4: Tahap Pengembangan (Gambar 2.9 -> Gambar 2.11)
+    if "telah ditetapkan" in text and "Gambar 2.9" in text:
+        text = text.replace("Gambar 2.9", "Gambar 2.11")
+    if "Alur waktu pelaksanaan" in text and "Gambar 2.9" in text:
+        text = text.replace("Gambar 2.9", "Gambar 2.11")
+        
+    # Rule 5: ERD (Gambar 2.10 -> Gambar 2.12)
+    if "skema database PostgreSQL" in text and "Gambar 2.10" in text:
+        text = text.replace("Gambar 2.10", "Gambar 2.12")
+    if "Skema ERD divisualisasikan" in text and "Gambar 2.10" in text:
+        text = text.replace("Gambar 2.10", "Gambar 2.12")
+        
+    # Rule 6: Legenda Use Case (Gambar 2.11 -> Gambar 2.13)
+    if "legenda" in text and "Gambar 2.11" in text:
+        text = text.replace("Gambar 2.11", "Gambar 2.13")
+        
+    # Rule 7: Use Case (Gambar 2.12 -> Gambar 2.14)
+    if "Use Case Diagram" in text and "Gambar 2.12" in text:
+        text = text.replace("Gambar 2.12", "Gambar 2.14")
+    if "hak akses read-only" in text and "Gambar 2.12" in text:
+        text = text.replace("Gambar 2.12", "Gambar 2.14")
+        
+    # Rule 8: Activity Admin (Gambar 2.13 -> Gambar 2.15)
+    if "Activity Diagram" in text and "Gambar 2.13" in text:
+        text = text.replace("Gambar 2.13", "Gambar 2.15")
+    if "pengelolaan data oleh administrator" in text and "Gambar 2.13" in text:
+        text = text.replace("Gambar 2.13", "Gambar 2.15")
+        
+    # Rule 9: Activity Denah (Gambar 2.14 -> Gambar 2.16)
+    if "Activity Diagram" in text and "Gambar 2.14" in text:
+        text = text.replace("Gambar 2.14", "Gambar 2.16")
+    if "mitigasi" in text and "Gambar 2.14" in text:
+        text = text.replace("Gambar 2.14", "Gambar 2.16")
+        
+    # Rule 10: Halaman Login (Gambar 2.16 -> Gambar 2.17)
+    if "autentikasi" in text and "Gambar 2.16" in text:
+        text = text.replace("Gambar 2.16", "Gambar 2.17")
+    if "halaman login admin" in text and "Gambar 2.16" in text:
+        text = text.replace("Gambar 2.16", "Gambar 2.17")
+        
+    # Rule 11: Dashboard Admin (Gambar 2.17 -> Gambar 2.18)
+    if "pusat pengelolaan data" in text and "Gambar 2.17" in text:
+        text = text.replace("Gambar 2.17", "Gambar 2.18")
+    if "halaman utama dashboard admin" in text and "Gambar 2.17" in text:
+        text = text.replace("Gambar 2.17", "Gambar 2.18")
+        
+    # Rule 12: Modal Tambah (Gambar 2.18 -> Gambar 2.19)
+    if "tambah data" in text and "Gambar 2.18" in text:
+        text = text.replace("Gambar 2.18", "Gambar 2.19")
+        
+    # Rule 13: Modal Update (Gambar 2.19 -> Gambar 2.20)
+    if "edit data" in text and "Gambar 2.19" in text:
+        text = text.replace("Gambar 2.19", "Gambar 2.20")
+    if "modal update dosen" in text and "Gambar 2.19" in text:
+        text = text.replace("Gambar 2.19", "Gambar 2.20")
+        
+    # Rule 14: Modal Konfirmasi Hapus (Gambar 2.20 -> Gambar 2.21)
+    if "hapus data" in text and "Gambar 2.20" in text:
+        text = text.replace("Gambar 2.20", "Gambar 2.21")
+    if "modal konfirmasi hapus" in text and "Gambar 2.20" in text:
+        text = text.replace("Gambar 2.20", "Gambar 2.21")
+        
+    # Rule 15: Traffic Admin (Gambar 2.21 -> Gambar 2.22)
+    if "traffic website" in text and "Gambar 2.21" in text:
+        text = text.replace("Gambar 2.21", "Gambar 2.22")
+    if "lalu lintas penggunaan" in text and "Gambar 2.21" in text:
+        text = text.replace("Gambar 2.21", "Gambar 2.22")
+        
+    # Rule 16: Hero Section (Gambar 2.22 -> Gambar 2.23)
+    if "hero section" in text and "Gambar 2.22" in text:
+        text = text.replace("Gambar 2.22", "Gambar 2.23")
+    if "titik orientasi utama" in text and "Gambar 2.22" in text:
+        text = text.replace("Gambar 2.22", "Gambar 2.23")
+        
+    # Rule 17: Traffic Public (Gambar 2.23 -> Gambar 2.24)
+    if "Public Traffic" in text and "Gambar 2.23" in text:
+        text = text.replace("Gambar 2.23", "Gambar 2.24")
+    if "aktivitas pengguna pada public dashboard" in text and "Gambar 2.23" in text:
+        text = text.replace("Gambar 2.23", "Gambar 2.24")
+        
+    # Rule 18: Fasilitas dan Aset (Gambar 2.24 -> Gambar 2.25)
+    if "fasilitas dan aset" in text and "Gambar 2.24" in text:
+        text = text.replace("Gambar 2.24", "Gambar 2.25")
+        
+    # Rule 19: Modal List Fasilitas (Gambar 2.25 -> Gambar 2.26)
+    if "modal yang berisi daftar fasilitas" in text and "Gambar 2.25" in text:
+        text = text.replace("Gambar 2.25", "Gambar 2.26")
+    if "modal daftar fasilitas kategori" in text and "Gambar 2.25" in text:
+        text = text.replace("Gambar 2.25", "Gambar 2.26")
+        
+    # Rule 20: Modal Detail Fasilitas (Gambar 2.26 -> Gambar 2.27)
+    if "kategori unggulan" in text and "Gambar 2.26" in text:
+        text = text.replace("Gambar 2.26", "Gambar 2.27")
+    if "informasi spesifik" in text and "Gambar 2.26" in text:
+        text = text.replace("Gambar 2.26", "Gambar 2.27")
+        
+    # Rule 21: Bagian Statistik (Gambar 2.27 -> Gambar 2.28)
+    if "grafik batang" in text and "Gambar 2.27" in text:
+        text = text.replace("Gambar 2.27", "Gambar 2.28")
+    if "distribusi sumber daya akademik" in text and "Gambar 2.27" in text:
+        text = text.replace("Gambar 2.27", "Gambar 2.28")
+        
+    # Rule 22: Detail Dosen (Gambar 2.28 -> Gambar 2.29)
+    if "detail data dosen" in text and "Gambar 2.28" in text:
+        text = text.replace("Gambar 2.28", "Gambar 2.29")
+    if "grafik dosen" in text and "Gambar 2.28" in text:
+        text = text.replace("Gambar 2.28", "Gambar 2.29")
+        
+    # Rule 23: Detail Mahasiswa (Gambar 2.29 -> Gambar 2.30)
+    if "detail data mahasiswa" in text and "Gambar 2.29" in text:
+        text = text.replace("Gambar 2.29", "Gambar 2.30")
+    if "grafik mahasiswa" in text and "Gambar 2.29" in text:
+        text = text.replace("Gambar 2.29", "Gambar 2.30")
+        
+    # Rule 24: Bagian Footer (Gambar 2.30 -> Gambar 2.31)
+    if "footer" in text and "Gambar 2.30" in text:
+        text = text.replace("Gambar 2.30", "Gambar 2.31")
+        
+    return text
+
+def format_caption_paragraph_clean(p, label, prefix, seq_name, default_val, desc, namespaces):
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    
+    pPr = p.find('w:pPr', namespaces)
+    if pPr is None:
+        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+        p.insert(0, pPr)
+        
+    set_child_element(pPr, 'pStyle', {'val': 'Caption'})
+    set_child_element(pPr, 'spacing', {'before': '120', 'after': '120', 'line': '240', 'lineRule': 'auto'})
+    set_child_element(pPr, 'jc', {'val': 'center'})
+    set_child_element(pPr, 'ind', {'firstLine': '0', 'left': '0'})
+    sort_element_children(pPr, PPR_ORDER)
+    
+    # Extract bookmarks (resilient to namespaces)
+    bookmarks = []
+    for elem in list(p):
+        if elem.tag.endswith('bookmarkStart'):
+            bm_id = elem.get(f'{{{ns_uri}}}id') or elem.get('id')
+            bm_name = elem.get(f'{{{ns_uri}}}name') or elem.get('name')
+            if bm_id is not None:
+                bookmarks.append(('start', bm_id, bm_name or ""))
+        elif elem.tag.endswith('bookmarkEnd'):
+            bm_id = elem.get(f'{{{ns_uri}}}id') or elem.get('id')
+            if bm_id is not None:
+                bookmarks.append(('end', bm_id, None))
+            
+    # Clear all child elements except pPr
+    for elem in list(p):
+        if elem != pPr:
+            p.remove(elem)
+            
+    # Add bookmarkStarts
+    for bm_type, bm_id, bm_name in bookmarks:
+        if bm_type == 'start':
+            bms = lxml.etree.Element(f'{{{ns_uri}}}bookmarkStart')
+            bms.set(f'{{{ns_uri}}}id', str(bm_id))
+            bms.set(f'{{{ns_uri}}}name', str(bm_name))
+            p.append(bms)
+            
+    # Label prefix, e.g. "Gambar 2."
+    r1 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    rPr1 = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+    set_child_element(rPr1, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
+    set_child_element(rPr1, 'b', {})
+    set_child_element(rPr1, 'bCs', {})
+    set_child_element(rPr1, 'sz', {'val': '24'})
+    set_child_element(rPr1, 'szCs', {'val': '24'})
+    r1.append(rPr1)
+    
+    t1 = lxml.etree.Element(f'{{{ns_uri}}}t')
+    t1.text = f"{label} {prefix}"
+    if t1.text.startswith(' ') or t1.text.endswith(' '):
+        t1.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+    r1.append(t1)
+    p.append(r1)
+    
+    # SEQ field
+    r2 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    fld2 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "begin"})
+    r2.append(fld2)
+    p.append(r2)
+    
+    r3 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    ins3 = lxml.etree.Element(f'{{{ns_uri}}}instrText')
+    ins3.text = f" SEQ {seq_name} \\* ARABIC "
+    ins3.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+    r3.append(ins3)
+    p.append(r3)
+    
+    r4 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    fld4 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "separate"})
+    r4.append(fld4)
+    p.append(r4)
+    
+    r5 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    t5 = lxml.etree.Element(f'{{{ns_uri}}}t')
+    t5.text = str(default_val)
+    r5.append(t5)
+    p.append(r5)
+    
+    r6 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    fld6 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "end"})
+    r6.append(fld6)
+    p.append(r6)
+    
+    # Description
+    r7 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    rPr7 = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+    set_child_element(rPr7, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
+    set_child_element(rPr7, 'sz', {'val': '24'})
+    set_child_element(rPr7, 'szCs', {'val': '24'})
+    r7.append(rPr7)
+    
+    t7 = lxml.etree.Element(f'{{{ns_uri}}}t')
+    t7.text = f" {desc.strip()}"
+    t7.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+    r7.append(t7)
+    p.append(r7)
+    
+    # Add bookmarkEnds
+    for bm_type, bm_id, _ in bookmarks:
+        if bm_type == 'end':
+            bme = lxml.etree.Element(f'{{{ns_uri}}}bookmarkEnd')
+            bme.set(f'{{{ns_uri}}}id', str(bm_id))
+            p.append(bme)
+
+def insert_dynamic_toc_field(body, insertion_idx, field_instruction, namespaces):
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    
+    p = lxml.etree.Element(f'{{{ns_uri}}}p')
+    pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+    set_child_element(pPr, 'pStyle', {'val': 'TableofFigures'})
+    tabs = lxml.etree.Element(f'{{{ns_uri}}}tabs')
+    set_child_element(tabs, 'tab', {'val': 'right', 'leader': 'dot', 'pos': '7927'})
+    pPr.append(tabs)
+    
+    # Sort pPr
+    children_list = list(pPr)
+    for c in children_list: pPr.remove(c)
+    for tag in PPR_ORDER:
+        for c in children_list:
+            if c.tag.split('}')[-1] == tag:
+                pPr.append(c)
+                break
+    p.append(pPr)
+    
+    r_begin = lxml.etree.Element(f'{{{ns_uri}}}r')
+    set_child_element(r_begin, 'fldChar', {'fldCharType': 'begin'})
+    p.append(r_begin)
+    
+    r_instr = lxml.etree.Element(f'{{{ns_uri}}}r')
+    instr = lxml.etree.Element(f'{{{ns_uri}}}instrText')
+    instr.text = field_instruction
+    instr.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+    r_instr.append(instr)
+    p.append(r_instr)
+    
+    r_sep = lxml.etree.Element(f'{{{ns_uri}}}r')
+    set_child_element(r_sep, 'fldChar', {'fldCharType': 'separate'})
+    p.append(r_sep)
+    
+    r_end = lxml.etree.Element(f'{{{ns_uri}}}r')
+    set_child_element(r_end, 'fldChar', {'fldCharType': 'end'})
+    p.append(r_end)
+    
+    body.insert(insertion_idx, p)
+    return p
+
 def format_document_xmls(unpacked_dir):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     namespaces = {'w': ns_uri}
@@ -434,6 +752,7 @@ def format_document_xmls(unpacked_dir):
         tree = lxml.etree.parse(styles_path, parser)
         root = tree.getroot()
         ensure_front_matter_heading_style(root)
+        ensure_appendix_heading_style(root)
         # ensure_hyperlink_style(root)
         for style in root.findall('w:style', namespaces):
             style_id = style.get(f'{{{ns_uri}}}styleId')
@@ -841,6 +1160,7 @@ def format_document_xmls(unpacked_dir):
                         daftar_pustaka_heading_idx = idx
                         break
                         
+        gambar_idx = 1
         for idx, child in enumerate(children):
             if child.tag.endswith('tbl'): continue
             if child.tag.endswith('sdt'):
@@ -892,35 +1212,65 @@ def format_document_xmls(unpacked_dir):
                 # Auto-detect captions and format them (only in body Section 2)
                 if is_section2:
                     text_clean = text.strip()
-                    if re.match(r'^(Tabel|Gambar)\s+[0-9]+', text_clean, re.IGNORECASE):
-                        if pPr is None:
-                            pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-                            p.insert(0, pPr)
-                        set_child_element(pPr, 'pStyle', {'val': 'Caption'})
-                        set_child_element(pPr, 'spacing', {'before': '120', 'after': '120', 'line': '240', 'lineRule': 'auto'})
-                        set_child_element(pPr, 'jc', {'val': 'center'})
-                        set_child_element(pPr, 'ind', {'firstLine': '0', 'left': '0'})
-                        sort_element_children(pPr, PPR_ORDER)
-                        pStyle_val = 'Caption'
+                    is_gambar_caption = (pStyle_val == 'Caption' and text_clean.lower().startswith('gambar')) or re.match(r'^Gambar\s+[0-9]+', text_clean, re.IGNORECASE)
+                    is_tabel_caption = (pStyle_val == 'Caption' and text_clean.lower().startswith('tabel')) or re.match(r'^Tabel\s+[0-9]+', text_clean, re.IGNORECASE)
+                    
+                    if is_gambar_caption:
+                        m = re.match(r'^Gambar\s+[0-9]+(?:\.[0-9]+)*\.?\s*(.*)$', text_clean, re.IGNORECASE)
+                        desc = m.group(1) if m else text_clean
+                        format_caption_paragraph_clean(p, "Gambar", "2.", "Gambar_2.", gambar_idx, desc, namespaces)
                         
-                        # Clean trailing dot from caption numbers (e.g. 'Tabel 1.1.' -> 'Tabel 1.1')
-                        m = re.match(r'^(Tabel|Gambar)\s+([0-9]+(?:\.[0-9]+)*)\.?\s*(.*)$', text_clean, re.IGNORECASE)
+                        new_caption_text = f"Gambar 2.{gambar_idx} {desc}"
+                        collected_captions.append({
+                            "type": "Gambar",
+                            "text": new_caption_text,
+                            "page": estimated_page
+                        })
+                        text = new_caption_text
+                        gambar_idx += 1
+                        
+                    elif is_tabel_caption:
+                        m = re.match(r'^Tabel\s+([0-9]+(?:\.[0-9]+)*)\.?\s*(.*)$', text_clean, re.IGNORECASE)
                         if m:
-                            label = m.group(1)
-                            num = m.group(2)
-                            desc = m.group(3)
+                            num_part = m.group(1)
+                            desc = m.group(2)
+                            parts = num_part.split('.')
+                            if len(parts) >= 2:
+                                chap_num = parts[0]
+                                seq_val = int(parts[1])
+                            else:
+                                chap_num = "2"
+                                seq_val = int(parts[0])
                             
-                            cleaned_caption = f"{label.capitalize()} {num} {desc}"
-                            
-                            collected_captions.append({
-                                "type": label.capitalize(),
-                                "text": cleaned_caption,
-                                "page": estimated_page
-                            })
+                            format_caption_paragraph_clean(p, "Tabel", f"{chap_num}.", f"Tabel_{chap_num}.", seq_val, desc, namespaces)
+                            cleaned_caption = f"Tabel {chap_num}.{seq_val} {desc}"
                             text = cleaned_caption
+                            
+                        collected_captions.append({
+                            "type": "Tabel",
+                            "text": text,
+                            "page": estimated_page
+                        })
+                        
+                    elif "Gambar 2." in text:
+                        new_text = replace_mentions_in_paragraph(text)
+                        if new_text != text:
+                            t_elems = p.findall('.//w:t', namespaces)
+                            if t_elems:
+                                t_elems[0].text = new_text
+                                t_elems[0].set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+                                for t in t_elems[1:]:
+                                    t.text = ""
+                            text = new_text
                     
                 # Format Headings
-                if pStyle_val.startswith('Heading'):
+                if pStyle_val == 'Heading1':
+                    text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text]).strip()
+                    if text.upper().startswith('LAMPIRAN'):
+                        pStyle.set(f'{{{ns_uri}}}val', 'AppendixHeading1')
+                        pStyle_val = 'AppendixHeading1'
+                        
+                if pStyle_val.startswith('Heading') or pStyle_val == 'AppendixHeading1':
                     text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text]).strip()
                     if not text:
                         if pPr is not None:
@@ -928,7 +1278,16 @@ def format_document_xmls(unpacked_dir):
                             numPr = pPr.find(f'{{{ns_uri}}}numPr', namespaces)
                             if numPr is not None: pPr.remove(numPr)
                         continue
-                    if pStyle_val == 'Heading1':
+                    if pStyle_val == 'AppendixHeading1':
+                        if pPr is None:
+                            pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                            p.insert(0, pPr)
+                        set_child_element(pPr, 'pStyle', {'val': 'AppendixHeading1'})
+                        set_child_element(pPr, 'pageBreakBefore', {})
+                        numPr = pPr.find(f'{{{ns_uri}}}numPr', namespaces)
+                        if numPr is not None:
+                            pPr.remove(numPr)
+                    elif pStyle_val == 'Heading1':
                         if pPr is None:
                             pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
                             p.insert(0, pPr)
@@ -1091,8 +1450,177 @@ def format_document_xmls(unpacked_dir):
                         print("  Split nested Table of Figures fields (Tabel 1. and Tabel 2.) and formatted second field as 1pt.")
             idx_t += 1
 
-        # Keep native Table of Figures fields so that they can be updated via COM automation.
-        # This preserves the dynamic links and exact page numbering.
+        # Clean static lists and replace with dynamic fields
+        children = list(body)
+        daftar_gambar_idx = -1
+        daftar_tabel_idx = -1
+        
+        for idx, child in enumerate(children):
+            if child.tag.endswith('p'):
+                text = "".join(child.itertext()).strip()
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                if text == "DAFTAR GAMBAR" and style_val == "Heading1":
+                    daftar_gambar_idx = idx
+                elif text == "DAFTAR TABEL" and style_val == "Heading1":
+                    daftar_tabel_idx = idx
+                    
+        # 1. Clean and insert dynamic Table of Figures
+        if daftar_gambar_idx != -1 and daftar_tabel_idx != -1:
+            print(f"Cleaning static DAFTAR GAMBAR list between {daftar_gambar_idx} and {daftar_tabel_idx}...")
+            to_delete = []
+            for idx in range(daftar_gambar_idx + 1, daftar_tabel_idx):
+                child = children[idx]
+                if child.tag.endswith('p'):
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    text = "".join(child.itertext()).strip()
+                    if style_val == 'TableofFigures' or not text:
+                        to_delete.append(child)
+            for child in to_delete:
+                body.remove(child)
+            print(f"Removed {len(to_delete)} elements from DAFTAR GAMBAR.")
+            
+            children = list(body)
+            for idx, child in enumerate(children):
+                if child.tag.endswith('p'):
+                    text = "".join(child.itertext()).strip()
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    if text == "DAFTAR GAMBAR" and style_val == "Heading1":
+                        daftar_gambar_idx = idx
+                        break
+            for idx, child in enumerate(children):
+                if child.tag.endswith('p'):
+                    text = "".join(child.itertext()).strip()
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    if text == "DAFTAR TABEL" and style_val == "Heading1":
+                        daftar_tabel_idx = idx
+                        break
+                        
+            insert_dynamic_toc_field(body, daftar_gambar_idx + 1, ' TOC \\h \\z \\c "Gambar" ', namespaces)
+            
+        # 2. Clean and insert Table of Tables
+        children = list(body)
+        for idx, child in enumerate(children):
+            if child.tag.endswith('p'):
+                text = "".join(child.itertext()).strip()
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                if text == "DAFTAR TABEL" and style_val == "Heading1":
+                    daftar_tabel_idx = idx
+                    break
+                    
+        insertion_idx = -1
+        if daftar_tabel_idx != -1:
+            for idx in range(daftar_tabel_idx + 1, len(children)):
+                child = children[idx]
+                if child.tag.endswith('p'):
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    if style_val == "Heading1":
+                        insertion_idx = idx
+                        break
+                        
+        if daftar_tabel_idx != -1 and insertion_idx != -1:
+            print(f"Cleaning static DAFTAR TABEL list between {daftar_tabel_idx} and {insertion_idx}...")
+            to_delete = []
+            for idx in range(daftar_tabel_idx + 1, insertion_idx):
+                child = children[idx]
+                if child.tag.endswith('p'):
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    text = "".join(child.itertext()).strip()
+                    if style_val == 'TableofFigures' or not text:
+                        to_delete.append(child)
+            for child in to_delete:
+                body.remove(child)
+            print(f"Removed {len(to_delete)} elements from DAFTAR TABEL.")
+            
+            children = list(body)
+            for idx, child in enumerate(children):
+                if child.tag.endswith('p'):
+                    text = "".join(child.itertext()).strip()
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    if text == "DAFTAR TABEL" and style_val == "Heading1":
+                        daftar_tabel_idx = idx
+                        break
+            for idx in range(daftar_tabel_idx + 1, len(children)):
+                child = children[idx]
+                if child.tag.endswith('p'):
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    if style_val == "Heading1":
+                        insertion_idx = idx
+                        break
+                        
+            insert_dynamic_toc_field(body, daftar_tabel_idx + 1, ' TOC \\h \\z \\c "Tabel" ', namespaces)
+            
+        # 3. Create DAFTAR LAMPIRAN section
+        children = list(body)
+        for idx, child in enumerate(children):
+            if child.tag.endswith('p'):
+                text = "".join(child.itertext()).strip()
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                if text == "DAFTAR TABEL" and style_val == "Heading1":
+                    daftar_tabel_idx = idx
+                    break
+                    
+        insertion_idx = -1
+        for idx in range(daftar_tabel_idx + 1, len(children)):
+            child = children[idx]
+            if child.tag.endswith('p'):
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                if style_val == "Heading1":
+                    text = "".join(child.itertext()).strip()
+                    if "DAFTAR LAMPIRAN" in text.upper():
+                        insertion_idx = -1
+                        break
+                    if "PENDAHULUAN" in text.upper() or "BAB I" in text.upper():
+                        insertion_idx = idx
+                        break
+                        
+        if insertion_idx != -1:
+            print(f"Inserting DAFTAR LAMPIRAN at index {insertion_idx}...")
+            p_head = lxml.etree.Element(f'{{{ns_uri}}}p')
+            pPr_head = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+            set_child_element(pPr_head, 'pStyle', {'val': 'Heading1'})
+            set_child_element(pPr_head, 'pageBreakBefore', {})
+            set_child_element(pPr_head, 'jc', {'val': 'center'})
+            sort_element_children(pPr_head, PPR_ORDER)
+            p_head.append(pPr_head)
+            
+            r_head = lxml.etree.Element(f'{{{ns_uri}}}r')
+            rPr_head = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+            set_child_element(rPr_head, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
+            set_child_element(rPr_head, 'b', {})
+            set_child_element(rPr_head, 'bCs', {})
+            set_child_element(rPr_head, 'sz', {'val': '28'})
+            set_child_element(rPr_head, 'szCs', {'val': '28'})
+            r_head.append(rPr_head)
+            t_head = lxml.etree.Element(f'{{{ns_uri}}}t')
+            t_head.text = "DAFTAR LAMPIRAN"
+            r_head.append(t_head)
+            p_head.append(r_head)
+            
+            body.insert(insertion_idx, p_head)
+            insert_dynamic_toc_field(body, insertion_idx + 1, ' TOC \\t "AppendixHeading1,1" \\h \\z ', namespaces)
+            print("Successfully inserted DAFTAR LAMPIRAN heading and TOF field.")
 
         fix_whitespace_preservation(root)
         tree.write(doc_path, encoding='utf-8', xml_declaration=True)

@@ -82,6 +82,7 @@ To automate the formatting of your `.docx` document:
    - Penomoran lampiran wajib menggunakan format angka Arab kapital dengan titik: **LAMPIRAN 1.**, **LAMPIRAN 2.**, dst.
    - Setiap lampiran wajib diawali pada halaman baru terpisah (Page Isolation/Page Split menggunakan `---` di Markdown) untuk meminimalkan kegagalan pemformatan dokumen.
    - Daftar lampiran wajib tercantum pada bagian awal dokumen setelah Daftar Tabel.
+   - Daftar lampiran harus terisolasi terpisah dari Daftar Isi, di mana lampiran individu (LAMPIRAN 1-4) dilarang muncul di Daftar Isi dengan menerapkan gaya paragraf kustom tanpa outline level.
    - Lampiran wajib menyertakan minimal:
      * LAMPIRAN 1. Surat Pernyataan Keaslian
      * LAMPIRAN 2. Surat Keterangan Implementasi Proyek dari Mitra
