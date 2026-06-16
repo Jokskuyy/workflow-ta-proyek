@@ -866,21 +866,22 @@ def format_document_xmls(unpacked_dir):
                         print(f"  Moved table caption '{txt_after}' above the table.")
             i += 1
             
-        # 2. Move figure captions below figures
-        i = 0
-        while i < len(children):
-            child = children[i]
-            if child.tag.endswith('p'):
-                if child.find('.//w:drawing', namespaces) is not None:
-                    if i - 1 >= 0 and children[i-1].tag.endswith('p'):
-                        p_before = children[i-1]
-                        txt_before = "".join([t.text for t in p_before.iter(f'{{{ns_uri}}}t') if t.text]).strip()
-                        if txt_before.startswith('Gambar'):
-                            body.remove(p_before)
-                            body.insert(i, p_before)
-                            children = list(body)
-                            print(f"  Moved figure caption '{txt_before}' below the figure.")
-            i += 1
+        # 2. Move figure captions below figures (Disabled: causing reordering issues; all figures are already placed correctly above captions)
+        # i = 0
+        # while i < len(children):
+        #     child = children[i]
+        #     if child.tag.endswith('p'):
+        #         if child.find('.//w:drawing', namespaces) is not None:
+        #             if i - 1 >= 0 and children[i-1].tag.endswith('p'):
+        #                 p_before = children[i-1]
+        #                 txt_before = "".join([t.text for t in p_before.iter(f'{{{ns_uri}}}t') if t.text]).strip()
+        #                 if txt_before.startswith('Gambar'):
+        #                     body.remove(p_before)
+        #                     body.insert(i, p_before)
+        #                     children = list(body)
+        #                     print(f"  Moved figure caption '{txt_before}' below the figure.")
+        #     i += 1
+
             
         # Remove manual page breaks that are immediately before Heading 1 (to prevent double page breaks)
         children = list(body)
