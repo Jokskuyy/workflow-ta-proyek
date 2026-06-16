@@ -429,9 +429,14 @@ def center_and_scale_drawings(p, namespaces, unpacked_dir=None, rel_map=None):
     set_child_element(pPr, 'ind', {'left': '0', 'firstLine': '0'})
     sort_element_children(pPr, PPR_ORDER)
     
-    max_width_emu = 5040000  # 14.0cm in EMUs
+    max_width_emu = 4320000   # 12.0cm in EMUs
+    max_height_emu = 4320000  # 12.0cm in EMUs
     
     for drawing in drawings:
+        # Remove all srcRect elements to disable cropping entirely
+        for src_rect in drawing.xpath('.//a:srcRect', namespaces={'a': 'http://schemas.openxmlformats.org/drawingml/2006/main'}):
+            src_rect.getparent().remove(src_rect)
+            
         aspect_ratio = None
         if unpacked_dir and rel_map:
             blip = drawing.find('.//a:blip', {'a': 'http://schemas.openxmlformats.org/drawingml/2006/main'})
@@ -450,49 +455,35 @@ def center_and_scale_drawings(p, namespaces, unpacked_dir=None, rel_map=None):
                         except Exception as e:
                             print(f"  Error reading image aspect ratio: {e}")
 
-        if aspect_ratio is not None:
-            for elem in drawing.iter():
-                tag_local = elem.tag.split('}')[-1]
-                if tag_local in ['extent', 'ext']:
-                    cx_str = elem.get('cx')
-                    if cx_str:
-                        try:
-                            cx = int(cx_str)
-                            cy = int(cx / aspect_ratio)
-                            elem.set('cy', str(cy))
-                        except ValueError:
-                            pass
-                elif tag_local == 'srcRect':
-                    for attr in list(elem.attrib.keys()):
-                        elem.attrib.pop(attr)
-
-        max_cx = 0
+        # Scale based on aspect ratio and enforce limits
         for elem in drawing.iter():
             tag_local = elem.tag.split('}')[-1]
             if tag_local in ['extent', 'ext']:
                 cx_str = elem.get('cx')
+                cy_str = elem.get('cy')
                 if cx_str:
                     try:
-                        max_cx = max(max_cx, int(cx_str))
+                        cx = int(cx_str)
+                        if aspect_ratio is not None:
+                            cy = int(cx / aspect_ratio)
+                        elif cy_str:
+                            cy = int(cy_str)
+                        else:
+                            cy = cx
+                            
+                        # Apply limits
+                        scale_x = max_width_emu / cx
+                        scale_y = max_height_emu / cy
+                        scale = min(scale_x, scale_y, 1.0)
+                        
+                        if scale < 1.0:
+                            cx = int(cx * scale)
+                            cy = int(cy * scale)
+                            
+                        elem.set('cx', str(cx))
+                        elem.set('cy', str(cy))
                     except ValueError:
                         pass
-                        
-        if max_cx > max_width_emu:
-            scale_factor = max_width_emu / max_cx
-            print(f"  Scaling drawing in paragraph to {scale_factor * 100:.2f}% of original size")
-            for elem in drawing.iter():
-                tag_local = elem.tag.split('}')[-1]
-                if tag_local in ['extent', 'ext']:
-                    cx_str = elem.get('cx')
-                    cy_str = elem.get('cy')
-                    if cx_str and cy_str:
-                        try:
-                            new_cx = int(int(cx_str) * scale_factor)
-                            new_cy = int(int(cy_str) * scale_factor)
-                            elem.set('cx', str(new_cx))
-                            elem.set('cy', str(new_cy))
-                        except ValueError:
-                            pass
 
 def build_toc_entry(caption_text, page_num, bookmark_name):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
@@ -1533,6 +1524,10 @@ def format_document_xmls(unpacked_dir):
                 if p.find('.//w:drawing', namespaces) is not None:
                     center_and_scale_drawings(p, namespaces, unpacked_dir, rel_map)
                     pPr = p.find('w:pPr', namespaces)
+                    if pPr is None:
+                        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                        p.insert(0, pPr)
+                    set_child_element(pPr, 'keepNext', {})
                 
                 if pPr is not None: sort_element_children(pPr, PPR_ORDER)
                 
