@@ -27,7 +27,11 @@ class TestTddFormatting(unittest.TestCase):
 
     def write_document_xml(self, paragraphs_xml_str):
         xml_content = f"""<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+            xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+            xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+            xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
   <w:body>
     <w:p>
       <w:pPr>
@@ -183,6 +187,155 @@ class TestTddFormatting(unittest.TestCase):
         self.assertTrue(len(t_elems) >= 3)
         self.assertEqual(t_elems[0].text, 'Tabel 1.')
         self.assertEqual(t_elems[-1].text, ' Peran dan Tanggung Jawab')
+
+    def test_drawing_paragraph_has_keepnext(self):
+        p_xml = """
+        <w:p>
+          <w:pPr><w:pStyle w:val="Normal"/></w:pPr>
+          <w:r>
+            <w:drawing>
+              <wp:inline>
+                <wp:extent cx="1000" cy="1000"/>
+              </wp:inline>
+            </w:drawing>
+          </w:r>
+        </w:p>
+        """
+        self.write_document_xml(p_xml)
+        
+        format_ta_proyek.format_document_xmls(self.test_dir)
+        
+        namespaces = {
+            'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
+            'wp': 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing'
+        }
+        tree = ET.parse(self.doc_path)
+        root = tree.getroot()
+        
+        p_draw = root.find('.//w:drawing/../..', namespaces)
+        self.assertIsNotNone(p_draw, "Paragraph containing drawing not found")
+        
+        pPr = p_draw.find('w:pPr', namespaces)
+        self.assertIsNotNone(pPr, "w:pPr not found in drawing paragraph")
+        
+        keep_next = pPr.find('w:keepNext', namespaces)
+        self.assertIsNotNone(keep_next, "w:keepNext element should be present in drawing paragraph properties")
+
+    def test_drawing_crop_deletion(self):
+        p_xml = """
+        <w:p>
+          <w:pPr><w:pStyle w:val="Normal"/></w:pPr>
+          <w:r>
+            <w:drawing>
+              <wp:inline>
+                <wp:extent cx="1000" cy="1000"/>
+                <a:graphic>
+                  <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+                    <pic:pic>
+                      <pic:blipFill>
+                        <a:blip r:embed="rId9"/>
+                        <a:srcRect l="10" t="20" r="30" b="40"/>
+                      </pic:blipFill>
+                    </pic:pic>
+                  </a:graphicData>
+                </a:graphic>
+              </wp:inline>
+            </w:drawing>
+          </w:r>
+        </w:p>
+        """
+        self.write_document_xml(p_xml)
+        
+        format_ta_proyek.format_document_xmls(self.test_dir)
+        
+        namespaces = {
+            'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
+            'a': 'http://schemas.openxmlformats.org/drawingml/2006/main',
+            'pic': 'http://schemas.openxmlformats.org/drawingml/2006/picture'
+        }
+        tree = ET.parse(self.doc_path)
+        root = tree.getroot()
+        
+        src_rects = root.findall('.//a:srcRect', namespaces)
+        self.assertEqual(len(src_rects), 0, "All a:srcRect elements must be completely deleted")
+
+    def test_lembar_pengesahan_isolation(self):
+        xml_content = """<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+            xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+            xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+            xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+  <w:body>
+    <w:p>
+      <w:r>
+        <w:drawing>
+          <wp:inline><wp:extent cx="1000" cy="1000"/></wp:inline>
+        </w:drawing>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:r><w:t>PROPOSAL TUGAS AKHIR</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:r>
+        <w:drawing>
+          <wp:inline><wp:extent cx="1000" cy="1000"/></wp:inline>
+        </w:drawing>
+      </w:r>
+    </w:p>
+    <w:p/>
+    <w:p>
+      <w:r><w:t>DAFTAR ISI</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="Heading1"/>
+      </w:pPr>
+      <w:r>
+        <w:t>BAB I PENDAHULUAN</w:t>
+      </w:r>
+    </w:p>
+  </w:body>
+</w:document>
+"""
+        with open(self.doc_path, "w", encoding="utf-8") as f:
+            f.write(xml_content)
+            
+        format_ta_proyek.format_document_xmls(self.test_dir)
+        
+        namespaces = {
+            'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+        }
+        tree = ET.parse(self.doc_path)
+        root = tree.getroot()
+        
+        body = root.find('w:body', namespaces)
+        paragraphs = body.findall('w:p', namespaces)
+        
+        draw_paras = []
+        for p in paragraphs:
+            if p.find('.//w:drawing', namespaces) is not None:
+                draw_paras.append(p)
+                
+        self.assertEqual(len(draw_paras), 2, "Should have cover logo and lembar pengesahan drawings")
+        lp_para = draw_paras[1]
+        
+        pPr_lp = lp_para.find('w:pPr', namespaces)
+        self.assertIsNotNone(pPr_lp, "Lembar Pengesahan should have w:pPr")
+        self.assertIsNotNone(pPr_lp.find('w:pageBreakBefore', namespaces), "Lembar Pengesahan must have pageBreakBefore")
+        
+        di_para = None
+        for p in paragraphs:
+            text = "".join(p.itertext()).strip()
+            if "DAFTAR ISI" in text:
+                di_para = p
+                break
+                
+        self.assertIsNotNone(di_para, "DAFTAR ISI paragraph should be present")
+        pPr_di = di_para.find('w:pPr', namespaces)
+        self.assertIsNotNone(pPr_di, "DAFTAR ISI should have w:pPr")
+        self.assertIsNotNone(pPr_di.find('w:pageBreakBefore', namespaces), "DAFTAR ISI must have pageBreakBefore to isolate Lembar Pengesahan")
 
 if __name__ == '__main__':
     unittest.main()

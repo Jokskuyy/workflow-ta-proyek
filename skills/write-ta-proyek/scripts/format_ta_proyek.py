@@ -1136,6 +1136,7 @@ def format_document_xmls(unpacked_dir):
                 cover_end_idx = idx
 
         lembar_pengesahan_processed = False
+        need_page_break_after_lp = False
         for idx, child in enumerate(children):
             para_count += 1
             if para_count > 25:
@@ -1173,7 +1174,17 @@ def format_document_xmls(unpacked_dir):
                                 set_child_element(pPr, 'jc', {'val': 'center'})
                                 sort_element_children(pPr, PPR_ORDER)
                                 lembar_pengesahan_processed = True
+                                need_page_break_after_lp = True
                                 print(f"  Applied page break and centering to Lembar Pengesahan at index {idx}")
+                            elif lembar_pengesahan_processed and need_page_break_after_lp:
+                                pPr = child.find('w:pPr', namespaces)
+                                if pPr is None:
+                                    pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                                    child.insert(0, pPr)
+                                set_child_element(pPr, 'pageBreakBefore', {})
+                                sort_element_children(pPr, PPR_ORDER)
+                                need_page_break_after_lp = False
+                                print(f"  Applied page break after Lembar Pengesahan to paragraph at index {idx}")
                             reconstructed_children.append(child)
                         else:
                             print(f"  Removing redundant empty paragraph in front-matter transition at index {idx}")
@@ -1514,12 +1525,13 @@ def format_document_xmls(unpacked_dir):
                 
                 # Center and scale drawings if present in paragraph
                 if p.find('.//w:drawing', namespaces) is not None:
-                    center_and_scale_drawings(p, namespaces, unpacked_dir, rel_map)
-                    pPr = p.find('w:pPr', namespaces)
-                    if pPr is None:
-                        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-                        p.insert(0, pPr)
-                    set_child_element(pPr, 'keepNext', {})
+                    if is_section2:
+                        center_and_scale_drawings(p, namespaces, unpacked_dir, rel_map)
+                        pPr = p.find('w:pPr', namespaces)
+                        if pPr is None:
+                            pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                            p.insert(0, pPr)
+                        set_child_element(pPr, 'keepNext', {})
                 
                 if pPr is not None: sort_element_children(pPr, PPR_ORDER)
                 
