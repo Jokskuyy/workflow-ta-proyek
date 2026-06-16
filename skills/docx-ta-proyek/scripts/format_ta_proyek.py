@@ -627,9 +627,17 @@ def replace_mentions_in_paragraph(text):
     if "grafik mahasiswa" in text and "Gambar 2.29" in text:
         text = text.replace("Gambar 2.29", "Gambar 2.30")
         
-    # Rule 24: Bagian Footer (Gambar 2.30 -> Gambar 2.31)
-    if "footer" in text and "Gambar 2.30" in text:
-        text = text.replace("Gambar 2.30", "Gambar 2.31")
+    # Rule 24: Bagian Footer (Gambar 2.30 / Gambar 2.22 -> Gambar 2.28)
+    if "footer" in text and ("Gambar 2.30" in text or "Gambar 2.22" in text or "Gambar 2.31" in text):
+        text = text.replace("Gambar 2.30", "Gambar 2.28").replace("Gambar 2.22", "Gambar 2.28").replace("Gambar 2.31", "Gambar 2.28")
+        
+    # Rule 25: Unity Prefab (Gambar 3.1 -> Gambar 2.29)
+    if "Gambar 3.1" in text:
+        text = text.replace("Gambar 3.1", "Gambar 2.29")
+        
+    # Rule 26: Unity Editor Sync Checker (Gambar 3.2 -> Gambar 2.30)
+    if "Gambar 3.2" in text:
+        text = text.replace("Gambar 3.2", "Gambar 2.30")
         
     return text
 
@@ -1357,7 +1365,7 @@ def format_document_xmls(unpacked_dir):
                             "page": estimated_page
                         })
                         
-                    elif "Gambar 2." in text:
+                    elif "Gambar 2." in text or "Gambar 3." in text:
                         new_text = replace_mentions_in_paragraph(text)
                         if new_text != text:
                             t_elems = p.findall('.//w:t', namespaces)

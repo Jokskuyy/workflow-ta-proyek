@@ -31,11 +31,8 @@ Gambar 2.17 Public Traffic Statistics Website
 Gambar 2.18 Bagian Fasilitas dan Aset
 Gambar 2.19 Modal List Fasilitas dan Aset
 Gambar 2.20 Modal Fasilitas dan Aset
-Gambar 2.21 Bagian Statistik
-Gambar 2.22 Detail Data Dosen
-Gambar 2.23 Detail Data Mahasiswa
-Gambar 2.24 Bagian Footer
-Gambar 2.25 Dokumentasi Wawancara dan Penandatanganan Pakta Integritas
+Gambar 2.21 Bagian Footer
+Gambar 2.22 Dokumentasi Wawancara dan Penandatanganan Pakta Integritas
 
 # DAFTAR TABEL
 
@@ -294,9 +291,9 @@ Identifikasi kebutuhan sistem dirumuskan berdasarkan hasil wawancara mendalam de
 Secara garis besar, kebutuhan fungsional sistem diklasifikasikan ke dalam tiga kategori utama:
 
 1. Kebutuhan Fungsional Pengguna Publik (User):
-  a. Sistem harus dapat menyajikan data statistik kampus (dosen, mahasiswa).
+  a. Sistem harus dapat menyajikan data statistik lalu lintas website.
   b. Sistem harus dapat menyajikan data profil (akreditasi, fasilitas, aset).
-  c. Sistem harus dapat menyajikan data terperinci saat chart atau item fasilitas diklik.
+  c. Sistem harus dapat menyajikan data terperinci saat kartu indikator aset atau item fasilitas diklik.
   d. Sistem harus dapat menampilkan viewport Denah Virtual (yang diintegrasikan oleh Simulator Developer menggunakan aset dari 3D Designer).
 2. Kebutuhan Fungsional Administrator (Admin):
   a. Sistem harus menyediakan halaman login yang aman (autentikasi) untuk Admin.
@@ -341,7 +338,7 @@ Proses pengembangan proyek ini mengikuti model Prototyping yang terbagi ke dalam
 Perancangan Information Architecture membagi aplikasi web ke dalam dua zona akses utama:
 
 1. Halaman Publik (Public Route):
-  a. Dashboard Utama (`/`): Menampilkan widget statistik akademik (grafik batang sebaran mahasiswa/dosen), modul visualisasi peta denah virtual 3D, serta bagian fasilitas.
+  a. Dashboard Utama (`/`): Menampilkan widget statistik lalu lintas website (grafik tren pengunjung dari Umami), kartu indikator (KPI) aset kampus (gedung dan fasilitas), tabel akreditasi program studi, serta modul visualisasi peta denah virtual 3D.
   b. Pengaturan Bahasa: Toggle dinamis untuk memicu perubahan kamus bahasa lokal (ID/EN) yang diinjeksi ke komponen-komponen React.
 2. Halaman Administratif (Protected Route):
   a. Login (`/login`): Form otentikasi administrator terproteksi JWT.
@@ -470,7 +467,7 @@ Penjelasan mengenai struktur tabel, kolom, tipe data, serta aturan relasi antart
 Rancangan antarmuka pengguna diwujudkan melalui serangkaian mockup visual:
 
 1. Bagian Admin Dashboard: Mockup halaman login admin (Gambar 2.10), halaman utama dashboard admin (Gambar 2.11), modal formulir tambah data (Gambar 2.12), modal formulir edit data (Gambar 2.13), modal konfirmasi hapus data (Gambar 2.14), serta visualisasi statistik analitik admin (Gambar 2.15).
-2. Bagian Public Dashboard: Mockup hero section (Gambar 2.16), visualisasi analitik publik (Gambar 2.17), bagian pencarian fasilitas dan aset (Gambar 2.18), modal daftar fasilitas kategori (Gambar 2.19), modal detail spesifik fasilitas unggulan (Gambar 2.20), diagram statistik drill-down mahasiswa/dosen (Gambar 2.21), detail drill-down (Gambar 2.22 dan Gambar 2.23), dan footer halaman (Gambar 2.24).
+2. Bagian Public Dashboard: Mockup hero section (Gambar 2.16), visualisasi analitik publik (Gambar 2.17), bagian pencarian fasilitas dan aset (Gambar 2.18), modal daftar fasilitas kategori (Gambar 2.19), modal detail spesifik fasilitas unggulan (Gambar 2.20), dan footer halaman (Gambar 2.21).
 
 ## 2.4 Rencana Pengujian Proyek
 
@@ -488,7 +485,7 @@ Pengujian fungsional sistem menggunakan metode Black Box Testing untuk menguji 1
 
 1. Pengujian fungsionalitas CRUD pada dashboard admin untuk setiap entitas data (Gedung, Fasilitas, Fakultas, dan Program Studi).
 2. Pengujian validitas form login admin dan penanganan error kredensial yang tidak valid.
-3. Pengujian interaktivitas grafik statistik publik (drill-down saat grafik diklik).
+3. Pengujian interaktivitas grafik statistik lalu lintas website.
 4. Pengujian sinkronisasi filter bahasa (Bahasa Indonesia dan English) pada public dashboard.
 5. Pengujian keakuratan modul pencarian gabungan (Search Overlay) di frontend React.
 
@@ -703,7 +700,7 @@ Backend API berhasil diimplementasikan dan dideploy di Vercel. Hasil keluaran da
 ### 3.4.3 Hasil Implementasi Front-end
 
 Frontend React SPA berhasil dideploy secara statis. Antarmuka pengguna menyajikan:
-1. Public Dashboard: Menyajikan widget grafik statistik mahasiswa/dosen, bilah pencarian gabungan (Search Overlay), serta viewport canvas WebGL yang memuat peta 3D UPNVJ secara halus.
+1. Public Dashboard: Menyajikan widget grafik statistik lalu lintas website (tren harian pengunjung dan page views dari Umami), bilah pencarian gabungan (Search Overlay), serta viewport canvas WebGL yang memuat peta 3D UPNVJ secara halus.
 2. Admin Dashboard: Menyediakan halaman login aman, halaman pengelolaan data CRUD untuk semua entitas dengan modal form interaktif, serta widget traffic analitik dari Umami proxy.
 
 ## 3.5 Hasil Pengujian Proyek
@@ -1250,10 +1247,11 @@ Halaman Admin Panel berfungsi untuk mengelola seluruh konten dinamis yang tersim
 Dashboard Publik ditujukan bagi mahasiswa, tamu, dan civitas akademika untuk menjelajahi profil universitas serta melakukan navigasi spasial 3D.
 1. Akses Dashboard Utama:
    a. Akses halaman utama sistem melalui alamat root domain `/`.
-   b. Halaman depan menyajikan widget visualisasi statistik akademik universitas berupa sebaran jumlah mahasiswa dan dosen per fakultas yang digambarkan dalam grafik interaktif.
-2. Penelusuran Detail Data Akademik (Drill-Down):
-   a. Pada grafik sebaran dosen atau mahasiswa, arahkan kursor dan klik pada salah satu batang fakultas (misalnya: `Fakultas Ilmu Komputer`).
-   b. Aksi klik tersebut akan memicu pemanggilan modal detail data akademik yang menyajikan rincian statistik mahasiswa atau dosen per program studi pada fakultas tersebut secara dinamis.
+   b. Halaman depan menyajikan visualisasi statistik lalu lintas pengunjung (Website Traffic Statistics) dalam bentuk grafik garis (Line Chart) interaktif yang bersumber dari Umami Analytics, menampilkan metrik pengunjung harian dan tampilan halaman.
+   c. Selain itu, halaman utama juga memuat kartu indikator aset utama kampus (KPI Cards) untuk mempermudah akses ke detail data gedung dan berbagai jenis fasilitas.
+2. Penelusuran Detail Aset dan Profil Akademik:
+   a. Pengguna dapat mengeklik salah satu kartu aset kampus (seperti Gedung, Laboratorium, Perpustakaan, atau Ruang Kuliah) untuk membuka modal detail yang menampilkan daftar lengkap aset dalam kategori tersebut beserta deskripsi dan lokasinya.
+   b. Pengguna juga dapat meninjau data program studi melalui tabel akreditasi (Accreditation Table) yang menyajikan informasi jenjang, lembaga akreditasi, tanggal kedaluwarsa, dan status akreditasi dari masing-masing program studi secara langsung.
 3. Eksplorasi Bebas pada Canvas Denah Virtual 3D:
    a. Layar utama dashboard menyajikan viewport WebGL yang memuat model 3D lingkungan UPNVJ Kampus Pondok Labu secara interaktif.
    b. Kontrol pergerakan pada PC/Laptop:
