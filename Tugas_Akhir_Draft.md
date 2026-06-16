@@ -1211,20 +1211,100 @@ namespace UPNVJ.Editor
 
 ---
 
-# LAMPIRAN 4. Panduan Pengguna (User Manual) (Rencana/Placeholder)
+# LAMPIRAN 4. Panduan Pengguna (User Manual)
 
-Panduan Pengguna (User Manual) sistem terintegrasi Dashboard Profil & Denah Virtual 3D UPNVJ Kampus Pondok Labu saat ini dirancang sebagai rencana implementasi dokumen pelengkap. Panduan ini akan memuat panduan operasional langkah-demi-langkah bagi dua kelompok pengguna:
+Dokumen panduan ini disusun untuk memberikan petunjuk operasional yang komprehensif bagi seluruh pengguna sistem terintegrasi Dashboard Profil dan Denah Virtual 3D UPNVJ Kampus Pondok Labu. Panduan ini dibagi menjadi tiga bagian utama yang ditujukan untuk administrator web, pengguna publik, serta pengembang/administrator Unity.
 
-1. Kelompok Administrator (Staff Pengelola):
-  a. Panduan masuk/login ke halaman Admin Panel.
-  b. Langkah-langkah melakukan operasi CRUD data gedung (termasuk pengisian parameter `unity_object_name` secara presisi).
-  c. Langkah-langkah mengaitkan data fasilitas ke gedung dan mendefinisikan lantai.
-  d. Peninjauan riwayat perubahan data pada log audit.
-  e. Pemantauan statistik lalu lintas pengunjung via visualisasi dashboard Umami.
-2. Kelompok Pengguna Publik (Mahasiswa dan Tamu Kampus):
-  a. Panduan menjelajahi Dashboard publik (peninjauan statistik dosen/mahasiswa drill-down).
-  b. Panduan interaksi eksplorasi bebas pada Canvas Denah Virtual 3D.
-  c. Panduan melakukan pencarian rute fasilitas tertentu menggunakan Search Overlay React.
-  d. Panduan kontrol pergerakan karakter dan rotasi kamera first-person (Pointer Lock) serta penggunaan joystick virtual pada perangkat mobile.
+## 4.1 Panduan Administrator (Web Admin Panel)
 
-Dokumen lengkap Panduan Pengguna beserta tangkapan layar antarmuka operasional (User Guide manual) akan dilampirkan setelah sistem secara penuh diserahkan dan dideploy di lingkungan server produksi milik mitra.
+Halaman Admin Panel berfungsi untuk mengelola seluruh konten dinamis yang tersimpan di dalam database PostgreSQL Supabase serta memantau log audit dan statistik analitik.
+1. Prosedur Masuk ke Halaman Admin Panel:
+   a. Buka browser dan arahkan alamat URL ke `/admin/login` atau `/login`.
+   b. Masukkan nama pengguna (*username*) dan kata sandi (*password*) administrator yang sah pada form yang disediakan.
+   c. Klik tombol "Masuk". Jika kredensial valid, sistem akan mengarahkan pengguna ke halaman utama Admin Panel (`/admin`) dan menyimpan token JWT terotentikasi.
+2. Pengelolaan Data Gedung:
+   a. Menu utama admin menyajikan daftar tabel salah satunya adalah tabel gedung yang menampilkan nama, deskripsi, lokasi, jumlah lantai, dan kolom `unity_object_name`.
+   b. Untuk menambah data gedung baru, klik tombol "Tambah Data Gedung" di sudut kanan atas tabel.
+   c. Isi formulir modal dengan parameter nama gedung, deskripsi, lokasi fisik, jumlah lantai, tautan foto gedung, serta kolom `unity_object_name`.
+   d. Parameter `unity_object_name` wajib diisi menggunakan format huruf kecil dan garis bawah (misalnya: `gedung_rektorat`, `gedung_fik`) dan harus sama persis dengan nama GameObject penunjuk utama gedung di Unity.
+   e. Untuk memperbarui atau menghapus data gedung, klik tombol ikon pensil (*Edit*) atau tempat sampah (*Hapus*) pada baris data gedung yang bersangkutan.
+3. Pengelolaan Data Fasilitas:
+   a. Pilih menu tabel fasilitas pada bilah navigasi admin.
+   b. Untuk menambahkan fasilitas baru, klik tombol "Tambah Data Fasilitas".
+   c. Pada formulir modal, masukkan nama fasilitas (misalnya: `Laboratorium Rekayasa Perangkat Lunak`), deskripsi, tipe fasilitas (misalnya: `Laboratorium`), letak lantai (berupa angka bulat, misalnya: `3`), warna representasi frontend (misalnya: `blue`), dan tautan foto.
+   d. Pilih gedung induk dari menu dropdown yang menampilkan daftar gedung yang terdaftar di database. Pilihan ini akan mengisi kolom `id_gedung` (Foreign Key) secara otomatis.
+   e. Isi kolom `unity_object_name` dengan nama GameObject fasilitas tersebut pada hierarki Unity scene (misalnya: `lab_rpl`). Kolom ini harus unik agar navigasi kamera Unity dapat menargetkan objek secara tepat.
+4. Pengelolaan Data Fakultas dan Program Studi:
+   a. Pilih menu fakultas atau program studi untuk melakukan pengelolaan administratif akademik.
+   b. Pada menu fakultas, admin dapat mengaitkan fakultas dengan gedung kantor utamanya melalui pilihan dropdown gedung utama (`id_gedung_utama`).
+   c. Pada menu program studi, admin dapat mengaitkan program studi ke fakultas naungannya melalui dropdown fakultas (`id_fakultas`). Kolom akreditasi juga dapat diperbarui sesuai dengan status akreditasi terkini.
+5. Peninjauan Riwayat Perubahan Data (Audit Logs):
+   a. Admin dapat memantau seluruh riwayat manipulasi data yang terjadi di dalam sistem melalui halaman khusus Audit Logs.
+   b. Setiap kali terjadi penambahan, pembaruan, atau penghapusan data, trigger basis data akan mencatat aksi tersebut beserta identitas admin pelaksana (*actor_email*), jenis aksi (INSERT/UPDATE/DELETE), nama tabel yang bermutasi, waktu mutasi (*created_at*), serta data lama (*old_data*) dan data baru (*new_data*) dalam format JSON.
+6. Pemantauan Statistik Lalu Lintas Pengunjung (Umami Analytics):
+   a. Untuk memantau aktivitas pengunjung website secara real-time, admin dapat membuka dashboard Umami Analytics yang diinangi secara terpisah.
+   b. Dashboard menyajikan metrik jumlah pengunjung unik, jumlah tayangan halaman (*page views*), durasi kunjungan rata-rata, jenis perangkat yang digunakan, lokasi geografis pengunjung, serta halaman terpopuler yang sering diakses.
+
+## 4.2 Panduan Pengguna Publik (Public Dashboard & Denah 3D)
+
+Dashboard Publik ditujukan bagi mahasiswa, tamu, dan civitas akademika untuk menjelajahi profil universitas serta melakukan navigasi spasial 3D.
+1. Akses Dashboard Utama:
+   a. Akses halaman utama sistem melalui alamat root domain `/`.
+   b. Halaman depan menyajikan widget visualisasi statistik akademik universitas berupa sebaran jumlah mahasiswa dan dosen per fakultas yang digambarkan dalam grafik interaktif.
+2. Penelusuran Detail Data Akademik (Drill-Down):
+   a. Pada grafik sebaran dosen atau mahasiswa, arahkan kursor dan klik pada salah satu batang fakultas (misalnya: `Fakultas Ilmu Komputer`).
+   b. Aksi klik tersebut akan memicu pemanggilan modal detail data akademik yang menyajikan rincian statistik mahasiswa atau dosen per program studi pada fakultas tersebut secara dinamis.
+3. Eksplorasi Bebas pada Canvas Denah Virtual 3D:
+   a. Layar utama dashboard menyajikan viewport WebGL yang memuat model 3D lingkungan UPNVJ Kampus Pondok Labu secara interaktif.
+   b. Kontrol pergerakan pada PC/Laptop:
+      1) Tekan tombol `W`, `A`, `S`, `D` atau tombol panah arah pada keyboard untuk menggerakkan kamera maju, kiri, mundur, dan kanan di dalam scene 3D.
+      2) Gerakkan mouse sambil menekan klik kiri (*drag*) untuk memutar sudut pandang kamera (rotasi kamera).
+      3) Putar tombol scroll mouse ke depan atau ke belakang untuk melakukan zoom-in dan zoom-out kamera.
+      4) Klik dua kali pada area model untuk memasuki mode Pointer Lock first-person demi penelusuran tingkat mata manusia (*eye-level*). Tekan tombol `Esc` untuk keluar dari mode Pointer Lock.
+   c. Kontrol pergerakan pada Perangkat Mobile (Smartphone/Tablet):
+      1) Gunakan joystick virtual yang muncul di sisi kiri bawah layar untuk menggerakkan kamera ke segala arah.
+      2) Sentuh dan geser jari pada sisi kanan layar untuk memutar sudut pandang kamera.
+      3) Cubit layar ke dalam atau ke luar dengan dua jari (*pinch*) untuk mengatur jarak pandang zoom.
+4. Pencarian Aset dan Navigasi Rute Fasilitas:
+   a. Klik kotak pencarian (Search Bar) di bagian atas dashboard publik untuk membuka Search Overlay.
+   b. Ketik nama gedung atau fasilitas yang dicari (misalnya: `Perpustakaan` atau `Dewi Sartika`). Hasil pencarian campuran antara gedung dan fasilitas akan muncul secara real-time disertai dengan ikon pembeda.
+   c. Pilih salah satu hasil pencarian. Sistem React akan langsung mengirimkan pesan instruksi navigasi ke viewport Unity WebGL menggunakan parameter nama objek (`unity_object_name`).
+   d. Viewport Unity akan secara otomatis mengarahkan kamera ke lokasi objek sasaran dan memicu kalkulasi NavMesh pathfinding untuk menggambar garis rute navigasi visual 3D dari posisi titik awal pengguna ke ruangan tujuan.
+
+## 4.3 Panduan Unity & Alur Penggantian Nama Ruangan (Engine Developer)
+
+Hubungan antara database PostgreSQL Supabase dengan GameObject visual di Unity scene dijembatani secara eksklusif oleh kolom `unity_object_name`. Apabila terjadi penggantian nama ruangan atau penambahan fasilitas baru di lingkungan fisik kampus, alur kerja sinkronisasi berikut wajib dilakukan agar sistem navigasi spasial tidak terputus.
+1. Pemahaman Konsep Hubungan Kunci:
+   a. Jembatan relasi bersifat case-insensitive di mana string penamaan objek pada kolom `unity_object_name` di database PostgreSQL Supabase harus sama persis dengan nama GameObject pada hierarki scene Unity.
+   b. Apabila nama GameObject di Unity berubah namun data database tidak diperbarui, maka saat runtime pesan navigasi yang dikirim oleh React melalui `SendMessage` tidak akan menemukan target di scene.
+2. Langkah-Langkah Penggantian Nama Ruangan di Unity Editor:
+   a. Buka proyek Unity denah kampus menggunakan Unity Editor.
+   b. Pada jendela *Hierarchy*, telusuri struktur objek di bawah folder *Pointers* gedung yang bersangkutan (misalnya: `Gedung_Dewi_Sartika > Pointers`).
+   c. Pilih GameObject ruangan yang ingin diubah (misalnya: `dewi_sartika_301`).
+   d. Ubah nama GameObject tersebut menjadi nama baru (misalnya: `dewi_sartika_301_baru`). Gunakan konvensi penamaan huruf kecil dengan separator garis bawah.
+3. Langkah-Langkah Pembaruan Data di Database Supabase:
+   a. Masuk ke halaman Admin Panel web (`/admin`).
+   b. Pilih menu pengelolaan data *Fasilitas* atau *Gedung* (sesuai jenis objek yang diubah).
+   c. Temukan baris ruangan yang bersangkutan dan klik tombol *Edit*.
+   d. Pada formulir modal, ubah nilai pada kolom `unity_object_name` agar memiliki string penulisan yang sama persis dengan nama GameObject baru di Unity (yaitu: `dewi_sartika_301_baru`).
+   e. Klik "Simpan" untuk menulis perubahan ke Supabase Cloud.
+4. Validasi Otomatis Menggunakan Alat Editor Sync Checker:
+   a. Di dalam Unity Editor, klik menu navigasi atas `Tools > UPNVJ > Check Database Sync`. Aksi ini akan memicu pembukaan jendela *Database Sync Checker* khusus.
+   b. Klik tombol `Check Synchronization` pada jendela editor tersebut.
+   c. Alat sync checker akan melakukan request HTTP asinkron ke API backend `/api/unity/names` untuk mengambil seluruh record `unityObjectNames` terdaftar.
+   d. Skrip editor secara rekursif menelusuri hierarki scene aktif untuk mencocokkan nama GameObject dengan data API secara case-insensitive.
+   e. Hasil verifikasi akan ditampilkan pada jendela antarmuka:
+      1) Objek yang namanya cocok di scene dan database akan terdaftar pada kategori hijau (*Synchronized*).
+      2) Objek yang terdaftar di database namun tidak ditemukan di scene akan masuk kategori merah (*Missing in Scene*).
+      3) Objek yang ada di scene namun belum didefinisikan kolom `unity_object_name` di database akan masuk kategori kuning (*Not Registered in Database*).
+   f. Lakukan perbaikan penamaan GameObject atau entitas database hingga seluruh ruangan sasaran berstatus hijau (*Synchronized*).
+5. Pembaruan Jalur Navigasi (Re-Bake NavMesh):
+   a. Apabila penggantian nama ruangan diikuti dengan perubahan posisi fisik pintu, penyekat ruangan, atau rintangan jalan baru di scene Unity, maka peta jalan navigasi harus diperbarui.
+   b. Buka jendela navigasi bawaan Unity melalui menu `Window > AI > Navigation`.
+   c. Pada tab *Bake*, atur tinggi dan radius agen penelusuran, lalu klik tombol `Bake` di sudut kanan bawah.
+   d. Unity akan memperbarui struktur data NavMesh di seluruh area kampus agar rute pathfinding rintangan jalan terbebas dari kesalahan visual tabrakan dinding.
+6. Kompilasi dan Penyebaran (Build & Deploy WebGL):
+   a. Buka jendela pengatur build WebGL khusus melalui menu `Tools > UPNVJ > WebGL Build Settings`.
+   b. Atur optimasi build kompilasi (misalnya: WebGL2, kompresi Gzip/Brotli, dan culling distance) lalu klik `Build Project`.
+   c. Setelah proses kompilasi selesai, salin seluruh file hasil build WebGL dari direktori keluaran Unity ke dalam folder publik React di web server (`/public/build/`).
+   d. Jalankan perintah deploy web (`npm run build` dan push deploy) untuk menyebarkan pembaruan visual nama ruangan tersebut sehingga dapat diakses oleh publik secara langsung.
