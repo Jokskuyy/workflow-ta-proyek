@@ -124,6 +124,48 @@ def ensure_appendix_heading_style(styles_root):
         styles_root.append(style)
         print("Successfully defined taappendixheading style in styles.xml")
 
+def ensure_toc9_style(styles_root):
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    namespaces = {'w': ns_uri}
+    style = styles_root.find("w:style[@w:styleId='TOC9']", namespaces)
+    if style is None:
+        style = lxml.etree.Element(f'{{{ns_uri}}}style')
+        style.set(f'{{{ns_uri}}}type', 'paragraph')
+        style.set(f'{{{ns_uri}}}styleId', 'TOC9')
+        set_child_element(style, 'name', {'val': 'toc 9'})
+        set_child_element(style, 'basedOn', {'val': 'Normal'})
+        set_child_element(style, 'next', {'val': 'Normal'})
+        set_child_element(style, 'qFormat', {})
+        styles_root.append(style)
+        
+    pPr = style.find('w:pPr', namespaces)
+    if pPr is None:
+        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+        style.append(pPr)
+    
+    set_child_element(pPr, 'spacing', {'before': '0', 'after': '0', 'line': '360', 'lineRule': 'auto'})
+    set_child_element(pPr, 'ind', {'left': '1'})
+    set_child_element(pPr, 'jc', {'val': 'left'})
+    sort_element_children(pPr, PPR_ORDER)
+    
+    rPr = style.find('w:rPr', namespaces)
+    if rPr is None:
+        rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+        style.append(rPr)
+        
+    set_child_element(rPr, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
+    set_child_element(rPr, 'sz', {'val': '24'})
+    set_child_element(rPr, 'szCs', {'val': '24'})
+    
+    # Remove any bold/italic elements to keep the text plain
+    for tag in ['b', 'bCs', 'i', 'iCs']:
+        elem = rPr.find(f'w:{tag}', namespaces)
+        if elem is not None:
+            rPr.remove(elem)
+            
+    sort_element_children(style, STYLE_ORDER)
+    print("Successfully defined or updated TOC9 style in styles.xml")
+
 def ensure_hyperlink_style(styles_root):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     namespaces = {'w': ns_uri}
@@ -756,6 +798,7 @@ def format_document_xmls(unpacked_dir):
         root = tree.getroot()
         ensure_front_matter_heading_style(root)
         ensure_appendix_heading_style(root)
+        ensure_toc9_style(root)
         # ensure_hyperlink_style(root)
         for style in root.findall('w:style', namespaces):
             style_id = style.get(f'{{{ns_uri}}}styleId')

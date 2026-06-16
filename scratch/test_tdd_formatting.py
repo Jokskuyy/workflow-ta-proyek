@@ -129,6 +129,14 @@ class TestTddFormatting(unittest.TestCase):
         outlineLvl = style_pPr.find('w:outlineLvl', namespaces)
         self.assertIsNotNone(outlineLvl, "Appendix style should have w:outlineLvl to map to Level 9")
         self.assertEqual(outlineLvl.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val'), '8')
+        
+        # Verify TOC9 style has zero indentation
+        toc9_style = styles_root.find("w:style[@w:styleId='TOC9']", namespaces)
+        self.assertIsNotNone(toc9_style)
+        toc9_pPr = toc9_style.find('w:pPr', namespaces)
+        self.assertIsNotNone(toc9_pPr)
+        toc9_ind = toc9_pPr.find('w:ind', namespaces)
+        self.assertEqual(toc9_ind.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}left'), '1')
             
         # Verify Table of Appendices field instruction maps outline levels 9-9
         p_lampiran_toc = self.find_paragraph_by_text(root, namespaces, "DAFTAR LAMPIRAN")

@@ -53,6 +53,26 @@ def main():
             
     print("SUCCESS: taappendixheading style is correctly defined with outline level 8.")
     
+    # 1.1 Validate TOC9 style in styles.xml
+    print("Checking styles.xml for TOC9 style...")
+    toc9_style = styles_root.find("w:style[@w:styleId='TOC9']", namespaces)
+    if toc9_style is None:
+        print("ERROR: TOC9 style not found in styles.xml")
+        sys.exit(1)
+        
+    toc9_pPr = toc9_style.find("w:pPr", namespaces)
+    if toc9_pPr is not None:
+        toc9_ind = toc9_pPr.find("w:ind", namespaces)
+        if toc9_ind is None:
+            print("ERROR: TOC9 style is missing indentation definition (w:ind).")
+            sys.exit(1)
+        left_val = toc9_ind.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}left') or toc9_ind.get('left')
+        if left_val != '1':
+            print(f"ERROR: TOC9 indentation has left='{left_val}' (should be '1' to prevent Word from stripping it).")
+            sys.exit(1)
+            
+    print("SUCCESS: TOC9 style is correctly defined with left='1' (visually zero) indentation.")
+    
     # 2. Iterate paragraphs and perform checks
     body = doc_root.find('w:body', namespaces)
     if body is None:
