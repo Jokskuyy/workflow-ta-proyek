@@ -122,5 +122,16 @@
       "Tugas Akhir_Abimanyu Damarjati_2110511110.pdf",
       "Outline Laporan Tugas Akhir Jenis Prototipe.docx"
     ]
+  },
+  "integration_pointer_and_sync": {
+    "pointer_mechanism": {
+      "description": "Sebagai integrator, Muhammad Iman Nugraha membuat unity object name di dalam Unity (seperti prefab dewi sartika) yang memiliki child empty object pointer dengan nama yang sesuai dengan unity_object_name di database Supabase.",
+      "hierarchy_screenshot": "dokumentasi/contoh_pointer.png"
+    },
+    "database_sync_checker": {
+      "script_path": "src/unity-scripts/Editor/DatabaseSyncChecker.cs",
+      "description": "Script editor Unity untuk memeriksa sinkronisasi antara objek-objek di Unity Hierarchy dengan data di database Supabase melalui API /api/unity/names.",
+      "ui_screenshot": "dokumentasi/contoh_sync_db.png"
+    }
   }
 }
