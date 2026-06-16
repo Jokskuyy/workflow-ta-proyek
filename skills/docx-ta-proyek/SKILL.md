@@ -71,6 +71,7 @@ Unlike research theses (skripsi) which use a 5-chapter structure, project-based 
 | **Page Splits** | Table of Contents (Daftar Isi), Table of Figures (Daftar Gambar), Table of Tables (Daftar Tabel) must be on separate pages |
 | **Cover Page** | Cover page must be on its own page and separated from the rest of the document |
 | **Table of Appendices** | Table of Appendices (Daftar Lampiran) must be placed on its own page after the Table of Tables (Daftar Tabel). Appendices (LAMPIRAN 1-4) must be excluded from the main Table of Contents (Daftar Isi) by using custom styling without outline levels. |
+| **Images & Figures** | Must preserve their original aspect ratio and must not be stretched or distorted. Sizing must adjust dynamically based on actual image dimensions. |
 
 ## Handling Discrepancies & Ambiguities
 

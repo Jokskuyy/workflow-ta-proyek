@@ -339,7 +339,23 @@ def clean_bibliography_sdt(sdt_elem):
         sdtContent.append(p)
     print("Replaced bibliography entries inside SDT.")
 
-def scale_cover_drawings(p, namespaces):
+def load_rels_map(unpacked_dir):
+    rels_path = os.path.join(unpacked_dir, 'word', '_rels', 'document.xml.rels')
+    rel_map = {}
+    if os.path.exists(rels_path):
+        try:
+            tree = lxml.etree.parse(rels_path)
+            root = tree.getroot()
+            for rel in root.findall('{http://schemas.openxmlformats.org/package/2006/relationships}Relationship'):
+                rel_id = rel.get('Id')
+                target = rel.get('Target')
+                if rel_id and target:
+                    rel_map[rel_id] = target
+        except Exception as e:
+            print(f"Error loading relationships from {rels_path}: {e}")
+    return rel_map
+
+def scale_cover_drawings(p, namespaces, unpacked_dir=None, rel_map=None):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     drawings = p.findall('.//w:drawing', namespaces)
     if not drawings:
@@ -357,6 +373,24 @@ def scale_cover_drawings(p, namespaces):
     max_height_emu = 1800000  # 5.0 cm
     
     for drawing in drawings:
+        aspect_ratio = None
+        if unpacked_dir and rel_map:
+            blip = drawing.find('.//a:blip', {'a': 'http://schemas.openxmlformats.org/drawingml/2006/main'})
+            if blip is not None:
+                embed_id = blip.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
+                if embed_id and embed_id in rel_map:
+                    rel_target = rel_map[embed_id]
+                    img_path = os.path.join(unpacked_dir, 'word', rel_target)
+                    if os.path.exists(img_path):
+                        try:
+                            from PIL import Image
+                            with Image.open(img_path) as img:
+                                img_w, img_h = img.size
+                                if img_h > 0:
+                                    aspect_ratio = img_w / img_h
+                        except Exception as e:
+                            print(f"  Error reading cover image aspect ratio: {e}")
+
         for elem in drawing.iter():
             tag_local = elem.tag.split('}')[-1]
             if tag_local in ['extent', 'ext']:
@@ -366,6 +400,10 @@ def scale_cover_drawings(p, namespaces):
                     try:
                         cx = int(cx_str)
                         cy = int(cy_str)
+                        if aspect_ratio is not None:
+                            cy = int(cx / aspect_ratio)
+                            elem.set('cy', str(cy))
+                            
                         scale_x = max_width_emu / cx
                         scale_y = max_height_emu / cy
                         scale = min(scale_x, scale_y, 1.0)
@@ -376,7 +414,7 @@ def scale_cover_drawings(p, namespaces):
                     except ValueError:
                         pass
 
-def center_and_scale_drawings(p, namespaces):
+def center_and_scale_drawings(p, namespaces, unpacked_dir=None, rel_map=None):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     drawings = p.findall('.//w:drawing', namespaces)
     if not drawings:
@@ -394,6 +432,37 @@ def center_and_scale_drawings(p, namespaces):
     max_width_emu = 5040000  # 14.0cm in EMUs
     
     for drawing in drawings:
+        aspect_ratio = None
+        if unpacked_dir and rel_map:
+            blip = drawing.find('.//a:blip', {'a': 'http://schemas.openxmlformats.org/drawingml/2006/main'})
+            if blip is not None:
+                embed_id = blip.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
+                if embed_id and embed_id in rel_map:
+                    rel_target = rel_map[embed_id]
+                    img_path = os.path.join(unpacked_dir, 'word', rel_target)
+                    if os.path.exists(img_path):
+                        try:
+                            from PIL import Image
+                            with Image.open(img_path) as img:
+                                img_w, img_h = img.size
+                                if img_h > 0:
+                                    aspect_ratio = img_w / img_h
+                        except Exception as e:
+                            print(f"  Error reading image aspect ratio: {e}")
+
+        if aspect_ratio is not None:
+            for elem in drawing.iter():
+                tag_local = elem.tag.split('}')[-1]
+                if tag_local in ['extent', 'ext']:
+                    cx_str = elem.get('cx')
+                    if cx_str:
+                        try:
+                            cx = int(cx_str)
+                            cy = int(cx / aspect_ratio)
+                            elem.set('cy', str(cy))
+                        except ValueError:
+                            pass
+
         max_cx = 0
         for elem in drawing.iter():
             tag_local = elem.tag.split('}')[-1]
@@ -790,6 +859,7 @@ def format_document_xmls(unpacked_dir):
     namespaces = {'w': ns_uri}
     styles_path = os.path.join(unpacked_dir, 'word/styles.xml')
     doc_path = os.path.join(unpacked_dir, 'word/document.xml')
+    rel_map = load_rels_map(unpacked_dir)
     
     # 1. Modify Styles
     if os.path.exists(styles_path):
@@ -1081,7 +1151,7 @@ def format_document_xmls(unpacked_dir):
             if idx < bab1_idx_orig:
                 if idx <= cover_end_idx:
                     if child.tag.endswith('p'):
-                        scale_cover_drawings(child, namespaces)
+                        scale_cover_drawings(child, namespaces, unpacked_dir, rel_map)
                         text = "".join(child.itertext()).strip()
                         if not text:
                             pPr = child.find('w:pPr', namespaces)
@@ -1450,7 +1520,7 @@ def format_document_xmls(unpacked_dir):
                 
                 # Center and scale drawings if present in paragraph
                 if p.find('.//w:drawing', namespaces) is not None:
-                    center_and_scale_drawings(p, namespaces)
+                    center_and_scale_drawings(p, namespaces, unpacked_dir, rel_map)
                     pPr = p.find('w:pPr', namespaces)
                 
                 if pPr is not None: sort_element_children(pPr, PPR_ORDER)

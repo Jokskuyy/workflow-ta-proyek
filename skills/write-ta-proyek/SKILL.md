@@ -116,6 +116,7 @@ To automate the formatting of your `.docx` document:
 | **TOC & bibliography** | Center-aligned title, unnumbered Heading1, fonts forced to Times New Roman |
 | **Page Splits** | Table of Contents (Daftar Isi), Table of Figures (Daftar Gambar), Table of Tables (Daftar Tabel) must be on separate pages |
 | **Cover Page** | Cover page must be on its own page and separated from the rest of the document |
+| **Images & Figures** | Must preserve their original aspect ratio and must not be stretched or distorted. Sizing must adjust dynamically based on actual image dimensions. |
 
 ## Handling Discrepancies & Ambiguities
 
