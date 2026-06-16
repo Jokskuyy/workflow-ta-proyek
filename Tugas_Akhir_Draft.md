@@ -1253,7 +1253,7 @@ Dashboard Publik ditujukan bagi mahasiswa, tamu, dan civitas akademika untuk men
    a. Pengguna dapat mengeklik salah satu kartu aset kampus (seperti Gedung, Laboratorium, Perpustakaan, atau Ruang Kuliah) untuk membuka modal detail yang menampilkan daftar lengkap aset dalam kategori tersebut beserta deskripsi dan lokasinya.
    b. Pengguna juga dapat meninjau data program studi melalui tabel akreditasi (Accreditation Table) yang menyajikan informasi jenjang, lembaga akreditasi, tanggal kedaluwarsa, dan status akreditasi dari masing-masing program studi secara langsung.
 3. Eksplorasi Bebas pada Canvas Denah Virtual 3D:
-   a. Layar utama dashboard menyajikan viewport WebGL yang memuat model 3D lingkungan UPNVJ Kampus Pondok Labu secara interaktif.
+   a. Viewport WebGL pada dashboard mula-mula menyajikan gambar statis penutup (cover placeholder) sebelum runtime WebGL aktif. Pengguna harus mengeklik tombol "Mulai Denah 3D" untuk memicu pengunduhan modul WebGL dan menginisialisasi model 3D lingkungan UPNVJ Kampus Pondok Labu secara interaktif.
    b. Kontrol pergerakan pada PC/Laptop:
       1) Tekan tombol `W`, `A`, `S`, `D` atau tombol panah arah pada keyboard untuk menggerakkan kamera maju, kiri, mundur, dan kanan di dalam scene 3D.
       2) Gerakkan mouse sambil menekan klik kiri (*drag*) untuk memutar sudut pandang kamera (rotasi kamera).

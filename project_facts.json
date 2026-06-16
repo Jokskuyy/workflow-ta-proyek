@@ -40,6 +40,29 @@
           "dokumentasi/wawancara warek 2(1).jpeg",
           "dokumentasi/wawancara warek 2(2).jpeg"
         ]
+      },
+      "screenshots": {
+        "admin_dashboard": {
+          "login_page": "dokumentasi/login-page.png",
+          "main_dashboard": "dokumentasi/header+gedung-view.png",
+          "modal_create": "dokumentasi/modal-create-gedung.png",
+          "modal_edit": "dokumentasi/modal-edit-gedung.png",
+          "modal_delete": "dokumentasi/modal-konfirmasi-delete-gedung.png",
+          "traffic_analytics": "dokumentasi/section-admin-traffic-view.png",
+          "audit_logs": "dokumentasi/audit-log-admin-dashboard.png"
+        },
+        "public_dashboard": {
+          "hero_section": "dokumentasi/section-header+hero.png",
+          "traffic_web_public": "dokumentasi/traffic-web-public.png",
+          "facilities_section": "dokumentasi/section fasilitas-asset(dan gedung).png",
+          "search_overlay": "dokumentasi/search-fasilitas-aset.png",
+          "modal_facilities_list": "dokumentasi/modal-fasilitas-aset.png",
+          "modal_detail_facility": "dokumentasi/modal-detail-fasilitas-aset.png",
+          "modal_detail_building": "dokumentasi/modal-detail-gedung.png",
+          "denah_placeholder": "dokumentasi/section-denah-kampus.png",
+          "webgl_canvas": "dokumentasi/ui-webgl.png",
+          "footer": "dokumentasi/section-footer.png"
+        }
       }
     }
   },
