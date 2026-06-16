@@ -462,6 +462,9 @@ def center_and_scale_drawings(p, namespaces, unpacked_dir=None, rel_map=None):
                             elem.set('cy', str(cy))
                         except ValueError:
                             pass
+                elif tag_local == 'srcRect':
+                    for attr in list(elem.attrib.keys()):
+                        elem.attrib.pop(attr)
 
         max_cx = 0
         for elem in drawing.iter():

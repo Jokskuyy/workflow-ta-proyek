@@ -271,54 +271,6 @@ def main():
             new_text = new_text.replace("menampilkan detail dosen berdasarkan fakultas", "menampilkan detail fasilitas berdasarkan kategori")
         if "POST /api/dosen" in new_text:
             new_text = new_text.replace("POST /api/dosen", "POST /api/buildings")
-
-        # Replace Figure numbers for the footer
-        if "Gambar 2.22" in new_text:
-            new_text = new_text.replace("Gambar 2.22", "Gambar 2.19")
-        if "Gambar 2.22 Bagian Footer" in new_text:
-            new_text = new_text.replace("Gambar 2.22 Bagian Footer", "Gambar 2.19 Bagian Footer")
-            
-        # Update Hero Section description (P 389 in template)
-        if "Area ini menampilkan identitas sistem, navigasi utama, serta fitur pengaturan bahasa yang mendukung aksesibilitas bagi pengguna dengan latar belakang berbeda, sebagaimana terlihat pada Gambar 2.14." in new_text:
-            new_text = new_text.replace(
-                "Area ini menampilkan identitas sistem, navigasi utama, serta fitur pengaturan bahasa yang mendukung aksesibilitas bagi pengguna dengan latar belakang berbeda, sebagaimana terlihat pada Gambar 2.14.",
-                "Area ini menampilkan identitas sistem, navigasi utama, tombol yang mengarah ke login admin, serta tombol toggle bahasa (Bahasa Indonesia dan English) yang sangat penting untuk aksesibilitas pengguna mancanegara, sebagaimana terlihat pada Gambar 2.14."
-            )
-            
-        # Update Public Traffic Statistics description (P 391 in template)
-        if "Modul ini menyajikan visualisasi line chart yang merepresentasikan tren kunjungan dari waktu ke waktu, serta indikator kinerja utama (Key Performance Indicator/KPI) berupa total pengunjung, total page views, rata-rata pengunjung harian, dan rata-rata jumlah tampilan halaman, sebagaimana ditampilkan pada Gambar 2.15." in new_text:
-            new_text = new_text.replace(
-                "Modul ini menyajikan visualisasi line chart yang merepresentasikan tren kunjungan dari waktu ke waktu, serta indikator kinerja utama (Key Performance Indicator/KPI) berupa total pengunjung, total page views, rata-rata pengunjung harian, dan rata-rata jumlah tampilan halaman, sebagaimana ditampilkan pada Gambar 2.15.",
-                "Modul ini menyajikan visualisasi line chart yang merepresentasikan tren jumlah pengunjung dan tampilan halaman selama 14 hari terakhir, serta empat kartu indikator kinerja utama (KPI) berupa total pengunjung, total page views, rata-rata pengunjung harian, dan rata-rata jumlah tampilan halaman, sebagaimana ditampilkan pada Gambar 2.15."
-            )
-            
-        # Update Fasilitas & Aset description (P 394 in template)
-        if "Informasi mengenai fasilitas dan aset kampus disajikan dengan tata letak berbasis kartu yang mengelompokkan data berdasarkan kategori utama, seperti gedung kampus, laboratorium, perpustakaan, ruang kuliah, dan fasilitas pendukung lainnya. Setiap kartu menampilkan jumlah entitas yang tersedia serta menyediakan aksi lihat semua untuk eksplorasi lebih lanjut, sebagaimana diperlihatkan pada Gambar 2.16." in new_text:
-            new_text = new_text.replace(
-                "Informasi mengenai fasilitas dan aset kampus disajikan dengan tata letak berbasis kartu yang mengelompokkan data berdasarkan kategori utama, seperti gedung kampus, laboratorium, perpustakaan, ruang kuliah, dan fasilitas pendukung lainnya. Setiap kartu menampilkan jumlah entitas yang tersedia serta menyediakan aksi lihat semua untuk eksplorasi lebih lanjut, sebagaimana diperlihatkan pada Gambar 2.16.",
-                "Informasi mengenai sarana prasarana kampus disajikan dengan tata letak berbasis kartu yang mengelompokkan data ke dalam 8 kategori utama aset dan fasilitas (seperti Gedung Kuliah, Laboratorium, Perpustakaan, Ruang Kelas, Ruang Rapat, Ruang Dosen, Fasilitas Umum, dan Fasilitas Olahraga), serta dilengkapi fitur search gabungan (Search Overlay) untuk mencari nama gedung dan fasilitas secara langsung, sebagaimana diperlihatkan pada Gambar 2.16."
-            )
-            
-        # Update Modal List Fasilitas & Aset description (P 397 in template)
-        if "Ketika pengguna memilih salah satu kartu pada bagian fasilitas dan aset (selain kategori unggulan), sistem akan menampilkan modal yang berisi daftar fasilitas sesuai kategori yang dipilih. Modal ini menyajikan informasi dasar setiap fasilitas dalam bentuk daftar terstruktur, sehingga pengguna dapat melakukan penelusuran tanpa harus berpindah halaman, sebagaimana ditunjukkan pada Gambar 2.17. Desain ini mendukung prinsip efisiensi interaksi dan pengalaman pengguna yang lebih fokus." in new_text:
-            new_text = new_text.replace(
-                "Ketika pengguna memilih salah satu kartu pada bagian fasilitas dan aset (selain kategori unggulan), sistem akan menampilkan modal yang berisi daftar fasilitas sesuai kategori yang dipilih. Modal ini menyajikan informasi dasar setiap fasilitas dalam bentuk daftar terstruktur, sehingga pengguna dapat melakukan penelusuran tanpa harus berpindah halaman, sebagaimana ditunjukkan pada Gambar 2.17. Desain ini mendukung prinsip efisiensi interaksi dan pengalaman pengguna yang lebih fokus.",
-                "Ketika pengguna mengeklik salah satu kartu kategori pada bagian fasilitas dan aset, sistem akan menampilkan modal popup daftar item yang sesuai dengan kategori yang dipilih, sebagaimana ditunjukkan pada Gambar 2.17. Desain ini mendukung penelusuran data terstruktur secara dinamis."
-            )
-            
-        # Update Modal Detail Fasilitas & Aset description (P 400 in template)
-        if "Untuk fasilitas yang dikategorikan sebagai unggulan, sistem menyediakan tampilan detail yang lebih informatif. Modal detail ini tidak hanya ditampilkan ketika pengguna memilih kategori fasilitas unggulan, tetapi juga akan muncul apabila pengguna menekan salah satu item pada daftar fasilitas yang tersedia. Dalam kondisi tersebut, sistem menampilkan informasi spesifik yang mencakup deskripsi lengkap fasilitas yang dipilih, sebagaimana terlihat pada Gambar 2.18. Mekanisme ini memastikan konsistensi perilaku antarmuka sekaligus memberikan konteks yang lebih mendalam mengenai fasilitas strategis kampus." in new_text:
-            new_text = new_text.replace(
-                "Untuk fasilitas yang dikategorikan sebagai unggulan, sistem menyediakan tampilan detail yang lebih informatif. Modal detail ini tidak hanya ditampilkan ketika pengguna memilih kategori fasilitas unggulan, tetapi juga akan muncul apabila pengguna menekan salah satu item pada daftar fasilitas yang tersedia. Dalam kondisi tersebut, sistem menampilkan informasi spesifik yang mencakup deskripsi lengkap fasilitas yang dipilih, sebagaimana terlihat pada Gambar 2.18. Mekanisme ini memastikan konsistensi perilaku antarmuka sekaligus memberikan konteks yang lebih mendalam mengenai fasilitas strategis kampus.",
-                "Jika pengguna mengeklik salah satu item dari daftar tersebut, sistem akan menampilkan modal detail yang berbeda secara spesifik antara gedung dan fasilitas. Untuk modal detail gedung, sistem menyajikan deskripsi gedung, foto, lokasi, serta daftar lengkap fasilitas yang ada di dalam gedung tersebut, sedangkan untuk detail fasilitas menyajikan deskripsi spesifik dan lokasinya, sebagaimana terlihat pada Gambar 2.18."
-            )
-            
-        # Update Footer description (P 404 in template)
-        if "Sebagai penutup halaman, sistem menyediakan bagian footer yang berfungsi sebagai pusat informasi tambahan dan navigasi cepat. Footer ini memuat tautan ke media sosial resmi UPNVJ, informasi kontak institusi, serta tautan cepat menuju situs-situs penting universitas, sebagaimana ditunjukkan pada Gambar 2.22. Keberadaan footer ini mendukung aksesibilitas informasi dan memperkuat identitas institusi secara digital." in new_text:
-            new_text = new_text.replace(
-                "Sebagai penutup halaman, sistem menyediakan bagian footer yang berfungsi sebagai pusat informasi tambahan dan navigasi cepat. Footer ini memuat tautan ke media sosial resmi UPNVJ, informasi kontak institusi, serta tautan cepat menuju situs-situs penting universitas, sebagaimana ditunjukkan pada Gambar 2.22. Keberadaan footer ini mendukung aksesibilitas informasi dan memperkuat identitas institusi secara digital.",
-                "Sebagai penutup halaman, sistem menyediakan bagian footer yang berfungsi sebagai pusat informasi tambahan dan navigasi cepat. Footer ini memuat tautan cepat, alamat fisik kampus, jam operasional, informasi kontak, serta visualisasi peta Google Maps lokasi kampus Pondok Labu, sebagaimana ditunjukkan pada Gambar 2.22."
-            )
             
         if new_text != text:
             wt.text = new_text
@@ -349,6 +301,83 @@ def main():
         print("Outdated mockup paragraphs removed.")
     else:
         print("Warning: Could not locate outdated mockup paragraphs for removal.")
+
+    # 1.6. Replace the User Interface section narrative paragraphs directly in XML
+    ui_replacements = {
+        "Berikut adalah rancangan antarmuka pengguna": 
+            "Berikut adalah rancangan antarmuka pengguna (user interface) dalam bentuk mockup untuk komponen frontend utama yang akan dikembangkan. Halaman antarmuka dalam sistem ini dibagi menjadi dua bagian utama, yaitu Antarmuka Dashboard Admin untuk kebutuhan manajemen data oleh administrator dan Antarmuka Public Dashboard untuk akses informasi sarana prasarana oleh pengguna umum.",
+        
+        "Proses awal interaksi administrator dengan sistem diawali melalui mekanisme autentikasi": 
+            "Proses awal interaksi administrator dengan sistem manajemen diawali melalui mekanisme autentikasi pada Halaman Login Admin. Halaman ini menyediakan formulir input kredensial berupa nama pengguna (username) dan kata sandi (password) yang wajib diisi oleh administrator sebelum dapat mengakses dashboard administratif, sebagaimana ditunjukkan pada Gambar 2.17. Mekanisme autentikasi ini berfungsi untuk membatasi akses administratif hanya kepada pengguna yang berwenang, sehingga integritas data operasional tetap terjaga.",
+        
+        "Setelah autentikasi berhasil dilakukan, administrator diarahkan menuju halaman utama dashboard": 
+            "Setelah proses autentikasi berhasil, administrator akan diarahkan menuju Halaman Dashboard Admin yang bertindak sebagai pusat kendali manajemen data kampus. Halaman ini menampilkan ringkasan data statistik operasional dalam bentuk widget analitik serta tabel data terperinci yang mendukung aktivitas pemantauan dan pengelolaan sarana prasarana, sebagaimana divisualisasikan pada Gambar 2.18. Tombol aksi yang tersedia pada tabel ini memungkinkan administrator untuk mengelola data secara dinamis.",
+        
+        "Interaksi pengelolaan data pada sistem ini dirancang menggunakan pendekatan modal-based form": 
+            "Interaksi pengelolaan data pada sistem ini dirancang menggunakan pendekatan formulir berbasis modal (modal-based form) untuk menjaga fokus administrator tanpa harus berpindah halaman. Ketika administrator menambahkan data gedung baru, sistem menampilkan modal popup formulir input sebagaimana ditunjukkan pada Gambar 2.19. Pola interaksi serupa diterapkan ketika administrator memperbarui data gedung, di mana data lama akan otomatis dimuat ke dalam kolom input modal, sebagaimana divisualisasikan pada Gambar 2.20.",
+        
+        "Untuk mencegah terjadinya penghapusan data secara tidak disengaja": 
+            "Untuk mencegah terjadinya penghapusan data secara tidak sengaja, sistem menerapkan mekanisme konfirmasi sebelum eksekusi aksi hapus dilakukan. Mekanisme ini direalisasikan melalui modal konfirmasi yang meminta persetujuan eksplisit dari administrator, sebagaimana diperlihatkan pada Gambar 2.21. Aksi penghapusan data pada database hanya akan dijalankan apabila administrator menekan tombol konfirmasi hapus secara sadar.",
+        
+        "Pemantauan lalu lintas penggunaan sistem pada sisi administratif dirancang": 
+            "Pemantauan lalu lintas penggunaan sistem pada sisi administratif dirancang untuk menyajikan analisis kunjungan secara mendalam. Modul traffic website pada Dashboard Admin menyajikan informasi agregat mengenai aktivitas penggunaan internal, mencakup total kunjungan, frekuensi akses halaman, serta detail sistem operasi dan peramban yang digunakan untuk mengakses sistem, sebagaimana ditunjukkan pada Gambar 2.22.",
+        
+        "Sedikit berbeda dengan modul public traffic": 
+            "Metrik pemantauan lalu lintas pada Dashboard Admin ini memiliki cakupan yang lebih lengkap dibandingkan dengan Dashboard Publik. Klasifikasi tipe perangkat yang digunakan oleh pengguna (seperti desktop, tablet, dan mobile) ditampilkan secara detail untuk memberikan gambaran komprehensif mengenai pola kerja administrator dalam mengelola konten sistem.",
+        
+        "Keberadaan detail perangkat pada admin traffic": 
+            "Analisis perangkat pada halaman admin traffic ini memiliki peran penting untuk mengevaluasi aspek keamanan dan kegunaan (usability) sistem. Dengan mengetahui peramban dan sistem operasi yang digunakan oleh administrator, pengelola sistem dapat mengoptimalkan tata letak antarmuka serta mengidentifikasi jika terjadi akses tidak wajar dari perangkat yang tidak dikenal.",
+        
+        "Bagian awal antarmuka public dashboard dirancang sebagai hero section": 
+            "Bagian awal antarmuka public dashboard dirancang sebagai Hero Section yang menjadi titik orientasi visual utama bagi pengunjung. Area ini memuat identitas sistem, navigasi utama, tombol akses ke login admin, serta tombol toggle bahasa (Bahasa Indonesia dan English) untuk memfasilitasi aksesibilitas bagi pengguna internasional, sebagaimana diperlihatkan pada Gambar 2.23. Penyediaan fitur multi-bahasa ini bertujuan untuk mempermudah pengguna asing dalam memahami konten navigasi.",
+        
+        "Pemantauan aktivitas pengguna pada public dashboard dirancang": 
+            "Metrik pemantauan lalu lintas pada halaman publik dirancang untuk menyajikan statistik kunjungan dasar secara transparan. Modul ini menampilkan visualisasi grafik garis tren kunjungan harian selama 14 hari terakhir serta empat kartu indikator kinerja utama (Key Performance Indicator/KPI) yang mencakup total pengunjung, total tampilan halaman, rata-rata pengunjung harian, dan rata-rata tampilan halaman, sebagaimana ditunjukkan pada Gambar 2.24.",
+        
+        "Informasi mengenai fasilitas dan aset kampus disajikan dengan tata letak berbasis kartu": 
+            "Informasi mengenai sarana prasarana kampus disajikan dengan tata letak berbasis kartu (card-based layout) yang mengelompokkan data ke dalam 8 kategori utama aset dan fasilitas. Sistem juga dilengkapi dengan fitur pencarian gabungan (Search Overlay) di bagian atas untuk memudahkan penemuan nama gedung atau fasilitas secara langsung dari seluruh kategori yang tersedia, sebagaimana diperlihatkan pada Gambar 2.25.",
+        
+        "Ketika pengguna mengeklik salah satu kartu kategori": 
+            "Ketika pengguna memilih salah satu kartu kategori sarana prasarana, sistem akan memicu jendela popup dinamis. Modal popup ini menyajikan daftar item terstruktur yang sesuai dengan kategori yang dipilih oleh pengguna tanpa memuat ulang halaman utama, sebagaimana ditunjukkan pada Gambar 2.26. Pola interaksi ini mendukung penelusuran informasi yang lebih terfokus.",
+        
+        "Ketika pengguna memilih salah satu kartu pada bagian fasilitas": 
+            "Ketika pengguna memilih salah satu kartu kategori sarana prasarana, sistem akan memicu jendela popup dinamis. Modal popup ini menyajikan daftar item terstruktur yang sesuai dengan kategori yang dipilih oleh pengguna tanpa memuat ulang halaman utama, sebagaimana ditunjukkan pada Gambar 2.26. Pola interaksi ini mendukung penelusuran informasi yang lebih terfokus.",
+        
+        "Untuk fasilitas yang dikategorikan sebagai unggulan": 
+            "Sistem menyediakan modal detail dengan struktur informasi berbeda yang disesuaikan secara otomatis berdasarkan jenis entitas yang dipilih oleh pengguna. Ketika pengguna mengeklik item bertipe gedung, modal detail menampilkan deskripsi gedung, foto fisik, lokasi kampus, serta daftar lengkap fasilitas yang ada di dalam gedung tersebut. Sementara itu, untuk item bertipe fasilitas, modal detail hanya menampilkan deskripsi spesifik dan lokasinya saja, sebagaimana ditunjukkan pada Gambar 2.27.",
+        
+        "Sebagai penutup halaman, sistem menyediakan bagian footer": 
+            "Sebagai penutup halaman dan pusat navigasi pelengkap, sistem menyediakan Bagian Footer di area paling bawah halaman. Footer ini memuat tautan navigasi cepat, jam operasional layanan, informasi kontak institusi, serta widget peta interaktif Google Maps yang memvisualisasikan lokasi fisik Kampus Pondok Labu UPNVJ secara langsung, sebagaimana diperlihatkan pada Gambar 2.28. Keberadaan footer ini mempermudah pengguna dalam mengakses informasi kontak resmi serta menemukan rute lokasi fisik kampus.",
+        
+        "Perancangan antarmuka pengguna pada Admin Dashboard dan Public Dashboard tidak hanya berfokus pada aspek visual": 
+            "Perancangan antarmuka pengguna pada Admin Dashboard dan Public Dashboard dirancang dengan mengutamakan aspek konsistensi elemen visual dan kemudahan penggunaan (usability). Desain antarmuka yang dinamis ini diharapkan dapat mempermudah pengguna dalam memperoleh informasi spasial secara mandiri. Rancangan antarmuka ini selanjutnya menjadi acuan dalam penyusunan skenario pengujian fungsional dan pengujian penerimaan pengguna pada tahap evaluasi sistem."
+    }
+
+    replaced_ui_count = 0
+    for p in body.findall('w:p', namespaces):
+        p_text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text])
+        for match_key, new_val in ui_replacements.items():
+            if match_key in p_text:
+                # Clear runs and insert new one
+                pPr = p.find('w:pPr', namespaces)
+                for child in list(p):
+                    if child != pPr:
+                        p.remove(child)
+                r = lxml.etree.SubElement(p, f'{{{ns_uri}}}r')
+                rPr = lxml.etree.SubElement(r, f'{{{ns_uri}}}rPr')
+                lxml.etree.SubElement(rPr, f'{{{ns_uri}}}rFonts', {
+                    f'{{{ns_uri}}}ascii': 'Times New Roman',
+                    f'{{{ns_uri}}}hAnsi': 'Times New Roman'
+                })
+                lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '24'})
+                lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '24'})
+                t = lxml.etree.SubElement(r, f'{{{ns_uri}}}t')
+                t.text = new_val
+                t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+                replaced_ui_count += 1
+                break
+
+    print(f"Replaced {replaced_ui_count} UI narrative paragraphs directly in XML.")
     
     # 2. Replace the ERD section description paragraphs
     # Find start and end paragraph indices
@@ -394,19 +423,23 @@ def main():
     # Copy new screenshots over the old mockup images in word/media
     media_dir = "unpacked_ta/word/media"
     replacements = {
-        "login-page.png": "image18.png",
-        "header+gedung-view.png": "image19.png",
-        "modal-create-gedung.png": "image20.png",
-        "modal-edit-gedung.png": "image21.png",
-        "modal-konfirmasi-delete-gedung.png": "image22.png",
-        "section-admin-traffic-view.png": "image23.png",
-        "section-header+hero.png": "image24.png",
-        "traffic-web-public.png": "image25.png",
-        "section fasilitas-asset(dan gedung).png": "image26.png",
-        "modal-fasilitas-aset.png": "image27.png",
-        "modal-detail-fasilitas-aset.png": "image28.png",
-        "section-footer.png": "image32.png",
-        "erd_schema.png": "image13.png"
+        "login-page.png": "image20.png",
+        "header+gedung-view.png": "image21.png",
+        "modal-create-gedung.png": "image22.png",
+        "modal-edit-gedung.png": "image23.png",
+        "modal-konfirmasi-delete-gedung.png": "image24.png",
+        "section-admin-traffic-view.png": "image25.png",
+        "section-header+hero.png": "image26.png",
+        "traffic-web-public.png": "image27.png",
+        "section fasilitas-asset(dan gedung).png": "image28.png",
+        "modal-fasilitas-aset.png": "image29.png",
+        "modal-detail-gedung.png": "image30.png",
+        "section-footer.png": "image31.png",
+        "erd_schema.png": "image15.png",
+        "ttd pakta integritas UPA TIK.jpeg": "image10.jpg",
+        "wawancara warek 2.jpeg": "image11.jpg",
+        "contoh_pointer.png": "image32.png",
+        "contoh_sync_db.png": "image33.png"
     }
     
     print("Replacing mockup image files with real screenshots...")
