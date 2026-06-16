@@ -44,14 +44,14 @@ def main():
     if style_pPr is not None:
         outlineLvl = style_pPr.find("w:outlineLvl", namespaces)
         if outlineLvl is None:
-            print("ERROR: taappendixheading style is missing w:outlineLvl. It needs to have outline level 3 to map to TOC level 4.")
+            print("ERROR: taappendixheading style is missing w:outlineLvl. It needs to have outline level 8 to map to TOC level 9.")
             sys.exit(1)
         val = outlineLvl.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val') or outlineLvl.get('val')
-        if val != '3':
-            print(f"ERROR: taappendixheading style outlineLvl value is '{val}' (should be '3' to map to level 4 and isolate from main TOC).")
+        if val != '8':
+            print(f"ERROR: taappendixheading style outlineLvl value is '{val}' (should be '8' to map to level 9 and isolate from main TOC).")
             sys.exit(1)
             
-    print("SUCCESS: taappendixheading style is correctly defined with outline level 3.")
+    print("SUCCESS: taappendixheading style is correctly defined with outline level 8.")
     
     # 2. Iterate paragraphs and perform checks
     body = doc_root.find('w:body', namespaces)
@@ -151,12 +151,12 @@ def main():
                 next_p = p_list[j]
                 next_p_instrs = [t.text.strip() for t in next_p.findall('.//w:instrText', namespaces) if t.text]
                 next_p_instr_str = " ".join(next_p_instrs)
-                if "TOC" in next_p_instr_str and ("4-4" in next_p_instr_str):
+                if "TOC" in next_p_instr_str and ("9-9" in next_p_instr_str):
                     found_lampiran_toc_field = True
                     print(f"SUCCESS: Found Daftar Lampiran TOC field at paragraph {j}: '{next_p_instr_str}'")
                     break
             if not found_lampiran_toc_field:
-                errors_found.append(f"DAFTAR LAMPIRAN heading at paragraph {idx} is not followed by a TOC field targeting level 4-4.")
+                errors_found.append(f"DAFTAR LAMPIRAN heading at paragraph {idx} is not followed by a TOC field targeting level 9-9.")
 
     print(f"Processed {gambar_count} Gambar captions and {tabel_count} Tabel captions.")
     

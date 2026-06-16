@@ -118,7 +118,7 @@ class TestTddFormatting(unittest.TestCase):
         numPr = pPr.find('w:numPr', namespaces)
         self.assertIsNone(numPr, "Appendix heading should NOT have w:numPr auto-numbering")
         
-        # Verify style in styles.xml has outlineLvl 3
+        # Verify style in styles.xml has outlineLvl 8
         styles_tree = ET.parse(self.styles_path)
         styles_root = styles_tree.getroot()
         app_style = styles_root.find("w:style[@w:styleId='taappendixheading']", namespaces)
@@ -127,10 +127,10 @@ class TestTddFormatting(unittest.TestCase):
         style_pPr = app_style.find('w:pPr', namespaces)
         self.assertIsNotNone(style_pPr)
         outlineLvl = style_pPr.find('w:outlineLvl', namespaces)
-        self.assertIsNotNone(outlineLvl, "Appendix style should have w:outlineLvl to map to Level 4")
-        self.assertEqual(outlineLvl.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val'), '3')
+        self.assertIsNotNone(outlineLvl, "Appendix style should have w:outlineLvl to map to Level 9")
+        self.assertEqual(outlineLvl.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val'), '8')
             
-        # Verify Table of Appendices field instruction maps outline levels 4-4
+        # Verify Table of Appendices field instruction maps outline levels 9-9
         p_lampiran_toc = self.find_paragraph_by_text(root, namespaces, "DAFTAR LAMPIRAN")
         body = root.find('w:body', namespaces)
         p_elements = body.findall('w:p', namespaces)
@@ -138,7 +138,7 @@ class TestTddFormatting(unittest.TestCase):
         p_toc = p_elements[idx_lampiran + 1]
         instr_toc = p_toc.find('.//w:instrText', namespaces)
         self.assertIsNotNone(instr_toc)
-        self.assertTrue('TOC \\o "4-4"' in instr_toc.text)
+        self.assertTrue('TOC \\o "9-9"' in instr_toc.text)
 
     def test_reconstruct_table_caption_clean(self):
         p_xml = """

@@ -110,7 +110,7 @@ def ensure_appendix_heading_style(styles_root):
         set_child_element(pPr, 'pageBreakBefore', {})
         set_child_element(pPr, 'spacing', {'before': '240', 'after': '120'})
         set_child_element(pPr, 'jc', {'val': 'center'})
-        set_child_element(pPr, 'outlineLvl', {'val': '3'})
+        set_child_element(pPr, 'outlineLvl', {'val': '8'})
         sort_element_children(pPr, PPR_ORDER)
         style.append(pPr)
         rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
@@ -1625,7 +1625,7 @@ def format_document_xmls(unpacked_dir):
             p_head.append(r_head)
             
             body.insert(insertion_idx, p_head)
-            insert_dynamic_toc_field(body, insertion_idx + 1, ' TOC \\o "4-4" \\h \\z ', namespaces)
+            insert_dynamic_toc_field(body, insertion_idx + 1, ' TOC \\o "9-9" \\h \\z ', namespaces)
             print("Successfully inserted DAFTAR LAMPIRAN heading and TOF field.")
 
         fix_whitespace_preservation(root)
