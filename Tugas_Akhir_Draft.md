@@ -22,9 +22,9 @@ Gambar 2.8 Sequence Diagram: Autentikasi Administrator
 Gambar 2.9 Sequence Diagram: Sinkronisasi Data Gedung dan Unity
 Gambar 2.10 Halaman Login Admin
 Gambar 2.11 Halaman Dashboard Admin
-Gambar 2.12 Modal Tambah Dosen
-Gambar 2.13 Modal Update Dosen
-Gambar 2.14 Modal Konfirmasi Hapus Dosen
+Gambar 2.12 Modal Tambah Data Gedung
+Gambar 2.13 Modal Update Data Gedung
+Gambar 2.14 Modal Konfirmasi Hapus Data Gedung
 Gambar 2.15 Traffic Website Admin
 Gambar 2.16 Hero Section
 Gambar 2.17 Public Traffic Statistics Website
@@ -282,7 +282,7 @@ Sebagaimana diilustrasikan pada Gambar 2.1, arsitektur sistem dirancang dengan a
 
 1. Integrasi Aset Visual: Aset 3D yang dihasilkan oleh 3D Designer diekspor dan diimpor ke dalam sistem Denah Virtual yang dikelola oleh Simulator Developer.
 2. Alur Pengguna Publik (User): Pengguna berinteraksi melalui Frontend Public Dashboard. Halaman ini berfungsi sebagai wadah (container) yang menampilkan Denah Virtual (Unity/WebGL) sekaligus menyajikan informasi profil kampus yang dinamis.
-3. Alur Administrator (Admin): Administrator memiliki jalur akses khusus melalui Frontend Admin Dashboard untuk mengelola data konten kampus (seperti data dosen, fasilitas, dan aset) melalui mekanisme CRUD.
+3. Alur Administrator (Admin): Administrator memiliki jalur akses khusus melalui Frontend Admin Dashboard untuk mengelola data konten kampus (seperti data gedung, fasilitas, fakultas, dan program studi) melalui mekanisme CRUD.
 4. Pusat Pertukaran Data: Seluruh interaksi data bermuara pada satu titik pusat, yaitu Backend: Main API. Komponen ini bertindak sebagai "otak" yang melayani permintaan data dari Denah Virtual (agar gedung dapat menampilkan informasi saat diklik) dan menyediakan data untuk kedua dashboard.
 
 Fokus utama dari usulan solusi dalam laporan ini akan menitikberatkan pada pengembangan komponen Full Stack Web yang terdiri dari empat modul fungsional berikut:
@@ -301,7 +301,7 @@ Secara garis besar, kebutuhan fungsional sistem diklasifikasikan ke dalam tiga k
 2. Kebutuhan Fungsional Administrator (Admin):
   a. Sistem harus menyediakan halaman login yang aman (autentikasi) untuk Admin.
   b. Sistem harus dapat menampilkan widget analitik dasar (kunjungan, page views).
-  c. Sistem harus menyediakan fungsionalitas CRUD (Create, Read, Update, Delete) untuk mengelola semua data konten dinamis (Dosen, Mahasiswa, Fakultas, Aset, Fasilitas, Akreditasi, dll.).
+  c. Sistem harus menyediakan fungsionalitas CRUD (Create, Read, Update, Delete) untuk mengelola semua data konten dinamis (Gedung, Fasilitas, Fakultas, dan Program Studi).
 3. Kebutuhan Fungsional Integrasi (API untuk 3D Engine): Backend API harus memenuhi kebutuhan teknis bagi 3D Simulator Developer agar Denah Virtual dapat menampilkan informasi secara dinamis:
   a. Sistem harus menyediakan endpoint API (misal: GET /api/gedung) yang menyajikan data spasial (nama gedung, deskripsi gedung).
   b. Sistem harus menyediakan endpoint API (misal: GET /api/fasilitas) yang menyajikan data fasilitas (nama fasilitas, deskripsi, lokasi/gedung terkait).
@@ -345,7 +345,7 @@ Perancangan Information Architecture membagi aplikasi web ke dalam dua zona akse
   b. Pengaturan Bahasa: Toggle dinamis untuk memicu perubahan kamus bahasa lokal (ID/EN) yang diinjeksi ke komponen-komponen React.
 2. Halaman Administratif (Protected Route):
   a. Login (`/login`): Form otentikasi administrator terproteksi JWT.
-  b. Admin Panel (`/admin`): Mengelola entitas database relasional dengan aksi CRUD, memuat tabel data dosen, mahasiswa, gedung, fasilitas, fakultas, dan program studi, serta read-only dashboard audit logs.
+  b. Admin Panel (`/admin`): Mengelola entitas database relasional dengan aksi CRUD, memuat tabel data gedung, fasilitas, fakultas, dan program studi, serta read-only dashboard audit logs.
 
 ### 2.3.3 Perancangan Unified Modelling Language (UML)
 
@@ -373,14 +373,97 @@ Perancangan modul keamanan data dan mitigasi penelusuran lalu lintas web mencaku
 
 ### 2.3.5 Perancangan Entity Relationship Diagram (ERD)
 
-Struktur data relasional yang diinangi pada PostgreSQL dirancang untuk menghubungkan profil akademik, aset fisik kampus, dan log aktivitas audit. Skema ERD divisualisasikan pada Gambar 2.3. Rancangan tabel adalah sebagai berikut:
+Rancangan struktur data relasional untuk sistem integrasi denah virtual kampus dan dashboard profil UPNVJ divisualisasikan melalui skema Entity-Relationship Diagram (ERD) yang dapat dilihat pada Gambar 2.3. Struktur basis data ini dirancang pada RDBMS PostgreSQL untuk menghubungkan profil akademik, aset fisik kampus, dan log aktivitas audit secara terintegrasi.
 
-1. `gedung` (id, nama_gedung, deskripsi_gedung, lokasi, jumlah_lantai, foto_url, unity_object_name)
-2. `fasilitas` (id, nama_fasilitas, deskripsi_fasilitas, tipe_fasilitas, warna_ui, lantai, id_gedung [FK], foto_url, unity_object_name)
-3. `fakultas` (id, nama_fakultas, deskripsi, email, website, gedung_id [FK])
-4. `program_studi` (id, nama_prodi, jenjang, fakultas_id [FK], akreditasi)
-5. `admin_users` (id, email, role, created_at)
-6. `audit_logs` (id, admin_id, table_name, action, old_data, new_data, timestamp)
+Gambar 2.3 Entity-Relationship Diagram
+
+Penjelasan mengenai struktur tabel, kolom, tipe data, serta aturan relasi antartabel dijabarkan sebagai berikut:
+
+1. Tabel `gedung`
+   Entitas ini menyimpan data administratif dan fisik dari seluruh bangunan/gedung yang ada di lingkungan UPNVJ Kampus Pondok Labu.
+   a. Atribut tabel terdiri atas:
+      1) `id`: Tipe `SERIAL` bertindak sebagai Primary Key.
+      2) `nama_gedung`: Tipe `VARCHAR(255)`, bernilai unik (*unique*) dan tidak boleh kosong (*not null*).
+      3) `deskripsi_gedung`: Tipe `TEXT` untuk penjelasan detail gedung.
+      4) `lokasi`: Tipe `TEXT` untuk deskripsi alamat atau letak koordinat fisik.
+      5) `jumlah_lantai`: Tipe `INT` dengan nilai default 1.
+      6) `foto_url`: Tipe `VARCHAR(255)` untuk menyimpan tautan gambar gedung.
+      7) `unity_object_name`: Tipe `TEXT` bersifat unik, berfungsi sebagai jembatan penamaan GameObject pada scene Unity.
+   b. Relasi tabel:
+      1) Berelasi One-to-Many dengan tabel `fasilitas` melalui foreign key `id_gedung`.
+      2) Berelasi One-to-One / Many-to-One dengan tabel `fakultas` melalui foreign key `id_gedung_utama`.
+
+2. Tabel `fasilitas`
+   Entitas ini menyimpan data fasilitas spesifik yang berada di dalam suatu gedung (misalnya ruang kelas, laboratorium, perpustakaan, toilet, dll.).
+   a. Atribut tabel terdiri atas:
+      1) `id`: Tipe `SERIAL` bertindak sebagai Primary Key.
+      2) `nama_fasilitas`: Tipe `VARCHAR(255)` untuk nama fasilitas.
+      3) `deskripsi_fasilitas`: Tipe `TEXT` untuk penjelasan detail fasilitas.
+      4) `tipe_fasilitas`: Tipe `VARCHAR(100)` untuk klasifikasi jenis fasilitas.
+      5) `color`: Tipe `VARCHAR(50)` dengan default 'gray' untuk penanda warna visual pada frontend React.
+      6) `lantai`: Tipe `INT` dengan default 1 untuk menunjukkan posisi lantai fasilitas.
+      7) `foto_url`: Tipe `TEXT` untuk menyimpan tautan gambar fasilitas.
+      8) `id_gedung`: Tipe `INT` sebagai Foreign Key yang merujuk ke tabel `gedung` (ON DELETE SET NULL).
+      9) `unity_object_name`: Tipe `TEXT` bersifat unik, berfungsi sebagai jembatan penamaan GameObject fasilitas pada scene Unity.
+   b. Relasi tabel: Merupakan tabel anak yang bergantung pada tabel `gedung`.
+
+3. Tabel `fakultas`
+   Entitas ini menampung data profil fakultas yang berada di lingkungan universitas.
+   a. Atribut tabel terdiri atas:
+      1) `id`: Tipe `SERIAL` bertindak sebagai Primary Key.
+      2) `nama_fakultas`: Tipe `VARCHAR(255)` bersifat unik dan tidak boleh kosong.
+      3) `deskripsi_fakultas`: Tipe `TEXT` untuk rincian profil fakultas.
+      4) `email`: Tipe `VARCHAR(255)` untuk kontak surat elektronik fakultas.
+      5) `website`: Tipe `VARCHAR(255)` untuk alamat web resmi fakultas.
+      6) `id_gedung_utama`: Tipe `INT` sebagai Foreign Key yang merujuk ke tabel `gedung` (ON DELETE SET NULL).
+   b. Relasi tabel:
+      1) Berelasi One-to-Many dengan tabel `program_studi` melalui foreign key `id_fakultas` pada tabel prodi.
+      2) Berelasi Many-to-One dengan tabel `gedung` untuk menentukan gedung administrasi utama.
+
+4. Tabel `program_studi`
+   Entitas ini menyimpan data program studi yang dinaungi oleh masing-masing fakultas.
+   a. Atribut tabel terdiri atas:
+      1) `id`: Tipe `SERIAL` bertindak sebagai Primary Key.
+      2) `nama_prodi`: Tipe `VARCHAR(255)` untuk nama program studi.
+      3) `jenjang`: Tipe `VARCHAR(10)` untuk tingkat pendidikan (D3/S1/S2/S3).
+      4) `id_fakultas`: Tipe `INT` sebagai Foreign Key yang merujuk ke tabel `fakultas` (ON DELETE CASCADE).
+      5) `akreditasi`: Tipe `VARCHAR(50)` untuk peringkat akreditasi program studi.
+   b. Relasi tabel: Bergantung penuh pada tabel `fakultas` melalui foreign key `id_fakultas`. Terdapat batasan unik gabungan (*composite unique key*) pada kolom `nama_prodi`, `jenjang`, dan `id_fakultas`.
+
+5. Tabel `admin_users`
+   Entitas ini menyimpan informasi akun administrator yang memiliki hak akses untuk mengelola data konten melalui Admin Panel.
+   a. Atribut tabel terdiri atas:
+      1) `id`: Tipe `SERIAL` bertindak sebagai Primary Key.
+      2) `username`: Tipe `VARCHAR(100)` bersifat unik dan tidak boleh kosong.
+      3) `password_hash`: Tipe `TEXT` untuk menyimpan hash kata sandi yang terenkripsi.
+      4) `nama_lengkap`: Tipe `VARCHAR(255)` untuk nama lengkap administrator.
+      5) `role`: Tipe `VARCHAR(50)` dengan default 'admin'.
+      6) `created_at`: Tipe `TIMESTAMP` dengan default waktu saat data dibuat.
+   b. Relasi tabel: Tabel independen untuk kebutuhan autentikasi dan otorisasi.
+
+6. Tabel `audit_logs`
+   Entitas ini digunakan sebagai pencatat riwayat (audit trail) otomatis terhadap setiap operasi manipulasi data (CRUD) yang dilakukan oleh administrator.
+   a. Atribut tabel terdiri atas:
+      1) `id`: Tipe `BIGSERIAL` bertindak sebagai Primary Key.
+      2) `actor_id`: Tipe `UUID` untuk menyimpan ID admin yang melakukan aksi.
+      3) `actor_email`: Tipe `TEXT` untuk menyimpan email administrator.
+      4) `action`: Tipe `TEXT` untuk jenis operasi (INSERT/UPDATE/DELETE).
+      5) `table_name`: Tipe `TEXT` untuk nama tabel yang mengalami mutasi.
+      6) `record_id`: Tipe `TEXT` untuk ID rekaman data yang diubah.
+      7) `old_data`: Tipe `JSONB` untuk menyimpan kondisi data lama sebelum diubah (bernilai null saat INSERT).
+      8) `new_data`: Tipe `JSONB` untuk menyimpan kondisi data baru sesudah diubah (bernilai null saat DELETE).
+      9) `created_at`: Tipe `TIMESTAMP` dengan default waktu mutasi tercatat.
+   b. Relasi tabel: Mencatat riwayat mutasi dari tabel-tabel utama secara transparan melalui trigger basis data.
+
+7. Tabel `web_analytics_log`
+   Entitas pendukung ini bersifat legacy dan berfungsi untuk mencatat log kunjungan pengguna ke halaman web secara mandiri sebelum digantikan oleh integrasi Umami Analytics.
+   a. Atribut tabel terdiri atas:
+      1) `id`: Tipe `SERIAL` bertindak sebagai Primary Key.
+      2) `visitor_hash`: Tipe `VARCHAR(255)` untuk sidik jari unik browser pengunjung.
+      3) `page_path`: Tipe `VARCHAR(255)` untuk menyimpan path halaman yang diakses.
+      4) `device_type`: Tipe `VARCHAR(100)` untuk jenis perangkat yang digunakan.
+      5) `visited_at`: Tipe `TIMESTAMP` dengan default waktu kunjungan.
+   b. Relasi tabel: Tabel mandiri yang mengumpulkan data analitik kunjungan.
 
 ### 2.3.6 Perancangan Antarmuka
 
@@ -403,7 +486,7 @@ Pengujian backend difokuskan pada pengujian integrasi fungsional (Integration Te
 
 Pengujian fungsional sistem menggunakan metode Black Box Testing untuk menguji 18 skenario interaksi antarmuka pengguna pada dashboard admin dan dashboard publik. Skenario tersebut meliputi:
 
-1. Pengujian fungsionalitas CRUD pada dashboard admin untuk setiap entitas data (Dosen, Mahasiswa, Gedung, Fasilitas, Fakultas, Program Studi).
+1. Pengujian fungsionalitas CRUD pada dashboard admin untuk setiap entitas data (Gedung, Fasilitas, Fakultas, dan Program Studi).
 2. Pengujian validitas form login admin dan penanganan error kredensial yang tidak valid.
 3. Pengujian interaktivitas grafik statistik publik (drill-down saat grafik diklik).
 4. Pengujian sinkronisasi filter bahasa (Bahasa Indonesia dan English) pada public dashboard.
@@ -607,7 +690,7 @@ Backend API berhasil diimplementasikan dan dideploy di Vercel. Hasil keluaran da
       "nama_fasilitas": "Laboratorium Rekayasa Perangkat Lunak",
       "deskripsi_fasilitas": "Laboratorium RPL Lantai 2 Gedung FIK",
       "tipe_fasilitas": "Laboratorium",
-      "warna_ui": "blue",
+      "color": "blue",
       "lantai": 2,
       "id_gedung": 1,
       "foto_url": "https://supabase-storage/lab_rpl.jpg",

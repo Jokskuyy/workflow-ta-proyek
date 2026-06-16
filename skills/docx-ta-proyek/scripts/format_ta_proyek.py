@@ -1475,7 +1475,10 @@ def format_document_xmls(unpacked_dir):
         # Final section break (body section)
         final_sectPr = body.find('w:sectPr', namespaces)
         if final_sectPr is not None:
-            set_child_element(final_sectPr, 'pgNumType', {'fmt': 'decimal'})
+            pg_num_type = set_child_element(final_sectPr, 'pgNumType', {'fmt': 'decimal'})
+            start_attr = f'{{{ns_uri}}}start'
+            if start_attr in pg_num_type.attrib:
+                del pg_num_type.attrib[start_attr]
             set_child_element(final_sectPr, 'pgSz', {'w': '11906', 'h': '16838'})
             set_child_element(final_sectPr, 'pgMar', {
                 'top': '1701', 'right': '1701', 'bottom': '1701', 'left': '2268',

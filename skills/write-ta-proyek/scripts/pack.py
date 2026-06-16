@@ -67,9 +67,10 @@ def pack_document(input_dir, output_file, validate=False):
         shutil.copytree(input_dir, temp_content_dir)
 
         # Process XML files to remove pretty-printing whitespace
-        for pattern in ["*.xml", "*.rels"]:
-            for xml_file in temp_content_dir.rglob(pattern):
-                condense_xml(xml_file)
+        # Note: Bypassed to prevent minidom namespace and formatting corruption in MS Word
+        # for pattern in ["*.xml", "*.rels"]:
+        #     for xml_file in temp_content_dir.rglob(pattern):
+        #         condense_xml(xml_file)
 
         # Create final Office file as zip archive
         output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -83,6 +84,30 @@ def pack_document(input_dir, output_file, validate=False):
             if not validate_document(output_file):
                 output_file.unlink()  # Delete the corrupt file
                 return False
+
+        # Update fields via COM automation (Windows only)
+        import platform
+        if platform.system() == 'Windows':
+            try:
+                # Find update_fields_com.py relative to this script
+                script_dir = Path(__file__).parent
+                com_script = script_dir / 'update_fields_com.py'
+                if com_script.exists():
+                    print("Updating fields via COM automation...")
+                    import subprocess
+                    result = subprocess.run(
+                        [sys.executable, str(com_script), str(output_file)],
+                        capture_output=True, text=True
+                    )
+                    if result.returncode != 0:
+                        print(f"Warning: COM field update failed:\n{result.stderr}\n{result.stdout}")
+                    else:
+                        print("COM field update completed successfully.")
+                        cleanup_post_com_update(output_file)
+                else:
+                    print("Warning: update_fields_com.py not found, skipping field update.")
+            except Exception as e:
+                print(f"Warning: Failed to run COM field update: {e}")
 
     return True
 
@@ -153,6 +178,83 @@ def condense_xml(xml_file):
     # Write back the condensed XML
     with open(xml_file, "wb") as f:
         f.write(dom.toxml(encoding="UTF-8"))
+
+
+def cleanup_post_com_update(docx_path):
+    """Clean up empty TableofFigures paragraphs in document.xml after COM update."""
+    import zipfile
+    import tempfile
+    import shutil
+    import os
+    try:
+        import lxml.etree as ET
+    except ImportError:
+        import xml.etree.ElementTree as ET
+
+    temp_dir = tempfile.mkdtemp()
+    try:
+        docx_path = str(docx_path)
+        with zipfile.ZipFile(docx_path, 'r') as zin:
+            zin.extract('word/document.xml', temp_dir)
+            
+        xml_path = os.path.join(temp_dir, 'word', 'document.xml')
+        
+        tree = ET.parse(xml_path)
+        root = tree.getroot()
+        namespaces = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+        body = root.find('w:body', namespaces)
+        if body is None:
+            return
+            
+        children = list(body)
+        paragraphs_to_remove = []
+        
+        for idx in range(1, len(children)):
+            child = children[idx]
+            if child.tag.endswith('p'):
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                pStyle_val = pStyle.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val') if pStyle is not None else ""
+                
+                if pStyle_val == 'TableofFigures':
+                    text = "".join(child.itertext()).strip()
+                    if not text:
+                        runs = child.findall('w:r', namespaces)
+                        if runs:
+                            prev_p = children[idx - 1]
+                            if prev_p.tag.endswith('p'):
+                                print(f"Cleanup: Moving {len(runs)} run(s) from empty TableofFigures paragraph at index {idx} to preceding paragraph.")
+                                for run in runs:
+                                    child.remove(run)
+                                    prev_p.append(run)
+                                paragraphs_to_remove.append(child)
+                            else:
+                                print(f"Cleanup: Preceding sibling is not a paragraph at index {idx}, skipping move.")
+                        else:
+                            paragraphs_to_remove.append(child)
+                            print(f"Cleanup: Removing empty TableofFigures paragraph at index {idx}.")
+                            
+        if paragraphs_to_remove:
+            for p in paragraphs_to_remove:
+                body.remove(p)
+            
+            tree.write(xml_path, encoding='utf-8', xml_declaration=True)
+            
+            temp_zip_path = docx_path + '.temp'
+            with zipfile.ZipFile(docx_path, 'r') as zin:
+                with zipfile.ZipFile(temp_zip_path, 'w', zipfile.ZIP_DEFLATED) as zout:
+                    for item in zin.infolist():
+                        if item.filename == 'word/document.xml':
+                            zout.write(xml_path, 'word/document.xml')
+                        else:
+                            zout.writestr(item, zin.read(item.filename))
+            os.replace(temp_zip_path, docx_path)
+            print("Cleanup: Successfully cleaned up empty TableofFigures paragraphs in final docx.")
+            
+    except Exception as e:
+        print(f"Warning: Failed to cleanup empty TableofFigures paragraphs: {e}")
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 if __name__ == "__main__":

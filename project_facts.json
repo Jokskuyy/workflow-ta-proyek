@@ -133,5 +133,39 @@
       "description": "Script editor Unity untuk memeriksa sinkronisasi antara objek-objek di Unity Hierarchy dengan data di database Supabase melalui API /api/unity/names.",
       "ui_screenshot": "dokumentasi/contoh_sync_db.png"
     }
+  },
+  "database_schema": {
+    "tables": [
+      {
+        "name": "gedung",
+        "columns": ["id", "nama_gedung", "deskripsi_gedung", "lokasi", "jumlah_lantai", "foto_url", "unity_object_name"]
+      },
+      {
+        "name": "fasilitas",
+        "columns": ["id", "nama_fasilitas", "deskripsi_fasilitas", "tipe_fasilitas", "color", "lantai", "foto_url", "id_gedung", "unity_object_name"]
+      },
+      {
+        "name": "fakultas",
+        "columns": ["id", "nama_fakultas", "deskripsi_fakultas", "email", "website", "id_gedung_utama"]
+      },
+      {
+        "name": "program_studi",
+        "columns": ["id", "nama_prodi", "jenjang", "id_fakultas", "akreditasi"]
+      },
+      {
+        "name": "admin_users",
+        "columns": ["id", "username", "password_hash", "nama_lengkap", "role", "created_at"]
+      },
+      {
+        "name": "audit_logs",
+        "columns": ["id", "actor_id", "actor_email", "action", "table_name", "record_id", "old_data", "new_data", "created_at"]
+      },
+      {
+        "name": "web_analytics_log",
+        "columns": ["id", "visitor_hash", "page_path", "device_type", "visited_at"],
+        "status": "legacy"
+      }
+    ],
+    "crud_entities": ["gedung", "fasilitas", "fakultas", "program_studi"]
   }
 }

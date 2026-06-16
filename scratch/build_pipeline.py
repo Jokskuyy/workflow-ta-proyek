@@ -28,6 +28,15 @@ def main():
     unpacked_dir = "unpacked_ta"
     output_docx = "Tugas_Akhir_Formatted.docx"
     
+    # Check if target docx is locked (open in Word)
+    try:
+        if os.path.exists(output_docx):
+            with open(output_docx, "a+b") as f:
+                pass
+    except IOError:
+        output_docx = "Tugas_Akhir_Formatted_Updated.docx"
+        print(f"WARNING: 'Tugas_Akhir_Formatted.docx' is locked. Falling back to output: '{output_docx}'")
+    
     # 0. Clean previous unpacked directory if it exists
     if os.path.exists(unpacked_dir):
         print(f"Cleaning existing {unpacked_dir} directory...")
@@ -43,6 +52,12 @@ def main():
     run_command(
         ["scratch/merge_draft_to_docx.py"],
         "Merge draft markdown to docx XML"
+    )
+    
+    # 2.5. Patch template Chapter II database & CRUD discrepancies
+    run_command(
+        ["scratch/patch_template.py"],
+        "Patch template Chapter II database & CRUD discrepancies"
     )
     
     # 3. Inject interview text and caption
@@ -77,13 +92,13 @@ def main():
     
     # 8. Update fields using Word COM automation
     run_command(
-        ["scratch/test_open_formatted.py"],
+        ["scratch/test_open_formatted.py", output_docx],
         "Update fields and save via Microsoft Word COM"
     )
     
     # 9. Verify generated document structure and fields
     run_command(
-        ["scratch/validate_docx_structure.py"],
+        ["scratch/validate_docx_structure.py", output_docx],
         "Verify generated document structure and fields"
     )
     

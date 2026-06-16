@@ -67,9 +67,10 @@ def pack_document(input_dir, output_file, validate=False):
         shutil.copytree(input_dir, temp_content_dir)
 
         # Process XML files to remove pretty-printing whitespace
-        for pattern in ["*.xml", "*.rels"]:
-            for xml_file in temp_content_dir.rglob(pattern):
-                condense_xml(xml_file)
+        # Note: Bypassed to prevent minidom namespace and formatting corruption in MS Word
+        # for pattern in ["*.xml", "*.rels"]:
+        #     for xml_file in temp_content_dir.rglob(pattern):
+        #         condense_xml(xml_file)
 
         # Create final Office file as zip archive
         output_file.parent.mkdir(parents=True, exist_ok=True)
