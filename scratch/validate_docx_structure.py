@@ -177,6 +177,32 @@ def main():
                     break
             if not found_lampiran_toc_field:
                 errors_found.append(f"DAFTAR LAMPIRAN heading at paragraph {idx} is not followed by a TOC field targeting level 9-9.")
+                
+        # E. Check for consecutive figure captions without intervening drawings or descriptions
+        if is_in_body and is_gambar_prefix:
+            found_consecutive_caption = False
+            for j in range(idx - 1, -1, -1):
+                prev_p = p_list[j]
+                prev_pPr = prev_p.find('w:pPr', namespaces)
+                prev_pStyle = prev_pPr.find('w:pStyle', namespaces) if prev_pPr is not None else None
+                prev_pStyle_val = prev_pStyle.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val') if prev_pStyle is not None else ""
+                prev_text = "".join([t.text for t in prev_p.findall('.//w:t', namespaces) if t.text]).strip()
+                
+                if not prev_text and prev_p.find('.//w:drawing', namespaces) is None:
+                    continue
+                    
+                if prev_p.find('.//w:drawing', namespaces) is not None:
+                    break
+                    
+                prev_is_gambar_prefix = re.match(r'^Gambar\s+[0-9]', prev_text, re.IGNORECASE)
+                if prev_pStyle_val == 'Caption' or prev_is_gambar_prefix:
+                    found_consecutive_caption = True
+                    break
+                    
+                break
+                
+            if found_consecutive_caption:
+                errors_found.append(f"Consecutive figure captions found: Paragraph {idx} '{text}' is preceded by another caption without an intervening drawing.")
 
     print(f"Processed {gambar_count} Gambar captions and {tabel_count} Tabel captions.")
     
