@@ -138,7 +138,7 @@ class TestTddFormatting(unittest.TestCase):
         p_toc = p_elements[idx_lampiran + 1]
         instr_toc = p_toc.find('.//w:instrText', namespaces)
         self.assertIsNotNone(instr_toc)
-        self.assertTrue('TOC \\o "9-9"' in instr_toc.text)
+        self.assertTrue('TOC \\o "9-9" \\n 9-9' in instr_toc.text)
 
     def test_reconstruct_table_caption_clean(self):
         p_xml = """

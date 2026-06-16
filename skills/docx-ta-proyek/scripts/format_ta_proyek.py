@@ -1131,6 +1131,62 @@ def format_document_xmls(unpacked_dir):
         for child in reconstructed_children:
             body.append(child)
             
+        # 3. Create DAFTAR LAMPIRAN section (run before boundaries are checked so it's in Section 1)
+        daftar_tabel_idx = -1
+        children_temp = list(body)
+        for idx, child in enumerate(children_temp):
+            if child.tag.endswith('p'):
+                text = "".join(child.itertext()).strip()
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                if text == "DAFTAR TABEL" and style_val == "Heading1":
+                    daftar_tabel_idx = idx
+                    break
+                    
+        insertion_idx = -1
+        for idx in range(daftar_tabel_idx + 1, len(children_temp)):
+            child = children_temp[idx]
+            if child.tag.endswith('p'):
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                if style_val == "Heading1":
+                    text = "".join(child.itertext()).strip()
+                    if "DAFTAR LAMPIRAN" in text.upper():
+                        insertion_idx = -1
+                        break
+                    if "PENDAHULUAN" in text.upper() or "BAB I" in text.upper():
+                        insertion_idx = idx
+                        break
+                        
+        if insertion_idx != -1:
+            print(f"Inserting DAFTAR LAMPIRAN at index {insertion_idx}...")
+            p_head = lxml.etree.Element(f'{{{ns_uri}}}p')
+            pPr_head = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+            set_child_element(pPr_head, 'pStyle', {'val': 'Heading1'})
+            set_child_element(pPr_head, 'pageBreakBefore', {})
+            set_child_element(pPr_head, 'jc', {'val': 'center'})
+            sort_element_children(pPr_head, PPR_ORDER)
+            p_head.append(pPr_head)
+            
+            r_head = lxml.etree.Element(f'{{{ns_uri}}}r')
+            rPr_head = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+            set_child_element(rPr_head, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
+            set_child_element(rPr_head, 'b', {})
+            set_child_element(rPr_head, 'bCs', {})
+            set_child_element(rPr_head, 'sz', {'val': '28'})
+            set_child_element(rPr_head, 'szCs', {'val': '28'})
+            r_head.append(rPr_head)
+            t_head = lxml.etree.Element(f'{{{ns_uri}}}t')
+            t_head.text = "DAFTAR LAMPIRAN"
+            r_head.append(t_head)
+            p_head.append(r_head)
+            
+            body.insert(insertion_idx, p_head)
+            insert_dynamic_toc_field(body, insertion_idx + 1, ' TOC \\o "9-9" \\n 9-9 \\h \\z ', namespaces)
+            print("Successfully inserted DAFTAR LAMPIRAN heading and TOF field.")
+            
         children = list(body)
         parent_map = {c: p for p in root.iter() for c in p}
         
@@ -1376,7 +1432,7 @@ def format_document_xmls(unpacked_dir):
         # Final section break (body section)
         final_sectPr = body.find('w:sectPr', namespaces)
         if final_sectPr is not None:
-            set_child_element(final_sectPr, 'pgNumType', {'fmt': 'decimal', 'start': '1'})
+            set_child_element(final_sectPr, 'pgNumType', {'fmt': 'decimal'})
             set_child_element(final_sectPr, 'pgSz', {'w': '11906', 'h': '16838'})
             set_child_element(final_sectPr, 'pgMar', {
                 'top': '1701', 'right': '1701', 'bottom': '1701', 'left': '2268',
@@ -1573,60 +1629,7 @@ def format_document_xmls(unpacked_dir):
                         
             insert_dynamic_toc_field(body, daftar_tabel_idx + 1, ' TOC \\h \\z \\c "Tabel" ', namespaces)
             
-        # 3. Create DAFTAR LAMPIRAN section
-        children = list(body)
-        for idx, child in enumerate(children):
-            if child.tag.endswith('p'):
-                text = "".join(child.itertext()).strip()
-                pPr = child.find('w:pPr', namespaces)
-                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
-                style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
-                if text == "DAFTAR TABEL" and style_val == "Heading1":
-                    daftar_tabel_idx = idx
-                    break
-                    
-        insertion_idx = -1
-        for idx in range(daftar_tabel_idx + 1, len(children)):
-            child = children[idx]
-            if child.tag.endswith('p'):
-                pPr = child.find('w:pPr', namespaces)
-                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
-                style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
-                if style_val == "Heading1":
-                    text = "".join(child.itertext()).strip()
-                    if "DAFTAR LAMPIRAN" in text.upper():
-                        insertion_idx = -1
-                        break
-                    if "PENDAHULUAN" in text.upper() or "BAB I" in text.upper():
-                        insertion_idx = idx
-                        break
-                        
-        if insertion_idx != -1:
-            print(f"Inserting DAFTAR LAMPIRAN at index {insertion_idx}...")
-            p_head = lxml.etree.Element(f'{{{ns_uri}}}p')
-            pPr_head = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-            set_child_element(pPr_head, 'pStyle', {'val': 'Heading1'})
-            set_child_element(pPr_head, 'pageBreakBefore', {})
-            set_child_element(pPr_head, 'jc', {'val': 'center'})
-            sort_element_children(pPr_head, PPR_ORDER)
-            p_head.append(pPr_head)
-            
-            r_head = lxml.etree.Element(f'{{{ns_uri}}}r')
-            rPr_head = lxml.etree.Element(f'{{{ns_uri}}}rPr')
-            set_child_element(rPr_head, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
-            set_child_element(rPr_head, 'b', {})
-            set_child_element(rPr_head, 'bCs', {})
-            set_child_element(rPr_head, 'sz', {'val': '28'})
-            set_child_element(rPr_head, 'szCs', {'val': '28'})
-            r_head.append(rPr_head)
-            t_head = lxml.etree.Element(f'{{{ns_uri}}}t')
-            t_head.text = "DAFTAR LAMPIRAN"
-            r_head.append(t_head)
-            p_head.append(r_head)
-            
-            body.insert(insertion_idx, p_head)
-            insert_dynamic_toc_field(body, insertion_idx + 1, ' TOC \\o "9-9" \\h \\z ', namespaces)
-            print("Successfully inserted DAFTAR LAMPIRAN heading and TOF field.")
+
 
         fix_whitespace_preservation(root)
         tree.write(doc_path, encoding='utf-8', xml_declaration=True)

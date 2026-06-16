@@ -151,7 +151,7 @@ def main():
                 next_p = p_list[j]
                 next_p_instrs = [t.text.strip() for t in next_p.findall('.//w:instrText', namespaces) if t.text]
                 next_p_instr_str = " ".join(next_p_instrs)
-                if "TOC" in next_p_instr_str and ("9-9" in next_p_instr_str):
+                if "TOC" in next_p_instr_str and ("9-9" in next_p_instr_str) and ("\\n 9-9" in next_p_instr_str):
                     found_lampiran_toc_field = True
                     print(f"SUCCESS: Found Daftar Lampiran TOC field at paragraph {j}: '{next_p_instr_str}'")
                     break
