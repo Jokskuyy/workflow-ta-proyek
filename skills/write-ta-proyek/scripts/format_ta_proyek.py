@@ -1038,6 +1038,17 @@ def format_document_xmls(unpacked_dir):
         body = root.find('w:body', namespaces)
         if body is None: return
         
+        # Find the original paragraph-level sectPr from the template to preserve header/footer references
+        original_sectPr = None
+        for p_elem in body.findall('w:p', namespaces):
+            pPr_elem = p_elem.find('w:pPr', namespaces)
+            if pPr_elem is not None:
+                sectPr_elem = pPr_elem.find('w:sectPr', namespaces)
+                if sectPr_elem is not None:
+                    import copy
+                    original_sectPr = copy.deepcopy(sectPr_elem)
+                    break
+                    
         # Reorder table and figure captions
         children = list(body)
         
@@ -1686,7 +1697,11 @@ def format_document_xmls(unpacked_dir):
         if bab1_idx_new != -1:
             p_sect = lxml.etree.Element(f'{{{ns_uri}}}p')
             pPr_sect = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-            sectPr = lxml.etree.Element(f'{{{ns_uri}}}sectPr')
+            
+            if original_sectPr is not None:
+                sectPr = original_sectPr
+            else:
+                sectPr = lxml.etree.Element(f'{{{ns_uri}}}sectPr')
             
             set_child_element(sectPr, 'type', {'val': 'nextPage'})
             set_child_element(sectPr, 'pgNumType', {'fmt': 'lowerRoman', 'start': '1'})
