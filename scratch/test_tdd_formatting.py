@@ -509,5 +509,65 @@ class TestTddFormatting(unittest.TestCase):
         self.assertIsNotNone(jc_b)
         self.assertEqual(jc_b.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val'), 'left')
 
+    def test_front_matter_section_break(self):
+        # Setup XML with a paragraph before BAB I PENDAHULUAN
+        xml_content = """<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+            xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+            xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+            xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+  <w:body>
+    <w:p>
+      <w:r><w:t>COVER PAGE</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:r><w:t>LEMBAR PENGESAHAN</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:r><w:t>DAFTAR ISI</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="Heading1"/>
+      </w:pPr>
+      <w:r><w:t>BAB I PENDAHULUAN</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:r><w:t>Body content</w:t></w:r>
+    </w:p>
+    <w:sectPr/>
+  </w:body>
+</w:document>
+"""
+        with open(self.doc_path, "w", encoding="utf-8") as f:
+            f.write(xml_content)
+            
+        format_ta_proyek.format_document_xmls(self.test_dir)
+        
+        namespaces = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+        tree = ET.parse(self.doc_path)
+        root = tree.getroot()
+        
+        body = root.find('w:body', namespaces)
+        paragraphs = body.findall('w:p', namespaces)
+        
+        # The paragraph preceding BAB I PENDAHULUAN should be the newly inserted empty section break paragraph
+        p_sect = paragraphs[5]
+        text_sect = "".join(p_sect.itertext()).strip()
+        self.assertEqual(text_sect, "")
+        
+        pPr = p_sect.find('w:pPr', namespaces)
+        self.assertIsNotNone(pPr, "Section break paragraph should have a w:pPr element")
+        
+        sectPr = pPr.find('w:sectPr', namespaces)
+        self.assertIsNotNone(sectPr, "Section break (w:sectPr) should be present on dedicated paragraph")
+        
+        pgNumType = sectPr.find('w:pgNumType', namespaces)
+        self.assertIsNotNone(pgNumType, "pgNumType should be present in section break")
+        self.assertEqual(pgNumType.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}fmt'), 'lowerRoman')
+        self.assertEqual(pgNumType.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}start'), '1')
+
 if __name__ == '__main__':
     unittest.main()
+

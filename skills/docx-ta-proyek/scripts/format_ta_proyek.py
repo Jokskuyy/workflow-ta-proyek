@@ -1661,24 +1661,49 @@ def format_document_xmls(unpacked_dir):
                 
                 if pPr is not None: sort_element_children(pPr, PPR_ORDER)
                 
-            # Layout Break Section 1
-            if idx == section1_last_p_idx:
-                if p.tag.endswith('p'):
-                    pPr = p.find('w:pPr', namespaces)
-                    if pPr is None:
-                        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-                        p.insert(0, pPr)
-                    sectPr = set_child_element(pPr, 'sectPr')
-                    set_child_element(sectPr, 'type', {'val': 'nextPage'})
-                    set_child_element(sectPr, 'pgNumType', {'fmt': 'lowerRoman', 'start': '1'})
-                    set_child_element(sectPr, 'pgSz', {'w': '11906', 'h': '16838'})
-                    set_child_element(sectPr, 'pgMar', {
-                        'top': '1701', 'right': '1701', 'bottom': '1701', 'left': '2268',
-                        'header': '720', 'footer': '720', 'gutter': '0'
-                    })
-                    sort_element_children(sectPr, SECTPR_ORDER)
-                    sort_element_children(pPr, PPR_ORDER)
-                    
+
+        # Remove any existing paragraph-level section breaks to avoid duplicates
+        for p_elem in body.findall('w:p', namespaces):
+            pPr_elem = p_elem.find('w:pPr', namespaces)
+            if pPr_elem is not None:
+                sectPr_elem = pPr_elem.find('w:sectPr', namespaces)
+                if sectPr_elem is not None:
+                    pPr_elem.remove(sectPr_elem)
+
+        # Insert dedicated section break paragraph before BAB I PENDAHULUAN
+        bab1_idx_new = -1
+        children_new = list(body)
+        for idx, child in enumerate(children_new):
+            if child.tag.endswith('p'):
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                pStyle_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                text = "".join([t.text for t in child.iter(f'{{{ns_uri}}}t') if t.text])
+                if pStyle_val == 'Heading1' and 'PENDAHULUAN' in text.upper():
+                    bab1_idx_new = idx
+                    break
+
+        if bab1_idx_new != -1:
+            p_sect = lxml.etree.Element(f'{{{ns_uri}}}p')
+            pPr_sect = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+            sectPr = lxml.etree.Element(f'{{{ns_uri}}}sectPr')
+            
+            set_child_element(sectPr, 'type', {'val': 'nextPage'})
+            set_child_element(sectPr, 'pgNumType', {'fmt': 'lowerRoman', 'start': '1'})
+            set_child_element(sectPr, 'pgSz', {'w': '11906', 'h': '16838'})
+            set_child_element(sectPr, 'pgMar', {
+                'top': '1701', 'right': '1701', 'bottom': '1701', 'left': '2268',
+                'header': '720', 'footer': '720', 'gutter': '0'
+            })
+            sort_element_children(sectPr, SECTPR_ORDER)
+            
+            pPr_sect.append(sectPr)
+            sort_element_children(pPr_sect, PPR_ORDER)
+            p_sect.append(pPr_sect)
+            
+            body.insert(bab1_idx_new, p_sect)
+            print(f"Inserted dedicated section break paragraph before BAB I PENDAHULUAN at index {bab1_idx_new}")
+
         # Final section break (body section)
         final_sectPr = body.find('w:sectPr', namespaces)
         if final_sectPr is not None:
