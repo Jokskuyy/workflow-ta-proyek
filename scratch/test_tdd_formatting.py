@@ -568,6 +568,51 @@ class TestTddFormatting(unittest.TestCase):
         self.assertEqual(pgNumType.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}fmt'), 'lowerRoman')
         self.assertEqual(pgNumType.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}start'), '1')
 
+    def test_cleanup_post_com_update_preserves_fields(self):
+        import pack
+        dummy_docx = os.path.join(self.test_dir, "dummy.docx")
+        
+        xml_content = """<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p>
+      <w:r><w:t>DAFTAR GAMBAR</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:pStyle w:val="TableofFigures"/></w:pPr>
+      <w:r><w:fldChar w:fldCharType="begin"/></w:r>
+      <w:r><w:instrText>TOC \h \z \c "Gambar"</w:instrText></w:r>
+      <w:r><w:fldChar w:fldCharType="separate"/></w:r>
+      <w:r><w:fldChar w:fldCharType="end"/></w:r>
+    </w:p>
+  </w:body>
+</w:document>
+"""
+        import zipfile
+        with zipfile.ZipFile(dummy_docx, "w") as z:
+            z.writestr("word/document.xml", xml_content)
+            
+        pack.cleanup_post_com_update(dummy_docx)
+        
+        namespaces = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+        with zipfile.ZipFile(dummy_docx) as z:
+            data = z.read("word/document.xml")
+            
+        root = ET.fromstring(data)
+        body = root.find('w:body', namespaces)
+        paragraphs = body.findall('w:p', namespaces)
+        
+        self.assertEqual(len(paragraphs), 2)
+        p_tof = paragraphs[1]
+        pPr = p_tof.find('w:pPr', namespaces)
+        pStyle = pPr.find('w:pStyle', namespaces)
+        self.assertEqual(pStyle.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val'), 'TableofFigures')
+        
+        instrText = p_tof.find('.//w:instrText', namespaces)
+        self.assertIsNotNone(instrText)
+        self.assertEqual(instrText.text, 'TOC \h \z \c "Gambar"')
+
 if __name__ == '__main__':
     unittest.main()
+
 

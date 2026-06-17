@@ -22,6 +22,7 @@ def main():
     try:
         word = win32com.client.Dispatch("Word.Application")
         word.Visible = False
+        word.DisplayAlerts = 0
         
         print("Word application dispatched. Opening document...")
         doc = word.Documents.Open(doc_path)

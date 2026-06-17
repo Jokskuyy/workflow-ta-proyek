@@ -28,14 +28,21 @@ def main():
     unpacked_dir = "unpacked_ta"
     output_docx = "Tugas_Akhir_Formatted.docx"
     
+    # Kill any running Word processes to release file locks
+    print("Terminating background Word processes to release file locks...")
+    subprocess.run(["taskkill", "/f", "/im", "winword.exe"], capture_output=True)
+    
     # Check if target docx is locked (open in Word)
-    try:
-        if os.path.exists(output_docx):
+    if os.path.exists(output_docx):
+        try:
             with open(output_docx, "a+b") as f:
                 pass
-    except IOError:
-        output_docx = "Tugas_Akhir_Formatted_Updated.docx"
-        print(f"WARNING: 'Tugas_Akhir_Formatted.docx' is locked. Falling back to output: '{output_docx}'")
+        except IOError:
+            print(f"\n=======================================================")
+            print(f"ERROR: '{output_docx}' is locked (likely open in Microsoft Word).")
+            print(f"Please close Microsoft Word and re-run the pipeline.")
+            print(f"=======================================================")
+            sys.exit(1)
     
     # 0. Clean previous unpacked directory if it exists
     if os.path.exists(unpacked_dir):
@@ -88,12 +95,6 @@ def main():
     run_command(
         ["skills/docx-ta-proyek/scripts/pack.py", unpacked_dir, output_docx],
         "Pack XML files back to DOCX"
-    )
-    
-    # 8. Update fields using Word COM automation
-    run_command(
-        ["scratch/test_open_formatted.py", output_docx],
-        "Update fields and save via Microsoft Word COM"
     )
     
     # 9. Verify generated document structure and fields
