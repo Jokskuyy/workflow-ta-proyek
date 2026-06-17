@@ -116,15 +116,15 @@
       "details": "Belum dilaksanakan. Menunggu penyelesaian prototipe akhir."
     },
     "lighthouse_testing": {
-      "completed": false,
-      "date_conducted": null,
+      "completed": true,
+      "date_conducted": "2026-06-17",
       "metrics": {
-        "performance": "TBD",
-        "accessibility": "TBD",
-        "best_practices": "TBD",
-        "seo": "TBD"
+        "performance": "56/100",
+        "accessibility": "93/100",
+        "best_practices": "100/100",
+        "seo": "92/100"
       },
-      "details": "Lighthouse baru berjalan pada tahap pengembangan awal. Pengujian resmi dengan optimasi final belum dilaksanakan."
+      "details": "Pengujian Lighthouse awal (baseline) dijalankan pada build produksi lokal menggunakan preview server Vite sebelum dilakukan optimasi performa lebih lanjut pada codebase."
     },
     "user_acceptance_test_uat": {
       "completed": false,
@@ -161,15 +161,40 @@
     "tables": [
       {
         "name": "gedung",
-        "columns": ["id", "nama_gedung", "deskripsi_gedung", "lokasi", "jumlah_lantai", "foto_url", "unity_object_name"]
+        "columns": [
+          "id",
+          "nama_gedung",
+          "deskripsi_gedung",
+          "lokasi",
+          "jumlah_lantai",
+          "foto_url",
+          "unity_object_name"
+        ]
       },
       {
         "name": "fasilitas",
-        "columns": ["id", "nama_fasilitas", "deskripsi_fasilitas", "tipe_fasilitas", "color", "lantai", "foto_url", "id_gedung", "unity_object_name"]
+        "columns": [
+          "id",
+          "nama_fasilitas",
+          "deskripsi_fasilitas",
+          "tipe_fasilitas",
+          "color",
+          "lantai",
+          "foto_url",
+          "id_gedung",
+          "unity_object_name"
+        ]
       },
       {
         "name": "fakultas",
-        "columns": ["id", "nama_fakultas", "deskripsi_fakultas", "email", "website", "id_gedung_utama"]
+        "columns": [
+          "id",
+          "nama_fakultas",
+          "deskripsi_fakultas",
+          "email",
+          "website",
+          "id_gedung_utama"
+        ]
       },
       {
         "name": "program_studi",
@@ -177,15 +202,38 @@
       },
       {
         "name": "admin_users",
-        "columns": ["id", "username", "password_hash", "nama_lengkap", "role", "created_at"]
+        "columns": [
+          "id",
+          "username",
+          "password_hash",
+          "nama_lengkap",
+          "role",
+          "created_at"
+        ]
       },
       {
         "name": "audit_logs",
-        "columns": ["id", "actor_id", "actor_email", "action", "table_name", "record_id", "old_data", "new_data", "created_at"]
+        "columns": [
+          "id",
+          "actor_id",
+          "actor_email",
+          "action",
+          "table_name",
+          "record_id",
+          "old_data",
+          "new_data",
+          "created_at"
+        ]
       },
       {
         "name": "web_analytics_log",
-        "columns": ["id", "visitor_hash", "page_path", "device_type", "visited_at"],
+        "columns": [
+          "id",
+          "visitor_hash",
+          "page_path",
+          "device_type",
+          "visited_at"
+        ],
         "status": "legacy"
       }
     ],
