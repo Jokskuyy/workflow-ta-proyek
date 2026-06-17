@@ -337,5 +337,177 @@ class TestTddFormatting(unittest.TestCase):
         self.assertIsNotNone(pPr_di, "DAFTAR ISI should have w:pPr")
         self.assertIsNotNone(pPr_di.find('w:pageBreakBefore', namespaces), "DAFTAR ISI must have pageBreakBefore to isolate Lembar Pengesahan")
 
+    def test_lembar_pengesahan_within_margins(self):
+        xml_content = """<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+            xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+            xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+            xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+  <w:body>
+    <w:p>
+      <w:r>
+        <w:drawing>
+          <wp:inline><wp:extent cx="1000" cy="1000"/></wp:inline>
+        </w:drawing>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:r><w:t>PROPOSAL TUGAS AKHIR</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:r>
+        <w:drawing>
+          <wp:inline>
+            <wp:extent cx="5943600" cy="7912100"/>
+            <a:graphic>
+              <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+                <pic:pic>
+                  <pic:blipFill>
+                    <a:blip r:embed="rId9"/>
+                    <a:srcRect l="10" t="20" r="30" b="40"/>
+                  </pic:blipFill>
+                </pic:pic>
+              </a:graphicData>
+            </a:graphic>
+          </wp:inline>
+        </w:drawing>
+      </w:r>
+    </w:p>
+    <w:p/>
+    <w:p>
+      <w:r><w:t>DAFTAR ISI</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="Heading1"/>
+      </w:pPr>
+      <w:r>
+        <w:t>BAB I PENDAHULUAN</w:t>
+      </w:r>
+    </w:p>
+  </w:body>
+</w:document>
+"""
+        with open(self.doc_path, "w", encoding="utf-8") as f:
+            f.write(xml_content)
+            
+        format_ta_proyek.format_document_xmls(self.test_dir)
+        
+        namespaces = {
+            'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
+            'wp': 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing',
+            'a': 'http://schemas.openxmlformats.org/drawingml/2006/main'
+        }
+        tree = ET.parse(self.doc_path)
+        root = tree.getroot()
+        
+        body = root.find('w:body', namespaces)
+        paragraphs = body.findall('w:p', namespaces)
+        
+        draw_paras = []
+        for p in paragraphs:
+            if p.find('.//w:drawing', namespaces) is not None:
+                draw_paras.append(p)
+                
+        # Lembar Pengesahan is the second drawing
+        lp_para = draw_paras[1]
+        
+        pPr = lp_para.find('w:pPr', namespaces)
+        self.assertIsNotNone(pPr)
+        
+        # Verify indents are cleared: left='0', firstLine='0', right='0'
+        ind = pPr.find('w:ind', namespaces)
+        self.assertIsNotNone(ind)
+        self.assertEqual(ind.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}left'), '0')
+        self.assertEqual(ind.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}firstLine'), '0')
+        self.assertEqual(ind.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}right'), '0')
+        
+        # Verify drawing size is scaled to width 14.0cm (5040000 EMUs)
+        drawing = lp_para.find('.//w:drawing', namespaces)
+        extent = drawing.find('.//wp:extent', namespaces)
+        self.assertEqual(extent.get('cx'), '5040000')
+        self.assertEqual(extent.get('cy'), '6709230') # Scaled proportionally from aspect ratio
+
+    def test_table_centering_and_cell_alignments(self):
+        table_xml = """
+        <w:tbl>
+          <w:tblPr>
+            <w:jc w:val="left"/>
+          </w:tblPr>
+          <w:tr>
+            <w:tc>
+              <w:tcPr/>
+              <w:p>
+                <w:pPr><w:jc w:val="left"/></w:pPr>
+                <w:r><w:t>Header Cell</w:t></w:r>
+              </w:p>
+            </w:tc>
+          </w:tr>
+          <w:tr>
+            <w:tc>
+              <w:tcPr/>
+              <w:p>
+                <w:pPr><w:jc w:val="center"/></w:pPr>
+                <w:r><w:t>Body Cell</w:t></w:r>
+              </w:p>
+            </w:tc>
+          </w:tr>
+        </w:tbl>
+        """
+        self.write_document_xml(table_xml)
+        
+        format_ta_proyek.format_document_xmls(self.test_dir)
+        
+        namespaces = {
+            'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+        }
+        tree = ET.parse(self.doc_path)
+        root = tree.getroot()
+        
+        tbl = root.find('.//w:tbl', namespaces)
+        self.assertIsNotNone(tbl)
+        
+        tblPr = tbl.find('w:tblPr', namespaces)
+        self.assertIsNotNone(tblPr)
+        
+        # Table horizontal alignment must be center
+        jc = tblPr.find('w:jc', namespaces)
+        self.assertIsNotNone(jc)
+        self.assertEqual(jc.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val'), 'center')
+        
+        rows = tbl.findall('w:tr', namespaces)
+        self.assertEqual(len(rows), 2)
+        
+        # Header Row (Row 0)
+        h_cell = rows[0].find('w:tc', namespaces)
+        h_tcPr = h_cell.find('w:tcPr', namespaces)
+        self.assertIsNotNone(h_tcPr)
+        v_align_h = h_tcPr.find('w:vAlign', namespaces)
+        self.assertIsNotNone(v_align_h)
+        self.assertEqual(v_align_h.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val'), 'center')
+        
+        h_p = h_cell.find('w:p', namespaces)
+        h_pPr = h_p.find('w:pPr', namespaces)
+        self.assertIsNotNone(h_pPr)
+        jc_h = h_pPr.find('w:jc', namespaces)
+        self.assertIsNotNone(jc_h)
+        self.assertEqual(jc_h.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val'), 'center')
+        
+        # Body Row (Row 1)
+        b_cell = rows[1].find('w:tc', namespaces)
+        b_tcPr = b_cell.find('w:tcPr', namespaces)
+        self.assertIsNotNone(b_tcPr)
+        v_align_b = b_tcPr.find('w:vAlign', namespaces)
+        self.assertIsNotNone(v_align_b)
+        self.assertEqual(v_align_b.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val'), 'top')
+        
+        b_p = b_cell.find('w:p', namespaces)
+        b_pPr = b_p.find('w:pPr', namespaces)
+        self.assertIsNotNone(b_pPr)
+        jc_b = b_pPr.find('w:jc', namespaces)
+        self.assertIsNotNone(jc_b)
+        self.assertEqual(jc_b.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val'), 'left')
+
 if __name__ == '__main__':
     unittest.main()

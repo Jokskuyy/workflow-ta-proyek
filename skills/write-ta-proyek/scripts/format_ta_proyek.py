@@ -414,6 +414,124 @@ def scale_cover_drawings(p, namespaces, unpacked_dir=None, rel_map=None):
                     except ValueError:
                         pass
 
+
+def scale_lembar_pengesahan(p, namespaces, unpacked_dir=None, rel_map=None):
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    drawings = p.findall('.//w:drawing', namespaces)
+    if not drawings:
+        return
+        
+    pPr = p.find('w:pPr', namespaces)
+    if pPr is None:
+        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+        p.insert(0, pPr)
+    set_child_element(pPr, 'jc', {'val': 'center'})
+    set_child_element(pPr, 'ind', {'left': '0', 'firstLine': '0', 'right': '0'})
+    sort_element_children(pPr, PPR_ORDER)
+    
+    max_width_emu = 5040000   # 14.0cm in EMUs
+    max_height_emu = 8532000  # 23.7cm in EMUs
+    
+    for drawing in drawings:
+        # Remove all srcRect elements to disable cropping entirely
+        for src_rect in drawing.xpath('.//a:srcRect', namespaces={'a': 'http://schemas.openxmlformats.org/drawingml/2006/main'}):
+            src_rect.getparent().remove(src_rect)
+            
+        aspect_ratio = None
+        if unpacked_dir and rel_map:
+            blip = drawing.find('.//a:blip', {'a': 'http://schemas.openxmlformats.org/drawingml/2006/main'})
+            if blip is not None:
+                embed_id = blip.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
+                if embed_id and embed_id in rel_map:
+                    rel_target = rel_map[embed_id]
+                    img_path = os.path.join(unpacked_dir, 'word', rel_target)
+                    if os.path.exists(img_path):
+                        try:
+                            from PIL import Image
+                            with Image.open(img_path) as img:
+                                img_w, img_h = img.size
+                                if img_h > 0:
+                                    aspect_ratio = img_w / img_h
+                        except Exception as e:
+                            print(f"  Error reading image aspect ratio for Lembar Pengesahan: {e}")
+                            
+        for elem in drawing.iter():
+            tag_local = elem.tag.split('}')[-1]
+            if tag_local in ['extent', 'ext']:
+                cx_str = elem.get('cx')
+                cy_str = elem.get('cy')
+                if cx_str:
+                    try:
+                        cx = int(cx_str)
+                        if aspect_ratio is not None:
+                            cy = int(cx / aspect_ratio)
+                        elif cy_str:
+                            cy = int(cy_str)
+                        else:
+                            cy = cx
+                            
+                        # Scale to fit printable area exactly
+                        scale_x = max_width_emu / cx
+                        scale_y = max_height_emu / cy
+                        scale = min(scale_x, scale_y)
+                        
+                        cx = int(cx * scale)
+                        cy = int(cy * scale)
+                        
+                        elem.set('cx', str(cx))
+                        elem.set('cy', str(cy))
+                        print(f"  Scaled Lembar Pengesahan drawing to {cx}x{cy} EMUs (width 14.0cm)")
+                    except ValueError:
+                        pass
+
+def format_all_tables(root, namespaces):
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    tbl_count = 0
+    for tbl in root.findall('.//w:tbl', namespaces):
+        tbl_count += 1
+        tblPr = tbl.find('w:tblPr', namespaces)
+        if tblPr is None:
+            tblPr = lxml.etree.Element(f'{{{ns_uri}}}tblPr')
+            tbl.insert(0, tblPr)
+        
+        # Center table horizontally
+        set_child_element(tblPr, 'jc', {'val': 'center'})
+        
+        # Format rows and cells
+        rows = tbl.findall('w:tr', namespaces)
+        for row_idx, row in enumerate(rows):
+            is_header = (row_idx == 0)
+            cells = row.findall('w:tc', namespaces)
+            for cell in cells:
+                tcPr = cell.find('w:tcPr', namespaces)
+                if tcPr is None:
+                    tcPr = lxml.etree.Element(f'{{{ns_uri}}}tcPr')
+                    cell.insert(0, tcPr)
+                
+                # Vertical alignment
+                if is_header:
+                    set_child_element(tcPr, 'vAlign', {'val': 'center'})
+                else:
+                    set_child_element(tcPr, 'vAlign', {'val': 'top'})
+                
+                # Process cell paragraphs
+                for p in cell.findall('w:p', namespaces):
+                    pPr = p.find('w:pPr', namespaces)
+                    if pPr is None:
+                        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                        p.insert(0, pPr)
+                    
+                    # Horizontal alignment
+                    if is_header:
+                        set_child_element(pPr, 'jc', {'val': 'center'})
+                    else:
+                        set_child_element(pPr, 'jc', {'val': 'left'})
+                        
+                    # Clear indentation
+                    set_child_element(pPr, 'ind', {'left': '0', 'firstLine': '0', 'right': '0'})
+                    sort_element_children(pPr, PPR_ORDER)
+    print(f"  Formatted {tbl_count} tables in document.xml.")
+
 def center_and_scale_drawings(p, namespaces, unpacked_dir=None, rel_map=None):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     drawings = p.findall('.//w:drawing', namespaces)
@@ -690,9 +808,17 @@ def replace_mentions_in_paragraph(text):
     if "grafik mahasiswa" in text and "Gambar 2.29" in text:
         text = text.replace("Gambar 2.29", "Gambar 2.30")
         
-    # Rule 24: Bagian Footer (Gambar 2.30 -> Gambar 2.31)
-    if "footer" in text and "Gambar 2.30" in text:
-        text = text.replace("Gambar 2.30", "Gambar 2.31")
+    # Rule 24: Bagian Footer (Gambar 2.30 / Gambar 2.22 -> Gambar 2.28)
+    if "footer" in text and ("Gambar 2.30" in text or "Gambar 2.22" in text or "Gambar 2.31" in text):
+        text = text.replace("Gambar 2.30", "Gambar 2.28").replace("Gambar 2.22", "Gambar 2.28").replace("Gambar 2.31", "Gambar 2.28")
+        
+    # Rule 25: Unity Prefab (Gambar 3.1 -> Gambar 2.29)
+    if "Gambar 3.1" in text:
+        text = text.replace("Gambar 3.1", "Gambar 2.29")
+        
+    # Rule 26: Unity Editor Sync Checker (Gambar 3.2 -> Gambar 2.30)
+    if "Gambar 3.2" in text:
+        text = text.replace("Gambar 3.2", "Gambar 2.30")
         
     return text
 
@@ -1166,16 +1292,16 @@ def format_document_xmls(unpacked_dir):
                         has_instr = child.find('.//w:instrText', namespaces) is not None
                         if text or has_drawing or has_sectPr or has_fldChar or has_instr:
                             if has_drawing and not lembar_pengesahan_processed:
+                                scale_lembar_pengesahan(child, namespaces, unpacked_dir, rel_map)
                                 pPr = child.find('w:pPr', namespaces)
                                 if pPr is None:
                                     pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
                                     child.insert(0, pPr)
                                 set_child_element(pPr, 'pageBreakBefore', {})
-                                set_child_element(pPr, 'jc', {'val': 'center'})
                                 sort_element_children(pPr, PPR_ORDER)
                                 lembar_pengesahan_processed = True
                                 need_page_break_after_lp = True
-                                print(f"  Applied page break and centering to Lembar Pengesahan at index {idx}")
+                                print(f"  Applied page break, margin scaling, and centering to Lembar Pengesahan at index {idx}")
                             elif lembar_pengesahan_processed and need_page_break_after_lp:
                                 pPr = child.find('w:pPr', namespaces)
                                 if pPr is None:
@@ -1433,7 +1559,7 @@ def format_document_xmls(unpacked_dir):
                             "page": estimated_page
                         })
                         
-                    elif "Gambar 2." in text:
+                    elif "Gambar 2." in text or "Gambar 3." in text:
                         new_text = replace_mentions_in_paragraph(text)
                         if new_text != text:
                             t_elems = p.findall('.//w:t', namespaces)
@@ -1758,6 +1884,7 @@ def format_document_xmls(unpacked_dir):
             
 
 
+        format_all_tables(root, namespaces)
         fix_whitespace_preservation(root)
         tree.write(doc_path, encoding='utf-8', xml_declaration=True)
         print("Updated document.xml.")
