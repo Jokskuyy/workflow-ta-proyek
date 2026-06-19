@@ -59,19 +59,19 @@ Skill mekanis berbasis Python yang mengoreksi seluruh struktur `.docx` secara in
 
 1.  **Unpack** berkas `.docx` mentah ke folder xml:
     ```bash
-    python docx-ta-proyek/scripts/unpack.py Tugas_Akhir.docx unpacked_ta
+    python skills/scripts/unpack.py Tugas_Akhir.docx unpacked_ta
     ```
 2.  **Suntikkan preset penomoran** bab dan heading:
     ```bash
-    python docx-ta-proyek/scripts/add_numbering_preset.py unpacked_ta
+    python skills/scripts/add_numbering_preset.py unpacked_ta
     ```
 3.  **Eksekusi script perapian format**:
     ```bash
-    python docx-ta-proyek/scripts/format_ta_proyek.py unpacked_ta
+    python skills/scripts/format_ta_proyek.py unpacked_ta
     ```
 4.  **Pack** kembali folder XML menjadi dokumen Word terformat:
     ```bash
-    python docx-ta-proyek/scripts/pack.py unpacked_ta Tugas_Akhir_Formatted.docx
+    python skills/scripts/pack.py unpacked_ta Tugas_Akhir_Formatted.docx
     ```
 5.  **Validasi halaman**: Jalankan script pemeriksa nomor halaman untuk memastikan layout aman:
     ```bash

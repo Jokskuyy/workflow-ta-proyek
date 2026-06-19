@@ -13,19 +13,19 @@ Advanced formatting automation for UPN Veteran Jakarta project-based final year 
 
 1. **Unpack** the `.docx` document:
    ```bash
-   python docx-ta-proyek/scripts/unpack.py input.docx unpacked_dir
+   python skills/scripts/unpack.py input.docx unpacked_dir
    ```
 2. **Inject Numbering Presets**:
    ```bash
-   python docx-ta-proyek/scripts/add_numbering_preset.py unpacked_dir
+   python skills/scripts/add_numbering_preset.py unpacked_dir
    ```
 3. **Format Layout & Styling**:
    ```bash
-   python docx-ta-proyek/scripts/format_ta_proyek.py unpacked_dir
+   python skills/scripts/format_ta_proyek.py unpacked_dir
    ```
 4. **Pack** the document back:
    ```bash
-   python docx-ta-proyek/scripts/pack.py unpacked_dir output.docx
+   python skills/scripts/pack.py unpacked_dir output.docx
    ```
 
 ## Chapter Outline (Tugas Akhir Proyek)

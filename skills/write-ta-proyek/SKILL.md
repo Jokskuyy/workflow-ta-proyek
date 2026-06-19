@@ -24,19 +24,19 @@ To automate the formatting of your `.docx` document:
 
 1. **Unpack** the `.docx` document:
    ```bash
-   python write-ta-proyek/scripts/unpack.py input.docx unpacked_dir
+   python skills/scripts/unpack.py input.docx unpacked_dir
    ```
 2. **Inject Numbering Presets**:
    ```bash
-   python write-ta-proyek/scripts/add_numbering_preset.py unpacked_dir
+   python skills/scripts/add_numbering_preset.py unpacked_dir
    ```
 3. **Format Layout & Styling**:
    ```bash
-   python write-ta-proyek/scripts/format_ta_proyek.py unpacked_dir
+   python skills/scripts/format_ta_proyek.py unpacked_dir
    ```
 4. **Pack** the document back:
    ```bash
-   python write-ta-proyek/scripts/pack.py unpacked_dir output.docx
+   python skills/scripts/pack.py unpacked_dir output.docx
    ```
 
 ## Core Writing & Content Rules

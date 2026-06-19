@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 import sys
 
 # Append the scripts directory
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../skills/docx-ta-proyek/scripts")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../skills/scripts")))
 import format_ta_proyek
 
 class TestTddFormatting(unittest.TestCase):

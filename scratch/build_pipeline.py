@@ -51,7 +51,7 @@ def main():
         
     # 1. Unpack fresh template
     run_command(
-        ["skills/docx-ta-proyek/scripts/unpack.py", template_docx, unpacked_dir],
+        ["skills/scripts/unpack.py", template_docx, unpacked_dir],
         "Unpack template docx"
     )
     
@@ -81,19 +81,19 @@ def main():
     
     # 5. Add numbering preset
     run_command(
-        ["skills/docx-ta-proyek/scripts/add_numbering_preset.py", unpacked_dir],
+        ["skills/scripts/add_numbering_preset.py", unpacked_dir],
         "Add numbering presets to unpacked docx"
     )
     
     # 6. Apply formatting rules
     run_command(
-        ["skills/docx-ta-proyek/scripts/format_ta_proyek.py", unpacked_dir],
+        ["skills/scripts/format_ta_proyek.py", unpacked_dir],
         "Format document layout and style XML files"
     )
     
     # 7. Pack unpacked directory to docx
     run_command(
-        ["skills/docx-ta-proyek/scripts/pack.py", unpacked_dir, output_docx],
+        ["skills/scripts/pack.py", unpacked_dir, output_docx],
         "Pack XML files back to DOCX"
     )
     
