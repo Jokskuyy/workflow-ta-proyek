@@ -499,20 +499,46 @@ def format_all_tables(root, namespaces):
         
         # Format rows and cells
         rows = tbl.findall('w:tr', namespaces)
+        if not rows:
+            continue
+            
+        # Check if this is Tabel 1.2 (Jadwal Kegiatan)
+        first_row_cells = rows[0].findall('w:tc', namespaces)
+        is_tabel_1_2 = False
+        if len(first_row_cells) == 6:
+            first_cell_text = "".join(first_row_cells[0].itertext()).strip()
+            if "Aktivitas" in first_cell_text:
+                is_tabel_1_2 = True
+                
+        # Customize tblGrid for Tabel 1.2
+        if is_tabel_1_2:
+            tblGrid = tbl.find('w:tblGrid', namespaces)
+            if tblGrid is not None:
+                for gc in list(tblGrid):
+                    tblGrid.remove(gc)
+                lxml.etree.SubElement(tblGrid, f'{{{ns_uri}}}gridCol', {f'{{{ns_uri}}}w': '3500'})
+                for _ in range(5):
+                    lxml.etree.SubElement(tblGrid, f'{{{ns_uri}}}gridCol', {f'{{{ns_uri}}}w': '900'})
+        
         for row_idx, row in enumerate(rows):
             is_header = (row_idx == 0)
             cells = row.findall('w:tc', namespaces)
-            for cell in cells:
+            for cell_idx, cell in enumerate(cells):
                 tcPr = cell.find('w:tcPr', namespaces)
                 if tcPr is None:
                     tcPr = lxml.etree.Element(f'{{{ns_uri}}}tcPr')
                     cell.insert(0, tcPr)
                 
+                # Apply column width if it's Tabel 1.2
+                if is_tabel_1_2:
+                    col_width = '3500' if cell_idx == 0 else '900'
+                    set_child_element(tcPr, 'tcW', {'w': col_width, 'type': 'dxa'})
+                
                 # Vertical alignment
                 if is_header:
                     set_child_element(tcPr, 'vAlign', {'val': 'center'})
                 else:
-                    set_child_element(tcPr, 'vAlign', {'val': 'top'})
+                    set_child_element(tcPr, 'vAlign', {'val': 'center'} if is_tabel_1_2 else {'val': 'top'})
                 
                 # Process cell paragraphs
                 for p in cell.findall('w:p', namespaces):
@@ -525,7 +551,10 @@ def format_all_tables(root, namespaces):
                     if is_header:
                         set_child_element(pPr, 'jc', {'val': 'center'})
                     else:
-                        set_child_element(pPr, 'jc', {'val': 'left'})
+                        if is_tabel_1_2 and cell_idx > 0:
+                            set_child_element(pPr, 'jc', {'val': 'center'})
+                        else:
+                            set_child_element(pPr, 'jc', {'val': 'left'})
                         
                     # Clear indentation
                     set_child_element(pPr, 'ind', {'left': '0', 'firstLine': '0', 'right': '0'})
@@ -678,12 +707,6 @@ def build_toc_entry(caption_text, page_num, bookmark_name):
     return p
 
 def replace_mentions_in_paragraph(text):
-    # Map Gambar 3.1 -> Gambar 2.30
-    if "Gambar 3.1" in text:
-        text = text.replace("Gambar 3.1", "Gambar 2.30")
-    # Map Gambar 3.2 -> Gambar 2.31
-    if "Gambar 3.2" in text:
-        text = text.replace("Gambar 3.2", "Gambar 2.31")
     return text
 
 def format_caption_paragraph_clean(p, label, prefix, seq_name, default_val, desc, namespaces):
@@ -1360,6 +1383,7 @@ def format_document_xmls(unpacked_dir):
                         daftar_pustaka_heading_idx = idx
                         break
                         
+        current_chapter = 1
         gambar_idx = 1
         for idx, child in enumerate(children):
             if child.tag.endswith('tbl'): continue
@@ -1409,6 +1433,20 @@ def format_document_xmls(unpacked_dir):
                     p.append(new_r)
                     text = cleaned_text
                     
+                # Track current chapter based on Heading1
+                if pStyle_val == 'Heading1':
+                    text_upper = text.upper()
+                    m_chap = re.search(r'\bBAB\s+([IVX0-9]+)\b', text_upper)
+                    if m_chap:
+                        chap_str = m_chap.group(1)
+                        roman_to_int = {'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5}
+                        if chap_str in roman_to_int:
+                            new_chap = roman_to_int[chap_str]
+                            if new_chap != current_chapter:
+                                current_chapter = new_chap
+                                if current_chapter >= 3:
+                                    gambar_idx = 1
+                                    
                 # Auto-detect captions and format them (only in body Section 2)
                 if is_section2:
                     text_clean = text.strip()
@@ -1418,9 +1456,10 @@ def format_document_xmls(unpacked_dir):
                     if is_gambar_caption:
                         m = re.match(r'^Gambar\s+[0-9]+(?:\.[0-9]+)*\.?\s*(.*)$', text_clean, re.IGNORECASE)
                         desc = m.group(1) if m else text_clean
-                        format_caption_paragraph_clean(p, "Gambar", "2.", "Gambar", gambar_idx, desc, namespaces)
+                        prefix = f"{current_chapter}."
+                        format_caption_paragraph_clean(p, "Gambar", prefix, "Gambar", gambar_idx, desc, namespaces)
                         
-                        new_caption_text = f"Gambar 2.{gambar_idx} {desc}"
+                        new_caption_text = f"Gambar {prefix}{gambar_idx} {desc}"
                         collected_captions.append({
                             "type": "Gambar",
                             "text": new_caption_text,
