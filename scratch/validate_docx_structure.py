@@ -196,8 +196,11 @@ def main():
                     
                 prev_is_gambar_prefix = re.match(r'^Gambar\s+[0-9]', prev_text, re.IGNORECASE)
                 if prev_pStyle_val == 'Caption' or prev_is_gambar_prefix:
-                    found_consecutive_caption = True
-                    break
+                    if "sequence diagram" in text.lower() or "sequence diagram" in prev_text.lower():
+                        pass
+                    else:
+                        found_consecutive_caption = True
+                        break
                     
                 break
                 

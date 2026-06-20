@@ -678,148 +678,12 @@ def build_toc_entry(caption_text, page_num, bookmark_name):
     return p
 
 def replace_mentions_in_paragraph(text):
-    # Rule 1: Wawancara / Mitra (Gambar 2.25 -> Gambar 2.8)
-    if "Wakil Rektor" in text and "pakta integritas" in text and "Gambar 2.25" in text:
-        text = text.replace("Gambar 2.25", "Gambar 2.8")
-        
-    # Rule 2: Diagram Arsitektur (Gambar 2.1 -> Gambar 2.9)
-    if "arsitektur sistem secara high-level" in text and "Gambar 2.1" in text:
-        text = text.replace("Gambar 2.1", "Gambar 2.9")
-    if "diilustrasikan pada Gambar 2.1" in text:
-        text = text.replace("Gambar 2.1", "Gambar 2.9")
-        
-    # Rule 3: Arsitektur Integrasi (Gambar 2.15 -> Gambar 2.10)
-    if "Arsitektur Integrasi" in text and "Gambar 2.15" in text:
-        text = text.replace("Gambar 2.15", "Gambar 2.10")
-    if "unity_object_name" in text and "Gambar 2.15" in text:
-        text = text.replace("Gambar 2.15", "Gambar 2.10")
-        
-    # Rule 4: Tahap Pengembangan (Gambar 2.9 -> Gambar 2.11)
-    if "telah ditetapkan" in text and "Gambar 2.9" in text:
-        text = text.replace("Gambar 2.9", "Gambar 2.11")
-    if "Alur waktu pelaksanaan" in text and "Gambar 2.9" in text:
-        text = text.replace("Gambar 2.9", "Gambar 2.11")
-        
-    # Rule 5: ERD (Gambar 2.10 -> Gambar 2.12)
-    if "skema database PostgreSQL" in text and "Gambar 2.10" in text:
-        text = text.replace("Gambar 2.10", "Gambar 2.12")
-    if "Skema ERD divisualisasikan" in text and "Gambar 2.10" in text:
-        text = text.replace("Gambar 2.10", "Gambar 2.12")
-        
-    # Rule 6: Legenda Use Case (Gambar 2.11 -> Gambar 2.13)
-    if "legenda" in text and "Gambar 2.11" in text:
-        text = text.replace("Gambar 2.11", "Gambar 2.13")
-        
-    # Rule 7: Use Case (Gambar 2.12 -> Gambar 2.14)
-    if "Use Case Diagram" in text and "Gambar 2.12" in text:
-        text = text.replace("Gambar 2.12", "Gambar 2.14")
-    if "hak akses read-only" in text and "Gambar 2.12" in text:
-        text = text.replace("Gambar 2.12", "Gambar 2.14")
-        
-    # Rule 8: Activity Admin (Gambar 2.13 -> Gambar 2.15)
-    if "Activity Diagram" in text and "Gambar 2.13" in text:
-        text = text.replace("Gambar 2.13", "Gambar 2.15")
-    if "pengelolaan data oleh administrator" in text and "Gambar 2.13" in text:
-        text = text.replace("Gambar 2.13", "Gambar 2.15")
-        
-    # Rule 9: Activity Denah (Gambar 2.14 -> Gambar 2.16)
-    if "Activity Diagram" in text and "Gambar 2.14" in text:
-        text = text.replace("Gambar 2.14", "Gambar 2.16")
-    if "mitigasi" in text and "Gambar 2.14" in text:
-        text = text.replace("Gambar 2.14", "Gambar 2.16")
-        
-    # Rule 10: Halaman Login (Gambar 2.16 -> Gambar 2.17)
-    if "autentikasi" in text and "Gambar 2.16" in text:
-        text = text.replace("Gambar 2.16", "Gambar 2.17")
-    if "halaman login admin" in text and "Gambar 2.16" in text:
-        text = text.replace("Gambar 2.16", "Gambar 2.17")
-        
-    # Rule 11: Dashboard Admin (Gambar 2.17 -> Gambar 2.18)
-    if "pusat pengelolaan data" in text and "Gambar 2.17" in text:
-        text = text.replace("Gambar 2.17", "Gambar 2.18")
-    if "halaman utama dashboard admin" in text and "Gambar 2.17" in text:
-        text = text.replace("Gambar 2.17", "Gambar 2.18")
-        
-    # Rule 12: Modal Tambah (Gambar 2.18 -> Gambar 2.19)
-    if "tambah data" in text and "Gambar 2.18" in text:
-        text = text.replace("Gambar 2.18", "Gambar 2.19")
-        
-    # Rule 13: Modal Update (Gambar 2.19 -> Gambar 2.20)
-    if "edit data" in text and "Gambar 2.19" in text:
-        text = text.replace("Gambar 2.19", "Gambar 2.20")
-    if "modal update dosen" in text and "Gambar 2.19" in text:
-        text = text.replace("Gambar 2.19", "Gambar 2.20")
-        
-    # Rule 14: Modal Konfirmasi Hapus (Gambar 2.20 -> Gambar 2.21)
-    if "hapus data" in text and "Gambar 2.20" in text:
-        text = text.replace("Gambar 2.20", "Gambar 2.21")
-    if "modal konfirmasi hapus" in text and "Gambar 2.20" in text:
-        text = text.replace("Gambar 2.20", "Gambar 2.21")
-        
-    # Rule 15: Traffic Admin (Gambar 2.21 -> Gambar 2.22)
-    if "traffic website" in text and "Gambar 2.21" in text:
-        text = text.replace("Gambar 2.21", "Gambar 2.22")
-    if "lalu lintas penggunaan" in text and "Gambar 2.21" in text:
-        text = text.replace("Gambar 2.21", "Gambar 2.22")
-        
-    # Rule 16: Hero Section (Gambar 2.22 -> Gambar 2.23)
-    if "hero section" in text and "Gambar 2.22" in text:
-        text = text.replace("Gambar 2.22", "Gambar 2.23")
-    if "titik orientasi utama" in text and "Gambar 2.22" in text:
-        text = text.replace("Gambar 2.22", "Gambar 2.23")
-        
-    # Rule 17: Traffic Public (Gambar 2.23 -> Gambar 2.24)
-    if "Public Traffic" in text and "Gambar 2.23" in text:
-        text = text.replace("Gambar 2.23", "Gambar 2.24")
-    if "aktivitas pengguna pada public dashboard" in text and "Gambar 2.23" in text:
-        text = text.replace("Gambar 2.23", "Gambar 2.24")
-        
-    # Rule 18: Fasilitas dan Aset (Gambar 2.24 -> Gambar 2.25)
-    if "fasilitas dan aset" in text and "Gambar 2.24" in text:
-        text = text.replace("Gambar 2.24", "Gambar 2.25")
-        
-    # Rule 19: Modal List Fasilitas (Gambar 2.25 -> Gambar 2.26)
-    if "modal yang berisi daftar fasilitas" in text and "Gambar 2.25" in text:
-        text = text.replace("Gambar 2.25", "Gambar 2.26")
-    if "modal daftar fasilitas kategori" in text and "Gambar 2.25" in text:
-        text = text.replace("Gambar 2.25", "Gambar 2.26")
-        
-    # Rule 20: Modal Detail Fasilitas (Gambar 2.26 -> Gambar 2.27)
-    if "kategori unggulan" in text and "Gambar 2.26" in text:
-        text = text.replace("Gambar 2.26", "Gambar 2.27")
-    if "informasi spesifik" in text and "Gambar 2.26" in text:
-        text = text.replace("Gambar 2.26", "Gambar 2.27")
-        
-    # Rule 21: Bagian Statistik (Gambar 2.27 -> Gambar 2.28)
-    if "grafik batang" in text and "Gambar 2.27" in text:
-        text = text.replace("Gambar 2.27", "Gambar 2.28")
-    if "distribusi sumber daya akademik" in text and "Gambar 2.27" in text:
-        text = text.replace("Gambar 2.27", "Gambar 2.28")
-        
-    # Rule 22: Detail Dosen (Gambar 2.28 -> Gambar 2.29)
-    if "detail data dosen" in text and "Gambar 2.28" in text:
-        text = text.replace("Gambar 2.28", "Gambar 2.29")
-    if "grafik dosen" in text and "Gambar 2.28" in text:
-        text = text.replace("Gambar 2.28", "Gambar 2.29")
-        
-    # Rule 23: Detail Mahasiswa (Gambar 2.29 -> Gambar 2.30)
-    if "detail data mahasiswa" in text and "Gambar 2.29" in text:
-        text = text.replace("Gambar 2.29", "Gambar 2.30")
-    if "grafik mahasiswa" in text and "Gambar 2.29" in text:
-        text = text.replace("Gambar 2.29", "Gambar 2.30")
-        
-    # Rule 24: Bagian Footer (Gambar 2.30 / Gambar 2.22 -> Gambar 2.28)
-    if "footer" in text and ("Gambar 2.30" in text or "Gambar 2.22" in text or "Gambar 2.31" in text):
-        text = text.replace("Gambar 2.30", "Gambar 2.28").replace("Gambar 2.22", "Gambar 2.28").replace("Gambar 2.31", "Gambar 2.28")
-        
-    # Rule 25: Unity Prefab (Gambar 3.1 -> Gambar 2.29)
+    # Map Gambar 3.1 -> Gambar 2.30
     if "Gambar 3.1" in text:
-        text = text.replace("Gambar 3.1", "Gambar 2.29")
-        
-    # Rule 26: Unity Editor Sync Checker (Gambar 3.2 -> Gambar 2.30)
+        text = text.replace("Gambar 3.1", "Gambar 2.30")
+    # Map Gambar 3.2 -> Gambar 2.31
     if "Gambar 3.2" in text:
-        text = text.replace("Gambar 3.2", "Gambar 2.30")
-        
+        text = text.replace("Gambar 3.2", "Gambar 2.31")
     return text
 
 def format_caption_paragraph_clean(p, label, prefix, seq_name, default_val, desc, namespaces):
@@ -1145,10 +1009,28 @@ def format_document_xmls(unpacked_dir):
                 return 'Gambar 2.15'
             try:
                 num = int(val)
-                if 1 <= num <= 7:
-                    return f'Gambar 2.{num + 7}'
-                elif 8 <= num <= 22:
+                if num == 1:
+                    return 'Gambar 2.9'
+                elif num == 2:
+                    return 'Gambar 2.10'
+                elif num == 3:
+                    return 'Gambar 2.17'
+                elif num == 4:
+                    return 'Gambar 2.11'
+                elif num == 5:
+                    return 'Gambar 2.12'
+                elif num == 6:
+                    return 'Gambar 2.13'
+                elif num == 7:
+                    return 'Gambar 2.14'
+                elif num == 8:
+                    return 'Gambar 2.15'
+                elif num == 9:
+                    return 'Gambar 2.16'
+                elif 10 <= num <= 21:
                     return f'Gambar 2.{num + 8}'
+                elif num == 22:
+                    return 'Gambar 2.8'
             except ValueError:
                 pass
             return match.group(0)
