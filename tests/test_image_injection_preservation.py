@@ -165,6 +165,7 @@ NON_MANIFEST_CAPTIONS = [
 # Captions that legitimately carry the "\r 1" numbering-restart switch.
 RESTART_CAPTIONS = {
     "Gambar 2.1 Hasil Kuesioner: Profil Status Akademik Responden",
+    "Gambar 3.1 Hierarki Prefab Gedung dengan Child Pointer di Unity",
     "Tabel 1.1 Peran dan Tanggung Jawab",
     "Tabel 3.1 Hubungan Mitra dengan Proyek",
 }

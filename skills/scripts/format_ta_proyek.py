@@ -1390,6 +1390,7 @@ def format_document_xmls(unpacked_dir):
                         break
                         
         gambar_idx = 1
+        gambar_seq_by_chap = {}  # chapter number -> running figure seq (BAB III+)
         for idx, child in enumerate(children):
             if child.tag.endswith('tbl'): continue
             if child.tag.endswith('sdt'):
@@ -1445,18 +1446,34 @@ def format_document_xmls(unpacked_dir):
                     is_tabel_caption = (pStyle_val == 'Caption' and text_clean.lower().startswith('tabel')) or re.match(r'^Tabel\s+[0-9]+', text_clean, re.IGNORECASE)
                     
                     if is_gambar_caption:
-                        m = re.match(r'^Gambar\s+[0-9]+(?:\.[0-9]+)*\.?\s*(.*)$', text_clean, re.IGNORECASE)
-                        desc = m.group(1) if m else text_clean
-                        format_caption_paragraph_clean(p, "Gambar", "2.", "Gambar", gambar_idx, desc, namespaces)
-                        
-                        new_caption_text = f"Gambar 2.{gambar_idx} {desc}"
+                        # Parse the chapter number from the source caption so
+                        # figures restart per chapter (BAB II -> 2.x, BAB III -> 3.x).
+                        m = re.match(r'^Gambar\s+([0-9]+)(?:\.[0-9]+)*\.?\s*(.*)$', text_clean, re.IGNORECASE)
+                        src_chap = int(m.group(1)) if m else 2
+                        desc = m.group(2) if m else text_clean
+
+                        if src_chap >= 3:
+                            # Chapter-aware numbering for BAB III and beyond
+                            # (e.g. implementation figures). A per-chapter counter
+                            # drives a SEQ restart (\r 1) on the first figure of the
+                            # chapter so it renders as "Gambar 3.1", "Gambar 3.2", ...
+                            seq_val = gambar_seq_by_chap.get(src_chap, 0) + 1
+                            gambar_seq_by_chap[src_chap] = seq_val
+                            format_caption_paragraph_clean(p, "Gambar", f"{src_chap}.", "Gambar", seq_val, desc, namespaces)
+                            new_caption_text = f"Gambar {src_chap}.{seq_val} {desc}"
+                        else:
+                            # BAB II: keep the existing sequential renumbering
+                            # (source numbers there are placeholders/reshuffled).
+                            format_caption_paragraph_clean(p, "Gambar", "2.", "Gambar", gambar_idx, desc, namespaces)
+                            new_caption_text = f"Gambar 2.{gambar_idx} {desc}"
+                            gambar_idx += 1
+
                         collected_captions.append({
                             "type": "Gambar",
                             "text": new_caption_text,
                             "page": estimated_page
                         })
                         text = new_caption_text
-                        gambar_idx += 1
                         
                     elif is_tabel_caption:
                         m = re.match(r'^Tabel\s+([0-9]+(?:\.[0-9]+)*)\.?\s*(.*)$', text_clean, re.IGNORECASE)
