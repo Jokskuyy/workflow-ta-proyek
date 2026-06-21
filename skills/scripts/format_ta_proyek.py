@@ -576,8 +576,12 @@ def center_and_scale_drawings(p, namespaces, unpacked_dir=None, rel_map=None):
     set_child_element(pPr, 'ind', {'left': '0', 'firstLine': '0'})
     sort_element_children(pPr, PPR_ORDER)
     
-    max_width_emu = 4320000   # 12.0cm in EMUs
-    max_height_emu = 4320000  # 12.0cm in EMUs
+    # Shared BODY-figure bounding box (MUST match inject_all_images.py):
+    #   BODY_MAX_W_EMU = 15 cm, BODY_MAX_H_EMU = 16 cm (1 cm = 360000 EMU).
+    # Aspect ratio is preserved (cy recomputed from the PIL aspect), srcRect is
+    # stripped (no crop), and a single min-scale fits the figure in the box.
+    max_width_emu = 5400000   # 15.0 cm in EMUs (BODY_MAX_W_EMU)
+    max_height_emu = 5760000  # 16.0 cm in EMUs (BODY_MAX_H_EMU)
     
     for drawing in drawings:
         # Remove all srcRect elements to disable cropping entirely

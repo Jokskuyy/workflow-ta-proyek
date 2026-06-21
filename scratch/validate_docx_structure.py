@@ -593,6 +593,83 @@ def main():
                         f"w:pageBreakBefore; the image and its caption can split across a page break."
                     )
 
+    # ============================================================ #
+    # Narration guard (WARNING ONLY -- never fatal).
+    #
+    # For every figure caption ("Gambar X.Y ...") confirm that, within the SAME
+    # chapter (Heading1 .. next Heading1), at least one ordinary body paragraph
+    # (Normal style, NOT a Caption, NOT a drawing paragraph) references the
+    # figure via \bGambar\s+X\.Y\b. If none does, print a clearly-labelled
+    # [WARN][narration] line. This DOES NOT append to errors_found and DOES NOT
+    # change the exit code.
+    # ============================================================ #
+    print("Checking figure narration references (non-fatal warnings)...")
+
+    def _h1_val(pp):
+        ppr = pp.find('w:pPr', namespaces)
+        ps = ppr.find('w:pStyle', namespaces) if ppr is not None else None
+        return ps.get(f'{{{W_NS}}}val') if ps is not None else ""
+
+    # Heading1 boundaries (chapter starts) within the document body.
+    heading1_idxs = [i for i, pp in enumerate(p_list)
+                     if _h1_val(pp) in ('Heading1', 'heading1')]
+
+    def _chapter_range(cap_idx):
+        start = 0
+        for hi in heading1_idxs:
+            if hi <= cap_idx:
+                start = hi
+            else:
+                break
+        end = len(p_list)
+        for hi in heading1_idxs:
+            if hi > cap_idx:
+                end = hi
+                break
+        return start, end
+
+    narration_warnings = []
+    for idx, p in enumerate(p_list):
+        is_in_body = (bab1_idx == -1 or idx >= bab1_idx)
+        if not is_in_body:
+            continue
+        pStyle_val = _content_style(p)
+        text = _content_text(p)
+        is_gambar_caption = (re.match(r'^Gambar\s+[0-9]', text, re.IGNORECASE)
+                             or (pStyle_val == 'Caption' and text.lower().startswith('gambar')))
+        if not is_gambar_caption:
+            continue
+        m = re.match(r'^Gambar\s+([0-9]+\.[0-9]+)', text, re.IGNORECASE)
+        if not m:
+            continue
+        fig_num = m.group(1)
+        ref_re = re.compile(r'\bGambar\s+' + re.escape(fig_num) + r'\b', re.IGNORECASE)
+        c_start, c_end = _chapter_range(idx)
+        found_ref = False
+        for j in range(c_start, c_end):
+            if j == idx:
+                continue
+            q = p_list[j]
+            q_style = _content_style(q)
+            if q_style == 'Caption':
+                continue
+            if q.find(f'.//{{{W_NS}}}drawing') is not None:
+                continue
+            # Treat empty/un-styled body text as Normal narrative; exclude only
+            # explicit Caption/drawing paragraphs above.
+            q_text = _content_text(q)
+            if not q_text:
+                continue
+            if ref_re.search(q_text):
+                found_ref = True
+                break
+        if not found_ref:
+            narration_warnings.append(f"[WARN][narration] Gambar {fig_num} has no referencing narrative paragraph")
+
+    for w in narration_warnings:
+        print(w)
+    print(f"Narration check: {len(narration_warnings)} figure(s) without a narrative reference (non-fatal).")
+
     # 3. Report results
     if errors_found:
         print("\n=== VALIDATION FAILED ===")

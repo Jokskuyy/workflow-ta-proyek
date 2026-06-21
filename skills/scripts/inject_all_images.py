@@ -8,7 +8,17 @@ import struct
 import hashlib
 import re
 
-# Standard Word max content width is around 15cm (5400000 EMU).
+# ------------------------------------------------------------------ #
+# Shared BODY-figure bounding box (tunable). Every BODY figure is scaled to
+# fit INSIDE this box while preserving aspect ratio (never upscaled, never
+# cropped). 1 cm = 360000 EMU.
+#   BODY_MAX_W_EMU = 15 cm, BODY_MAX_H_EMU = 16 cm.
+# These MUST match format_ta_proyek.center_and_scale_drawings().
+# ------------------------------------------------------------------ #
+BODY_MAX_W_EMU = 5400000   # 15 cm
+BODY_MAX_H_EMU = 5760000   # 16 cm
+
+# Legacy alias kept only as the printable-height fallback below.
 MAX_WIDTH = 5400000
 # 1 twip = 635 EMU (used to derive the printable page height threshold for C4).
 EMU_PER_TWIP = 635
@@ -78,12 +88,18 @@ def get_image_dimensions(filepath):
 
 
 def scaled_dimensions(cx, cy):
-    """Replicate generate_drawing_xml width-scaling so callers can reason about
-    the *rendered* height (used for the C4 page-break decision)."""
-    if cx > MAX_WIDTH:
-        scale = MAX_WIDTH / cx
-        return MAX_WIDTH, int(cy * scale)
-    return cx, cy
+    """Aspect-preserving bounding-box scale applied to every BODY figure.
+
+    Scales the native (cx, cy) to fit INSIDE the shared box
+    (BODY_MAX_W_EMU x BODY_MAX_H_EMU) using a SINGLE factor on both axes, so
+    the aspect ratio is preserved (no stretch). Never upscales (scale capped at
+    1.0). Callers use the returned values for BOTH wp:extent and a:ext (so
+    wp == ae) and to reason about the rendered height for the C4 page-break
+    decision."""
+    if cx <= 0 or cy <= 0:
+        return cx, cy
+    scale = min(BODY_MAX_W_EMU / cx, BODY_MAX_H_EMU / cy, 1.0)
+    return int(cx * scale), int(cy * scale)
 
 
 def printable_height_emu(doc_root, namespaces):
@@ -373,8 +389,18 @@ def inject_all_images(docx_path):
         })
         rels_root.append(elem)
 
-        # Compute drawing dimensions.
-        w, h = get_image_dimensions(src_path)
+        # Compute drawing dimensions. Read the ACTUAL image pixels (PIL) to get
+        # the true native aspect ratio; fall back to the lightweight header
+        # reader if PIL cannot open the file.
+        w = h = None
+        try:
+            from PIL import Image
+            with Image.open(src_path) as im:
+                w, h = im.size
+        except Exception as e:
+            print(f"  note: PIL could not read '{src_path}' ({e}); using header reader.")
+        if not w or not h:
+            w, h = get_image_dimensions(src_path)
         cx = w * 9525
         cy = h * 9525
         if "cx" in item:
@@ -385,11 +411,12 @@ def inject_all_images(docx_path):
         docpr_id += 1
         p_drawing = generate_drawing_xml(r_id, cx, cy, new_img_name, docpr_id)
 
-        # C4: page-break-before for oversized images. Preserve the original
-        # width-derived check (cy > MAX_WIDTH) AND add the explicit printable
-        # page-height threshold check on the rendered (scaled) height.
+        # C4: page-break-before only when the RENDERED (bounding-box scaled)
+        # height exceeds the printable page-height threshold. The legacy native
+        # `cy > MAX_WIDTH` heuristic is intentionally removed; the rendered
+        # height is the only thing that determines whether the figure fits.
         _, rendered_cy = scaled_dimensions(cx, cy)
-        if cy > MAX_WIDTH or rendered_cy > page_height_threshold:
+        if rendered_cy > page_height_threshold:
             pPr = p_drawing.find('w:pPr', namespaces)
             if pPr is not None and pPr.find('w:pageBreakBefore', namespaces) is None:
                 lxml.etree.SubElement(pPr, f'{{{ns_uri}}}pageBreakBefore')
