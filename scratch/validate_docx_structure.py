@@ -2,7 +2,110 @@ import sys
 import os
 import zipfile
 import re
+import json
+import hashlib
 import xml.etree.ElementTree as ET
+
+# Namespaces / constants shared by the content-level checks (C1-C4).
+W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+R_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
+A_NS = 'http://schemas.openxmlformats.org/drawingml/2006/main'
+WP_NS = 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing'
+MAX_WIDTH_EMU = 5400000
+EMU_PER_TWIP = 635  # printable page-height threshold uses twips * 635 (matches injector)
+
+
+def _md5_bytes(b):
+    """Hex MD5 of a byte string."""
+    return hashlib.md5(b).hexdigest()
+
+
+def _md5_file(path):
+    """Hex MD5 of a file's bytes."""
+    with open(path, "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()
+
+
+def _content_text(p):
+    """Concatenated, stripped text of every w:t descendant of a paragraph."""
+    return "".join(t.text for t in p.iter(f'{{{W_NS}}}t') if t.text).strip()
+
+
+def _content_style(p):
+    """pStyle val of a paragraph ('' if none)."""
+    pPr = p.find(f'{{{W_NS}}}pPr')
+    if pPr is None:
+        return ""
+    pStyle = pPr.find(f'{{{W_NS}}}pStyle')
+    if pStyle is None:
+        return ""
+    return pStyle.get(f'{{{W_NS}}}val') or ""
+
+
+def _resolve_caption_indices_content(body, caption_match):
+    """Replicate the injector's resolution rule: collect the indices (within the
+    body's direct children) of ALL paragraphs where pStyle == 'Caption', the text
+    contains caption_match, and the remainder matches ^(Gambar|Tabel)\\s+[0-9\\.]+$.
+    Returns (children_list, matched_indices)."""
+    children = list(body)
+    matches = []
+    for idx, child in enumerate(children):
+        if child.tag != f'{{{W_NS}}}p':
+            continue
+        if _content_style(child) != 'Caption':
+            continue
+        text = _content_text(child)
+        if caption_match in text:
+            remainder = text.replace(caption_match, "").strip()
+            if re.match(r'^(Gambar|Tabel)\s+[0-9\.]+$', remainder, re.IGNORECASE):
+                matches.append(idx)
+    return children, matches
+
+
+def _preceding_drawing_media(children, caption_idx, rel_target):
+    """Walk backwards from a caption to the nearest preceding drawing paragraph
+    (skipping empty paragraphs) and resolve its blip -> rels Target -> packed
+    media name ('word/media/imageNN'). Returns (media_name, drawing_p) or
+    (None, None)."""
+    j = caption_idx - 1
+    while j >= 0:
+        prev = children[j]
+        if prev.tag != f'{{{W_NS}}}p':
+            break
+        if prev.find(f'.//{{{W_NS}}}drawing') is not None:
+            blip = prev.find(f'.//{{{A_NS}}}blip')
+            if blip is None:
+                return None, None
+            embed = blip.get(f'{{{R_NS}}}embed')
+            target = rel_target.get(embed)
+            if not target:
+                return None, None
+            return 'word/' + target, prev
+        if _content_text(prev):
+            break
+        j -= 1
+    return None, None
+
+
+def _printable_height_emu_content(doc_root):
+    """Printable page height in EMU from the body sectPr:
+    (pgSz.h - pgMar.top - pgMar.bottom) twips * 635. Must match the injector's
+    threshold. Falls back to MAX_WIDTH_EMU if the geometry is unavailable."""
+    sect = doc_root.find(f'{{{W_NS}}}body/{{{W_NS}}}sectPr')
+    if sect is None:
+        return MAX_WIDTH_EMU
+    pgSz = sect.find(f'{{{W_NS}}}pgSz')
+    pgMar = sect.find(f'{{{W_NS}}}pgMar')
+    if pgSz is None or pgMar is None:
+        return MAX_WIDTH_EMU
+    try:
+        h = int(pgSz.get(f'{{{W_NS}}}h'))
+        top = int(pgMar.get(f'{{{W_NS}}}top'))
+        bottom = int(pgMar.get(f'{{{W_NS}}}bottom'))
+    except (TypeError, ValueError):
+        return MAX_WIDTH_EMU
+    return (h - top - bottom) * EMU_PER_TWIP
+
 
 def main():
     # Force UTF-8 encoding for stdout
@@ -253,6 +356,26 @@ def main():
                 # Exception: sequence diagram captions can be consecutive without intervening drawings
                 if "sequence diagram" not in text.lower():
                     errors_found.append(f"Gambar caption at paragraph {idx} '{text}' is NOT immediately preceded by a drawing paragraph")
+                    
+    # I/J. Verify every Gambar caption paragraph has keepNext and keepLines
+    print("Checking keepNext/keepLines on Gambar captions...")
+    for idx, p in enumerate(p_list):
+        is_in_body = (bab1_idx == -1 or idx >= bab1_idx)
+        if not is_in_body:
+            continue
+        pPr = p.find('w:pPr', namespaces)
+        pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+        pStyle_val = pStyle.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val') if pStyle is not None else ""
+        text = "".join([t.text for t in p.findall('.//w:t', namespaces) if t.text]).strip()
+        
+        is_gambar_prefix = re.match(r'^Gambar\s+[0-9]', text, re.IGNORECASE)
+        if is_gambar_prefix or (pStyle_val == 'Caption' and text.lower().startswith('gambar')):
+            has_keepNext = pPr is not None and pPr.find('w:keepNext', namespaces) is not None
+            has_keepLines = pPr is not None and pPr.find('w:keepLines', namespaces) is not None
+            if not has_keepNext:
+                errors_found.append(f"Gambar caption {idx} '{text}' is missing w:keepNext (may split from following paragraph)")
+            if not has_keepLines:
+                errors_found.append(f"Gambar caption {idx} '{text}' is missing w:keepLines (caption may split across pages)")
     
     # H. Check for orphan code text outside code-styled paragraphs
     # After font normalization, code blocks have: sz=18 (9pt) + ind left=720, no Consolas
@@ -292,6 +415,184 @@ def main():
             if marker in text:
                 errors_found.append(f"Paragraph {idx} contains code text '{marker}' outside code block (style='{pStyle_val}')")
     
+    # ============================================================ #
+    # Content-level figure checks (C1-C4).
+    #
+    # These ADD failures only; Sections A-J above remain unchanged and run
+    # first. None of the checks below short-circuits the build via sys.exit:
+    # every defect is appended to errors_found so the final report lists all
+    # of them and the process exits non-zero at the end.
+    # ============================================================ #
+    print("Checking content-level figure invariants (C1 uniqueness, C2 resolution, C3 integrity, C4 page-split)...")
+
+    # Load the manifest + reconciliation allow-lists (BOM tolerant, utf-8-sig).
+    manifest_path = os.path.join("images", "manifest.json")
+    reconcile_path = os.path.join("images", "manifest_reconcile.json")
+    post_com_items = []
+    duplicate_allow_groups = []
+    unresolved_allow = set()
+    if os.path.exists(manifest_path):
+        with open(manifest_path, "r", encoding="utf-8-sig") as f:
+            manifest = json.load(f)
+        post_com_items = [it for it in manifest.get("images", [])
+                          if it.get("inject_method") == "post_com"]
+    else:
+        errors_found.append(
+            f"[content] manifest not found at '{manifest_path}'; cannot run content-level checks.")
+    if os.path.exists(reconcile_path):
+        with open(reconcile_path, "r", encoding="utf-8-sig") as f:
+            rec = json.load(f)
+        duplicate_allow_groups = [set(g) for g in rec.get("duplicate_content_allow", [])]
+        unresolved_allow = set(rec.get("unresolved_allow", []))
+
+    # Read packed media bytes + the document relationship targets.
+    media_bytes = {}
+    rel_target = {}
+    rels_xml = None
+    try:
+        with zipfile.ZipFile(docx_path) as z:
+            for n in z.namelist():
+                if n.startswith("word/media/"):
+                    media_bytes[n] = z.read(n)
+            try:
+                rels_xml = z.read("word/_rels/document.xml.rels")
+            except KeyError:
+                rels_xml = None
+    except Exception as e:
+        errors_found.append(f"[content] failed to read media/rels from package: {e}")
+    if rels_xml is not None:
+        rels_root = ET.fromstring(rels_xml)
+        for rel in rels_root:
+            rid = rel.get("Id")
+            tgt = rel.get("Target")
+            if rid and tgt:
+                rel_target[rid] = tgt
+
+    body_el = doc_root.find(f'{{{W_NS}}}body')
+
+    # Per-entry resolution feeds C2 (count) and C3 (packed-vs-injected), and
+    # records the figure<->media mapping consumed by the C1 allow-list logic.
+    target_to_figure = {}  # packed media name -> figure id (for allow-list mapping)
+    for item in post_com_items:
+        item_id = item.get("id", item.get("file", "<unknown>"))
+        caption_match = item.get("caption_match", "")
+        img_file = item.get("file", "")
+        src_path = os.path.join("images", img_file)
+
+        children, matches = _resolve_caption_indices_content(body_el, caption_match)
+        count = len(matches)
+
+        # --- C2: exactly-one caption resolution --------------------------- #
+        if count != 1:
+            if item_id in unresolved_allow and count == 0:
+                print(f"  note: [C2] entry '{item_id}' resolves to 0 captions but is "
+                      f"reconciled (unresolved_allow); intentionally skipped.")
+                continue
+            errors_found.append(
+                f"[C2] entry '{item_id}' caption_match '{caption_match}' resolved to {count} "
+                f"caption paragraph(s); expected exactly 1 (ambiguous/unresolved caption "
+                f"resolution; not exactly one match)."
+            )
+            continue
+
+        # Map the resolved caption to its preceding drawing's packed media.
+        media_name, _drawing_p = _preceding_drawing_media(children, matches[0], rel_target)
+        if media_name is None:
+            errors_found.append(
+                f"[C3] entry '{item_id}' resolves to a caption but no preceding drawing/media "
+                f"could be located for content integrity verification."
+            )
+            continue
+        target_to_figure[media_name] = item_id
+
+        packed = media_bytes.get(media_name)
+        if packed is None:
+            errors_found.append(
+                f"[C3] entry '{item_id}' references packed media '{media_name}' which is "
+                f"absent from the package; cannot verify content integrity."
+            )
+            continue
+        packed_md5 = _md5_bytes(packed)
+
+        # --- C3: packed media MD5 == injected images/<file> MD5 ----------- #
+        if os.path.exists(src_path):
+            injected_md5 = _md5_file(src_path)
+            if packed_md5 != injected_md5:
+                errors_found.append(
+                    f"[C3] entry '{item_id}' content integrity mismatch: packed '{media_name}' "
+                    f"md5 {packed_md5} does not match injected '{src_path}' md5 {injected_md5} "
+                    f"(content drift / recompression)."
+                )
+        else:
+            errors_found.append(
+                f"[C3] entry '{item_id}' injected file '{src_path}' is missing on disk; cannot "
+                f"verify packed-vs-injected content integrity (md5)."
+            )
+
+        # Best-effort, NON-FATAL provenance note for the declared source.
+        source = item.get("source")
+        if source and os.path.exists(source):
+            if _md5_file(source) != packed_md5:
+                print(f"  note: [C3] entry '{item_id}' declared source '{source}' differs from "
+                      f"the packed media (provenance only, not a failure).")
+
+    # --- C1: media MD5 uniqueness across distinct drawing-referenced media - #
+    print("Checking media MD5 uniqueness across injected drawings...")
+    md5_to_targets = {}
+    if body_el is not None:
+        for p in body_el.findall(f'{{{W_NS}}}p'):
+            if p.find(f'.//{{{W_NS}}}drawing') is None:
+                continue
+            blip = p.find(f'.//{{{A_NS}}}blip')
+            if blip is None:
+                continue
+            target = rel_target.get(blip.get(f'{{{R_NS}}}embed'))
+            if not target:
+                continue
+            media_name = 'word/' + target
+            packed = media_bytes.get(media_name)
+            if packed is None:
+                continue
+            md5_to_targets.setdefault(_md5_bytes(packed), set()).add(media_name)
+
+    for md5val, targets in md5_to_targets.items():
+        if len(targets) < 2:
+            continue
+        fig_ids = sorted(target_to_figure.get(t, t) for t in targets)
+        # Allowed only if every involved figure appears together in one allow group.
+        allowed = any(set(fig_ids).issubset(group) for group in duplicate_allow_groups)
+        if not allowed:
+            errors_found.append(
+                f"[C1] duplicate media content: {sorted(targets)} (figures {fig_ids}) share "
+                f"identical MD5 {md5val}; distinct figures must reference unique image content. "
+                f"Reconcile legitimate reuse via duplicate_content_allow."
+            )
+
+    # --- C4: oversized image lacking pageBreakBefore (page-split safety) --- #
+    page_height_threshold = _printable_height_emu_content(doc_root)
+    print(f"Checking page-split safety (printable page-height threshold {page_height_threshold} EMU)...")
+    if body_el is not None:
+        for fig_idx, p in enumerate(body_el.findall(f'{{{W_NS}}}p')):
+            drawing = p.find(f'.//{{{W_NS}}}drawing')
+            if drawing is None:
+                continue
+            ext = drawing.find(f'.//{{{WP_NS}}}extent')
+            if ext is None or ext.get('cy') is None:
+                continue
+            try:
+                cy = int(ext.get('cy'))
+            except ValueError:
+                continue
+            if cy > page_height_threshold:
+                pPr = p.find(f'{{{W_NS}}}pPr')
+                has_pbb = pPr is not None and pPr.find(f'{{{W_NS}}}pageBreakBefore') is not None
+                if not has_pbb:
+                    errors_found.append(
+                        f"[C4] drawing paragraph {fig_idx} is too tall (image height {cy} EMU > "
+                        f"printable page height {page_height_threshold} EMU) but lacks "
+                        f"w:pageBreakBefore; the image and its caption can split across a page break."
+                    )
+
     # 3. Report results
     if errors_found:
         print("\n=== VALIDATION FAILED ===")

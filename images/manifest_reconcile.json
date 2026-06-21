@@ -1,0 +1,15 @@
+{
+  "_comment": "Reconciliation allow-lists for the image-injection pipeline (.kiro/specs/image-injection-pipeline-fix). duplicate_content_allow groups distinct figure ids that may legitimately share identical media (C1). unresolved_allow lists post_com manifest entries that legitimately resolve to 0 captions because the figure is placed by another step or intentionally omitted (C2). NOTE: the 9 entries below (2 appendix photos + 7 'Hasil Kuesioner' survey charts) are NOT caption-based figures in the current draft - the survey charts are placed inline as template drawings during the merge step (image3-image9) and the two photos are handled separately, so their post_com entries resolve to 0 captions by design. They are allow-listed so the injector/validator pass; remove them here if these figures are later converted to caption-based post_com injection.",
+  "duplicate_content_allow": [],
+  "unresolved_allow": [
+    "foto_pakta_integritas",
+    "foto_wawancara_warek",
+    "survey_01_profil",
+    "survey_02_efektivitas",
+    "survey_03_frekuensi",
+    "survey_04_perilaku",
+    "survey_05_urgensi",
+    "survey_06_adopsi",
+    "survey_07_prioritas"
+  ]
+}

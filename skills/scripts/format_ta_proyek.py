@@ -718,6 +718,9 @@ def format_caption_paragraph_clean(p, label, prefix, seq_name, default_val, desc
         p.insert(0, pPr)
         
     set_child_element(pPr, 'pStyle', {'val': 'Caption'})
+    # Keep the caption with its image and prevent it splitting across pages.
+    set_child_element(pPr, 'keepNext', {})
+    set_child_element(pPr, 'keepLines', {})
     set_child_element(pPr, 'spacing', {'before': '120', 'after': '120', 'line': '240', 'lineRule': 'auto'})
     set_child_element(pPr, 'jc', {'val': 'center'})
     set_child_element(pPr, 'ind', {'firstLine': '0', 'left': '0'})
@@ -1096,6 +1099,9 @@ def format_document_xmls(unpacked_dir):
             p = lxml.etree.Element(f'{{{ns_uri}}}p')
             pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
             set_child_element(pPr, 'pStyle', {'val': 'Caption'})
+            # Keep the caption with its image and prevent it splitting across pages.
+            set_child_element(pPr, 'keepNext', {})
+            set_child_element(pPr, 'keepLines', {})
             set_child_element(pPr, 'spacing', {'before': '120', 'after': '120', 'line': '240', 'lineRule': 'auto'})
             set_child_element(pPr, 'jc', {'val': 'center'})
             set_child_element(pPr, 'ind', {'firstLine': '0', 'left': '0'})
@@ -1259,3 +1265,659 @@ def format_document_xmls(unpacked_dir):
                             if next_pStyle_val == 'Caption' or re.match(r'^Gambar\s+2\b', next_text, re.IGNORECASE):
                                 already_captioned = True
                                 
+                    if "Analisis Sistem yang Sedang Berjalan" in current_section_title and survey_idx < 7:
+                        reconstructed_children.append(child)
+                        if not already_captioned:
+                            bmid = 9000 + len(collected_captions) + survey_idx
+                            bmname = f"_TocGemini{bmid}"
+                            caption_p = create_caption_paragraph_local("Gambar", "2.", "Gambar_2.", survey_idx + 1, survey_captions[survey_idx], bmid, bmname)
+                            reconstructed_children.append(caption_p)
+                            print(f"  Generated survey caption Gambar 2.{survey_idx + 1}")
+                        else:
+                            print(f"  Survey caption for Gambar 2.{survey_idx + 1} already exists, skipping generation.")
+                        survey_idx += 1
+                    elif "Integrasi Backend dengan Unity" in current_section_title:
+                        reconstructed_children.append(child)
+                        if not already_captioned:
+                            bmid = 9000 + 100
+                            bmname = f"_TocGemini{bmid}"
+                            caption_p = create_caption_paragraph_local("Gambar", "2.", "Gambar_2.", 15, "Arsitektur Integrasi Sistem", bmid, bmname)
+                            reconstructed_children.append(caption_p)
+                            print("  Generated integration caption Gambar 2.15")
+                        else:
+                            print("  Integration caption Gambar 2.15 already exists, skipping generation.")
+                    else:
+                        reconstructed_children.append(child)
+                else:
+                    reconstructed_children.append(child)
+            else:
+                reconstructed_children.append(child)
+                
+        for child in list(body):
+            body.remove(child)
+        for child in reconstructed_children:
+            body.append(child)
+            
+        # 3. Create DAFTAR LAMPIRAN section (run before boundaries are checked so it's in Section 1)
+        daftar_tabel_idx = -1
+        children_temp = list(body)
+        for idx, child in enumerate(children_temp):
+            if child.tag.endswith('p'):
+                text = "".join(child.itertext()).strip()
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                if text == "DAFTAR TABEL" and style_val == "Heading1":
+                    daftar_tabel_idx = idx
+                    break
+                    
+        insertion_idx = -1
+        for idx in range(daftar_tabel_idx + 1, len(children_temp)):
+            child = children_temp[idx]
+            if child.tag.endswith('p'):
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                if style_val == "Heading1":
+                    text = "".join(child.itertext()).strip()
+                    if "DAFTAR LAMPIRAN" in text.upper():
+                        insertion_idx = -1
+                        break
+                    if "PENDAHULUAN" in text.upper() or "BAB I" in text.upper():
+                        insertion_idx = idx
+                        break
+                        
+        if insertion_idx != -1:
+            print(f"Inserting DAFTAR LAMPIRAN at index {insertion_idx}...")
+            p_head = lxml.etree.Element(f'{{{ns_uri}}}p')
+            pPr_head = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+            set_child_element(pPr_head, 'pStyle', {'val': 'Heading1'})
+            set_child_element(pPr_head, 'pageBreakBefore', {})
+            set_child_element(pPr_head, 'jc', {'val': 'center'})
+            sort_element_children(pPr_head, PPR_ORDER)
+            p_head.append(pPr_head)
+            
+            r_head = lxml.etree.Element(f'{{{ns_uri}}}r')
+            rPr_head = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+            set_child_element(rPr_head, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
+            set_child_element(rPr_head, 'b', {})
+            set_child_element(rPr_head, 'bCs', {})
+            set_child_element(rPr_head, 'sz', {'val': '28'})
+            set_child_element(rPr_head, 'szCs', {'val': '28'})
+            r_head.append(rPr_head)
+            t_head = lxml.etree.Element(f'{{{ns_uri}}}t')
+            t_head.text = "DAFTAR LAMPIRAN"
+            r_head.append(t_head)
+            p_head.append(r_head)
+            
+            body.insert(insertion_idx, p_head)
+            insert_dynamic_toc_field(body, insertion_idx + 1, ' TOC \\o "9-9" \\n 9-9 \\h \\z ', namespaces)
+            print("Successfully inserted DAFTAR LAMPIRAN heading and TOF field.")
+            
+        children = list(body)
+        parent_map = {c: p for p in root.iter() for c in p}
+        
+        def is_inside_table(elem):
+            curr = elem
+            while curr in parent_map:
+                parent = parent_map[curr]
+                if parent.tag.endswith('tc'): return True
+                curr = parent
+            return False
+            
+        # Find boundaries
+        bab1_idx = -1
+        for idx, child in enumerate(children):
+            if child.tag.endswith('p'):
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                pStyle_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                text = "".join([t.text for t in child.iter(f'{{{ns_uri}}}t') if t.text])
+                if pStyle_val == 'Heading1' and 'PENDAHULUAN' in text.upper():
+                    bab1_idx = idx
+                    break
+        section1_last_p_idx = bab1_idx - 1 if bab1_idx != -1 else 60
+        
+        daftar_pustaka_heading_idx = -1
+        for idx, child in enumerate(children):
+            if child.tag.endswith('p'):
+                text = "".join([t.text for t in child.iter(f'{{{ns_uri}}}t') if t.text])
+                if 'DAFTAR PUSTAKA' in text:
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    if pStyle is not None and pStyle.get(f'{{{ns_uri}}}val') == 'Heading1':
+                        daftar_pustaka_heading_idx = idx
+                        break
+                        
+        gambar_idx = 1
+        for idx, child in enumerate(children):
+            if child.tag.endswith('tbl'): continue
+            if child.tag.endswith('sdt'):
+                if daftar_pustaka_heading_idx != -1 and idx > daftar_pustaka_heading_idx:
+                    clean_bibliography_sdt(child)
+                # Formats DAFTAR ISI paragraph inside the TOC sdt
+                sdtContent = child.find('w:sdtContent', namespaces)
+                if sdtContent is not None:
+                    sdtPr = child.find('w:sdtPr', namespaces)
+                    tag_elem = sdtPr.find('w:tag', namespaces) if sdtPr is not None else None
+                    tag_val = tag_elem.get(f'{{{ns_uri}}}val') if tag_elem is not None else ""
+                    if tag_val != 'MENDELEY_BIBLIOGRAPHY':
+                        toc_p = sdtContent.find('w:p', namespaces)
+                        if toc_p is not None:
+                            toc_text = "".join(toc_p.itertext()).strip()
+                            if 'DAFTAR ISI' in toc_text.upper():
+                                toc_pPr = toc_p.find('w:pPr', namespaces)
+                                if toc_pPr is None:
+                                    toc_pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                                    toc_p.insert(0, toc_pPr)
+                                set_child_element(toc_pPr, 'pStyle', {'val': 'Heading1'})
+                                set_child_element(toc_pPr, 'pageBreakBefore', {})
+                                sort_element_children(toc_pPr, PPR_ORDER)
+                continue
+                
+            if child.tag.endswith('p'):
+                p = child
+                if is_inside_table(p): continue
+                pPr = p.find('w:pPr', namespaces)
+                pStyle_val = "Normal"
+                if pPr is not None:
+                    pStyle = pPr.find('w:pStyle', namespaces)
+                    if pStyle is not None: pStyle_val = pStyle.get(f'{{{ns_uri}}}val')
+                    
+                is_section2 = (idx > section1_last_p_idx)
+                
+                # Correct in-text citations
+                text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text])
+                if 'Aliyah Aliyah' in text:
+                    cleaned_text = text.replace('Aliyah Aliyah et al., 2024', 'Aliyah et al., 2024')
+                    for r in p.findall(f'{{{ns_uri}}}r', namespaces): p.remove(r)
+                    new_r = lxml.etree.Element(f'{{{ns_uri}}}r')
+                    new_t = lxml.etree.Element(f'{{{ns_uri}}}t')
+                    new_t.text = cleaned_text
+                    new_r.append(new_t)
+                    p.append(new_r)
+                    text = cleaned_text
+                    
+                # Auto-detect captions and format them (only in body Section 2)
+                if is_section2:
+                    text_clean = text.strip()
+                    is_gambar_caption = (pStyle_val == 'Caption' and text_clean.lower().startswith('gambar')) or re.match(r'^Gambar\s+[0-9]+', text_clean, re.IGNORECASE)
+                    is_tabel_caption = (pStyle_val == 'Caption' and text_clean.lower().startswith('tabel')) or re.match(r'^Tabel\s+[0-9]+', text_clean, re.IGNORECASE)
+                    
+                    if is_gambar_caption:
+                        m = re.match(r'^Gambar\s+[0-9]+(?:\.[0-9]+)*\.?\s*(.*)$', text_clean, re.IGNORECASE)
+                        desc = m.group(1) if m else text_clean
+                        format_caption_paragraph_clean(p, "Gambar", "2.", "Gambar", gambar_idx, desc, namespaces)
+                        
+                        new_caption_text = f"Gambar 2.{gambar_idx} {desc}"
+                        collected_captions.append({
+                            "type": "Gambar",
+                            "text": new_caption_text,
+                            "page": estimated_page
+                        })
+                        text = new_caption_text
+                        gambar_idx += 1
+                        
+                    elif is_tabel_caption:
+                        m = re.match(r'^Tabel\s+([0-9]+(?:\.[0-9]+)*)\.?\s*(.*)$', text_clean, re.IGNORECASE)
+                        if m:
+                            num_part = m.group(1)
+                            desc = m.group(2)
+                            parts = num_part.split('.')
+                            if len(parts) >= 2:
+                                chap_num = parts[0]
+                                seq_val = int(parts[1])
+                            else:
+                                chap_num = "2"
+                                seq_val = int(parts[0])
+                            
+                            format_caption_paragraph_clean(p, "Tabel", f"{chap_num}.", "Tabel", seq_val, desc, namespaces)
+                            cleaned_caption = f"Tabel {chap_num}.{seq_val} {desc}"
+                            text = cleaned_caption
+                            
+                        collected_captions.append({
+                            "type": "Tabel",
+                            "text": text,
+                            "page": estimated_page
+                        })
+                        
+                    elif "Gambar 2." in text or "Gambar 3." in text:
+                        new_text = replace_mentions_in_paragraph(text)
+                        if new_text != text:
+                            t_elems = p.findall('.//w:t', namespaces)
+                            if t_elems:
+                                t_elems[0].text = new_text
+                                t_elems[0].set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+                                for t in t_elems[1:]:
+                                    t.text = ""
+                            text = new_text
+                    
+                # Format Headings
+                if pStyle_val == 'Heading1':
+                    text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text]).strip()
+                    if text.upper().startswith('LAMPIRAN'):
+                        pStyle.set(f'{{{ns_uri}}}val', 'taappendixheading')
+                        pStyle_val = 'taappendixheading'
+                        
+                if pStyle_val.startswith('Heading') or pStyle_val == 'taappendixheading':
+                    text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text]).strip()
+                    if not text:
+                        if pPr is not None:
+                            set_child_element(pPr, 'pStyle', {'val': 'Normal'})
+                            numPr = pPr.find(f'{{{ns_uri}}}numPr', namespaces)
+                            if numPr is not None: pPr.remove(numPr)
+                        continue
+                    if pStyle_val == 'taappendixheading':
+                        if pPr is None:
+                            pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                            p.insert(0, pPr)
+                        set_child_element(pPr, 'pStyle', {'val': 'taappendixheading'})
+                        set_child_element(pPr, 'pageBreakBefore', {})
+                        numPr = pPr.find(f'{{{ns_uri}}}numPr', namespaces)
+                        if numPr is not None:
+                            pPr.remove(numPr)
+                    elif pStyle_val == 'Heading1':
+                        if pPr is None:
+                            pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                            p.insert(0, pPr)
+                        set_child_element(pPr, 'pageBreakBefore', {})
+                        if 'DAFTAR' in text.upper() or 'KATA PENGANTAR' in text.upper() or 'ABSTRAK' in text.upper():
+                            set_child_element(pPr, 'pStyle', {'val': 'Heading1'})
+                            numPr = pPr.find(f'{{{ns_uri}}}numPr', namespaces)
+                            if numPr is not None: pPr.remove(numPr)
+                        else:
+                            clean_heading_text_and_add_num(p, 0, 76)
+                    elif pStyle_val == 'Heading2': clean_heading_text_and_add_num(p, 1, 76)
+                    elif pStyle_val == 'Heading3': clean_heading_text_and_add_num(p, 2, 76)
+                    elif pStyle_val == 'Heading4': clean_heading_text_and_add_num(p, 3, 76)
+                    elif pStyle_val == 'Heading5': clean_heading_text_and_add_num(p, 4, 76)
+                else:
+                    # Body text
+                    if is_section2:
+                        if pStyle_val == 'Normal':
+                            if pPr is None:
+                                pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                                p.insert(0, pPr)
+                            left_indent = '0'
+                            ind_elem = pPr.find('w:ind', namespaces)
+                            if ind_elem is not None:
+                                left_indent = ind_elem.get(f'{{{ns_uri}}}left', '0')
+                            try: left_val = int(left_indent)
+                            except: left_val = 0
+                            
+                            if left_val > 0: set_child_element(pPr, 'ind', {'firstLine': '0'})
+                            else: set_child_element(pPr, 'ind', {'firstLine': '567', 'left': '0'})
+                            
+                            jc_elem = pPr.find('w:jc', namespaces)
+                            jc_val = jc_elem.get(f'{{{ns_uri}}}val', 'both') if jc_elem is not None else 'both'
+                            if jc_val not in ['center', 'right']: set_child_element(pPr, 'jc', {'val': 'both'})
+                            set_child_element(pPr, 'spacing', {'before': '0', 'after': '0', 'line': '360', 'lineRule': 'auto'})
+                        elif pStyle_val == 'ListParagraph':
+                            if pPr is None:
+                                pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                                p.insert(0, pPr)
+                            set_child_element(pPr, 'spacing', {'before': '0', 'after': '0', 'line': '360', 'lineRule': 'auto'})
+                        elif pStyle_val == 'Caption':
+                            if pPr is None:
+                                pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                                p.insert(0, pPr)
+                            set_child_element(pPr, 'spacing', {'before': '120', 'after': '120', 'line': '240', 'lineRule': 'auto'})
+                            set_child_element(pPr, 'jc', {'val': 'center'})
+                            set_child_element(pPr, 'ind', {'firstLine': '0', 'left': '0'})
+                    else:
+                        if pStyle_val == 'Normal':
+                            if pPr is None:
+                                pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                                p.insert(0, pPr)
+                            set_child_element(pPr, 'ind', {'firstLine': '0'})
+                
+                # Center and scale drawings if present in paragraph
+                if p.find('.//w:drawing', namespaces) is not None:
+                    if is_section2:
+                        center_and_scale_drawings(p, namespaces, unpacked_dir, rel_map)
+                        pPr = p.find('w:pPr', namespaces)
+                        if pPr is None:
+                            pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                            p.insert(0, pPr)
+                        set_child_element(pPr, 'keepNext', {})
+                        set_child_element(pPr, 'keepLines', {})
+                
+                if pPr is not None: sort_element_children(pPr, PPR_ORDER)
+                
+
+        # Remove any existing paragraph-level section breaks to avoid duplicates
+        for p_elem in body.findall('w:p', namespaces):
+            pPr_elem = p_elem.find('w:pPr', namespaces)
+            if pPr_elem is not None:
+                sectPr_elem = pPr_elem.find('w:sectPr', namespaces)
+                if sectPr_elem is not None:
+                    pPr_elem.remove(sectPr_elem)
+
+        # Insert dedicated section break paragraph before BAB I PENDAHULUAN
+        bab1_idx_new = -1
+        children_new = list(body)
+        for idx, child in enumerate(children_new):
+            if child.tag.endswith('p'):
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                pStyle_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                text = "".join([t.text for t in child.iter(f'{{{ns_uri}}}t') if t.text])
+                if pStyle_val == 'Heading1' and 'PENDAHULUAN' in text.upper():
+                    bab1_idx_new = idx
+                    break
+
+        if bab1_idx_new != -1:
+            p_sect = lxml.etree.Element(f'{{{ns_uri}}}p')
+            pPr_sect = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+            
+            if original_sectPr is not None:
+                sectPr = original_sectPr
+            else:
+                sectPr = lxml.etree.Element(f'{{{ns_uri}}}sectPr')
+            
+            set_child_element(sectPr, 'type', {'val': 'nextPage'})
+            set_child_element(sectPr, 'pgNumType', {'fmt': 'lowerRoman', 'start': '1'})
+            set_child_element(sectPr, 'pgSz', {'w': '11906', 'h': '16838'})
+            set_child_element(sectPr, 'pgMar', {
+                'top': '1701', 'right': '1701', 'bottom': '1701', 'left': '2268',
+                'header': '720', 'footer': '720', 'gutter': '0'
+            })
+            sort_element_children(sectPr, SECTPR_ORDER)
+            
+            pPr_sect.append(sectPr)
+            sort_element_children(pPr_sect, PPR_ORDER)
+            p_sect.append(pPr_sect)
+            
+            body.insert(bab1_idx_new, p_sect)
+            print(f"Inserted dedicated section break paragraph before BAB I PENDAHULUAN at index {bab1_idx_new}")
+
+        # Final section break (body section)
+        final_sectPr = body.find('w:sectPr', namespaces)
+        if final_sectPr is not None:
+            pg_num_type = set_child_element(final_sectPr, 'pgNumType', {'fmt': 'decimal'})
+            start_attr = f'{{{ns_uri}}}start'
+            if start_attr in pg_num_type.attrib:
+                del pg_num_type.attrib[start_attr]
+            set_child_element(final_sectPr, 'pgSz', {'w': '11906', 'h': '16838'})
+            set_child_element(final_sectPr, 'pgMar', {
+                'top': '1701', 'right': '1701', 'bottom': '1701', 'left': '2268',
+                'header': '720', 'footer': '720', 'gutter': '0'
+            })
+            sort_element_children(final_sectPr, SECTPR_ORDER)
+            
+        # Strip all dirty flags from fldChar elements to prevent Word 
+        # from showing "update fields" dialog on open.
+        for fldChar in body.iter(f'{{{ns_uri}}}fldChar'):
+            if fldChar.get(f'{{{ns_uri}}}dirty'):
+                del fldChar.attrib[f'{{{ns_uri}}}dirty']
+
+        # Split and format nested TOC fields to remove the gap/jeda between Tabel 1.1 and Tabel 2.1
+        idx_t = 0
+        while idx_t < len(body):
+            child = body[idx_t]
+            if child.tag.endswith('p'):
+                instrs = child.findall('.//w:instrText', namespaces)
+                has_t1 = any('Tabel 1.' in instr.text for instr in instrs)
+                has_t2 = any('Tabel 2.' in instr.text for instr in instrs)
+                if has_t1 and has_t2:
+                    children_elems = list(child)
+                    p1_elems = []
+                    p2_elems = []
+                    found_second_begin = False
+                    
+                    for elem in children_elems:
+                        if elem.tag.endswith('pPr'):
+                            continue
+                        
+                        is_second_begin = False
+                        if elem.tag.endswith('r'):
+                            fldChar = elem.find('w:fldChar', namespaces)
+                            if fldChar is not None and fldChar.get(f'{{{ns_uri}}}fldCharType') == 'begin':
+                                if len(p1_elems) > 0:
+                                    is_second_begin = True
+                                    
+                        if is_second_begin:
+                            found_second_begin = True
+                            
+                        if not found_second_begin:
+                            p1_elems.append(elem)
+                        else:
+                            p2_elems.append(elem)
+                            
+                    if found_second_begin and len(p2_elems) > 0:
+                        for elem in list(child):
+                            if not elem.tag.endswith('pPr'):
+                                child.remove(elem)
+                        for elem in p1_elems:
+                            child.append(elem)
+                            
+                        # Build P2 (1pt spacing and font size)
+                        p2 = lxml.etree.Element(f'{{{ns_uri}}}p')
+                        pPr2 = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                        set_child_element(pPr2, 'pStyle', {'val': 'TableofFigures'})
+                        set_child_element(pPr2, 'spacing', {'before': '0', 'after': '0', 'line': '20', 'lineRule': 'auto'})
+                        
+                        rPr2 = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+                        set_child_element(rPr2, 'sz', {'val': '2'})
+                        set_child_element(rPr2, 'szCs', {'val': '2'})
+                        pPr2.append(rPr2)
+                        p2.append(pPr2)
+                        
+                        for elem in p2_elems:
+                            if elem.tag.endswith('r'):
+                                run_rPr = elem.find('w:rPr', namespaces)
+                                if run_rPr is None:
+                                    run_rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+                                    elem.insert(0, run_rPr)
+                                set_child_element(run_rPr, 'sz', {'val': '2'})
+                                set_child_element(run_rPr, 'szCs', {'val': '2'})
+                            p2.append(elem)
+                            
+                        body.insert(idx_t + 1, p2)
+                        print("  Split nested Table of Figures fields (Tabel 1. and Tabel 2.) and formatted second field as 1pt.")
+            idx_t += 1
+
+        # Clean static lists and replace with dynamic fields
+        children = list(body)
+        daftar_gambar_idx = -1
+        daftar_tabel_idx = -1
+        
+        for idx, child in enumerate(children):
+            if child.tag.endswith('p'):
+                text = "".join(child.itertext()).strip()
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                if text == "DAFTAR GAMBAR" and style_val == "Heading1":
+                    daftar_gambar_idx = idx
+                elif text == "DAFTAR TABEL" and style_val == "Heading1":
+                    daftar_tabel_idx = idx
+                    
+        # 1. Clean and insert dynamic Table of Figures
+        if daftar_gambar_idx != -1 and daftar_tabel_idx != -1:
+            print(f"Cleaning static DAFTAR GAMBAR list between {daftar_gambar_idx} and {daftar_tabel_idx}...")
+            to_delete = []
+            for idx in range(daftar_gambar_idx + 1, daftar_tabel_idx):
+                child = children[idx]
+                if child.tag.endswith('p'):
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    text = "".join(child.itertext()).strip()
+                    if style_val == 'TableofFigures' or not text:
+                        to_delete.append(child)
+            for child in to_delete:
+                body.remove(child)
+            print(f"Removed {len(to_delete)} elements from DAFTAR GAMBAR.")
+            
+            children = list(body)
+            for idx, child in enumerate(children):
+                if child.tag.endswith('p'):
+                    text = "".join(child.itertext()).strip()
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    if text == "DAFTAR GAMBAR" and style_val == "Heading1":
+                        daftar_gambar_idx = idx
+                        break
+            for idx, child in enumerate(children):
+                if child.tag.endswith('p'):
+                    text = "".join(child.itertext()).strip()
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    if text == "DAFTAR TABEL" and style_val == "Heading1":
+                        daftar_tabel_idx = idx
+                        break
+                        
+            insert_dynamic_toc_field(body, daftar_gambar_idx + 1, ' TOC \\h \\z \\c "Gambar" ', namespaces)
+            
+        # 2. Clean and insert Table of Tables
+        children = list(body)
+        for idx, child in enumerate(children):
+            if child.tag.endswith('p'):
+                text = "".join(child.itertext()).strip()
+                pPr = child.find('w:pPr', namespaces)
+                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                if text == "DAFTAR TABEL" and style_val == "Heading1":
+                    daftar_tabel_idx = idx
+                    break
+                    
+        insertion_idx = -1
+        if daftar_tabel_idx != -1:
+            for idx in range(daftar_tabel_idx + 1, len(children)):
+                child = children[idx]
+                if child.tag.endswith('p'):
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    if style_val == "Heading1":
+                        insertion_idx = idx
+                        break
+                        
+        if daftar_tabel_idx != -1 and insertion_idx != -1:
+            print(f"Cleaning static DAFTAR TABEL list between {daftar_tabel_idx} and {insertion_idx}...")
+            to_delete = []
+            for idx in range(daftar_tabel_idx + 1, insertion_idx):
+                child = children[idx]
+                if child.tag.endswith('p'):
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    text = "".join(child.itertext()).strip()
+                    if style_val == 'TableofFigures' or not text:
+                        to_delete.append(child)
+            for child in to_delete:
+                body.remove(child)
+            print(f"Removed {len(to_delete)} elements from DAFTAR TABEL.")
+            
+            children = list(body)
+            for idx, child in enumerate(children):
+                if child.tag.endswith('p'):
+                    text = "".join(child.itertext()).strip()
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    if text == "DAFTAR TABEL" and style_val == "Heading1":
+                        daftar_tabel_idx = idx
+                        break
+            for idx in range(daftar_tabel_idx + 1, len(children)):
+                child = children[idx]
+                if child.tag.endswith('p'):
+                    pPr = child.find('w:pPr', namespaces)
+                    pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+                    style_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
+                    if style_val == "Heading1":
+                        insertion_idx = idx
+                        break
+                        
+            insert_dynamic_toc_field(body, daftar_tabel_idx + 1, ' TOC \\h \\z \\c "Tabel" ', namespaces)
+            
+
+
+        format_all_tables(root, namespaces)
+        fix_whitespace_preservation(root)
+        tree.write(doc_path, encoding='utf-8', xml_declaration=True)
+        print("Updated document.xml.")
+
+def fix_all_fonts_lxml(directory):
+    W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    A_NS = 'http://schemas.openxmlformats.org/drawingml/2006/main'
+    parser = lxml.etree.XMLParser(remove_blank_text=False)
+    
+    print(f"Normalizing fonts in {directory} recursively...")
+    for root_dir, dirs, files in os.walk(directory):
+        for file in files:
+            if not (file.endswith('.xml') or file.endswith('.rels')): continue
+            filepath = os.path.join(root_dir, file)
+            try:
+                tree = lxml.etree.parse(filepath, parser)
+                root = tree.getroot()
+            except:
+                continue
+                
+            modified = False
+            for elem in root.iter():
+                tag_local = elem.tag.split('}')[-1]
+                if tag_local == 'rFonts':
+                    for attr in ['ascii', 'hAnsi', 'eastAsia', 'cs']:
+                        full_attr = f'{{{W_NS}}}{attr}'
+                        val = elem.get(full_attr)
+                        if val and val not in ['Symbol', 'Wingdings', 'Courier New', 'Times New Roman']:
+                            elem.set(full_attr, 'Times New Roman')
+                            modified = True
+                    theme_attrs = ['asciiTheme', 'hAnsiTheme', 'eastAsiaTheme', 'cstheme']
+                    has_theme = False
+                    for attr in theme_attrs:
+                        full_attr = f'{{{W_NS}}}{attr}'
+                        if elem.get(full_attr) is not None:
+                            elem.attrib.pop(full_attr)
+                            has_theme = True
+                            modified = True
+                    if has_theme:
+                        for attr in ['ascii', 'hAnsi', 'eastAsia', 'cs']:
+                            full_attr = f'{{{W_NS}}}{attr}'
+                            val = elem.get(full_attr)
+                            if not val or val not in ['Symbol', 'Wingdings', 'Courier New']:
+                                elem.set(full_attr, 'Times New Roman')
+                                modified = True
+                elif tag_local in ['latin', 'ea', 'cs'] and elem.tag.startswith(f'{{{A_NS}}}'):
+                    val = elem.get('typeface')
+                    if val and val not in ['Symbol', 'Wingdings', 'Courier New', 'Times New Roman']:
+                        elem.set('typeface', 'Times New Roman')
+                        modified = True
+                elif 'typeface' in elem.attrib:
+                    val = elem.attrib['typeface']
+                    if val and val not in ['Symbol', 'Wingdings', 'Courier New', 'Times New Roman']:
+                        elem.attrib['typeface'] = 'Times New Roman'
+                        modified = True
+                        
+            if modified:
+                try:
+                    tree.write(filepath, encoding='utf-8', xml_declaration=True)
+                    print(f"  Fixed fonts in {os.path.relpath(filepath, directory)}")
+                except Exception as e:
+                    print(f"  Error writing {file}: {e}")
+
+def force_field_update(unpacked_dir):
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    namespaces = {'w': ns_uri}
+    settings_path = os.path.join(unpacked_dir, 'word', 'settings.xml')
+    if os.path.exists(settings_path):
+        tree = lxml.etree.parse(settings_path)
+        root = tree.getroot()
+        update_fields = root.find('w:updateFields', namespaces)
+        if update_fields is not None:
+            root.remove(update_fields)
+            tree.write(settings_path, encoding='utf-8', xml_declaration=True, standalone=True)
+            print("Removed updateFields from settings.xml to prevent popup.")
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print("Usage: python format_ta_proyek.py <unpacked_dir>")
+        sys.exit(1)
+    unpacked_dir = sys.argv[1]
+    format_document_xmls(unpacked_dir)
+    force_field_update(unpacked_dir)
+    fix_all_fonts_lxml(unpacked_dir)

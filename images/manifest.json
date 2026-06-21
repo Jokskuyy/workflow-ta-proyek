@@ -148,16 +148,9 @@
       "inject_method": "post_com"
     },
     {
-      "id": "foto_pakta_integritas",
-      "file": "foto_pakta_integritas.jpg",
-      "caption_match": "Dokumentasi Penandatanganan Pakta Integritas",
-      "source": "unpacked_ta/word/media/image11.png",
-      "inject_method": "post_com"
-    },
-    {
       "id": "foto_wawancara_warek",
       "file": "foto_wawancara_warek.jpg",
-      "caption_match": "Dokumentasi Wawancara dengan Wakil Rektor",
+      "caption_match": "Dokumentasi Wawancara dan Penandatanganan Pakta Integritas",
       "source": "unpacked_ta/word/media/image12.jpg",
       "inject_method": "post_com"
     },
