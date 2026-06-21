@@ -97,6 +97,12 @@ def main():
         "Pack XML files back to DOCX"
     )
     
+    # 8. Post-COM image injection (sequence diagrams stripped by Word COM)
+    run_command(
+        ["scratch/post_com_inject_images.py", output_docx],
+        "Post-COM inject sequence diagram images"
+    )
+    
     # 9. Verify generated document structure and fields
     run_command(
         ["scratch/validate_docx_structure.py", output_docx],

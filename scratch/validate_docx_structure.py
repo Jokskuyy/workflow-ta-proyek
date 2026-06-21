@@ -209,6 +209,89 @@ def main():
 
     print(f"Processed {gambar_count} Gambar captions and {tabel_count} Tabel captions.")
     
+    # F. Verify keepNext+keepLines chain on ALL drawing paragraphs in body
+    print("Checking keepNext/keepLines chain on drawing paragraphs...")
+    for idx, p in enumerate(p_list):
+        is_in_body = (bab1_idx == -1 or idx >= bab1_idx)
+        if not is_in_body:
+            continue
+        has_drawing = p.find('.//w:drawing', namespaces) is not None
+        if has_drawing:
+            pPr = p.find('w:pPr', namespaces)
+            has_keepNext = pPr is not None and pPr.find('w:keepNext', namespaces) is not None
+            has_keepLines = pPr is not None and pPr.find('w:keepLines', namespaces) is not None
+            if not has_keepNext:
+                errors_found.append(f"Drawing paragraph {idx} is missing w:keepNext (image may split from caption)")
+            if not has_keepLines:
+                errors_found.append(f"Drawing paragraph {idx} is missing w:keepLines (image may split across pages)")
+    
+    # G. Verify every Gambar caption is immediately preceded by a drawing paragraph
+    print("Checking drawing-before-caption adjacency...")
+    for idx, p in enumerate(p_list):
+        is_in_body = (bab1_idx == -1 or idx >= bab1_idx)
+        if not is_in_body:
+            continue
+        pPr = p.find('w:pPr', namespaces)
+        pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+        pStyle_val = pStyle.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val') if pStyle is not None else ""
+        text = "".join([t.text for t in p.findall('.//w:t', namespaces) if t.text]).strip()
+        
+        is_gambar_prefix = re.match(r'^Gambar\s+[0-9]', text, re.IGNORECASE)
+        if is_gambar_prefix or (pStyle_val == 'Caption' and text.lower().startswith('gambar')):
+            # Look backwards for the nearest drawing paragraph, skipping empty paragraphs
+            found_drawing = False
+            for j in range(idx - 1, max(idx - 3, -1), -1):
+                prev_p = p_list[j]
+                prev_text = "".join([t.text for t in prev_p.findall('.//w:t', namespaces) if t.text]).strip()
+                if prev_p.find('.//w:drawing', namespaces) is not None:
+                    found_drawing = True
+                    break
+                if prev_text:
+                    # Non-empty non-drawing paragraph between drawing and caption = error
+                    break
+            if not found_drawing:
+                # Exception: sequence diagram captions can be consecutive without intervening drawings
+                if "sequence diagram" not in text.lower():
+                    errors_found.append(f"Gambar caption at paragraph {idx} '{text}' is NOT immediately preceded by a drawing paragraph")
+    
+    # H. Check for orphan code text outside code-styled paragraphs
+    # After font normalization, code blocks have: sz=18 (9pt) + ind left=720, no Consolas
+    print("Checking for orphan code text outside code blocks...")
+    code_markers = ['$$ LANGUAGE plpgsql', 'CREATE TRIGGER', 'CREATE OR REPLACE FUNCTION',
+                    'EXECUTE FUNCTION', 'RETURNS TRIGGER AS $$']
+    ns_w = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    for idx, p in enumerate(p_list):
+        is_in_body = (bab1_idx == -1 or idx >= bab1_idx)
+        if not is_in_body:
+            continue
+        pPr = p.find('w:pPr', namespaces)
+        pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
+        pStyle_val = pStyle.get(f'{{{ns_w}}}val') if pStyle is not None else ""
+        if 'code' in pStyle_val.lower():
+            continue
+        # Detect code block by sz=18 (9pt) + ind left=720
+        is_code_block = False
+        ind_elem = pPr.find('w:ind', namespaces) if pPr is not None else None
+        left_val = ind_elem.get(f'{{{ns_w}}}left', '0') if ind_elem is not None else '0'
+        if left_val == '720':
+            for sz_el in p.findall('.//w:sz', namespaces):
+                if sz_el.get(f'{{{ns_w}}}val') == '18':
+                    is_code_block = True
+                    break
+        # Also check for Consolas font (pre-normalization)
+        if not is_code_block:
+            for rFonts in p.findall('.//w:rFonts', namespaces):
+                av = rFonts.get(f'{{{ns_w}}}ascii', '')
+                if av.lower() in ['consolas', 'courier new', 'courier']:
+                    is_code_block = True
+                    break
+        if is_code_block:
+            continue
+        text = "".join([t.text for t in p.findall('.//w:t', namespaces) if t.text]).strip()
+        for marker in code_markers:
+            if marker in text:
+                errors_found.append(f"Paragraph {idx} contains code text '{marker}' outside code block (style='{pStyle_val}')")
+    
     # 3. Report results
     if errors_found:
         print("\n=== VALIDATION FAILED ===")

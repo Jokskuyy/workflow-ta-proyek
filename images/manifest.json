@@ -1,0 +1,228 @@
+{
+  "images": [
+    {
+      "id": "diagram_arsitektur",
+      "file": "diagram_arsitektur.png",
+      "caption_match": "Diagram Arsitektur Sistem",
+      "source": "unpacked_ta/word/media/image22.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "diagram_tahap_pengembangan",
+      "file": "diagram_tahap_pengembangan.jpg",
+      "caption_match": "Tahap Pengembangan",
+      "source": "unpacked_ta/word/media/image23.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "diagram_erd",
+      "file": "diagram_erd.png",
+      "caption_match": "Entity-Relationship Diagram",
+      "source": "dokumentasi/erd_schema.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "diagram_use_case_legenda",
+      "file": "diagram_use_case_legenda.png",
+      "caption_match": "Legenda Use Case Diagram",
+      "source": "unpacked_ta/word/media/image25.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "diagram_use_case",
+      "file": "diagram_use_case.jpg",
+      "caption_match": "Use Case Diagram",
+      "source": "unpacked_ta/word/media/image26.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "diagram_activity_kelola_data",
+      "file": "diagram_activity_kelola_data.png",
+      "caption_match": "Activity Diagram: Pengelolaan Data oleh Admin",
+      "source": "unpacked_ta/word/media/image27.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "diagram_activity_integrasi",
+      "file": "diagram_activity_integrasi.png",
+      "caption_match": "Activity Diagram: Integrasi Data Denah",
+      "source": "unpacked_ta/word/media/image28.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "diagram_sequence_autentikasi",
+      "file": "diagram_sequence_autentikasi.png",
+      "caption_match": "Sequence Diagram: Autentikasi Administrator",
+      "source": "dokumentasi/sequence_autentikasi.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "diagram_sequence_sinkronisasi",
+      "file": "diagram_sequence_sinkronisasi.png",
+      "caption_match": "Sequence Diagram: Sinkronisasi Data Gedung dan Unity",
+      "source": "dokumentasi/sequence_sinkronisasi.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mockup_login_admin",
+      "file": "mockup_login_admin.png",
+      "caption_match": "Halaman Login Admin",
+      "source": "dokumentasi/login-page.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mockup_dashboard_admin",
+      "file": "mockup_dashboard_admin.png",
+      "caption_match": "Halaman Dashboard Admin",
+      "source": "dokumentasi/header+gedung-view.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mockup_modal_tambah_gedung",
+      "file": "mockup_modal_tambah_gedung.png",
+      "caption_match": "Modal Tambah Data Gedung",
+      "source": "dokumentasi/modal-create-gedung.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mockup_modal_edit_gedung",
+      "file": "mockup_modal_edit_gedung.png",
+      "caption_match": "Modal Update Data Gedung",
+      "source": "dokumentasi/modal-edit-gedung.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mockup_modal_hapus_gedung",
+      "file": "mockup_modal_hapus_gedung.png",
+      "caption_match": "Modal Konfirmasi Hapus Data Gedung",
+      "source": "dokumentasi/modal-konfirmasi-delete-gedung.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mockup_admin_traffic",
+      "file": "mockup_admin_traffic.png",
+      "caption_match": "Traffic Website Admin",
+      "source": "dokumentasi/section-admin-traffic-view.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mockup_hero_section",
+      "file": "mockup_hero_section.png",
+      "caption_match": "Hero Section",
+      "source": "dokumentasi/section-header+hero.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mockup_public_traffic",
+      "file": "mockup_public_traffic.png",
+      "caption_match": "Public Traffic Statistics Website",
+      "source": "dokumentasi/traffic-web-public.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mockup_fasilitas_aset",
+      "file": "mockup_fasilitas_aset.png",
+      "caption_match": "Bagian Fasilitas dan Aset",
+      "source": "dokumentasi/section fasilitas-asset(dan gedung).png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mockup_modal_list_fasilitas",
+      "file": "mockup_modal_list_fasilitas.png",
+      "caption_match": "Modal List Fasilitas dan Aset",
+      "source": "dokumentasi/modal-fasilitas-aset.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mockup_modal_detail_fasilitas",
+      "file": "mockup_modal_detail_fasilitas.png",
+      "caption_match": "Modal Fasilitas dan Aset",
+      "source": "dokumentasi/modal-fasilitas-aset.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mockup_footer",
+      "file": "mockup_footer.png",
+      "caption_match": "Bagian Footer",
+      "source": "dokumentasi/section-footer.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "foto_pakta_integritas",
+      "file": "foto_pakta_integritas.jpg",
+      "caption_match": "Dokumentasi Penandatanganan Pakta Integritas",
+      "source": "unpacked_ta/word/media/image11.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "foto_wawancara_warek",
+      "file": "foto_wawancara_warek.jpg",
+      "caption_match": "Dokumentasi Wawancara dengan Wakil Rektor",
+      "source": "unpacked_ta/word/media/image12.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "impl_pointer_hierarchy",
+      "file": "impl_pointer_hierarchy.png",
+      "caption_match": "Hierarki Prefab Gedung dengan Child Pointer di Unity",
+      "source": "unpacked_ta/word/media/image31.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "impl_sync_db_checker",
+      "file": "impl_sync_db_checker.png",
+      "caption_match": "Tampilan UI Database Sync Checker di Unity Editor",
+      "source": "unpacked_ta/word/media/image32.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "survey_01_profil",
+      "file": "survey_01_profil.png",
+      "caption_match": "Hasil Kuesioner: Profil Status Akademik",
+      "source": "unpacked_ta/word/media/image4.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "survey_02_efektivitas",
+      "file": "survey_02_efektivitas.png",
+      "caption_match": "Hasil Kuesioner: Efektivitas Informasi",
+      "source": "unpacked_ta/word/media/image5.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "survey_03_frekuensi",
+      "file": "survey_03_frekuensi.png",
+      "caption_match": "Hasil Kuesioner: Frekuensi Akses Denah",
+      "source": "unpacked_ta/word/media/image6.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "survey_04_perilaku",
+      "file": "survey_04_perilaku.png",
+      "caption_match": "Hasil Kuesioner: Perilaku Pencarian Lokasi",
+      "source": "unpacked_ta/word/media/image7.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "survey_05_urgensi",
+      "file": "survey_05_urgensi.png",
+      "caption_match": "Hasil Kuesioner: Urgensi Kebutuhan Denah",
+      "source": "unpacked_ta/word/media/image8.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "survey_06_adopsi",
+      "file": "survey_06_adopsi.png",
+      "caption_match": "Hasil Kuesioner: Tingkat Adopsi Potensial",
+      "source": "unpacked_ta/word/media/image9.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "survey_07_prioritas",
+      "file": "survey_07_prioritas.png",
+      "caption_match": "Hasil Kuesioner: Prioritas Fitur",
+      "source": "unpacked_ta/word/media/image10.png",
+      "inject_method": "post_com"
+    }
+  ]
+}
