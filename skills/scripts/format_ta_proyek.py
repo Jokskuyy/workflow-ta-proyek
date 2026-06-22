@@ -3,6 +3,347 @@ import os
 import re
 import sys
 
+# Tabel angka Romawi untuk Nomor_Bab (I=1 .. X=10).
+ROMAN = {
+    "I": 1, "II": 2, "III": 3, "IV": 4, "V": 5,
+    "VI": 6, "VII": 7, "VIII": 8, "IX": 9, "X": 10,
+}
+
+# Pola heading BAB: 'BAB' diikuti angka Romawi atau Arab, dengan batas kata.
+_BAB_PATTERN = re.compile(r"^BAB\s+([IVX]+|[0-9]+)\b", re.IGNORECASE)
+
+
+def parse_chapter_number(heading_text):
+    """Ambil Nomor_Bab dari teks heading BAB sebagai fungsi murni.
+
+    Mendukung 'BAB II', 'BAB 2', 'BAB II RANCANGAN PROYEK', case-insensitive,
+    dengan spasi ternormalisasi (mis. '  bab   iii  '). Mengembalikan int bila
+    teks merupakan heading BAB, atau None bila bukan.
+
+    Aturan: cocokkan ^BAB\\s+([IVX]+|[0-9]+)\\b; angka Romawi dipetakan via
+    tabel ROMAN, angka Arab via int().
+    """
+    if not heading_text:
+        return None
+    # Normalisasi spasi: ringkas whitespace berturut menjadi satu spasi, trim.
+    normalized = re.sub(r"\s+", " ", str(heading_text)).strip()
+    if not normalized:
+        return None
+    m = _BAB_PATTERN.match(normalized)
+    if not m:
+        return None
+    token = m.group(1)
+    if token.isdigit():
+        return int(token)
+    roman = token.upper()
+    return ROMAN.get(roman)
+
+
+class _Ambiguous:
+    """Penanda (sentinel) untuk nomor lama yang memetakan ke >1 nomor baru.
+
+    Konvensi nilai remap (dipakai oleh task 5.1 `rewrite_references`):
+      - Kunci peta (`fig_remap`/`tbl_remap`) selalu berupa string nomor lama
+        "C.Y" (mis. "2.5") yang terbaca dari teks kapsi sumber draf.
+      - Bila satu nomor lama hanya pernah memetakan ke SATU nomor baru, nilainya
+        berupa string nomor baru "C.k" (mis. "2.7"). `rewrite_references` boleh
+        mengganti referensi secara langsung.
+      - Bila satu nomor lama memetakan ke LEBIH DARI SATU nomor baru yang
+        berbeda (mis. dua kapsi "Gambar 2.5" akibat penyuntingan), nilainya
+        diganti dengan instance `_Ambiguous` yang menyimpan `frozenset` seluruh
+        nomor baru kandidat pada atribut `candidates`. `rewrite_references`
+        WAJIB mendeteksi ini (via `is_ambiguous(value)`), mempertahankan teks
+        asli, dan mencatat peringatan berisi daftar kandidat.
+    """
+
+    __slots__ = ("candidates",)
+
+    def __init__(self, candidates):
+        # Simpan sebagai frozenset agar nilai bersifat hashable & immutable.
+        self.candidates = frozenset(candidates)
+
+    def __repr__(self):
+        return "AMBIGUOUS(%s)" % sorted(self.candidates)
+
+    def __eq__(self, other):
+        return isinstance(other, _Ambiguous) and self.candidates == other.candidates
+
+    def __hash__(self):
+        return hash(("_Ambiguous", self.candidates))
+
+
+def is_ambiguous(value):
+    """True bila nilai remap menandakan nomor lama yang ambigu (>1 nomor baru)."""
+    return isinstance(value, _Ambiguous)
+
+
+# Sentinel marker tingkat-modul. Nilai remap yang merupakan instance `_Ambiguous`
+# menandai nomor lama yang memetakan ke lebih dari satu nomor baru (R6.5).
+AMBIGUOUS = _Ambiguous
+
+
+class CaptionRegistry:
+    """Menomori kapsi gambar & tabel per-bab dan merekam pemetaan nomor lama->baru.
+
+    Registri ini adalah sumber kebenaran tunggal untuk penomoran kapsi (R1, R2)
+    sekaligus menyediakan peta renumbering referensi silang (R6.3). Logika murni
+    tanpa efek samping XML sehingga dapat diuji langsung (property-based testing).
+
+    Atribut:
+      _fig_seq / _tbl_seq: dict[int,int] penghitung gambar/tabel berjalan per-bab.
+      fig_remap / tbl_remap: dict[str, str | _Ambiguous] pemetaan nomor lama "C.Y"
+        -> nomor baru "C.k"; bernilai instance `_Ambiguous` bila satu nomor lama
+        memetakan ke >1 nomor baru (lihat konvensi pada docstring `_Ambiguous`).
+      fig_numbers / tbl_numbers: set[str] himpunan nomor final ("C.k") untuk
+        pengecekan "punya padanan?" (R6.4).
+    """
+
+    def __init__(self):
+        self._fig_seq = {}      # bab -> seq gambar berjalan
+        self._tbl_seq = {}      # bab -> seq tabel berjalan
+        self.fig_remap = {}     # "2.5" -> "2.7" | _Ambiguous
+        self.tbl_remap = {}
+        self.fig_numbers = set()
+        self.tbl_numbers = set()
+
+    @staticmethod
+    def _record_remap(remap, old_number, new_number):
+        """Catat old_number -> new_number, tandai AMBIGUOUS bila berbeda padanan."""
+        if old_number is None:
+            return
+        existing = remap.get(old_number)
+        if existing is None:
+            remap[old_number] = new_number
+            return
+        if is_ambiguous(existing):
+            # Sudah ambigu: tambahkan kandidat baru ke himpunan.
+            remap[old_number] = _Ambiguous(existing.candidates | {new_number})
+            return
+        if existing == new_number:
+            # Padanan identik berulang: tetap unik, tidak ada perubahan.
+            return
+        # Dua padanan berbeda untuk satu nomor lama -> tandai ambigu.
+        remap[old_number] = _Ambiguous({existing, new_number})
+
+    def _next(self, seq, remap, numbers, chapter, old_number):
+        k = seq.get(chapter, 0) + 1
+        seq[chapter] = k
+        new_number = "%d.%d" % (chapter, k)
+        is_first_in_chapter = (k == 1)
+        self._record_remap(remap, old_number, new_number)
+        numbers.add(new_number)
+        return new_number, k, is_first_in_chapter
+
+    def next_figure(self, chapter, old_number):
+        """Kembalikan (nomor_baru 'C.k', default_val=k, is_first_in_chapter).
+
+        Menaikkan penghitung gambar per-bab (`_fig_seq[chapter]`); k dimulai dari
+        1 di tiap bab dan bertambah tepat 1. `is_first_in_chapter` True bila k==1
+        (memicu opsi restart SEQ `\\r 1`, R1.4/R1.5). `default_val` sama dengan k.
+        Mencatat `old_number -> nomor_baru` ke `fig_remap` (menandai AMBIGUOUS
+        bila perlu) dan menambah nomor baru ke `fig_numbers`.
+        """
+        return self._next(
+            self._fig_seq, self.fig_remap, self.fig_numbers, chapter, old_number
+        )
+
+    def next_table(self, chapter, old_number):
+        """Analog `next_figure` untuk tabel (R2.2-R2.5) memakai `_tbl_seq`,
+        `tbl_remap`, dan `tbl_numbers`."""
+        return self._next(
+            self._tbl_seq, self.tbl_remap, self.tbl_numbers, chapter, old_number
+        )
+
+
+# ---------------------------------------------------------------------------
+# Helper murni: ekstraksi teks/gaya paragraf lxml (dipakai task 3.1, 4.1).
+# ---------------------------------------------------------------------------
+
+def _paragraph_text(p, ns):
+    """Gabungkan seluruh teks (`w:t`) di dalam paragraf lxml `p` menjadi satu
+    string (urutan baca). `ns` adalah dict namespace konsisten dengan kode
+    eksisting, mis. {'w': ns_uri}."""
+    ns_uri = ns['w']
+    return "".join(t.text for t in p.iter('{%s}t' % ns_uri) if t.text)
+
+
+def _paragraph_style(p, ns):
+    """Kembalikan nilai `w:pStyle/@w:val` paragraf `p`, atau None bila tak ada."""
+    ns_uri = ns['w']
+    pPr = p.find('w:pPr', ns)
+    if pPr is None:
+        return None
+    pStyle = pPr.find('w:pStyle', ns)
+    if pStyle is None:
+        return None
+    return pStyle.get('{%s}val' % ns_uri)
+
+
+# ---------------------------------------------------------------------------
+# Task 3.1 (R3.1-3.5): parse teks kapsi draf -> (label, old_number, desc).
+# ---------------------------------------------------------------------------
+
+# Pola kapsi: 'Gambar'/'Tabel' diikuti nomor 'C' atau 'C.Y[.Z...]' lalu deskripsi.
+# Titik opsional setelah nomor (mis. 'Gambar 3.1.' atau 'Gambar 3.1'), lalu
+# deskripsi VERBATIM sebagai trailing text.
+_CAPTION_TEXT_PATTERN = re.compile(
+    r"^(Gambar|Tabel)\s+([0-9]+(?:\.[0-9]+)*)\.?\s*(.*)$", re.IGNORECASE
+)
+
+
+def parse_caption_text(text):
+    """Parse satu paragraf kapsi draf menjadi `(label, old_number, desc)`.
+
+    Mengembalikan tuple `("Gambar"|"Tabel", "C.Y", deskripsi_verbatim)` bila
+    `text` adalah kapsi, atau `None` bila bukan kapsi (R3.1, R3.5). `desc`
+    diambil verbatim dari trailing description draf (tanpa label & nomor),
+    sehingga mengubah deskripsi di draf mengubah keluaran tanpa perubahan kode.
+
+    Contoh:
+        parse_caption_text("Gambar 3.1 Hierarki Prefab")
+            -> ("Gambar", "3.1", "Hierarki Prefab")
+        parse_caption_text("Paragraf narasi biasa") -> None
+
+    Helper ini adalah basis untuk menyumber deskripsi kapsi dari draf dan
+    Aturan_Umum gambar tanpa kapsi; penghapusan `survey_captions`/pemicu
+    judul-seksi bernama dilakukan pada task integrasi 7.2.
+    """
+    if not text:
+        return None
+    s = str(text).strip()
+    if not s:
+        return None
+    m = _CAPTION_TEXT_PATTERN.match(s)
+    if not m:
+        return None
+    label = "Gambar" if m.group(1).lower() == "gambar" else "Tabel"
+    old_number = m.group(2)
+    desc = m.group(3)
+    return (label, old_number, desc)
+
+
+# ---------------------------------------------------------------------------
+# Task 4.1 (R5.1-5.5): deteksi seksi & heading dinamis (tanpa indeks tetap).
+# ---------------------------------------------------------------------------
+
+# Petunjuk teks heading front matter, dipakai HANYA untuk fallback struktural
+# batas front matter bila heading 'BAB I'/'PENDAHULUAN' tidak ditemukan (R5.5).
+_FRONT_MATTER_HEADING_HINTS = (
+    "DAFTAR", "KATA PENGANTAR", "ABSTRAK", "ABSTRACT", "LEMBAR", "HALAMAN",
+    "PERNYATAAN", "MOTTO", "PERSEMBAHAN", "RINGKASAN",
+)
+
+
+def find_front_matter_boundary(children, ns):
+    """Kembalikan indeks paragraf Heading1 BAB I pertama.
+
+    BAB I dikenali bila teks heading (gaya 'Heading1') memuat 'PENDAHULUAN'
+    atau `parse_chapter_number(text) == 1` (mencakup 'BAB I'/'BAB 1'), R5.1/R5.2.
+
+    Fallback (R5.3/R5.5): bila tidak ditemukan, kembalikan akhir front matter
+    terdeteksi secara struktural (indeks tepat setelah heading front-matter
+    terakhir; bila tak ada heading front-matter, `len(children)`), dan catat
+    tepat satu peringatan. Tidak memakai indeks numerik tetap.
+    """
+    last_front_matter_idx = -1
+    for idx, p in enumerate(children):
+        if _paragraph_style(p, ns) != 'Heading1':
+            continue
+        text_norm = re.sub(r"\s+", " ", _paragraph_text(p, ns)).strip()
+        upper = text_norm.upper()
+        if 'PENDAHULUAN' in upper or parse_chapter_number(text_norm) == 1:
+            return idx
+        if any(hint in upper for hint in _FRONT_MATTER_HEADING_HINTS):
+            last_front_matter_idx = idx
+    boundary = last_front_matter_idx + 1 if last_front_matter_idx != -1 else len(children)
+    print(
+        "  [WARNING] find_front_matter_boundary: heading 'BAB I'/'PENDAHULUAN' "
+        "tidak ditemukan; memakai fallback struktural index %d" % boundary
+    )
+    return boundary
+
+
+def find_heading(children, ns, *, style=None, text_contains=None):
+    """Pemindaian awal->akhir; kembalikan indeks heading pertama yang cocok.
+
+    - `style`: bila diberikan, paragraf wajib ber-`pStyle` sama (case-insensitive).
+    - `text_contains`: bila diberikan, teks paragraf (ternormalisasi spasi, trim,
+      case-insensitive) wajib memuat substring ini.
+    Mengembalikan -1 bila tak ada yang cocok, atau bila tidak ada kriteria yang
+    diberikan (`style` dan `text_contains` keduanya None).
+    """
+    if style is None and text_contains is None:
+        return -1
+    target = re.sub(r"\s+", " ", text_contains).strip().lower() if text_contains else None
+    for idx, p in enumerate(children):
+        if style is not None:
+            p_style = _paragraph_style(p, ns)
+            if p_style is None or p_style.lower() != style.lower():
+                continue
+        if target is not None:
+            txt = re.sub(r"\s+", " ", _paragraph_text(p, ns)).strip().lower()
+            if target not in txt:
+                continue
+        return idx
+    return -1
+
+
+# ---------------------------------------------------------------------------
+# Task 5.1 (R6.1-6.5): reference rewriter dari registri kapsi.
+# ---------------------------------------------------------------------------
+
+# Penyebutan referensi silang 'Gambar X.Y' / 'Tabel X.Y' pada narasi.
+_REFERENCE_PATTERN = re.compile(
+    r"\b(Gambar|Tabel)\s+([0-9]+(?:\.[0-9]+)*)\b", re.IGNORECASE
+)
+
+
+def rewrite_references(text, fig_remap, tbl_remap):
+    """Tulis ulang semua 'Gambar X.Y' / 'Tabel X.Y' pada `text` memakai peta
+    yang DITURUNKAN dari `CaptionRegistry` (`fig_remap`/`tbl_remap`), R6.1-R6.3.
+
+    Per kemunculan:
+      - padanan unik (nilai berupa string 'C.k') -> ganti ke nomor baru pada
+        SEMUA kemunculan, termasuk yang berulang (R6.1, R6.3).
+      - tanpa padanan di peta -> pertahankan teks asli + tambahkan peringatan
+        yang menyebut teks referensi & nomornya (R6.4).
+      - ambigu (`is_ambiguous(value)` True; nilai instance AMBIGUOUS dengan
+        atribut `.candidates`) -> pertahankan teks asli + peringatan berisi
+        daftar nomor kandidat (R6.5).
+
+    Mengembalikan `(new_text, warnings)`; `warnings` adalah list[str].
+    """
+    warnings = []
+    if not text:
+        return text, warnings
+
+    def _repl(m):
+        label_raw = m.group(1)
+        old_number = m.group(2)
+        is_fig = label_raw.lower() == "gambar"
+        label = "Gambar" if is_fig else "Tabel"
+        remap = fig_remap if is_fig else tbl_remap
+        original = m.group(0)
+        if not remap or old_number not in remap:
+            warnings.append(
+                "Referensi '%s %s' tidak memiliki padanan kapsi; teks dipertahankan."
+                % (label, old_number)
+            )
+            return original
+        target = remap[old_number]
+        if is_ambiguous(target):
+            candidates = ", ".join(sorted(target.candidates))
+            warnings.append(
+                "Referensi '%s %s' ambigu (kandidat: %s); teks dipertahankan."
+                % (label, old_number, candidates)
+            )
+            return original
+        return "%s %s" % (label, target)
+
+    new_text = _REFERENCE_PATTERN.sub(_repl, text)
+    return new_text, warnings
+
+
 # Official element order from OOXML schemas
 PPR_ORDER = [
     'pStyle', 'keepNext', 'keepLines', 'pageBreakBefore', 'framePr', 
@@ -960,7 +1301,42 @@ def format_document_xmls(unpacked_dir):
                         children = list(body)
                         print(f"  Moved table caption '{txt_after}' above the table.")
             i += 1
-            
+
+        # 1b. Move figure captions to sit immediately after their figure when a
+        # single narrative paragraph separates them: [drawing][narasi][kapsi] ->
+        # [drawing][kapsi][narasi]. This is a GENERAL structural rule (analogous
+        # to the table-caption move above) with no hardcoded caption text. It
+        # restores figure/caption adjacency for figures whose drawing was anchored
+        # to a narrative paragraph during the merge (e.g. survey charts), so the
+        # caption is immediately preceded by its drawing.
+        children = list(body)
+        i = 2
+        while i < len(children):
+            cap = children[i]
+            if cap.tag.endswith('p'):
+                cap_text = "".join(t.text for t in cap.iter(f'{{{ns_uri}}}t') if t.text).strip()
+                cap_style = _paragraph_style(cap, namespaces) or ""
+                is_fig_caption = (cap_style == 'Caption' and cap_text.lower().startswith('gambar')) \
+                    or re.match(r'^Gambar\s+[0-9]', cap_text, re.IGNORECASE)
+                if is_fig_caption:
+                    prev = children[i - 1]
+                    prev2 = children[i - 2]
+                    prev_is_p = prev.tag.endswith('p')
+                    prev2_is_drawing = prev2.tag.endswith('p') and prev2.find('.//w:drawing', namespaces) is not None
+                    prev_is_drawing = prev_is_p and prev.find('.//w:drawing', namespaces) is not None
+                    prev_style = _paragraph_style(prev, namespaces) or "" if prev_is_p else ""
+                    prev_text = "".join(t.text for t in prev.iter(f'{{{ns_uri}}}t') if t.text).strip() if prev_is_p else ""
+                    prev_is_caption = bool(re.match(r'^(Gambar|Tabel)\s+[0-9]', prev_text, re.IGNORECASE)) or prev_style == 'Caption'
+                    prev_is_heading = prev_style.startswith('Heading')
+                    # Only reposition the specific [drawing][narrative][caption] pattern.
+                    if (not prev_is_drawing) and prev2_is_drawing and prev_is_p \
+                            and not prev_is_caption and not prev_is_heading:
+                        body.remove(cap)
+                        body.insert(i - 1, cap)
+                        children = list(body)
+                        print(f"  Moved figure caption '{cap_text[:50]}' to follow its figure.")
+            i += 1
+
         # 2. Move figure captions below figures (Disabled: causing reordering issues; all figures are already placed correctly above captions)
         # i = 0
         # while i < len(children):
@@ -1032,72 +1408,13 @@ def format_document_xmls(unpacked_dir):
                             continue
             i += 1
             
-        # 3. Update existing figure references and captions to their new numbers (to avoid double-matching new captions)
-        def ref_repl(match):
-            val = match.group(1)
-            if val == 'x':
-                return 'Gambar 2.15'
-            try:
-                num = int(val)
-                if num == 1:
-                    return 'Gambar 2.9'
-                elif num == 2:
-                    return 'Gambar 2.10'
-                elif num == 3:
-                    return 'Gambar 2.17'
-                elif num == 4:
-                    return 'Gambar 2.11'
-                elif num == 5:
-                    return 'Gambar 2.12'
-                elif num == 6:
-                    return 'Gambar 2.13'
-                elif num == 7:
-                    return 'Gambar 2.14'
-                elif num == 8:
-                    return 'Gambar 2.15'
-                elif num == 9:
-                    return 'Gambar 2.16'
-                elif 10 <= num <= 21:
-                    return f'Gambar 2.{num + 8}'
-                elif num == 22:
-                    return 'Gambar 2.8'
-            except ValueError:
-                pass
-            return match.group(0)
-            
-        for t_elem in root.iter(f'{{{ns_uri}}}t'):
-            if t_elem.text:
-                new_text = re.sub(r'Gambar\s+2\.([0-9]+|x)\b', ref_repl, t_elem.text)
-                if new_text != t_elem.text:
-                    t_elem.text = new_text
-                    
-        # 4. Generate new captions for uncaptioned drawings and reconstruct body
+        # 4. Reconstruct body (reference rewriting is deferred to Fase 2 after the
+        #    chapter-aware caption pass has built the caption registry).
         reconstructed_children = []
-        fig_counter = 0
-        survey_captions = [
-            "Hasil Kuesioner: Profil Status Akademik Responden",
-            "Hasil Kuesioner: Efektivitas Media Navigasi Kampus Saat Ini",
-            "Hasil Kuesioner: Frekuensi Kesulitan Menemukan Lokasi",
-            "Hasil Kuesioner: Perilaku Pengguna Saat Mencari Lokasi",
-            "Hasil Kuesioner: Urgensi Kebutuhan Peta Virtual 3D",
-            "Hasil Kuesioner: Potensi Adopsi Denah Virtual 3D",
-            "Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus"
-        ]
-        survey_idx = 0
         current_section_title = ""
-        
-        bab1_idx_orig = -1
-        for idx, child in enumerate(children):
-            if child.tag.endswith('p'):
-                pPr = child.find('w:pPr', namespaces)
-                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
-                pStyle_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
-                text = "".join([t.text for t in child.iter(f'{{{ns_uri}}}t') if t.text])
-                if pStyle_val == 'Heading1' and 'PENDAHULUAN' in text.upper():
-                    bab1_idx_orig = idx
-                    break
-        if bab1_idx_orig == -1:
-            bab1_idx_orig = 60
+
+        # Fase 0 (R5.2-5.5): batas front matter dinamis, mengganti konstanta 60.
+        bab1_idx_orig = find_front_matter_boundary(children, namespaces)
             
         def create_caption_paragraph_local(label, prefix, seq_name, default_val, desc, bookmark_id, bookmark_name):
             p = lxml.etree.Element(f'{{{ns_uri}}}p')
@@ -1245,55 +1562,11 @@ def format_document_xmls(unpacked_dir):
                 continue
                 
             if child.tag.endswith('p'):
-                pPr = child.find('w:pPr', namespaces)
-                pStyle_val = ""
-                if pPr is not None:
-                    pStyle = pPr.find('w:pStyle', namespaces)
-                    if pStyle is not None:
-                        pStyle_val = pStyle.get(f'{{{ns_uri}}}val')
-                
-                if pStyle_val and pStyle_val.startswith('Heading'):
-                    current_section_title = "".join(child.itertext()).strip()
-                    
-                has_drawing = child.find('.//w:drawing', namespaces) is not None
-                
-                if has_drawing:
-                    already_captioned = False
-                    if idx + 1 < len(children):
-                        next_child = children[idx + 1]
-                        if next_child.tag.endswith('p'):
-                            next_pPr = next_child.find('w:pPr', namespaces)
-                            next_pStyle = next_pPr.find('w:pStyle', namespaces) if next_pPr is not None else None
-                            next_pStyle_val = next_pStyle.get(f'{{{ns_uri}}}val') if next_pStyle is not None else ""
-                            next_text = "".join(next_child.itertext()).strip()
-                            if next_pStyle_val == 'Caption' or re.match(r'^Gambar\s+2\b', next_text, re.IGNORECASE):
-                                already_captioned = True
-                                
-                    if "Analisis Sistem yang Sedang Berjalan" in current_section_title and survey_idx < 7:
-                        reconstructed_children.append(child)
-                        if not already_captioned:
-                            bmid = 9000 + len(collected_captions) + survey_idx
-                            bmname = f"_TocGemini{bmid}"
-                            caption_p = create_caption_paragraph_local("Gambar", "2.", "Gambar_2.", survey_idx + 1, survey_captions[survey_idx], bmid, bmname)
-                            reconstructed_children.append(caption_p)
-                            print(f"  Generated survey caption Gambar 2.{survey_idx + 1}")
-                        else:
-                            print(f"  Survey caption for Gambar 2.{survey_idx + 1} already exists, skipping generation.")
-                        survey_idx += 1
-                    elif "Integrasi Backend dengan Unity" in current_section_title:
-                        reconstructed_children.append(child)
-                        if not already_captioned:
-                            bmid = 9000 + 100
-                            bmname = f"_TocGemini{bmid}"
-                            caption_p = create_caption_paragraph_local("Gambar", "2.", "Gambar_2.", 15, "Arsitektur Integrasi Sistem", bmid, bmname)
-                            reconstructed_children.append(caption_p)
-                            print("  Generated integration caption Gambar 2.15")
-                        else:
-                            print("  Integration caption Gambar 2.15 already exists, skipping generation.")
-                    else:
-                        reconstructed_children.append(child)
-                else:
-                    reconstructed_children.append(child)
+                # Aturan_Umum (R3.3): gambar tanpa baris kapsi di draf TIDAK dibuatkan
+                # kapsi maupun nomor. Tidak ada lagi injeksi survey_captions atau pemicu
+                # judul-seksi bernama; setiap paragraf dipertahankan apa adanya dan
+                # penomoran kapsi ditangani satu kali oleh Fase 1 (chapter-aware pass).
+                reconstructed_children.append(child)
             else:
                 reconstructed_children.append(child)
                 
@@ -1369,18 +1642,9 @@ def format_document_xmls(unpacked_dir):
                 curr = parent
             return False
             
-        # Find boundaries
-        bab1_idx = -1
-        for idx, child in enumerate(children):
-            if child.tag.endswith('p'):
-                pPr = child.find('w:pPr', namespaces)
-                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
-                pStyle_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
-                text = "".join([t.text for t in child.iter(f'{{{ns_uri}}}t') if t.text])
-                if pStyle_val == 'Heading1' and 'PENDAHULUAN' in text.upper():
-                    bab1_idx = idx
-                    break
-        section1_last_p_idx = bab1_idx - 1 if bab1_idx != -1 else 60
+        # Fase 0 (R5.2/R5.3): batas seksi dinamis tanpa indeks numerik tetap.
+        bab1_idx = find_front_matter_boundary(children, namespaces)
+        section1_last_p_idx = bab1_idx - 1
         
         daftar_pustaka_heading_idx = -1
         for idx, child in enumerate(children):
@@ -1393,8 +1657,82 @@ def format_document_xmls(unpacked_dir):
                         daftar_pustaka_heading_idx = idx
                         break
                         
-        gambar_idx = 1
-        gambar_seq_by_chap = {}  # chapter number -> running figure seq (BAB III+)
+        # ---- Fase 1 (R1, R2, R3.1, R3.3): chapter-aware caption pass tunggal ----
+        # Telusuri body dalam urutan baca SEKALI: lacak Nomor_Bab dari heading BAB
+        # (Heading1) via parse_chapter_number, lalu nomori tiap kapsi gambar/tabel
+        # per-bab memakai CaptionRegistry. Deskripsi diambil VERBATIM dari draf.
+        registry = CaptionRegistry()
+        current_chapter = None
+        for idx, child in enumerate(children):
+            if not child.tag.endswith('p'):
+                continue
+            p = child
+            if is_inside_table(p):
+                continue
+            pStyle_val = _paragraph_style(p, namespaces) or "Normal"
+            text_clean = _paragraph_text(p, namespaces).strip()
+            # Lacak Nomor_Bab dari heading BAB pembungkus (urutan baca).
+            if pStyle_val == 'Heading1':
+                chap = parse_chapter_number(text_clean)
+                if chap is not None:
+                    current_chapter = chap
+            # Hanya kapsi pada body Section 2 yang dinomori.
+            if idx <= section1_last_p_idx:
+                continue
+            parsed = parse_caption_text(text_clean)
+            if parsed is None:
+                continue
+            is_caption_para = (pStyle_val == 'Caption') or re.match(
+                r'^(Gambar|Tabel)\s+[0-9]+', text_clean, re.IGNORECASE)
+            if not is_caption_para:
+                continue
+            label, old_number, desc = parsed
+            chapter = current_chapter
+            if chapter is None:
+                # Fallback R1.7/R2.6: kapsi sebelum BAB pertama -> pakai 1 + peringatan.
+                chapter = 1
+                print("  [WARNING] Kapsi '%s' muncul sebelum heading BAB; memakai Nomor_Bab=1"
+                      % text_clean[:60])
+            if label == "Gambar":
+                new_number, k, _ = registry.next_figure(chapter, old_number)
+            else:
+                new_number, k, _ = registry.next_table(chapter, old_number)
+            # format_caption_paragraph_clean dipakai apa adanya: default_val=k -> kapsi
+            # pertama bab (k==1) memancarkan opsi restart SEQ "\r 1" (R1.4/R2.3).
+            format_caption_paragraph_clean(p, label, f"{chapter}.", label, k, desc, namespaces)
+            collected_captions.append({
+                "type": label,
+                "text": f"{label} {new_number} {desc}".strip(),
+                "page": estimated_page,
+            })
+
+        # ---- Fase 2 (R6): reference rewriter dari registri kapsi ----
+        # Tulis ulang penyebutan "Gambar X.Y"/"Tabel X.Y" pada narasi memakai peta
+        # yang DITURUNKAN dari registri Fase 1 (bukan tabel angka statis). Kapsi
+        # (pStyle 'Caption') dilewati karena sudah dinomori oleh Fase 1.
+        ref_warnings = []
+        for idx, child in enumerate(children):
+            if not child.tag.endswith('p'):
+                continue
+            p = child
+            if is_inside_table(p):
+                continue
+            if idx <= section1_last_p_idx:
+                continue
+            if (_paragraph_style(p, namespaces) or "Normal") == 'Caption':
+                continue
+            for t_elem in p.findall('.//w:t', namespaces):
+                if not t_elem.text:
+                    continue
+                new_text, warns = rewrite_references(
+                    t_elem.text, registry.fig_remap, registry.tbl_remap)
+                if new_text != t_elem.text:
+                    t_elem.text = new_text
+                if warns:
+                    ref_warnings.extend(warns)
+        for warn_msg in ref_warnings:
+            print("  [REF] %s" % warn_msg)
+
         for idx, child in enumerate(children):
             if child.tag.endswith('tbl'): continue
             if child.tag.endswith('sdt'):
@@ -1443,76 +1781,9 @@ def format_document_xmls(unpacked_dir):
                     p.append(new_r)
                     text = cleaned_text
                     
-                # Auto-detect captions and format them (only in body Section 2)
-                if is_section2:
-                    text_clean = text.strip()
-                    is_gambar_caption = (pStyle_val == 'Caption' and text_clean.lower().startswith('gambar')) or re.match(r'^Gambar\s+[0-9]+', text_clean, re.IGNORECASE)
-                    is_tabel_caption = (pStyle_val == 'Caption' and text_clean.lower().startswith('tabel')) or re.match(r'^Tabel\s+[0-9]+', text_clean, re.IGNORECASE)
-                    
-                    if is_gambar_caption:
-                        # Parse the chapter number from the source caption so
-                        # figures restart per chapter (BAB II -> 2.x, BAB III -> 3.x).
-                        m = re.match(r'^Gambar\s+([0-9]+)(?:\.[0-9]+)*\.?\s*(.*)$', text_clean, re.IGNORECASE)
-                        src_chap = int(m.group(1)) if m else 2
-                        desc = m.group(2) if m else text_clean
+                # Caption renumbering & reference rewriting handled by Fase 1/Fase 2
+                # above (chapter-aware pass + registry-derived reference rewriter).
 
-                        if src_chap >= 3:
-                            # Chapter-aware numbering for BAB III and beyond
-                            # (e.g. implementation figures). A per-chapter counter
-                            # drives a SEQ restart (\r 1) on the first figure of the
-                            # chapter so it renders as "Gambar 3.1", "Gambar 3.2", ...
-                            seq_val = gambar_seq_by_chap.get(src_chap, 0) + 1
-                            gambar_seq_by_chap[src_chap] = seq_val
-                            format_caption_paragraph_clean(p, "Gambar", f"{src_chap}.", "Gambar", seq_val, desc, namespaces)
-                            new_caption_text = f"Gambar {src_chap}.{seq_val} {desc}"
-                        else:
-                            # BAB II: keep the existing sequential renumbering
-                            # (source numbers there are placeholders/reshuffled).
-                            format_caption_paragraph_clean(p, "Gambar", "2.", "Gambar", gambar_idx, desc, namespaces)
-                            new_caption_text = f"Gambar 2.{gambar_idx} {desc}"
-                            gambar_idx += 1
-
-                        collected_captions.append({
-                            "type": "Gambar",
-                            "text": new_caption_text,
-                            "page": estimated_page
-                        })
-                        text = new_caption_text
-                        
-                    elif is_tabel_caption:
-                        m = re.match(r'^Tabel\s+([0-9]+(?:\.[0-9]+)*)\.?\s*(.*)$', text_clean, re.IGNORECASE)
-                        if m:
-                            num_part = m.group(1)
-                            desc = m.group(2)
-                            parts = num_part.split('.')
-                            if len(parts) >= 2:
-                                chap_num = parts[0]
-                                seq_val = int(parts[1])
-                            else:
-                                chap_num = "2"
-                                seq_val = int(parts[0])
-                            
-                            format_caption_paragraph_clean(p, "Tabel", f"{chap_num}.", "Tabel", seq_val, desc, namespaces)
-                            cleaned_caption = f"Tabel {chap_num}.{seq_val} {desc}"
-                            text = cleaned_caption
-                            
-                        collected_captions.append({
-                            "type": "Tabel",
-                            "text": text,
-                            "page": estimated_page
-                        })
-                        
-                    elif "Gambar 2." in text or "Gambar 3." in text:
-                        new_text = replace_mentions_in_paragraph(text)
-                        if new_text != text:
-                            t_elems = p.findall('.//w:t', namespaces)
-                            if t_elems:
-                                t_elems[0].text = new_text
-                                t_elems[0].set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-                                for t in t_elems[1:]:
-                                    t.text = ""
-                            text = new_text
-                    
                 # Format Headings
                 if pStyle_val == 'Heading1':
                     text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text]).strip()

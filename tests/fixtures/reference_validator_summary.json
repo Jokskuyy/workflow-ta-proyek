@@ -1,0 +1,22 @@
+{
+  "exit_code": 0,
+  "success": true,
+  "success_marker_present": true,
+  "failed_marker_present": false,
+  "error_count": 0,
+  "error_lines": [],
+  "warn_count": 10,
+  "warn_lines": [
+    "[WARN][narration] Gambar 2.1 has no referencing narrative paragraph",
+    "[WARN][narration] Gambar 2.2 has no referencing narrative paragraph",
+    "[WARN][narration] Gambar 2.3 has no referencing narrative paragraph",
+    "[WARN][narration] Gambar 2.4 has no referencing narrative paragraph",
+    "[WARN][narration] Gambar 2.5 has no referencing narrative paragraph",
+    "[WARN][narration] Gambar 2.6 has no referencing narrative paragraph",
+    "[WARN][narration] Gambar 2.7 has no referencing narrative paragraph",
+    "[WARN][sitasi] Paragraf Latar Belakang tanpa sitasi: 'Perkembangan transformasi digital telah mendorong institusi pendidikan...'",
+    "[WARN][sitasi] Paragraf Latar Belakang tanpa sitasi: 'Kondisi tersebut relevan dengan permasalahan yang dihadapi oleh Univer...'",
+    "[WARN][sitasi] Paragraf Latar Belakang tanpa sitasi: 'Dengan demikian, urgensi pengembangan sistem tidak hanya didasarkan pa...'"
+  ],
+  "source": "Tugas_Akhir_Formatted.docx"
+}

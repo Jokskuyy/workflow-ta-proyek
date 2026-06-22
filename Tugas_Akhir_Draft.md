@@ -202,17 +202,31 @@ Berdasarkan hasil kuesioner yang telah disebarkan kepada 21 responden, diperoleh
 
 Mayoritas responden merupakan sivitas akademika UPNVJ, yaitu sebesar 95,2%, sedangkan sisanya merupakan pengunjung eksternal. Hal ini menunjukkan bahwa data yang diperoleh cukup merepresentasikan pengalaman pengguna utama yang beraktivitas di lingkungan kampus secara rutin.
 
+Gambar 2.23 Hasil Kuesioner: Profil Status Akademik Responden
+
 Dari aspek efektivitas media navigasi yang tersedia, diperoleh bahwa persepsi responden terhadap papan penunjuk arah dan denah statis cenderung berada pada kategori cukup hingga kurang informatif. Hal ini terlihat dari distribusi jawaban yang menunjukkan bahwa hanya sebagian kecil responden yang menilai sistem navigasi saat ini sangat membantu, sementara sebagian lainnya masih merasakan keterbatasan dalam memahami informasi yang disajikan.
+
+Gambar 2.24 Hasil Kuesioner: Efektivitas Media Navigasi Kampus Saat Ini
 
 Lebih lanjut, dalam satu semester terakhir, sebanyak 57,1% responden mengaku mengalami kesulitan menemukan lokasi sebanyak 1–3 kali, sementara 33,3% menyatakan tidak pernah mengalami kesulitan. Namun demikian, terdapat juga responden yang mengalami kesulitan lebih dari 3 kali, yang menunjukkan bahwa permasalahan navigasi masih terjadi secara berulang bagi sebagian pengguna.
 
+Gambar 2.25 Hasil Kuesioner: Frekuensi Kesulitan Menemukan Lokasi
+
 Dari sisi perilaku pengguna dalam mencari informasi lokasi, sebanyak 90,5% responden menyatakan bahwa mereka lebih mengandalkan bantuan orang lain, seperti bertanya kepada mahasiswa lain atau petugas kampus, dibandingkan menggunakan media navigasi yang tersedia. Hal ini mengindikasikan bahwa sistem navigasi yang ada belum mampu menjadi sumber informasi utama yang efektif.
+
+Gambar 2.26 Hasil Kuesioner: Perilaku Pengguna Saat Mencari Lokasi
 
 Terkait kebutuhan akan sistem yang lebih baik, mayoritas responden menyatakan bahwa keberadaan sistem peta virtual 3D interaktif yang terintegrasi dengan informasi fasilitas merupakan hal yang penting. Sebanyak 76,2% responden memberikan penilaian tinggi (skala 4 dan 5) terhadap pentingnya sistem tersebut, yang menunjukkan adanya kebutuhan yang signifikan terhadap solusi berbasis teknologi yang lebih interaktif.
 
+Gambar 2.27 Hasil Kuesioner: Urgensi Kebutuhan Peta Virtual 3D
+
 Selain itu, dalam hal potensi penggunaan, sebanyak 61,9% responden menyatakan akan menggunakan sistem denah virtual 3D ketika membutuhkan pencarian lokasi tertentu, sementara sebagian lainnya menyatakan akan menggunakan dalam kondisi tertentu atau jarang. Hal ini menunjukkan bahwa sistem yang diusulkan memiliki potensi adopsi yang baik, terutama dalam situasi yang membutuhkan orientasi lokasi.
 
+Gambar 2.28 Hasil Kuesioner: Potensi Adopsi Denah Virtual 3D
+
 Dari aspek kebutuhan informasi, responden juga menunjukkan bahwa informasi yang paling penting untuk ditampilkan dalam sistem adalah nama gedung (95,2%), diikuti oleh fasilitas dalam ruangan (52,4%) dan kapasitas ruangan (38,1%). Temuan ini menjadi dasar dalam menentukan jenis data yang perlu disediakan oleh backend dan ditampilkan dalam sistem visualisasi.
+
+Gambar 2.29 Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus
 
 Berdasarkan keseluruhan hasil kuesioner tersebut, dapat disimpulkan bahwa terdapat kebutuhan nyata terhadap sistem navigasi kampus yang lebih interaktif, terintegrasi, dan berbasis data dinamis. Temuan ini memperkuat urgensi pengembangan sistem integrasi denah virtual berbasis 3D yang didukung oleh backend sebagai pusat distribusi data.
 
