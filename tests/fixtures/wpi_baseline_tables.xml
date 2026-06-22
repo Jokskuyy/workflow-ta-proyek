@@ -1,0 +1,2268 @@
+<w:tables xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:tbl xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:cx="http://schemas.microsoft.com/office/drawing/2014/chartex" xmlns:cx1="http://schemas.microsoft.com/office/drawing/2015/9/8/chartex" xmlns:cx2="http://schemas.microsoft.com/office/drawing/2015/10/21/chartex" xmlns:cx3="http://schemas.microsoft.com/office/drawing/2016/5/9/chartex" xmlns:cx4="http://schemas.microsoft.com/office/drawing/2016/5/10/chartex" xmlns:cx5="http://schemas.microsoft.com/office/drawing/2016/5/11/chartex" xmlns:cx6="http://schemas.microsoft.com/office/drawing/2016/5/12/chartex" xmlns:cx7="http://schemas.microsoft.com/office/drawing/2016/5/13/chartex" xmlns:cx8="http://schemas.microsoft.com/office/drawing/2016/5/14/chartex" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:aink="http://schemas.microsoft.com/office/drawing/2016/ink" xmlns:am3d="http://schemas.microsoft.com/office/drawing/2017/model3d" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:oel="http://schemas.microsoft.com/office/2019/extlst" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml" xmlns:w16cex="http://schemas.microsoft.com/office/word/2018/wordml/cex" xmlns:w16cid="http://schemas.microsoft.com/office/word/2016/wordml/cid" xmlns:w16="http://schemas.microsoft.com/office/word/2018/wordml" xmlns:w16du="http://schemas.microsoft.com/office/word/2023/wordml/word16du" xmlns:w16sdtdh="http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash" xmlns:w16sdtfl="http://schemas.microsoft.com/office/word/2024/wordml/sdtformatlock" xmlns:w16se="http://schemas.microsoft.com/office/word/2015/wordml/symex" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">
+    <w:tblPr>
+      <w:tblStyle w:val="TableGrid"/>
+      <w:tblW w:w="0" w:type="auto"/>
+      <w:jc w:val="center"/>
+      <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/>
+    </w:tblPr>
+    <w:tblGrid>
+      <w:gridCol w:w="1868"/>
+      <w:gridCol w:w="6059"/>
+    </w:tblGrid>
+    <w:tr w:rsidR="0026713E" w14:paraId="2C9AD943" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:tblHeader/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="691789A6" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Role</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="4708831D" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Tugas dan Tanggung Jawab</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="57D89576" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="4B8D9E21" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>3D Designer</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="12F83A13" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Merancang dan memproduksi aset visual tiga dimensi lingkungan kampus, termasuk pemodelan gedung dan elemen pendukung, serta melakukan optimasi aset agar sesuai untuk digunakan pada lingkungan visualisasi 3D interaktif.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="569DD35D" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="2AEAB04D" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:lastRenderedPageBreak/>
+            <w:t>3D Simulator / Engine Developer</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="087A4B0C" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Mengembangkan engine visualisasi 3D interaktif sebagai modul navigasi spasial, termasuk pengelolaan scene, interaksi pengguna, optimasi performa, serta integrasi data satu arah dari API ke dalam lingkungan visualisasi 3D.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="1E68FD6A" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="7FC285FA" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Full Stack Developer (Dashboard Profile)</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="649AB6F0" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Merancang dan mengimplementasikan arsitektur backend dan frontend sistem, meliputi pengembangan database, RESTful API, dashboard publik, dan dashboard administrator untuk pengelolaan serta penyajian data profil kampus.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+  </w:tbl>
+  <w:tbl xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:cx="http://schemas.microsoft.com/office/drawing/2014/chartex" xmlns:cx1="http://schemas.microsoft.com/office/drawing/2015/9/8/chartex" xmlns:cx2="http://schemas.microsoft.com/office/drawing/2015/10/21/chartex" xmlns:cx3="http://schemas.microsoft.com/office/drawing/2016/5/9/chartex" xmlns:cx4="http://schemas.microsoft.com/office/drawing/2016/5/10/chartex" xmlns:cx5="http://schemas.microsoft.com/office/drawing/2016/5/11/chartex" xmlns:cx6="http://schemas.microsoft.com/office/drawing/2016/5/12/chartex" xmlns:cx7="http://schemas.microsoft.com/office/drawing/2016/5/13/chartex" xmlns:cx8="http://schemas.microsoft.com/office/drawing/2016/5/14/chartex" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:aink="http://schemas.microsoft.com/office/drawing/2016/ink" xmlns:am3d="http://schemas.microsoft.com/office/drawing/2017/model3d" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:oel="http://schemas.microsoft.com/office/2019/extlst" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml" xmlns:w16cex="http://schemas.microsoft.com/office/word/2018/wordml/cex" xmlns:w16cid="http://schemas.microsoft.com/office/word/2016/wordml/cid" xmlns:w16="http://schemas.microsoft.com/office/word/2018/wordml" xmlns:w16du="http://schemas.microsoft.com/office/word/2023/wordml/word16du" xmlns:w16sdtdh="http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash" xmlns:w16sdtfl="http://schemas.microsoft.com/office/word/2024/wordml/sdtformatlock" xmlns:w16se="http://schemas.microsoft.com/office/word/2015/wordml/symex" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">
+    <w:tblPr>
+      <w:tblStyle w:val="TableGrid"/>
+      <w:tblW w:w="0" w:type="auto"/>
+      <w:jc w:val="center"/>
+      <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/>
+    </w:tblPr>
+    <w:tblGrid>
+      <w:gridCol w:w="3438"/>
+      <w:gridCol w:w="897"/>
+      <w:gridCol w:w="898"/>
+      <w:gridCol w:w="898"/>
+      <w:gridCol w:w="898"/>
+      <w:gridCol w:w="898"/>
+    </w:tblGrid>
+    <w:tr w:rsidR="0026713E" w14:paraId="756959BF" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:tblHeader/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="3500" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="5A2B9AFF" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Aktivitas</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="55E621DF" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Bulan 1</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="78AE3DCD" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Bulan 2</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="4F85E0DA" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Bulan 3</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="5E0FDCF1" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Bulan 4</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="219BE9E9" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Bulan 5</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="72AB913B" w14:textId="77777777">
+      <w:trPr>
+        <w:gridAfter w:val="1"/>
+        <w:wAfter w:w="900" w:type="dxa"/>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="3500" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="65A4E6E0" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Desain Arsitektur &amp; UI</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="023A0E33" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="083F6072" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="0263A573" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="43CEE171" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="048556E8" w14:textId="77777777">
+      <w:trPr>
+        <w:gridAfter w:val="1"/>
+        <w:wAfter w:w="900" w:type="dxa"/>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="3500" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="3AEF84F0" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Pengembangan Backend</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="11CBB273" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="4E898F49" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="0E4AD57D" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="67ECDA73" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="18A68630" w14:textId="77777777">
+      <w:trPr>
+        <w:gridAfter w:val="1"/>
+        <w:wAfter w:w="900" w:type="dxa"/>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="3500" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="0A63AFB1" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Pengembangan Frontend</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="2D57CFA0" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="1CC4FB0E" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="4BDFF7F7" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="6A389B31" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="09D3533F" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="3500" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="47769BAE" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Integrasi dan Pengujian Sistem</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="2C3F3D8D" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="11290DD0" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="6F0391E4" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="7700D3E8" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="75CE63B0" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="72100F82" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="3500" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="0B2D588E" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Revisi Final &amp; Penulisan Laporan</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="65AAE9B2" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="68D42EA6" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="2F0E801B" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="5A555191" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="0026713E">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="162705A4" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="0B544EB1" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="3500" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="6D2FF180" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Dokumentasi</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="63509E54" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="26D6ECD6" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="1E488BEF" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="602D2085" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="900" w:type="dxa"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="3E458035" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:t>X</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+  </w:tbl>
+  <w:tbl xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:cx="http://schemas.microsoft.com/office/drawing/2014/chartex" xmlns:cx1="http://schemas.microsoft.com/office/drawing/2015/9/8/chartex" xmlns:cx2="http://schemas.microsoft.com/office/drawing/2015/10/21/chartex" xmlns:cx3="http://schemas.microsoft.com/office/drawing/2016/5/9/chartex" xmlns:cx4="http://schemas.microsoft.com/office/drawing/2016/5/10/chartex" xmlns:cx5="http://schemas.microsoft.com/office/drawing/2016/5/11/chartex" xmlns:cx6="http://schemas.microsoft.com/office/drawing/2016/5/12/chartex" xmlns:cx7="http://schemas.microsoft.com/office/drawing/2016/5/13/chartex" xmlns:cx8="http://schemas.microsoft.com/office/drawing/2016/5/14/chartex" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:aink="http://schemas.microsoft.com/office/drawing/2016/ink" xmlns:am3d="http://schemas.microsoft.com/office/drawing/2017/model3d" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:oel="http://schemas.microsoft.com/office/2019/extlst" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml" xmlns:w16cex="http://schemas.microsoft.com/office/word/2018/wordml/cex" xmlns:w16cid="http://schemas.microsoft.com/office/word/2016/wordml/cid" xmlns:w16="http://schemas.microsoft.com/office/word/2018/wordml" xmlns:w16du="http://schemas.microsoft.com/office/word/2023/wordml/word16du" xmlns:w16sdtdh="http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash" xmlns:w16sdtfl="http://schemas.microsoft.com/office/word/2024/wordml/sdtformatlock" xmlns:w16se="http://schemas.microsoft.com/office/word/2015/wordml/symex" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">
+    <w:tblPr>
+      <w:tblStyle w:val="TableGrid"/>
+      <w:tblW w:w="0" w:type="auto"/>
+      <w:jc w:val="center"/>
+      <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/>
+    </w:tblPr>
+    <w:tblGrid>
+      <w:gridCol w:w="1641"/>
+      <w:gridCol w:w="3208"/>
+      <w:gridCol w:w="3078"/>
+    </w:tblGrid>
+    <w:tr w:rsidR="0026713E" w14:paraId="0C671C97" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:tblHeader/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="1F58C82F" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Entitas</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="2C047024" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Peran</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="414EF057" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Manfaat</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="3934AFF0" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="6AC07E4E" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>UPNVJ Kampus Pondok Labu</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="75BA720A" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>1. Menjadi objek utama dalam pengembangan dan implementasi sistem, khususnya dalam penyediaan data spasial (gedung dan fasilitas) serta data profil kampus.&lt;br&gt;2. Menyediakan lingkungan nyata (real-world environment) sebagai dasar observasi, analisis kebutuhan, serta validasi sistem yang dikembangkan.&lt;br&gt;3. Mendukung proses pengembangan melalui koordinasi dengan stakeholder terkait, seperti pihak pengelola teknologi informasi (UPA TIK).</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="0CB5E591" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>1. Mendapatkan solusi sistem navigasi kampus berbasis visualisasi 3D yang lebih interaktif dibandingkan metode konvensional.&lt;br&gt;2. Memperoleh platform dashboard profil kampus yang terintegrasi, sehingga penyajian informasi menjadi lebih terpusat dan mudah diakses.&lt;br&gt;3. Mendukung implementasi konsep Smart Campus melalui integrasi teknologi backend, dashboard web, dan visualisasi 3D.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="6D6F6131" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="354E4FDF" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Sivitas Akademika (Mahasiswa &amp; Tamu)</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="185AF502" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>1. Bertindak sebagai pengguna utama sistem (end-user) yang berinteraksi langsung dengan public dashboard dan denah virtual.&lt;br&gt;2. Menjadi sumber data kebutuhan sistem melalui kuesioner dan observasi pengalaman navigasi kampus.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="7475FCC7" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>1. Mempermudah proses pencarian lokasi di lingkungan kampus melalui sistem navigasi berbasis visualisasi 3D.&lt;br&gt;2. Meningkatkan kemudahan akses terhadap informasi kampus yang sebelumnya tersebar di berbagai platform.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="1ED690E9" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="64F07B3A" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:lastRenderedPageBreak/>
+            <w:t>Administrator Sistem (Staf Pengelola)</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="78B44598" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>1. Mengelola data konten kampus melalui admin dashboard, termasuk data fasilitas, gedung, dan profil.&lt;br&gt;2. Menjaga konsistensi dan keakuratan data yang digunakan oleh sistem.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="36DEDD24" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>1. Memperoleh sistem manajemen konten terpusat yang mempermudah pengelolaan data secara efisien.&lt;br&gt;2. Mendukung proses pembaruan informasi secara real-time tanpa perlu mengubah sistem secara keseluruhan.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+  </w:tbl>
+  <w:tbl xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:cx="http://schemas.microsoft.com/office/drawing/2014/chartex" xmlns:cx1="http://schemas.microsoft.com/office/drawing/2015/9/8/chartex" xmlns:cx2="http://schemas.microsoft.com/office/drawing/2015/10/21/chartex" xmlns:cx3="http://schemas.microsoft.com/office/drawing/2016/5/9/chartex" xmlns:cx4="http://schemas.microsoft.com/office/drawing/2016/5/10/chartex" xmlns:cx5="http://schemas.microsoft.com/office/drawing/2016/5/11/chartex" xmlns:cx6="http://schemas.microsoft.com/office/drawing/2016/5/12/chartex" xmlns:cx7="http://schemas.microsoft.com/office/drawing/2016/5/13/chartex" xmlns:cx8="http://schemas.microsoft.com/office/drawing/2016/5/14/chartex" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:aink="http://schemas.microsoft.com/office/drawing/2016/ink" xmlns:am3d="http://schemas.microsoft.com/office/drawing/2017/model3d" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:oel="http://schemas.microsoft.com/office/2019/extlst" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml" xmlns:w16cex="http://schemas.microsoft.com/office/word/2018/wordml/cex" xmlns:w16cid="http://schemas.microsoft.com/office/word/2016/wordml/cid" xmlns:w16="http://schemas.microsoft.com/office/word/2018/wordml" xmlns:w16du="http://schemas.microsoft.com/office/word/2023/wordml/word16du" xmlns:w16sdtdh="http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash" xmlns:w16sdtfl="http://schemas.microsoft.com/office/word/2024/wordml/sdtformatlock" xmlns:w16se="http://schemas.microsoft.com/office/word/2015/wordml/symex" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">
+    <w:tblPr>
+      <w:tblStyle w:val="TableGrid"/>
+      <w:tblW w:w="0" w:type="auto"/>
+      <w:jc w:val="center"/>
+      <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/>
+    </w:tblPr>
+    <w:tblGrid>
+      <w:gridCol w:w="1059"/>
+      <w:gridCol w:w="2011"/>
+      <w:gridCol w:w="3050"/>
+      <w:gridCol w:w="1807"/>
+    </w:tblGrid>
+    <w:tr w:rsidR="0026713E" w14:paraId="5EFEA841" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:tblHeader/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="6CB3933F" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Minggu ke-</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="4024BDA4" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Aktivitas Pengembangan</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="5C8C09D4" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Kontribusi Peran Full Stack</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="0361EE46" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Validasi User</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="428F8E1A" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="6A89A19F" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>1-4</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="3D0A5310" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Requirement Gathering &amp; UI Design</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="502161C8" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Menganalisis kebutuhan API, menyusun rancangan database ERD, merancang mockup Admin/Public Dashboard</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="2BB10EBF" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Disetujui Stakeholder (Asep Saeful Ridwan, S.Kom.)</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="3EE03A1B" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="184B57AF" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>5-8</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="1D6F9F0E" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Backend Development</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="5E35A4B1" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Membangun database PostgreSQL di Supabase, menerapkan aturan keamanan RLS, membuat RESTful API serverless</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="4AFBF484" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Lulus validasi uji koneksi DB</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="22E6E089" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="3B21E298" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:lastRenderedPageBreak/>
+            <w:t>9-12</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="1DFEB152" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Frontend Development</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="4EE550EF" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Memprogram komponen React SPA, mengintegrasikan Umami Analytics Proxy, menerapkan connection-aware</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="4E5EB8DD" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Antarmuka responsif di desktop</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="331D5F24" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="0E40B0FA" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>13-16</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="62D22C0D" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>System Integration</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="33F0E8A2" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Mengintegrasikan container Unity WebGL dengan React menggunakan react-unity-webgl, menguji bridge SendMessage</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="3C1956A2" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Navigasi terpemicu dari pencarian React</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="40CA2C4F" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="08D7BD33" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>17-20</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="57820E30" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Testing &amp; Evaluation</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="33673E46" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Melakukan pengujian performa Lighthouse, melakukan uji fungsionalitas Black Box, menyusun laporan Tugas Akhir</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="1ACCE06B" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>[TBD: Evaluasi UAT Selesai]</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+  </w:tbl>
+  <w:tbl xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:cx="http://schemas.microsoft.com/office/drawing/2014/chartex" xmlns:cx1="http://schemas.microsoft.com/office/drawing/2015/9/8/chartex" xmlns:cx2="http://schemas.microsoft.com/office/drawing/2015/10/21/chartex" xmlns:cx3="http://schemas.microsoft.com/office/drawing/2016/5/9/chartex" xmlns:cx4="http://schemas.microsoft.com/office/drawing/2016/5/10/chartex" xmlns:cx5="http://schemas.microsoft.com/office/drawing/2016/5/11/chartex" xmlns:cx6="http://schemas.microsoft.com/office/drawing/2016/5/12/chartex" xmlns:cx7="http://schemas.microsoft.com/office/drawing/2016/5/13/chartex" xmlns:cx8="http://schemas.microsoft.com/office/drawing/2016/5/14/chartex" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:aink="http://schemas.microsoft.com/office/drawing/2016/ink" xmlns:am3d="http://schemas.microsoft.com/office/drawing/2017/model3d" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:oel="http://schemas.microsoft.com/office/2019/extlst" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml" xmlns:w16cex="http://schemas.microsoft.com/office/word/2018/wordml/cex" xmlns:w16cid="http://schemas.microsoft.com/office/word/2016/wordml/cid" xmlns:w16="http://schemas.microsoft.com/office/word/2018/wordml" xmlns:w16du="http://schemas.microsoft.com/office/word/2023/wordml/word16du" xmlns:w16sdtdh="http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash" xmlns:w16sdtfl="http://schemas.microsoft.com/office/word/2024/wordml/sdtformatlock" xmlns:w16se="http://schemas.microsoft.com/office/word/2015/wordml/symex" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">
+    <w:tblPr>
+      <w:tblStyle w:val="TableGrid"/>
+      <w:tblW w:w="0" w:type="auto"/>
+      <w:jc w:val="center"/>
+      <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/>
+    </w:tblPr>
+    <w:tblGrid>
+      <w:gridCol w:w="696"/>
+      <w:gridCol w:w="1404"/>
+      <w:gridCol w:w="2312"/>
+      <w:gridCol w:w="2658"/>
+      <w:gridCol w:w="857"/>
+    </w:tblGrid>
+    <w:tr w:rsidR="0026713E" w14:paraId="7B568714" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:tblHeader/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="644A618A" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>ID Test</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="148CD4DC" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Fitur Uji</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="79CEBAB5" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Skenario Pengujian</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="0ADDBA34" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Hasil yang Diharapkan</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="773D0786" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Status</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="2466A990" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="4188FD95" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>BB-01</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="3F750596" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Login Admin</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="076417C6" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Memasukkan kredensial admin yang valid.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="25F0B6F6" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Administrator berhasil login dan masuk ke Admin Dashboard</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="1EA7BF68" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>[TBD]</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="6D2E7521" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="1183B64F" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>BB-02</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="04F5A2A2" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>CRUD Gedung</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="5E6CE197" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Menambahkan data gedung baru melalui modal form admin.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="1217354D" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Data tersimpan di Supabase dan unity_object_name terdaftar</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="1F647D7A" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>[TBD]</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="44E841D7" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="2A505B97" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:lastRenderedPageBreak/>
+            <w:t>BB-03</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="67D67935" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Keamanan RLS</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="29F4DFCA" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Mengakses endpoint POST /api/buildings secara anonim.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="323A13B0" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>API menolak request dengan status HTTP 401 Unauthorized</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="79120F77" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>[TBD]</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="304B8067" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="1D32A774" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>BB-04</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="3B4ED885" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Search Overlay</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="5AD535D0" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Mengetik kata kunci "Laboratorium" pada kotak pencarian React.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="407E620D" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Menampilkan daftar fasilitas laboratorium dengan ikon yang sesuai</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="4B845F5E" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>[TBD]</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="19922E9A" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="5B89AE6E" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>BB-05</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="4BF5A8F2" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Navigation Bridge</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="2A5F36D7" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Memilih lokasi tujuan pada pencarian React.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="21C7914D" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>React mengirimkan nama objek via SendMessage dan memicu rute 3D</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="001DFD7C" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>[TBD]</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="085663DD" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="18129866" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>BB-06</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="1C6D49B8" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Connection Check</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="27B1DA83" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Membuka halaman pada kondisi jaringan internet lambat (3G).</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="6D18A842" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Preload otomatis dilewati dan tombol aktivasi manual muncul</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="65FBCF8E" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>[TBD]</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+  </w:tbl>
+  <w:tbl xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:cx="http://schemas.microsoft.com/office/drawing/2014/chartex" xmlns:cx1="http://schemas.microsoft.com/office/drawing/2015/9/8/chartex" xmlns:cx2="http://schemas.microsoft.com/office/drawing/2015/10/21/chartex" xmlns:cx3="http://schemas.microsoft.com/office/drawing/2016/5/9/chartex" xmlns:cx4="http://schemas.microsoft.com/office/drawing/2016/5/10/chartex" xmlns:cx5="http://schemas.microsoft.com/office/drawing/2016/5/11/chartex" xmlns:cx6="http://schemas.microsoft.com/office/drawing/2016/5/12/chartex" xmlns:cx7="http://schemas.microsoft.com/office/drawing/2016/5/13/chartex" xmlns:cx8="http://schemas.microsoft.com/office/drawing/2016/5/14/chartex" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:aink="http://schemas.microsoft.com/office/drawing/2016/ink" xmlns:am3d="http://schemas.microsoft.com/office/drawing/2017/model3d" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:oel="http://schemas.microsoft.com/office/2019/extlst" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml" xmlns:w16cex="http://schemas.microsoft.com/office/word/2018/wordml/cex" xmlns:w16cid="http://schemas.microsoft.com/office/word/2016/wordml/cid" xmlns:w16="http://schemas.microsoft.com/office/word/2018/wordml" xmlns:w16du="http://schemas.microsoft.com/office/word/2023/wordml/word16du" xmlns:w16sdtdh="http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash" xmlns:w16sdtfl="http://schemas.microsoft.com/office/word/2024/wordml/sdtformatlock" xmlns:w16se="http://schemas.microsoft.com/office/word/2015/wordml/symex" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">
+    <w:tblPr>
+      <w:tblStyle w:val="TableGrid"/>
+      <w:tblW w:w="0" w:type="auto"/>
+      <w:jc w:val="center"/>
+      <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/>
+    </w:tblPr>
+    <w:tblGrid>
+      <w:gridCol w:w="1525"/>
+      <w:gridCol w:w="1583"/>
+      <w:gridCol w:w="4819"/>
+    </w:tblGrid>
+    <w:tr w:rsidR="0026713E" w14:paraId="56CBAD62" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:tblHeader/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="3AF14A67" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Kategori Audit</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="55C030F3" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Skor Metrik Awal (Baseline)</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+          <w:vAlign w:val="center"/>
+        </w:tcPr>
+        <w:p w14:paraId="4922CAD2" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="center"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr>
+              <w:b/>
+              <w:bCs/>
+            </w:rPr>
+            <w:t>Keterangan</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="4A2FED6E" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="5EC7734C" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Performance</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="249F1DA0" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>56/100</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="07405600" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Rendahnya skor disebabkan oleh ukuran asset WebGL (WASMBinary + Data) yang berkisar ~25MB, yang memblokir main thread browser saat proses dekompresi dan inisialisasi awal engine.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="71F31B5F" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="2BB46DFA" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:lastRenderedPageBreak/>
+            <w:t>Accessibility</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="43EBE191" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>93/100</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="4B395809" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Menunjukkan kepatuhan aksesibilitas yang sangat baik dengan penggunaan elemen HTML semantik dan atribut ARIA yang lengkap.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="1FC21912" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="166DFE01" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Best Practices</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="14B634D2" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>100/100</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="2D152891" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Menunjukkan kepatuhan sempurna terhadap standar keamanan web modern, HTTPS, dan tidak adanya API usang.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+    <w:tr w:rsidR="0026713E" w14:paraId="28E2DF5D" w14:textId="77777777">
+      <w:trPr>
+        <w:cantSplit/>
+        <w:jc w:val="center"/>
+      </w:trPr>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="74488B92" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>SEO</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="1E1F5D8C" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>92/100</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+      <w:tc>
+        <w:tcPr>
+          <w:tcW w:w="0" w:type="auto"/>
+        </w:tcPr>
+        <w:p w14:paraId="345480ED" w14:textId="77777777" w:rsidR="0026713E" w:rsidRDefault="001630E0">
+          <w:pPr>
+            <w:spacing w:before="60" w:after="60" w:line="240" w:lineRule="auto"/>
+            <w:jc w:val="left"/>
+          </w:pPr>
+          <w:r>
+            <w:t>Menunjukkan optimasi mesin pencari yang solid dengan metadata terstruktur dan struktur heading yang tepat.</w:t>
+          </w:r>
+        </w:p>
+      </w:tc>
+    </w:tr>
+  </w:tbl>
+</w:tables>

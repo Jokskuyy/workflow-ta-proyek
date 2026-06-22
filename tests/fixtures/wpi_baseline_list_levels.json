@@ -1,0 +1,2246 @@
+{
+  "source": "Tugas_Akhir_Formatted.docx",
+  "count": 320,
+  "list_levels": [
+    {
+      "p_index": 133,
+      "text": "1.Masih terdapat kesulitan bagi mahasiswa dan pengunjung dalam menemukan lokasi ",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 134,
+      "text": "2.Informasi profil kampus, seperti data fasilitas, akademik, dan aset, masih ter",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 135,
+      "text": "3.Belum tersedia media visualisasi berbasis 3D yang mampu merepresentasikan ling",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 136,
+      "text": "4.Belum terdapat sistem backend yang terpusat untuk mengelola dan menyediakan da",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 137,
+      "text": "5.Belum tersedia mekanisme integrasi antara backend dan engine visualisasi seper",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 140,
+      "text": "1.Pengembangan sistem difokuskan pada integrasi antara backend, dashboard berbas",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 141,
+      "text": "2.Cakupan area visualisasi dan data dibatasi pada lingkungan Kampus Universitas ",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 142,
+      "text": "3.Data profil kampus seperti statistik mahasiswa, dosen, dan akreditasi tidak di",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 143,
+      "text": "4.Pengembangan pada sisi backend difokuskan pada perancangan dan implementasi RE",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 144,
+      "text": "5.Sistem API yang dikembangkan mendukung penyediaan data publik serta manipulasi",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 145,
+      "text": "6.Pengembangan visualisasi 3D dibatasi pada pembuatan aset dan lingkungan virtua",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 146,
+      "text": "7.Pengembangan pada sisi Unity atau simulator difokuskan pada integrasi dengan b",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 147,
+      "text": "8.Sistem yang dikembangkan tidak mencakup integrasi real-time dengan seluruh sis",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 161,
+      "text": "1.Mengembangkan sistem navigasi spasial kampus berbasis visualisasi 3D interakti",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 162,
+      "text": "2.Menyediakan media informasi kampus yang intuitif, mudah diakses, dan interakti",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 163,
+      "text": "3.Mengintegrasikan informasi profil akademik, fasilitas, dan lingkungan kampus k",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 164,
+      "text": "4.Merancang dan mengimplementasikan sistem digital terintegrasi yang menggabungk",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 167,
+      "text": "1.Bagi sivitas akademika dan pengunjung, sistem integrasi denah virtual kampus d",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 168,
+      "text": "2.Bagi pihak manajemen dan pengelola fakultas, sistem ini menyediakan media info",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 169,
+      "text": "3.Bagi institusi UPNVJ secara keseluruhan, penelitian ini berkontribusi dalam me",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 213,
+      "text": "1.Desain Arsitektur & UI (Bulan 1): Tahap fondasi yang berfokus pada perancangan",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 214,
+      "text": "2.Pengembangan Backend (Bulan 2-3): Tahap implementasi kode sisi server, mencaku",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 215,
+      "text": "3.Pengembangan Frontend (Bulan 3-4): Tahap implementasi kode sisi klien, berfoku",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 216,
+      "text": "4.Integrasi dan Pengujian Sistem (Bulan 4-5): Tahap validasi di mana frontend da",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 217,
+      "text": "5.Revisi Final & Penulisan Laporan (Bulan 5): Alokasi waktu khusus untuk perbaik",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 218,
+      "text": "6.Dokumentasi (Bulan 1-5): Aktivitas ini akan dilakukan secara paralel sepanjang",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 221,
+      "text": "1.BAB I PENDAHULUAN: Memaparkan latar belakang masalah navigasi spasial, identif",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 222,
+      "text": "2.BAB II RANCANGAN PROYEK: Menguraikan hasil observasi sistem berjalan, usulan s",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 223,
+      "text": "3.BAB III IMPLEMENTASI PROYEK: Mendokumentasikan profil institusi mitra, metode ",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 224,
+      "text": "4.BAB IV PENUTUP: Menyajikan kesimpulan akhir dari hasil pengembangan sistem dan",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 235,
+      "text": "1.Keterbatasan Navigasi Spasial",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 236,
+      "text": "a.Media navigasi masih mengandalkan papan penunjuk arah dan denah statis.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 237,
+      "text": "b.Berdasarkan hasil kuesioner, mayoritas mahasiswa pernah mengalami kesulitan da",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 238,
+      "text": "c.Sistem yang ada belum mampu memberikan pengalaman navigasi yang interaktif dan",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 239,
+      "text": "2.Fragmentasi Informasi Kampus",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 240,
+      "text": "a.Data profil kampus seperti fasilitas, akademik, dan statistik tersedia, namun ",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 241,
+      "text": "b.Pengguna harus mengakses beberapa sumber secara terpisah untuk mendapatkan inf",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 242,
+      "text": "c.Hal ini menyebabkan inefisiensi dalam pencarian informasi.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 243,
+      "text": "3.Belum Tersedianya Visualisasi Interaktif",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 244,
+      "text": "a.Sistem yang ada belum menyediakan media visualisasi berbasis 3D yang dapat mem",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 245,
+      "text": "b.Keterbatasan ini berdampak pada rendahnya kemampuan pengguna dalam memahami hu",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 246,
+      "text": "4.Keterbatasan Arsitektur Backend",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 247,
+      "text": "a.Belum terdapat sistem backend terpusat yang menyediakan data melalui API secar",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 248,
+      "text": "b.Data belum dapat didistribus async ke berbagai komponen sistem seperti dashboa",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 249,
+      "text": "5.Kondisi Integrasi Data Eksisting",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 250,
+      "text": "a.Berdasarkan koordinasi dengan UPA TIK, sebagian data kampus telah dikelola dal",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 251,
+      "text": "b.Oleh karena itu, pendekatan integrasi melalui embed atau konsumsi data ekstern",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 279,
+      "text": "1.Aspek Navigasi Spasial",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 280,
+      "text": "a.Sistem yang ada saat ini mengandalkan media konvensional, yaitu papan penunjuk",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 281,
+      "text": "b.Kelemahan: Media ini bersifat pasif (tidak interaktif), dan sulit diperbarui. ",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 282,
+      "text": "2.Aspek Penyajian Data Profil (Lingkup Full Stack)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 283,
+      "text": "a.Sistem yang ada saat ini untuk penyajian data profil kampus (statistik, akredi",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 284,
+      "text": "b.Kelemahan: Tidak ada dashboard terpusat yang menyajikan data secara agregat da",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 287,
+      "text": "1.Peran 3D Asset Designer (Muhammad Dwikhi Deandra Purnianto) untuk visualisasi ",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 288,
+      "text": "2.Peran 3D Simulator & Engine Developer (Muammar Faiz Khairul Anam) untuk logika",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 289,
+      "text": "3.Peran Full Stack Developer & System Integrator (Muhammad Iman Nugraha) untuk m",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 298,
+      "text": "1.Pendekatan Berbasis API (Backend-Centric)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 299,
+      "text": "a.Backend berperan sebagai pusat distribusi data melalui REST API.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 300,
+      "text": "b.Data dapat diakses oleh berbagai komponen sistem secara konsisten, termasuk da",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 301,
+      "text": "2.Integrasi Multi-Platform",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 302,
+      "text": "a.Sistem menghubungkan dashboard berbasis web dengan visualisasi denah virtual b",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 303,
+      "text": "b.Data yang sama dapat disajikan dalam bentuk informasi tekstual dan visualisasi",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 304,
+      "text": "3.Penyajian Data Secara Dinamis",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 305,
+      "text": "a.Informasi kampus seperti fasilitas, gedung, dan statistik disajikan secara din",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 306,
+      "text": "b.Dashboard dan Unity tidak menggunakan data statis, melainkan data yang diambil",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 307,
+      "text": "4.Strategi Integrasi Data Eksisting",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 308,
+      "text": "a.Data tertentu seperti statistik dan akreditasi diperoleh melalui mekanisme emb",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 309,
+      "text": "b.Sistem tidak menggantikan sistem yang sudah ada, tetapi berfungsi sebagai laye",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 310,
+      "text": "5.Pendekatan Kolaboratif Multi-Role",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 311,
+      "text": "a.Sistem dikembangkan melalui kolaborasi antara 3D Asset Designer, Simulator/Eng",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 312,
+      "text": "b.Fokus utama penelitian ini berada pada pengembangan backend, dashboard web, da",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 317,
+      "text": "1.Integrasi Aset Visual",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 319,
+      "text": "2.Alur Pengguna Publik (User)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 321,
+      "text": "3.Alur Administrator (Admin)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 323,
+      "text": "4.Pusat Pertukaran Data",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 329,
+      "text": "1.Kebutuhan Fungsional Pengguna Publik (User)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 330,
+      "text": "a.Sistem harus dapat menyajikan data statistik lalu lintas website (tren harian ",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 331,
+      "text": "b.Sistem harus dapat menyajikan data profil kampus (akreditasi, fasilitas, aset)",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 332,
+      "text": "c.Sistem harus dapat menyajikan data terperinci saat kartu indikator aset atau i",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 333,
+      "text": "d.Sistem harus dapat menampilkan viewport Denah Virtual (yang diintegrasikan ole",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 334,
+      "text": "e.Sistem harus menyediakan toggle bahasa (Bahasa Indonesia ↔ English) dengan pen",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 335,
+      "text": "2.Kebutuhan Fungsional Administrator (Admin)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 336,
+      "text": "a.Sistem harus menyediakan halaman login yang aman (autentikasi JWT) untuk Admin",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 337,
+      "text": "b.Sistem harus dapat menampilkan widget analitik kunjungan.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 338,
+      "text": "c.Sistem harus menyediakan fungsionalitas CRUD (Create, Read, Update, Delete) un",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 339,
+      "text": "d.Sistem harus menampilkan pop-up konfirmasi modal sebelum operasi hapus dilakuk",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 340,
+      "text": "e.Sistem harus menampilkan riwayat audit logs dari perubahan data secara read-on",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 341,
+      "text": "3.Kebutuhan Fungsional Integrasi (API untuk 3D Engine)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 342,
+      "text": "a.Sistem harus menyediakan endpoint API `GET /api/unity/data` yang menyajikan da",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 343,
+      "text": "b.Sistem harus menyediakan endpoint API `GET /api/unity/names` yang menyajikan a",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 344,
+      "text": "c.API harus menyediakan data dalam format JSON yang terstruktur agar mudah di-pa",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 347,
+      "text": "1.Frontend Framework: React.js (Single Page Application via Vite)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 348,
+      "text": "a.Dipilih karena performa tinggi dalam memanipulasi DOM secara virtual (Virtual ",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 349,
+      "text": "b.Menangani integrasi container canvas Unity WebGL reaktif via `react-unity-webg",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 350,
+      "text": "2.Backend & Serverless API: Node.js (Express.js) + Vercel Serverless Functions",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 351,
+      "text": "a.Router Express.js menyediakan rute RESTful API yang bersih.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 352,
+      "text": "b.Dideploy secara terfragmentasi pada serverless functions Vercel untuk efisiens",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 353,
+      "text": "3.Database Management System (DBMS): PostgreSQL (Supabase Cloud BaaS)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 354,
+      "text": "a.PostgreSQL dipilih untuk integritas data relasional yang andal.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 355,
+      "text": "b.Supabase memfasilitasi hosting database cloud, JWT-based Supabase Auth, Row-Le",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 356,
+      "text": "4.Analytics Tracking Platform: Umami Analytics (Self-hosted via Docker)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 357,
+      "text": "a.Dipilih sebagai platform analitik yang ramah privasi (GDPR compliant) tanpa co",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 358,
+      "text": "b.Menggunakan Express.js proxy di port 3001 untuk mengamankan data collect metri",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 362,
+      "text": "1.Pengumpulan Kebutuhan (Requirement Gathering)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 364,
+      "text": "2.Membangun Prototyping Awal (Quick Design)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 366,
+      "text": "3.Evaluasi Prototipe (Evaluation & Testing)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 368,
+      "text": "4.Iterasi Perbaikan (Iteration)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 375,
+      "text": "1.Halaman Publik (Public Route)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 376,
+      "text": "a.Dashboard Utama (`/`): Menampilkan widget statistik lalu lintas website (grafi",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 377,
+      "text": "b.Pengaturan Bahasa: Toggle dinamis untuk memicu perubahan kamus bahasa lokal (I",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 378,
+      "text": "2.Halaman Administratif (Protected Route)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 379,
+      "text": "a.Login (`/login`): Form otentikasi administrator terproteksi JWT.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 380,
+      "text": "b.Admin Panel (`/admin`): Mengelola entitas database relasional dengan aksi CRUD",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 383,
+      "text": "1.Use Case Diagram",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 389,
+      "text": "2.Activity Diagram",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 395,
+      "text": "3.Sequence Diagram",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 396,
+      "text": "a.Autentikasi Admin: Memetakan proses login dari frontend React, pengiriman kred",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 397,
+      "text": "b.Sinkronisasi Data: Memetakan aliran pembaruan field `unity_object_name` dari A",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 404,
+      "text": "1.Keamanan Row-Level Security (RLS) Database",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 406,
+      "text": "a.Tabel publik (`gedung`, `fasilitas`, `fakultas`, `program_studi`) diberikan ke",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 407,
+      "text": "b.Kebijakan INSERT, UPDATE, dan DELETE diamankan secara database-level, hanya me",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 408,
+      "text": "2.Sistem Audit Logs Otomatis",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 409,
+      "text": "a.Merancang trigger basis data `log_data_mutation()` yang aktif setiap kali terj",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 410,
+      "text": "b.Trigger menyimpan metadata perubahan (nama tabel, jenis operasi, ID rekaman, U",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 411,
+      "text": "3.Reverse Proxy Umami Analytics",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 412,
+      "text": "a.Mengonfigurasi Express.js proxy server pada port 3001 untuk memotong request c",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 413,
+      "text": "b.Proxy menyembunyikan endpoint Umami Docker internal (port 3000) dan menyajikan",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 419,
+      "text": "1.Tabel `gedung`",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 421,
+      "text": "a.Atribut tabel terdiri atas:",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 422,
+      "text": "1)`id`: Tipe `SERIAL` bertindak sebagai Primary Key.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 423,
+      "text": "2)`nama_gedung`: Tipe `VARCHAR(255)`, bernilai unik (unique) dan tidak boleh kos",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 424,
+      "text": "3)`deskripsi_gedung`: Tipe `TEXT` untuk penjelasan detail gedung.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 425,
+      "text": "4)`lokasi`: Tipe `TEXT` untuk deskripsi letak fisik.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 426,
+      "text": "5)`jumlah_lantai`: Tipe `INT` dengan nilai default 1.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 427,
+      "text": "6)`foto_url`: Tipe `VARCHAR(255)` untuk menyimpan tautan gambar gedung.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 428,
+      "text": "7)`unity_object_name`: Tipe `TEXT` bersifat unik, berfungsi sebagai jembatan pen",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 429,
+      "text": "b.Relasi tabel:",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 430,
+      "text": "1)Berelasi One-to-Many dengan tabel `fasilitas` melalui foreign key `id_gedung`.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 431,
+      "text": "2)Berelasi One-to-One / Many-to-One dengan tabel `fakultas` melalui foreign key ",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 432,
+      "text": "2.Tabel `fasilitas`",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 434,
+      "text": "a.Atribut tabel terdiri atas:",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 435,
+      "text": "1)`id`: Tipe `SERIAL` bertindak sebagai Primary Key.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 436,
+      "text": "2)`nama_fasilitas`: Tipe `VARCHAR(255)` untuk nama fasilitas.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 437,
+      "text": "3)`deskripsi_fasilitas`: Tipe `TEXT` untuk penjelasan detail fasilitas.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 438,
+      "text": "4)`tipe_fasilitas`: Tipe `VARCHAR(100)` untuk klasifikasi jenis fasilitas.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 439,
+      "text": "5)`color`: Tipe `VARCHAR(50)` dengan default 'gray' untuk penanda warna visual p",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 440,
+      "text": "6)`lantai`: Tipe `INT` dengan default 1 untuk menunjukkan posisi lantai fasilita",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 441,
+      "text": "7)`foto_url`: Tipe `TEXT` untuk menyimpan tautan gambar fasilitas.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 442,
+      "text": "8)`id_gedung`: Tipe `INT` sebagai Foreign Key yang merujuk ke tabel `gedung` (ON",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 443,
+      "text": "9)`unity_object_name`: Tipe `TEXT` bersifat unik, berfungsi sebagai jembatan pen",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 444,
+      "text": "b.Relasi tabel: Merupakan tabel anak yang bergantung pada tabel `gedung`.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 445,
+      "text": "3.Tabel `fakultas`",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 447,
+      "text": "a.Atribut tabel terdiri atas:",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 448,
+      "text": "1)`id`: Tipe `SERIAL` bertindak sebagai Primary Key.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 449,
+      "text": "2)`nama_fakultas`: Tipe `VARCHAR(255)` bersifat unik dan tidak boleh kosong.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 450,
+      "text": "3)`deskripsi_fakultas`: Tipe `TEXT` untuk rincian profil fakultas.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 451,
+      "text": "4)`email`: Tipe `VARCHAR(255)` untuk kontak surat elektronik fakultas.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 452,
+      "text": "5)`website`: Tipe `VARCHAR(255)` untuk alamat web resmi fakultas.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 453,
+      "text": "6)`id_gedung_utama`: Tipe `INT` sebagai Foreign Key yang merujuk ke tabel `gedun",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 454,
+      "text": "b.Relasi tabel:",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 455,
+      "text": "1)Berelasi One-to-Many dengan tabel `program_studi` melalui foreign key `id_faku",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 456,
+      "text": "2)Berelasi Many-to-One dengan tabel `gedung` untuk menentukan gedung administras",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 457,
+      "text": "4.Tabel `program_studi`",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 459,
+      "text": "a.Atribut tabel terdiri atas:",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 460,
+      "text": "1)`id`: Tipe `SERIAL` bertindak sebagai Primary Key.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 461,
+      "text": "2)`nama_prodi`: Tipe `VARCHAR(255)` untuk nama program studi.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 462,
+      "text": "3)`jenjang`: Tipe `VARCHAR(10)` untuk tingkat pendidikan (D3/S1/S2/S3).",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 463,
+      "text": "4)`id_fakultas`: Tipe `INT` sebagai Foreign Key yang merujuk ke tabel `fakultas`",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 464,
+      "text": "5)`akreditasi`: Tipe `VARCHAR(50)` untuk peringkat akreditasi program studi.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 465,
+      "text": "b.Relasi tabel: Bergantung penuh pada tabel `fakultas` melalui foreign key `id_f",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 466,
+      "text": "5.Tabel `admin_users`",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 468,
+      "text": "a.Atribut tabel terdiri atas:",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 469,
+      "text": "1)`id`: Tipe `SERIAL` bertindak sebagai Primary Key.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 470,
+      "text": "2)`username`: Tipe `VARCHAR(100)` bersifat unik dan tidak boleh kosong.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 471,
+      "text": "3)`password_hash`: Tipe `TEXT` untuk menyimpan hash kata sandi yang terenkripsi.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 472,
+      "text": "4)`nama_lengkap`: Tipe `VARCHAR(255)` untuk nama lengkap administrator.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 473,
+      "text": "5)`role`: Tipe `VARCHAR(50)` dengan default 'admin'.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 474,
+      "text": "6)`created_at`: Tipe `TIMESTAMP` dengan default waktu saat data dibuat.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 475,
+      "text": "b.Relasi tabel: Tabel independen untuk kebutuhan autentikasi dan otorisasi.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 476,
+      "text": "6.Tabel `audit_logs`",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 478,
+      "text": "a.Atribut tabel terdiri atas:",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 479,
+      "text": "1)`id`: Tipe `BIGSERIAL` bertindak sebagai Primary Key.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 480,
+      "text": "2)`actor_id`: Tipe `UUID` untuk menyimpan ID admin yang melakukan aksi.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 481,
+      "text": "3)`actor_email`: Tipe `TEXT` untuk menyimpan email administrator.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 482,
+      "text": "4)`action`: Tipe `TEXT` untuk jenis operasi (INSERT/UPDATE/DELETE).",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 483,
+      "text": "5)`table_name`: Tipe `TEXT` untuk nama tabel yang mengalami mutasi.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 484,
+      "text": "6)`record_id`: Tipe `TEXT` untuk ID rekaman data yang diubah.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 485,
+      "text": "7)`old_data`: Tipe `JSONB` untuk menyimpan kondisi data lama sebelum diubah (ber",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 486,
+      "text": "8)`new_data`: Tipe `JSONB` untuk menyimpan kondisi data baru sesudah diubah (ber",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 487,
+      "text": "9)`created_at`: Tipe `TIMESTAMP` dengan default waktu mutasi tercatat.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 488,
+      "text": "b.Relasi tabel: Mencatat riwayat mutasi dari tabel-tabel utama secara transparan",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 489,
+      "text": "7.Tabel `web_analytics_log` (Legacy)",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 491,
+      "text": "a.Atribut tabel terdiri atas:",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 492,
+      "text": "1)`id`: Tipe `SERIAL` bertindak sebagai Primary Key.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 493,
+      "text": "2)`visitor_hash`: Tipe `VARCHAR(255)` untuk sidik jari unik browser pengunjung.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 494,
+      "text": "3)`page_path`: Tipe `VARCHAR(255)` untuk menyimpan path halaman yang diakses.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 495,
+      "text": "4)`device_type`: Tipe `VARCHAR(100)` untuk jenis perangkat yang digunakan.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 496,
+      "text": "5)`visited_at`: Tipe `TIMESTAMP` dengan default waktu kunjungan.",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 497,
+      "text": "b.Relasi tabel: Tabel mandiri yang mengumpulkan data analitik kunjungan.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 500,
+      "text": "1.Bagian Admin Dashboard",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 514,
+      "text": "2.Bagian Public Dashboard",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 531,
+      "text": "1.Validasi Koneksi Database: Menguji apakah RESTful API dapat terhubung secara l",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 532,
+      "text": "2.Pengujian Endpoint API: Melakukan tes terhadap endpoint publik (`/api/unity/da",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 533,
+      "text": "3.Pengujian Proteksi Autentikasi: Memastikan endpoint modifikasi data (POST/PUT/",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 536,
+      "text": "1.Pengujian fungsionalitas CRUD pada dashboard admin untuk setiap entitas data (",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 537,
+      "text": "2.Pengujian validitas form login admin dan penanganan error kredensial yang tida",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 538,
+      "text": "3.Pengujian interaktivitas grafik statistik lalu lintas website.",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 539,
+      "text": "4.Pengujian sinkronisasi filter bahasa (Bahasa Indonesia dan English) pada publi",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 540,
+      "text": "5.Pengujian keakuratan modul pencarian gabungan (Search Overlay) di frontend Rea",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 541,
+      "text": "6.Pengujian jembatan komunikasi navigasi (React→Unity SendMessage bridge) untuk ",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 692,
+      "text": "1.`GET /api/buildings`: Mengembalikan data gedung untuk React frontend.",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 693,
+      "text": "2.`GET /api/rooms`: Mengembalikan data fasilitas/ruangan untuk React frontend.",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 694,
+      "text": "3.`GET /api/unity/data`: Mengembalikan data terintegrasi (gedung dan fasilitas) ",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 695,
+      "text": "4.`GET /api/unity/names`: Mengembalikan array string `unityObjectNames` terdafta",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 696,
+      "text": "5.`GET /api/health`: Mengembalikan status kesehatan server/koneksi database.",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 752,
+      "text": "1.Mengambil seluruh record penamaan objek (`unityObjectNames`) secara asinkron d",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 753,
+      "text": "2.Melakukan penelusuran (traverse) hierarki scene aktif di Unity Editor secara r",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 754,
+      "text": "3.Mencocokkan nama GameObject di scene dengan data dari database secara case-ins",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 755,
+      "text": "4.Menampilkan laporan diagnostik interaktif dalam Editor Window khusus lengkap d",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 864,
+      "text": "1.Public Dashboard: Menyajikan widget grafik statistik lalu lintas website (tren",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 865,
+      "text": "2.Admin Dashboard: Menyediakan halaman login aman, halaman pengelolaan data CRUD",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 933,
+      "text": "1.Sistem integrasi denah virtual berbasis visualisasi 3D interaktif dan dashboar",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 934,
+      "text": "2.Aturan keamanan data relasional berhasil diterapkan secara andal menggunakan R",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 935,
+      "text": "3.Integrasi data dinamis satu arah dari React ke Unity menggunakan metode `SendM",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 936,
+      "text": "4.Evaluasi fungsionalitas sistem (Black Box) dan tingkat penerimaan pengguna (UA",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 939,
+      "text": "1.Mengintegrasikan basis data sistem denah ini dengan API akademik utama (SIK UP",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 940,
+      "text": "2.Menerapkan optimasi kompresi dan culling grafis tingkat lanjut pada model 3D k",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 941,
+      "text": "3.Menambahkan dukungan suara (audio navigation guidance) guna meningkatkan aspek",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 978,
+      "text": "1.Pembangunan database relasional PostgreSQL di Supabase Cloud dengan konfiguras",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 979,
+      "text": "2.Pengembangan RESTful API berbasis Vercel Serverless Functions.",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 980,
+      "text": "3.Pengembangan antarmuka web reaktif (React SPA) berupa Public Dashboard dan Adm",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 981,
+      "text": "4.Integrasi reverse proxy collect metrik Umami Analytics untuk pemantauan lalu l",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 988,
+      "text": "1.Konfigurasi Row-Level Security (RLS) & Triggers (Supabase Cloud PostgreSQL):",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1007,
+      "text": "2.Connection-Aware Preloading (React Frontend SPA):",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1016,
+      "text": "3.Communication Bridge React-Unity WebGL (React Component):",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1031,
+      "text": "4.Reverse Proxy Analytics Metrik collect (Express.js Proxy Route):",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1050,
+      "text": "5.Alat Verifikasi Sinkronisasi Database Spasial di Unity Editor (Unity Editor C#",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1330,
+      "text": "1.Prosedur Masuk ke Halaman Admin Panel:",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1331,
+      "text": "a.Buka browser dan arahkan alamat URL ke `/admin/login` atau `/login`.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1332,
+      "text": "b.Masukkan nama pengguna (username) dan kata sandi (password) administrator yang",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1333,
+      "text": "c.Klik tombol \"Masuk\". Jika kredensial valid, sistem akan mengarahkan pengguna k",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1334,
+      "text": "2.Pengelolaan Data Gedung:",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1335,
+      "text": "a.Menu utama admin menyajikan daftar tabel salah satunya adalah tabel gedung yan",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1336,
+      "text": "b.Untuk menambah data gedung baru, klik tombol \"Tambah Data Gedung\" di sudut kan",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1337,
+      "text": "c.Isi formulir modal dengan parameter nama gedung, deskripsi, lokasi fisik, juml",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1338,
+      "text": "d.Parameter `unity_object_name` wajib diisi menggunakan format huruf kecil dan g",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1339,
+      "text": "e.Untuk memperbarui atau menghapus data gedung, klik tombol ikon pensil (Edit) a",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1340,
+      "text": "3.Pengelolaan Data Fasilitas:",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1341,
+      "text": "a.Pilih menu tabel fasilitas pada bilah navigasi admin.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1342,
+      "text": "b.Untuk menambahkan fasilitas baru, klik tombol \"Tambah Data Fasilitas\".",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1343,
+      "text": "c.Pada formulir modal, masukkan nama fasilitas (misalnya: `Laboratorium Rekayasa",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1344,
+      "text": "d.Pilih gedung induk dari menu dropdown yang menampilkan daftar gedung yang terd",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1345,
+      "text": "e.Isi kolom `unity_object_name` dengan nama GameObject fasilitas tersebut pada h",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1346,
+      "text": "4.Pengelolaan Data Fakultas dan Program Studi:",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1347,
+      "text": "a.Pilih menu fakultas atau program studi untuk melakukan pengelolaan administrat",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1348,
+      "text": "b.Pada menu fakultas, admin dapat mengaitkan fakultas dengan gedung kantor utama",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1349,
+      "text": "c.Pada menu program studi, admin dapat mengaitkan program studi ke fakultas naun",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1350,
+      "text": "5.Peninjauan Riwayat Perubahan Data (Audit Logs):",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1351,
+      "text": "a.Admin dapat memantau seluruh riwayat manipulasi data yang terjadi di dalam sis",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1352,
+      "text": "b.Setiap kali terjadi penambahan, pembaruan, atau penghapusan data, trigger basi",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1353,
+      "text": "6.Pemantauan Statistik Lalu Lintas Pengunjung (Umami Analytics):",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1354,
+      "text": "a.Untuk memantau aktivitas pengunjung website secara real-time, admin dapat memb",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1355,
+      "text": "b.Dashboard menyajikan metrik jumlah pengunjung unik, jumlah tayangan halaman (p",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1358,
+      "text": "1.Akses Dashboard Utama:",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1359,
+      "text": "a.Akses halaman utama sistem melalui alamat root domain `/`.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1360,
+      "text": "b.Halaman depan menyajikan visualisasi statistik lalu lintas pengunjung (Website",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1361,
+      "text": "c.Selain itu, halaman utama juga memuat kartu indikator aset utama kampus (KPI C",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1362,
+      "text": "2.Penelusuran Detail Aset dan Profil Akademik:",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1363,
+      "text": "a.Pengguna dapat mengeklik salah satu kartu aset kampus (seperti Gedung, Laborat",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1364,
+      "text": "b.Pengguna juga dapat meninjau data program studi melalui tabel akreditasi (Accr",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1365,
+      "text": "3.Eksplorasi Bebas pada Canvas Denah Virtual 3D:",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1366,
+      "text": "a.Viewport WebGL pada dashboard mula-mula menyajikan gambar statis penutup (cove",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1367,
+      "text": "b.Kontrol pergerakan pada PC/Laptop:",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1368,
+      "text": "1)Tekan tombol `W`, `A`, `S`, `D` atau tombol panah arah pada keyboard untuk men",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1369,
+      "text": "2)Gerakkan mouse sambil menekan klik kiri (drag) untuk memutar sudut pandang kam",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1370,
+      "text": "3)Putar tombol scroll mouse ke depan atau ke belakang untuk melakukan zoom-in da",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1371,
+      "text": "4)Klik dua kali pada area model untuk memasuki mode Pointer Lock first-person de",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1372,
+      "text": "c.Kontrol pergerakan pada Perangkat Mobile (Smartphone/Tablet):",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1373,
+      "text": "1)Gunakan joystick virtual yang muncul di sisi kiri bawah layar untuk menggerakk",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1374,
+      "text": "2)Sentuh dan geser jari pada sisi kanan layar untuk memutar sudut pandang kamera",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1375,
+      "text": "3)Cubit layar ke dalam atau ke luar dengan dua jari (pinch) untuk mengatur jarak",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1376,
+      "text": "4.Pencarian Aset dan Navigasi Rute Fasilitas:",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1377,
+      "text": "a.Klik kotak pencarian (Search Bar) di bagian atas dashboard publik untuk membuk",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1378,
+      "text": "b.Ketik nama gedung atau fasilitas yang dicari (misalnya: `Perpustakaan` atau `D",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1379,
+      "text": "c.Pilih salah satu hasil pencarian. Sistem React akan langsung mengirimkan pesan",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1380,
+      "text": "d.Viewport Unity akan secara otomatis mengarahkan kamera ke lokasi objek sasaran",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1383,
+      "text": "1.Pemahaman Konsep Hubungan Kunci:",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1384,
+      "text": "a.Jembatan relasi bersifat case-insensitive di mana string penamaan objek pada k",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1385,
+      "text": "b.Apabila nama GameObject di Unity berubah namun data database tidak diperbarui,",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1386,
+      "text": "2.Langkah-Langkah Penggantian Nama Ruangan di Unity Editor:",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1387,
+      "text": "a.Buka proyek Unity denah kampus menggunakan Unity Editor.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1388,
+      "text": "b.Pada jendela Hierarchy, telusuri struktur objek di bawah folder Pointers gedun",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1389,
+      "text": "c.Pilih GameObject ruangan yang ingin diubah (misalnya: `dewi_sartika_301`).",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1390,
+      "text": "d.Ubah nama GameObject tersebut menjadi nama baru (misalnya: `dewi_sartika_301_b",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1391,
+      "text": "3.Langkah-Langkah Pembaruan Data di Database Supabase:",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1392,
+      "text": "a.Masuk ke halaman Admin Panel web (`/admin`).",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1393,
+      "text": "b.Pilih menu pengelolaan data Fasilitas atau Gedung (sesuai jenis objek yang diu",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1394,
+      "text": "c.Temukan baris ruangan yang bersangkutan dan klik tombol Edit.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1395,
+      "text": "d.Pada formulir modal, ubah nilai pada kolom `unity_object_name` agar memiliki s",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1396,
+      "text": "e.Klik \"Simpan\" untuk menulis perubahan ke Supabase Cloud.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1397,
+      "text": "4.Validasi Otomatis Menggunakan Alat Editor Sync Checker:",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1398,
+      "text": "a.Di dalam Unity Editor, klik menu navigasi atas `Tools > UPNVJ > Check Database",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1399,
+      "text": "b.Klik tombol `Check Synchronization` pada jendela editor tersebut.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1400,
+      "text": "c.Alat sync checker akan melakukan request HTTP asinkron ke API backend `/api/un",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1401,
+      "text": "d.Skrip editor secara rekursif menelusuri hierarki scene aktif untuk mencocokkan",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1402,
+      "text": "e.Hasil verifikasi akan ditampilkan pada jendela antarmuka:",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1403,
+      "text": "1)Objek yang namanya cocok di scene dan database akan terdaftar pada kategori hi",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1404,
+      "text": "2)Objek yang terdaftar di database namun tidak ditemukan di scene akan masuk kat",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1405,
+      "text": "3)Objek yang ada di scene namun belum didefinisikan kolom `unity_object_name` di",
+      "left": "1080",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1406,
+      "text": "f.Lakukan perbaikan penamaan GameObject atau entitas database hingga seluruh rua",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1407,
+      "text": "5.Pembaruan Jalur Navigasi (Re-Bake NavMesh):",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1408,
+      "text": "a.Apabila penggantian nama ruangan diikuti dengan perubahan posisi fisik pintu, ",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1409,
+      "text": "b.Buka jendela navigasi bawaan Unity melalui menu `Window > AI > Navigation`.",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1410,
+      "text": "c.Pada tab Bake, atur tinggi dan radius agen penelusuran, lalu klik tombol `Bake",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1411,
+      "text": "d.Unity akan memperbarui struktur data NavMesh di seluruh area kampus agar rute ",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1412,
+      "text": "6.Kompilasi dan Penyebaran (Build & Deploy WebGL):",
+      "left": "360",
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1413,
+      "text": "a.Buka jendela pengatur build WebGL khusus melalui menu `Tools > UPNVJ > WebGL B",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1414,
+      "text": "b.Atur optimasi build kompilasi (misalnya: WebGL2, kompresi Gzip/Brotli, dan cul",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1415,
+      "text": "c.Setelah proses kompilasi selesai, salin seluruh file hasil build WebGL dari di",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    },
+    {
+      "p_index": 1416,
+      "text": "d.Jalankan perintah deploy web (`npm run build` dan push deploy) untuk menyebark",
+      "left": null,
+      "hanging": "360",
+      "firstLine": null
+    }
+  ]
+}

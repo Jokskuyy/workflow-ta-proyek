@@ -586,63 +586,57 @@ def clean_heading_text_and_add_num(p, level, num_id):
         
     sort_element_children(pPr, PPR_ORDER)
 
-def clean_bibliography_sdt(sdt_elem):
+def clean_bibliography_sdt(sdt_elem, entries=None, draft_path="Tugas_Akhir_Draft.md"):
+    """Fill the bibliography SDT from the draft '# DAFTAR PUSTAKA' (Option B, R1).
+
+    The draft is the single source of truth: references are NO LONGER hardcoded
+    (R1.1). ``entries`` may be a precomputed list of ReferenceEntry; when None
+    they are parsed from ``draft_path`` via ``parse_bibliography_entries``.
+
+    Each entry is rendered with the baseline paragraph style (R1.3): pStyle
+    Normal; ind left=567 hanging=567; spacing before=0/after=120/line=240/
+    lineRule=auto; jc=both. Italic spans (``*...*`` in the draft) become
+    ``w:i``/``w:iCs`` runs (R1.2); entry order follows the draft (R1.4).
+
+    If the section is missing or empty (R1.8) the function prints a non-fatal
+    [WARN] and leaves the SDT untouched -- it never writes fake entries, so the
+    body-paragraph references produced by the merge stay intact.
+    """
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     namespaces = {'w': ns_uri}
     sdtContent = sdt_elem.find('w:sdtContent', namespaces)
-    if sdtContent is None: return
-    for child in list(sdtContent): sdtContent.remove(child)
-    
-    # Standard APA 7th edition entries (with single line spacing 240 dxa)
-    refs_data = [
-        {
-            'plain1': "'Afiifah, K., Azzahra, Z. F., & Anggoro, A. D. (2022). Analisis teknik Entity-Relationship Diagram dalam perancangan database: Sebuah literature review. ",
-            'italic': "INTECH (Informatika dan Teknologi)",
-            'plain2': ", 3(1), 8\u201314. https://doi.org/10.54895/intech.v3i1.1278"
-        },
-        {
-            'plain1': "Aliyah, A., Hartono, N., & Muin, A. A. (2024). Penggunaan User Acceptance Testing (UAT) pada pengujian sistem informasi pengelolaan keuangan dan inventaris barang. ",
-            'italic': "Switch: Jurnal Sains dan Teknologi Informasi",
-            'plain2': ", 3(1), 84\u2013100. https://doi.org/10.62951/switch.v3i1.330"
-        },
-        {
-            'plain1': "Ghai, V. (2025). Exploring the future career potential of Blender 3D as a professional tool. ",
-            'italic': "International Journal of Advance Research",
-            'plain2': ". https://www.ijariit.com/manuscript/exploring-the-future-career-potential-of-blender-3d-as-a-professional-tool/"
-        },
-        {
-            'plain1': "Jamaludin, J., & Saepuloh, L. (2024). Tren riset twin digital smart campus. ",
-            'italic': "Sang Pencerah: Jurnal Ilmiah Universitas Muhammadiyah Buton",
-            'plain2': ", 10(2), 408\u2013425. https://doi.org/10.35326/pencerah.v10i2.5317"
-        },
-        {
-            'plain1': "Kurniawan, T. A. (2018). Pemodelan Use Case (UML): Evaluasi terhadap beberapa kesalahan dalam praktik. ",
-            'italic': "Jurnal Teknologi Informasi dan Ilmu Komputer (JTIIK)",
-            'plain2': ", 5(1), 77\u201386. https://doi.org/10.25126/jtiik.201851610"
-        },
-        {
-            'plain1': "Maulida, M., Zahro, F., Hakim, R., & Akbar, M. S. (2025). Pengujian black box testing pada sistem website pemesanan online Toko Ayam Krispy. ",
-            'italic': "Jurnal Media Akademik (JMA)",
-            'plain2': ", 3(5). https://mediaakademik.com/index.php/jma/article/view/392"
-        },
-        {
-            'plain1': "Muharam, Y., Anggara, M. B., & Hanafi, T. J. (2023). Implementasi peta 3 dimensi menggunakan metode IMSDD (Interactive Multimedia System Design and Development) dan WebGL API berbasis web (Studi kasus di SMP Karya Pembangunan 2 Majalaya). ",
-            'italic': "Jurnal Informatika-COMPUTING",
-            'plain2': ", 10, 20\u201330. https://doi.org/10.55222/computing.v10i01.1155"
-        },
-        {
-            'plain1': "Siv, T. (2025). A framework for scalable digital twin deployment in smart campus building facility management. ",
-            'italic': "arXiv",
-            'plain2': ". https://doi.org/10.48550/arXiv.2512.12149"
-        },
-        {
-            'plain1': "Taurusta, C., Asiddiq, A. M., Suprianto, S., & Setiawan, H. (2024). Visualisasi gedung kampus 1 Universitas Muhammadiyah Sidoarjo menggunakan augmented reality sebagai media informasi. ",
-            'italic': "Journal of Technology and System Information",
-            'plain2': ", 1(1), 55\u201370. https://doi.org/10.47134/jtsi.v1i1.2146"
-        }
-    ]
-    
-    for entry in refs_data:
+    if sdtContent is None:
+        return
+
+    section_found = True
+    if entries is None:
+        try:
+            from merge_draft_to_docx import parse_bibliography_entries
+        except ImportError:
+            _here = os.path.dirname(os.path.abspath(__file__))
+            if _here not in sys.path:
+                sys.path.insert(0, _here)
+            from merge_draft_to_docx import parse_bibliography_entries
+        result = parse_bibliography_entries(draft_path)
+        entries = list(result)
+        section_found = getattr(result, 'section_found', bool(entries))
+
+    if not entries:
+        # R1.8: never write fake entries. Leave the SDT (and the body-paragraph
+        # references produced by the merge) untouched.
+        if not section_found:
+            print("[WARN] sumber Daftar_Pustaka tidak ditemukan: bagian "
+                  "'# DAFTAR PUSTAKA' tidak ada pada Draf.")
+        else:
+            print("[WARN] sumber Daftar_Pustaka kosong: bagian "
+                  "'# DAFTAR PUSTAKA' tidak memuat entri.")
+        return
+
+    # Draft entries exist -> replace SDT content with draft-sourced references.
+    for child in list(sdtContent):
+        sdtContent.remove(child)
+
+    for entry in entries:
         p = lxml.etree.Element(f'{{{ns_uri}}}p')
         pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
         set_child_element(pPr, 'pStyle', {'val': 'Normal'})
@@ -651,34 +645,22 @@ def clean_bibliography_sdt(sdt_elem):
         set_child_element(pPr, 'jc', {'val': 'both'})
         sort_element_children(pPr, PPR_ORDER)
         p.append(pPr)
-        
-        r1 = lxml.etree.Element(f'{{{ns_uri}}}r')
-        t1 = lxml.etree.Element(f'{{{ns_uri}}}t')
-        t1.text = entry['plain1']
-        t1.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-        r1.append(t1)
-        p.append(r1)
-        
-        r2 = lxml.etree.Element(f'{{{ns_uri}}}r')
-        rPr2 = lxml.etree.Element(f'{{{ns_uri}}}rPr')
-        set_child_element(rPr2, 'i', {})
-        set_child_element(rPr2, 'iCs', {})
-        r2.append(rPr2)
-        t2 = lxml.etree.Element(f'{{{ns_uri}}}t')
-        t2.text = entry['italic']
-        t2.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-        r2.append(t2)
-        p.append(r2)
-        
-        r3 = lxml.etree.Element(f'{{{ns_uri}}}r')
-        t3 = lxml.etree.Element(f'{{{ns_uri}}}t')
-        t3.text = entry['plain2']
-        t3.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-        r3.append(t3)
-        p.append(r3)
-        
+
+        for text, is_italic in entry.spans:
+            r = lxml.etree.Element(f'{{{ns_uri}}}r')
+            if is_italic:
+                rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+                set_child_element(rPr, 'i', {})
+                set_child_element(rPr, 'iCs', {})
+                r.append(rPr)
+            t = lxml.etree.Element(f'{{{ns_uri}}}t')
+            t.text = text
+            t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+            r.append(t)
+            p.append(r)
+
         sdtContent.append(p)
-    print("Replaced bibliography entries inside SDT.")
+    print(f"Replaced bibliography entries inside SDT from draft ({len(entries)} entries).")
 
 def load_rels_map(unpacked_dir):
     rels_path = os.path.join(unpacked_dir, 'word', '_rels', 'document.xml.rels')

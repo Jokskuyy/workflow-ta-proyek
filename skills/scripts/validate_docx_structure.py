@@ -107,6 +107,171 @@ def _printable_height_emu_content(doc_root):
     return (h - top - bottom) * EMU_PER_TWIP
 
 
+# ============================================================ #
+# Writing guards (R6) + citation cross-check (R1.5/1.6/6.3/1.7).
+#
+# These wire the PURE collectors defined in the Mesin_Merge
+# (scratch/merge_draft_to_docx.py) into the validator and print their results
+# as NON-FATAL "[WARN]" lines, ADDITIVELY (R6.6): existing checks A-J and C1-C4
+# are untouched and none of the structural guards append to errors_found.
+#
+# The ONLY path that can become fatal is the citation cross-check, and only
+# when explicitly configured via env "TA_CITATION_FATAL=1" (or the
+# "--citation-fatal" flag) -- R1.7. Default remains non-fatal.
+#
+# Everything here is defensively guarded: if the Mesin_Merge module or the draft
+# cannot be located/read, the guards are skipped with a note and the legacy
+# validation semantics are preserved exactly.
+# ============================================================ #
+def _locate_merge_module():
+    """Locate and import scratch/merge_draft_to_docx.py (the Mesin_Merge that
+    hosts the pure guard collectors). Walks up from this file and the cwd,
+    checking both "<root>" and "<root>/scratch". Returns the module or None."""
+    search_roots = []
+
+    def _add_ancestors(start):
+        d = start
+        for _ in range(8):
+            if d and d not in search_roots:
+                search_roots.append(d)
+            nd = os.path.dirname(d)
+            if not nd or nd == d:
+                break
+            d = nd
+
+    _add_ancestors(os.path.dirname(os.path.abspath(__file__)))
+    _add_ancestors(os.getcwd())
+
+    for root in search_roots:
+        for sub in (".", "scratch"):
+            cand = os.path.join(root, sub, "merge_draft_to_docx.py")
+            if os.path.exists(cand):
+                moddir = os.path.dirname(os.path.abspath(cand))
+                if moddir not in sys.path:
+                    sys.path.insert(0, moddir)
+                try:
+                    import merge_draft_to_docx as _m
+                    return _m
+                except Exception:
+                    return None
+    return None
+
+
+def _locate_draft():
+    """Locate the draft Markdown (source of truth for the writing guards).
+    Honours env "TA_DRAFT_PATH" authoritatively: when set, that path is used
+    exclusively (returned only if it exists, else None -- no silent fallback to
+    a different draft). Otherwise looks for "Tugas_Akhir_Draft.md" in the cwd and
+    the ancestors of this file. Returns a path or None."""
+    env = os.environ.get("TA_DRAFT_PATH")
+    if env:
+        return env if os.path.exists(env) else None
+    candidates = [os.path.join(os.getcwd(), "Tugas_Akhir_Draft.md")]
+    d = os.path.dirname(os.path.abspath(__file__))
+    for _ in range(8):
+        candidates.append(os.path.join(d, "Tugas_Akhir_Draft.md"))
+        nd = os.path.dirname(d)
+        if not nd or nd == d:
+            break
+        d = nd
+    for c in candidates:
+        if c and os.path.exists(c):
+            return c
+    return None
+
+
+def _citation_fatal_enabled():
+    """R1.7 — the citation cross-check is fatal only when explicitly configured
+    via env "TA_CITATION_FATAL" (1/true/yes/on) or the "--citation-fatal" flag.
+    Default (unset) is non-fatal."""
+    val = os.environ.get("TA_CITATION_FATAL", "")
+    if val.strip().lower() in ("1", "true", "yes", "on"):
+        return True
+    if "--citation-fatal" in sys.argv:
+        return True
+    return False
+
+
+def _run_writing_guards(errors_found):
+    """Run the pure writing-guard collectors against the draft and print their
+    results as non-fatal "[WARN]" lines (R6.1/6.2/6.4/6.5). The citation
+    cross-check (R1.5/1.6/6.3) is also printed non-fatal by default and only
+    appended to errors_found when fatal mode is configured (R1.7).
+
+    This NEVER raises: any lookup/parse failure degrades to a skip note so the
+    legacy validation is preserved exactly (R6.6)."""
+    print("Checking writing guards (heading/BAB/table/emphasis/citation, non-fatal additive)...")
+
+    mrg = _locate_merge_module()
+    if mrg is None:
+        print("  note: Mesin_Merge (merge_draft_to_docx) not importable; writing guards skipped.")
+        return
+    draft_path = _locate_draft()
+    if draft_path is None:
+        print("  note: draft 'Tugas_Akhir_Draft.md' not found; writing guards skipped.")
+        return
+    try:
+        with open(draft_path, encoding="utf-8") as f:
+            draft_text = f.read()
+    except OSError as e:
+        print(f"  note: could not read draft '{draft_path}': {e}; writing guards skipped.")
+        return
+    draft_lines = draft_text.splitlines()
+
+    # Parsed items feed the heading-level (R6.1) and BAB-order (R6.2) guards.
+    items = []
+    try:
+        items = mrg.parse_markdown(draft_path)
+    except Exception as e:
+        print(f"  note: parse_markdown failed ({e}); heading/BAB guards skipped.")
+
+    guard_warnings = []
+    for fn, arg in (
+        ("collect_heading_level_warnings", items),        # R6.1
+        ("collect_bab_order_warnings", items),            # R6.2
+        ("collect_unclosed_table_warnings", draft_lines), # R6.4
+        ("collect_unbalanced_emphasis_warnings", draft_lines),  # R6.5
+    ):
+        try:
+            guard_warnings.extend(getattr(mrg, fn)(arg))
+        except Exception:
+            pass
+
+    for w in guard_warnings:
+        print(w)
+
+    # Citation cross-check (R1.5/1.6/6.3). Two-way: in-text citation -> entry and
+    # entry -> citation. Default non-fatal; fatal only when configured (R1.7).
+    fatal = _citation_fatal_enabled()
+    cite_warnings = []
+    try:
+        bib = mrg.parse_bibliography_entries(draft_text)
+        entries = list(getattr(bib, "entries", bib) or [])
+        # Narrative body = draft up to the '# DAFTAR PUSTAKA' heading so the
+        # bibliography's own '(YYYY)' tokens are not mistaken for citations.
+        body_text = draft_text
+        for i, line in enumerate(draft_lines):
+            if re.match(r'^#{1,6}\s+DAFTAR\s+PUSTAKA\b', line.strip(), re.IGNORECASE):
+                body_text = "\n".join(draft_lines[:i])
+                break
+        cite_warnings, has_fatal = mrg.collect_citation_crosscheck_warnings(
+            body_text, entries, fatal=fatal)
+        for w in cite_warnings:
+            print(w)
+        if has_fatal:
+            # R1.7: configured fatal -> mismatches become fatal findings.
+            for w in cite_warnings:
+                errors_found.append(w)
+    except Exception as e:
+        print(f"  note: citation cross-check skipped ({e}).")
+
+    mode = "FATAL" if fatal else "non-fatal"
+    print(
+        f"Writing guards: {len(guard_warnings)} structural warning(s) (non-fatal); "
+        f"citation cross-check ({mode}): {len(cite_warnings)} mismatch(es)."
+    )
+
+
 def main():
     # Force UTF-8 encoding for stdout
     sys.stdout.reconfigure(encoding='utf-8')
@@ -727,6 +892,13 @@ def main():
     for w in citation_warnings:
         print(w)
     print(f"Citation check: {len(citation_warnings)} Latar Belakang paragraph(s) without a citation (non-fatal).")
+
+    # ============================================================ #
+    # Writing guards (R6) + citation cross-check (R1.5/1.6/6.3/1.7), additive.
+    # Non-fatal by default; only the citation cross-check can turn fatal and
+    # only when explicitly configured (TA_CITATION_FATAL=1 / --citation-fatal).
+    # ============================================================ #
+    _run_writing_guards(errors_found)
 
     # 3. Report results
     if errors_found:

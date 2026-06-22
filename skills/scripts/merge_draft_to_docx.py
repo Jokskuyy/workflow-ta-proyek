@@ -3,6 +3,8 @@ import re
 import sys
 import json
 import argparse
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 
 import lxml.etree
@@ -47,6 +49,39 @@ for prefix, uri in {
 }.items():
     lxml.etree.register_namespace(prefix, uri)
 
+# --------------------------------------------------------------------------- #
+# List nesting by indentation (R3)
+# --------------------------------------------------------------------------- #
+# Spaces of leading indentation that correspond to one nesting level.
+# The current Draf indents nested lists in steps of 3 spaces (top-level markers
+# at column 0, second level at 3 spaces, third level at 6 spaces), which aligns
+# 1:1 with the baseline marker nesting (1. -> a. -> 1)). A unit of 3 therefore
+# reproduces the captured baseline level partition exactly (see
+# tests/test_wpi_lists.py backward-compat test).
+LIST_INDENT_UNIT = 3
+
+
+def compute_list_level(indent_spaces, marker):
+    """Return the nesting level of a list item from its leading indentation.
+
+    Level depends ONLY on indentation; ``marker`` is cosmetic (R3.2) and never
+    changes the level. Indentation 0 yields the outermost level 1 (R3.5), and
+    the mapping is monotonic non-decreasing in indentation (R3.3): for
+    ``a <= b`` we have ``compute_list_level(a, _) <= compute_list_level(b, _)``.
+
+    Rule: ``level = 1 + (indent_spaces // LIST_INDENT_UNIT)``.
+
+    Backward compatibility (R3.4): the current Draf uses real leading
+    indentation (0/3/6 spaces) that mirrors its marker nesting, so this pure
+    indentation rule reproduces the baseline list levels exactly without any
+    marker-based fallback. The ``marker`` parameter is accepted for interface
+    completeness only.
+    """
+    if indent_spaces < 0:
+        indent_spaces = 0
+    return 1 + (indent_spaces // LIST_INDENT_UNIT)
+
+
 def parse_markdown(md_path):
     items = []
     
@@ -68,7 +103,11 @@ def parse_markdown(md_path):
     # Matches: 1. , a. , 1) , a)
     list_item_pattern = re.compile(r'^(\s*)([0-9a-zA-Z]+[\.\)])\s+(.*)$')
     
-    for line in lines:
+    skip_until = -1
+    for idx, line in enumerate(lines):
+        # Skip lines already consumed by a detected pipe table (R5).
+        if idx <= skip_until:
+            continue
         stripped = line.strip()
         
         # Detect Chapter I start
@@ -118,6 +157,18 @@ def parse_markdown(md_path):
                 table_lines.append(stripped)
             continue
             
+        # Handle standard pipe tables (R5, Opt_In_By_Content). Only triggers
+        # when a real pipe table (line with '|' + valid separator) is present,
+        # and only outside code blocks / [TABLE] blocks (handled by the
+        # continues above). The existing [TABLE] path is untouched.
+        if not in_code_block and not in_table and '|' in stripped:
+            detected = detect_pipe_table(lines, idx)
+            if detected is not None:
+                end_idx, table_item = detected
+                items.append(table_item)
+                skip_until = end_idx - 1
+                continue
+
         # Handle page breaks
         if stripped == '---':
             items.append({'type': 'page_break'})
@@ -143,20 +194,10 @@ def parse_markdown(md_path):
             indent_spaces = len(list_match.group(1))
             marker = list_match.group(2)
             text_content = list_match.group(3)
-            
-            # Determine level based on marker and indent
-            list_level = 1
-            if marker.endswith('.'):
-                if marker[:-1].isdigit():
-                    list_level = 1
-                else:
-                    list_level = 2
-            elif marker.endswith(')'):
-                if marker[:-1].isdigit():
-                    list_level = 3
-                else:
-                    list_level = 4
-                    
+
+            # Level is computed from leading indentation; marker is cosmetic (R3).
+            list_level = compute_list_level(indent_spaces, marker)
+
             items.append({
                 'type': 'list_item',
                 'level': list_level,
@@ -174,82 +215,736 @@ def parse_markdown(md_path):
             
     return items
 
-def add_formatted_text(p_elem, text, default_rPr=None):
+# --------------------------------------------------------------------------- #
+# Inline tokenizer (R2) — pure token model + left->right scanner.
+# --------------------------------------------------------------------------- #
+class TokenKind(Enum):
+    """Kind of an inline token produced by ``tokenize_inline``."""
+    TEXT = "text"   # plain text, carries bold/italic flags
+    CODE = "code"   # inline code -> monospace run
+    LINK = "link"   # hyperlink -> w:hyperlink run
+
+
+@dataclass(frozen=True)
+class InlineToken:
+    """A flat inline token (immutable). ``url`` is only set for LINK tokens."""
+    kind: TokenKind
+    text: str
+    bold: bool = False
+    italic: bool = False
+    url: "str | None" = None
+
+
+# Hyperlink pattern: [text](url). Greedy-free inner classes per design §1.
+_LINK_RE = re.compile(r'\[([^\]]*)\]\(([^)]*)\)')
+
+
+def tokenize_inline(text):
+    """Turn inline-markup ``text`` into a flat list of :class:`InlineToken`.
+
+    Supports (design Components §1):
+      - ``\\*``        -> literal asterisk (no state change)
+      - ```` `code` `` -> CODE token (literal backtick if unclosed)
+      - ``[text](url)``-> LINK token (literal ``[`` if the pattern does not match)
+      - ``***``        -> toggle bold+italic
+      - ``**``         -> toggle bold
+      - ``*``          -> toggle italic
+      - otherwise      -> accumulate as literal text
+
+    Unbalanced emphasis markers are reconciled (R2.7): an unpaired opener is
+    treated as a literal ``*``/``**``/``***`` at its position and never leaks
+    its format to following text. Pure and deterministic (no lxml).
     """
-    Parses **bold** and *italic* markdown tags and adds runs to the paragraph.
+    if text is None:
+        return []
+
+    # ----- Pass 1: scan into a flat element list -------------------------- #
+    # Each element is a dict with a 'kind'. Markers carry a mutable 'literal'
+    # flag set during reconciliation.
+    elements = []
+    i = 0
+    n = len(text)
+    while i < n:
+        c = text[i]
+        # Escaped asterisk -> literal '*', no state change.
+        if c == '\\' and i + 1 < n and text[i + 1] == '*':
+            elements.append({'kind': 'text', 'text': '*'})
+            i += 2
+            continue
+        # Inline code.
+        if c == '`':
+            close = text.find('`', i + 1)
+            if close != -1:
+                elements.append({'kind': 'code', 'text': text[i + 1:close]})
+                i = close + 1
+            else:
+                elements.append({'kind': 'text', 'text': '`'})
+                i += 1
+            continue
+        # Hyperlink.
+        if c == '[':
+            m = _LINK_RE.match(text, i)
+            if m:
+                elements.append({'kind': 'link', 'text': m.group(1), 'url': m.group(2)})
+                i = m.end()
+            else:
+                elements.append({'kind': 'text', 'text': '['})
+                i += 1
+            continue
+        # Emphasis markers (longest first).
+        if text.startswith('***', i):
+            elements.append({'kind': 'bitoggle', 'literal': False})
+            i += 3
+            continue
+        if text.startswith('**', i):
+            elements.append({'kind': 'btoggle', 'literal': False})
+            i += 2
+            continue
+        if c == '*':
+            elements.append({'kind': 'itoggle', 'literal': False})
+            i += 1
+            continue
+        # Plain character.
+        elements.append({'kind': 'text', 'text': c})
+        i += 1
+
+    # ----- Reconcile unbalanced markers (R2.7) ---------------------------- #
+    # A '***' participates in BOTH the bold and italic toggle streams.
+    bold_markers = [e for e in elements if e['kind'] in ('btoggle', 'bitoggle')]
+    italic_markers = [e for e in elements if e['kind'] in ('itoggle', 'bitoggle')]
+    if len(bold_markers) % 2 == 1:
+        bold_markers[-1]['literal'] = True
+    if len(italic_markers) % 2 == 1:
+        italic_markers[-1]['literal'] = True
+
+    _literal_form = {'btoggle': '**', 'itoggle': '*', 'bitoggle': '***'}
+
+    # ----- Pass 2: build final tokens ------------------------------------- #
+    tokens = []
+    buf = []
+    bold = False
+    italic = False
+
+    def flush():
+        if buf:
+            tokens.append(InlineToken(TokenKind.TEXT, ''.join(buf), bold, italic))
+            buf.clear()
+
+    for e in elements:
+        kind = e['kind']
+        if kind == 'text':
+            buf.append(e['text'])
+        elif kind == 'code':
+            flush()
+            tokens.append(InlineToken(TokenKind.CODE, e['text']))
+        elif kind == 'link':
+            flush()
+            tokens.append(InlineToken(TokenKind.LINK, e['text'], url=e['url']))
+        else:  # marker
+            if e['literal']:
+                buf.append(_literal_form[kind])
+            else:
+                flush()
+                if kind == 'btoggle':
+                    bold = not bold
+                elif kind == 'itoggle':
+                    italic = not italic
+                else:  # bitoggle
+                    bold = not bold
+                    italic = not italic
+    flush()
+    return tokens
+
+
+# --------------------------------------------------------------------------- #
+# Relationship manager for external hyperlinks (R2) -> document.xml.rels.
+# --------------------------------------------------------------------------- #
+class RelManager:
+    """Allocate and persist external (hyperlink) relationships additively.
+
+    ``add_external`` returns a relationship id (deduped per identical URL).
+    ``write`` appends the new relationships to ``document.xml.rels`` while
+    preserving every relationship already present. When no external
+    relationships were allocated, ``write`` leaves the file untouched.
+    """
+    _PKG_REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships'
+    _HYPERLINK_TYPE = ('http://schemas.openxmlformats.org/officeDocument/'
+                       '2006/relationships/hyperlink')
+
+    def __init__(self, existing_ids=None):
+        self._url_to_id = {}          # url -> rId (dedup)
+        self._new = []                # [(rId, url)] in allocation order
+        self._existing_ids = set(existing_ids or ())
+        self._counter = 0
+
+    def _next_id(self):
+        while True:
+            self._counter += 1
+            rid = f'rId{self._counter}'
+            if rid not in self._existing_ids and rid not in self._url_to_id.values():
+                return rid
+
+    def add_external(self, url):
+        """Return an rId for ``url`` (reusing the same rId for identical URLs)."""
+        if url in self._url_to_id:
+            return self._url_to_id[url]
+        rid = self._next_id()
+        self._url_to_id[url] = rid
+        self._new.append((rid, url))
+        return rid
+
+    @property
+    def has_new(self):
+        return bool(self._new)
+
+    def write(self, rels_path):
+        """Append new hyperlink relationships to ``rels_path`` (additive)."""
+        if not self._new:
+            return  # nothing allocated -> leave rels file unchanged
+        parser = lxml.etree.XMLParser(remove_blank_text=False)
+        if os.path.exists(rels_path):
+            tree = lxml.etree.parse(rels_path, parser)
+            root = tree.getroot()
+        else:
+            root = lxml.etree.Element(f'{{{self._PKG_REL_NS}}}Relationships')
+            tree = lxml.etree.ElementTree(root)
+        existing = {rel.get('Id') for rel in root}
+        for rid, url in self._new:
+            if rid in existing:
+                continue
+            rel = lxml.etree.SubElement(root, f'{{{self._PKG_REL_NS}}}Relationship')
+            rel.set('Id', rid)
+            rel.set('Type', self._HYPERLINK_TYPE)
+            rel.set('Target', url)
+            rel.set('TargetMode', 'External')
+        tree.write(rels_path, encoding='UTF-8', xml_declaration=True, standalone=True)
+
+
+# --------------------------------------------------------------------------- #
+# Bibliography entry parser (R1) — pure helpers consumed by the bibliography
+# writer (clean_bibliography_sdt in skills/scripts/format_ta_proyek.py) and the
+# citation cross-check (R1.5/1.6). Draft '# DAFTAR PUSTAKA' is the source of
+# truth (Option B); no references are hardcoded.
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class ReferenceEntry:
+    """One APA reference entry parsed from the draft '# DAFTAR PUSTAKA' section.
+
+    - ``raw``    : the verbatim entry line (no trailing newline, stripped).
+    - ``spans``  : tuple of (text, is_italic) segments (render-ready). Joining
+                   the segment texts reproduces ``raw`` with the ``*`` italic
+                   markers removed (R1.2 fidelity).
+    - ``authors``: tuple of author surname(s) used for matching/cross-check.
+    - ``year``   : publication year ('YYYY') or None.
+    """
+    raw: str
+    spans: tuple
+    authors: tuple
+    year: "str | None"
+
+
+class BibliographyResult(list):
+    """A ``list[ReferenceEntry]`` that also carries ``section_found`` (R1.8).
+
+    Behaves exactly like a list (count/order/indexing) so callers and property
+    tests can treat it as ``list[ReferenceEntry]``; the extra attribute lets
+    the bibliography writer distinguish "section missing" from "section empty".
+    """
+    def __init__(self, entries=(), section_found=False):
+        super().__init__(entries)
+        self.section_found = section_found
+
+
+_DAFTAR_PUSTAKA_RE = re.compile(r'^\s*#\s+DAFTAR\s+PUSTAKA\s*$', re.IGNORECASE)
+_YEAR_RE = re.compile(r'\((\d{4})[a-z]?\)')
+
+
+def _load_draft_text(draft_path_or_text):
+    """Accept either a draft path or raw draft text and return the text.
+
+    A value containing a newline, or starting with '#', or that is not an
+    existing file, is treated as literal text; otherwise it is read as a file.
+    """
+    s = draft_path_or_text
+    if not isinstance(s, str):
+        return ""
+    if '\n' in s or s.lstrip().startswith('#'):
+        return s
+    try:
+        if os.path.exists(s):
+            with open(s, encoding='utf-8') as f:
+                return f.read()
+    except (OSError, ValueError):
+        pass
+    return s
+
+
+def parse_italic_spans(raw):
+    """Split a reference entry into (text, is_italic) segments via the italic
+    path of :func:`tokenize_inline` (reuse keeps R1.2 consistent with R2).
+
+    Adjacent segments sharing the same italic flag are merged so the result is
+    canonical. Joining the segment texts reproduces ``raw`` minus the ``*``
+    markers. CODE/LINK tokens (not expected inside bibliography entries) are
+    emitted as plain, non-italic text.
+    """
+    spans = []
+    for tok in tokenize_inline(raw or ""):
+        text = tok.text
+        if not text:
+            continue
+        is_italic = bool(tok.italic) and tok.kind == TokenKind.TEXT
+        if spans and spans[-1][1] == is_italic:
+            spans[-1] = (spans[-1][0] + text, is_italic)
+        else:
+            spans.append((text, is_italic))
+    return [(t, i) for t, i in spans]
+
+
+def _parse_authors(raw):
+    """Best-effort extraction of author surname(s) from an APA entry.
+
+    The author block is the text before the first '(YYYY)'. The first surname
+    (text up to the first comma) is always returned; a second surname after an
+    '&' is included when easily separable.
+    """
+    m = _YEAR_RE.search(raw)
+    head = (raw[:m.start()] if m else raw).strip()
+    if not head:
+        return ()
+    first = head.split(',', 1)[0].strip()
+    surnames = [first] if first else []
+    if '&' in head:
+        tail = head.rsplit('&', 1)[1].strip()
+        tail_surname = tail.split(',', 1)[0].strip().rstrip('.').strip()
+        if tail_surname and tail_surname not in surnames:
+            surnames.append(tail_surname)
+    return tuple(surnames)
+
+
+def reference_key(entry):
+    """Matching key for an entry: (first-author surname lowercased, year)."""
+    surname = entry.authors[0].lower() if entry.authors else ""
+    return (surname, entry.year or "")
+
+
+def parse_bibliography_entries(draft_path_or_text):
+    """Read the '# DAFTAR PUSTAKA' section -> :class:`BibliographyResult`.
+
+    Each non-empty line under the heading (until the next '#' heading or a
+    '---' horizontal rule) is one entry, in order of appearance (R1.1, R1.4).
+    If the heading is absent, an empty result with ``section_found=False`` is
+    returned (R1.8).
+    """
+    text = _load_draft_text(draft_path_or_text)
+    lines = text.splitlines()
+    start = None
+    for idx, line in enumerate(lines):
+        if _DAFTAR_PUSTAKA_RE.match(line):
+            start = idx + 1
+            break
+    if start is None:
+        return BibliographyResult((), section_found=False)
+
+    entries = []
+    for line in lines[start:]:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith('#') or stripped == '---':
+            break
+        ym = _YEAR_RE.search(stripped)
+        entries.append(ReferenceEntry(
+            raw=stripped,
+            spans=tuple(parse_italic_spans(stripped)),
+            authors=_parse_authors(stripped),
+            year=(ym.group(1) if ym else None),
+        ))
+    return BibliographyResult(entries, section_found=True)
+
+
+# --------------------------------------------------------------------------- #
+# Writing guards (R6 + citation cross-check R1.5/1.6/6.3) — PURE collectors.
+# --------------------------------------------------------------------------- #
+# These functions are pure, deterministic, and never touch lxml. They are
+# consumed by ``validate_docx_structure.py`` (both copies) which prints the
+# returned strings as non-fatal ``[WARN]`` lines (additive, R6.6). Each
+# collector returns a list of warning strings, except the citation cross-check
+# which returns ``(warnings, has_fatal)``.
+# --------------------------------------------------------------------------- #
+_BAB_RE = re.compile(r'^BAB\s+([IVXLCDM]+|\d+)\b', re.IGNORECASE)
+_ROMAN_MAP = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
+# In-text citation: a parenthesised group that contains at least one 4-digit year.
+_CITATION_PAREN_RE = re.compile(r'\(([^)]*\d{4}[a-z]?[^)]*)\)')
+_INNER_YEAR_RE = re.compile(r'(\d{4})[a-z]?')
+_ET_AL_RE = re.compile(r'\bet\s+al\.?', re.IGNORECASE)
+
+
+def _roman_to_int(s):
+    """Convert a Roman numeral to int; return None if any char is invalid."""
+    total = 0
+    prev = 0
+    for ch in reversed(s.upper()):
+        v = _ROMAN_MAP.get(ch)
+        if v is None:
+            return None
+        if v < prev:
+            total -= v
+        else:
+            total += v
+            prev = v
+    return total
+
+
+def _bab_number(text):
+    """Return the BAB ordinal as int for a heading text like 'BAB II ...'.
+
+    Supports Roman (I, II, III, ...) and Arabic (1, 2, ...). Returns None when
+    the text is not a BAB heading or the numeral is unparseable.
+    """
+    if not text:
+        return None
+    m = _BAB_RE.match(text.strip())
+    if not m:
+        return None
+    token = m.group(1)
+    if token.isdigit():
+        return int(token)
+    return _roman_to_int(token)
+
+
+def collect_heading_level_warnings(items):
+    """R6.1 — warn on heading level jumps that ascend by more than one level.
+
+    Returns exactly one warning per transition between two consecutive headings
+    whose level increases by more than one (e.g. ``#`` directly to ``###``),
+    naming the location and the skipped level(s). Transitions that ascend by at
+    most one level (or descend) produce no warning. (Property 12)
+    """
+    warnings = []
+    headings = [it for it in (items or []) if it.get('type') == 'heading']
+    prev_level = None
+    for h in headings:
+        level = h.get('level')
+        text = h.get('text', '')
+        if prev_level is not None and level - prev_level > 1:
+            skipped = ", ".join(f"H{lv}" for lv in range(prev_level + 1, level))
+            warnings.append(
+                f"[WARN][heading] Lompatan level heading pada '{text}': "
+                f"dari H{prev_level} ke H{level} (melewati {skipped})."
+            )
+        prev_level = level
+    return warnings
+
+
+def collect_bab_order_warnings(items):
+    """R6.2 — warn when a BAB heading does not ascend sequentially.
+
+    For each BAB heading compared to the previous BAB heading, emit one warning
+    when the ordinal is not exactly ``prev + 1`` (i.e. out of order, repeated,
+    or skipped). Sequentially ascending BABs produce no warning. (Property 13)
+    """
+    warnings = []
+    prev_num = None
+    prev_text = None
+    for it in (items or []):
+        if it.get('type') != 'heading':
+            continue
+        num = _bab_number(it.get('text', ''))
+        if num is None:
+            continue
+        if prev_num is not None and num != prev_num + 1:
+            warnings.append(
+                f"[WARN][bab] Urutan BAB tidak berurutan: '{it.get('text', '')}' "
+                f"(BAB {num}) mengikuti '{prev_text}' (BAB {prev_num}); "
+                f"diharapkan BAB {prev_num + 1}."
+            )
+        prev_num = num
+        prev_text = it.get('text', '')
+    return warnings
+
+
+def collect_unclosed_table_warnings(lines):
+    """R6.4 — warn when a ``[TABLE]`` block is opened without a ``[/TABLE]``.
+
+    Mirrors the ``parse_markdown`` open/close semantics: a line whose stripped
+    form starts with ``[TABLE]`` opens a block; a line whose stripped form ends
+    with ``[/TABLE]`` closes it. Emits exactly one warning when a block remains
+    open at end of input, and none when every block is closed. (Property 14)
+    """
+    warnings = []
+    in_table = False
+    open_line = None
+    for idx, line in enumerate(lines or []):
+        stripped = line.strip()
+        if stripped.startswith('[TABLE]'):
+            in_table = True
+            open_line = idx + 1
+            continue
+        if stripped.endswith('[/TABLE]'):
+            in_table = False
+            continue
+    if in_table:
+        warnings.append(
+            f"[WARN][tabel] Blok [TABLE] dibuka pada baris {open_line} "
+            f"tanpa penutup [/TABLE]."
+        )
+    return warnings
+
+
+def _emphasis_balanced(line):
+    """True if a line's emphasis markers are balanced (ignoring escaped ``\\*``).
+
+    Counts backticks (code spans), ``**``/``***`` (bold stream) and
+    ``*``/``***`` (italic stream) exactly as the inline tokenizer does. Inside a
+    code span (between backticks) asterisks are literal and not counted. The
+    line is balanced iff backticks are even AND the bold stream is even AND the
+    italic stream is even.
+    """
+    i = 0
+    n = len(line)
+    bold = 0
+    italic = 0
+    backticks = 0
+    in_code = False
+    while i < n:
+        c = line[i]
+        if c == '\\' and i + 1 < n and line[i + 1] == '*':
+            i += 2
+            continue
+        if c == '`':
+            backticks += 1
+            in_code = not in_code
+            i += 1
+            continue
+        if in_code:
+            i += 1
+            continue
+        if line.startswith('***', i):
+            bold += 1
+            italic += 1
+            i += 3
+            continue
+        if line.startswith('**', i):
+            bold += 1
+            i += 2
+            continue
+        if c == '*':
+            italic += 1
+            i += 1
+            continue
+        i += 1
+    return (backticks % 2 == 0) and (bold % 2 == 0) and (italic % 2 == 0)
+
+
+def collect_unbalanced_emphasis_warnings(lines):
+    """R6.5 — warn for each line whose emphasis markers are unbalanced.
+
+    Emits one warning naming the line exactly when its emphasis markers
+    (``*``/``**``/`` ` ``) are unbalanced, ignoring escaped ``\\*``; balanced
+    lines produce no warning. (Property 15)
+    """
+    warnings = []
+    for idx, line in enumerate(lines or []):
+        content = line.rstrip('\r\n')
+        if not _emphasis_balanced(content):
+            warnings.append(
+                f"[WARN][emphasis] Penanda emphasis tak seimbang pada baris "
+                f"{idx + 1}: '{content}'."
+            )
+    return warnings
+
+
+def _extract_citation_keys(body_text):
+    """Extract in-text APA citation keys from ``body_text``.
+
+    Returns a list of ``(surname_lower, year, display_name)`` tuples. Handles
+    ``(Nama, Tahun)``, ``(Nama et al., Tahun)``, ``(Nama & Lain, Tahun)`` and
+    multiple sources in one parenthesis separated by ';'.
+    """
+    keys = []
+    for m in _CITATION_PAREN_RE.finditer(body_text or ""):
+        inner = m.group(1)
+        for part in inner.split(';'):
+            part = part.strip()
+            ym = _INNER_YEAR_RE.search(part)
+            if not ym:
+                continue
+            year = ym.group(1)
+            name_part = part.split(',', 1)[0].strip()
+            name_part = _ET_AL_RE.sub('', name_part).strip()
+            name_part = name_part.split('&', 1)[0].strip()
+            if not name_part:
+                continue
+            keys.append((name_part.lower(), year, name_part))
+    return keys
+
+
+def collect_citation_crosscheck_warnings(body_text, entries, *, fatal=False):
+    """R1.5/1.6/6.3 — two-way cross-check between citations and references.
+
+    Forward (R1.5, Property 4): each in-text citation whose key (name, year) has
+    no matching :class:`ReferenceEntry` yields exactly one warning naming the
+    citation's name and year.
+    Backward (R1.6, Property 5): each reference entry never referenced by any
+    citation yields exactly one warning naming the entry.
+
+    Returns ``(warnings, has_fatal)``. ``has_fatal`` is always ``False`` when
+    ``fatal=False`` (default, non-fatal); when ``fatal=True`` any mismatch sets
+    ``has_fatal=True`` (R1.7).
+    """
+    warnings = []
+    citations = _extract_citation_keys(body_text)
+    entry_keys = {reference_key(e) for e in (entries or [])}
+    cited_keys = {(surname, year) for surname, year, _ in citations}
+
+    # Forward: citation -> Daftar_Pustaka (R1.5). Dedup per unique (name, year).
+    seen_missing = set()
+    for surname, year, display in citations:
+        key = (surname, year)
+        if key not in entry_keys and key not in seen_missing:
+            seen_missing.add(key)
+            warnings.append(
+                f"[WARN][sitasi] Sitasi ({display}, {year}) tidak memiliki "
+                f"Entri_Referensi padanan pada Daftar_Pustaka."
+            )
+
+    # Backward: Daftar_Pustaka -> citation (R1.6).
+    for e in (entries or []):
+        if reference_key(e) not in cited_keys:
+            warnings.append(
+                f"[WARN][sitasi] Entri_Referensi '{e.raw}' tidak pernah "
+                f"dirujuk oleh Sitasi_In_Text mana pun."
+            )
+
+    has_fatal = bool(fatal and warnings)
+    return warnings, has_fatal
+
+
+# --------------------------------------------------------------------------- #
+def _baseline_text_rPr(ns_uri, bold, italic, default_rPr=None):
+    """Build the baseline rPr for a TEXT run, byte-identical to the oracle."""
+    rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+
+    # Inherit default fonts and sizes.
+    if default_rPr is not None:
+        for child in default_rPr:
+            rPr.append(lxml.etree.fromstring(lxml.etree.tostring(child)))
+
+    # Set fonts explicitly to Times New Roman.
+    rFonts = rPr.find(f'{{{ns_uri}}}rFonts')
+    if rFonts is None:
+        rFonts = lxml.etree.Element(f'{{{ns_uri}}}rFonts')
+        rPr.append(rFonts)
+    rFonts.set(f'{{{ns_uri}}}ascii', 'Times New Roman')
+    rFonts.set(f'{{{ns_uri}}}hAnsi', 'Times New Roman')
+
+    # Set size explicitly if not set (sz val 24 = 12pt).
+    sz = rPr.find(f'{{{ns_uri}}}sz')
+    if sz is None:
+        sz = lxml.etree.Element(f'{{{ns_uri}}}sz')
+        sz.set(f'{{{ns_uri}}}val', '24')
+        rPr.append(sz)
+
+    szCs = rPr.find(f'{{{ns_uri}}}szCs')
+    if szCs is None:
+        szCs = lxml.etree.Element(f'{{{ns_uri}}}szCs')
+        szCs.set(f'{{{ns_uri}}}val', '24')
+        rPr.append(szCs)
+
+    if bold:
+        rPr.append(lxml.etree.Element(f'{{{ns_uri}}}b'))
+        rPr.append(lxml.etree.Element(f'{{{ns_uri}}}bCs'))
+
+    if italic:
+        rPr.append(lxml.etree.Element(f'{{{ns_uri}}}i'))
+        rPr.append(lxml.etree.Element(f'{{{ns_uri}}}iCs'))
+
+    return rPr
+
+
+def emit_runs(p_elem, tokens, default_rPr=None, rel_manager=None):
+    """Append ``w:r`` (and ``w:hyperlink`` for LINK tokens) to ``p_elem``.
+
+    TEXT tokens replicate the baseline rPr byte-for-byte (Times New Roman,
+    sz/szCs 24, optional w:b/bCs and w:i/iCs) so balanced/plain text is
+    identical to the frozen oracle. CODE tokens use Consolas. LINK tokens wrap a
+    run inside a ``w:hyperlink`` carrying an r:id allocated by ``rel_manager``
+    (falls back to a plain run when no rel_manager is supplied).
     """
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
-    
-    # Split text into tokens based on markdown formatting
-    tokens = re.split(r'(\*\*|\*)', text)
-    
-    current_bold = False
-    current_italic = False
-    
-    for token in tokens:
-        if token == '**':
-            current_bold = not current_bold
-            continue
-        elif token == '*':
-            current_italic = not current_italic
-            continue
-            
-        if not token:
-            continue
-            
-        r = lxml.etree.Element(f'{{{ns_uri}}}r')
-        rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
-        
-        # Inherit default fonts and sizes
-        if default_rPr is not None:
-            for child in default_rPr:
-                # Use deep copy for lxml elements
-                rPr.append(lxml.etree.fromstring(lxml.etree.tostring(child)))
-                
-        # Set fonts explicitly to Times New Roman
-        rFonts = rPr.find(f'{{{ns_uri}}}rFonts')
-        if rFonts is None:
-            rFonts = lxml.etree.Element(f'{{{ns_uri}}}rFonts')
-            rPr.append(rFonts)
-        rFonts.set(f'{{{ns_uri}}}ascii', 'Times New Roman')
-        rFonts.set(f'{{{ns_uri}}}hAnsi', 'Times New Roman')
-        
-        # Set size explicitly if not set (sz val 24 = 12pt)
-        sz = rPr.find(f'{{{ns_uri}}}sz')
-        if sz is None:
-            sz = lxml.etree.Element(f'{{{ns_uri}}}sz')
-            sz.set(f'{{{ns_uri}}}val', '24')
-            rPr.append(sz)
-            
-        szCs = rPr.find(f'{{{ns_uri}}}szCs')
-        if szCs is None:
-            szCs = lxml.etree.Element(f'{{{ns_uri}}}szCs')
-            szCs.set(f'{{{ns_uri}}}val', '24')
-            rPr.append(szCs)
-            
-        if current_bold:
-            b = lxml.etree.Element(f'{{{ns_uri}}}b')
-            bCs = lxml.etree.Element(f'{{{ns_uri}}}bCs')
-            rPr.append(b)
-            rPr.append(bCs)
-            
-        if current_italic:
-            i = lxml.etree.Element(f'{{{ns_uri}}}i')
-            iCs = lxml.etree.Element(f'{{{ns_uri}}}iCs')
-            rPr.append(i)
-            rPr.append(iCs)
-            
-        r.append(rPr)
-        
-        t = lxml.etree.Element(f'{{{ns_uri}}}t')
-        t.text = token
-        if token.startswith(' ') or token.endswith(' '):
-            t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-            
-        r.append(t)
-        p_elem.append(r)
+    r_ns = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
 
-def build_p_element(item):
+    for tok in tokens:
+        if tok.kind == TokenKind.TEXT:
+            if not tok.text:
+                continue
+            r = lxml.etree.Element(f'{{{ns_uri}}}r')
+            r.append(_baseline_text_rPr(ns_uri, tok.bold, tok.italic, default_rPr))
+            t = lxml.etree.Element(f'{{{ns_uri}}}t')
+            t.text = tok.text
+            if tok.text.startswith(' ') or tok.text.endswith(' '):
+                t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+            r.append(t)
+            p_elem.append(r)
+
+        elif tok.kind == TokenKind.CODE:
+            r = lxml.etree.Element(f'{{{ns_uri}}}r')
+            rPr = lxml.etree.SubElement(r, f'{{{ns_uri}}}rPr')
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}rFonts', {
+                f'{{{ns_uri}}}ascii': 'Consolas',
+                f'{{{ns_uri}}}hAnsi': 'Consolas'
+            })
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '18'})
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '18'})
+            t = lxml.etree.SubElement(r, f'{{{ns_uri}}}t')
+            t.text = tok.text
+            if tok.text.startswith(' ') or tok.text.endswith(' '):
+                t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+            p_elem.append(r)
+
+        elif tok.kind == TokenKind.LINK:
+            if rel_manager is not None:
+                rid = rel_manager.add_external(tok.url)
+                hyperlink = lxml.etree.SubElement(p_elem, f'{{{ns_uri}}}hyperlink')
+                hyperlink.set(f'{{{r_ns}}}id', rid)
+                hyperlink.set(f'{{{ns_uri}}}history', '1')
+                r = lxml.etree.SubElement(hyperlink, f'{{{ns_uri}}}r')
+                rPr = lxml.etree.SubElement(r, f'{{{ns_uri}}}rPr')
+                lxml.etree.SubElement(rPr, f'{{{ns_uri}}}rStyle', {f'{{{ns_uri}}}val': 'Hyperlink'})
+                lxml.etree.SubElement(rPr, f'{{{ns_uri}}}rFonts', {
+                    f'{{{ns_uri}}}ascii': 'Times New Roman',
+                    f'{{{ns_uri}}}hAnsi': 'Times New Roman'
+                })
+                lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '24'})
+                lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '24'})
+                t = lxml.etree.SubElement(r, f'{{{ns_uri}}}t')
+                t.text = tok.text
+                if tok.text.startswith(' ') or tok.text.endswith(' '):
+                    t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+            else:
+                # No rel manager -> degrade gracefully to a plain baseline run.
+                r = lxml.etree.Element(f'{{{ns_uri}}}r')
+                r.append(_baseline_text_rPr(ns_uri, False, False, default_rPr))
+                t = lxml.etree.Element(f'{{{ns_uri}}}t')
+                t.text = tok.text
+                if tok.text.startswith(' ') or tok.text.endswith(' '):
+                    t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+                r.append(t)
+                p_elem.append(r)
+
+
+def add_formatted_text(p_elem, text, default_rPr=None, rel_manager=None):
+    """Backwards-compatible wrapper: emit_runs(p_elem, tokenize_inline(text), ...).
+
+    The legacy signature is preserved (``rel_manager`` is optional) so existing
+    callers keep working. For text without new constructs (plain text plus
+    balanced ``**``/``*``) the emitted runs are byte-identical to the frozen
+    oracle ``add_formatted_text``.
+    """
+    emit_runs(p_elem, tokenize_inline(text), default_rPr, rel_manager)
+
+def build_p_element(item, rel_manager=None):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     p = lxml.etree.Element(f'{{{ns_uri}}}p')
     pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
@@ -273,15 +968,31 @@ def build_p_element(item):
         lxml.etree.SubElement(default_rPr, f'{{{ns_uri}}}b')
         lxml.etree.SubElement(default_rPr, f'{{{ns_uri}}}bCs')
         
-        add_formatted_text(p, item['text'], default_rPr)
+        add_formatted_text(p, item['text'], default_rPr, rel_manager)
         
     elif item['type'] == 'page_break':
         r = lxml.etree.SubElement(p, f'{{{ns_uri}}}r')
         lxml.etree.SubElement(r, f'{{{ns_uri}}}br', {f'{{{ns_uri}}}type': 'page'})
         
     elif item['type'] == 'list_item':
+        # R4: opt-in Word numbering (numPr). The branch only activates when the
+        # list_item explicitly requests it via 'use_numpr' (Opt_In_By_Content).
+        # Without the trigger the rendering is byte-identical to Output_Baseline:
+        # a literal textual marker run.
+        use_numpr = bool(item.get('use_numpr', False))
+
         lxml.etree.SubElement(pPr, f'{{{ns_uri}}}pStyle', {f'{{{ns_uri}}}val': 'ListParagraph'})
-        
+
+        if use_numpr:
+            # R4.1: render the ordered-list item through Word's numbering engine
+            # (numId/ilvl) instead of a literal textual marker. numPr must sit
+            # right after pStyle per the CT_PPr child ordering.
+            numPr = lxml.etree.SubElement(pPr, f'{{{ns_uri}}}numPr')
+            ilvl_val = str(max(0, item['level'] - 1))
+            num_id_val = str(item.get('num_id', 1))
+            lxml.etree.SubElement(numPr, f'{{{ns_uri}}}ilvl', {f'{{{ns_uri}}}val': ilvl_val})
+            lxml.etree.SubElement(numPr, f'{{{ns_uri}}}numId', {f'{{{ns_uri}}}val': num_id_val})
+
         left_dxa = str(item['level'] * 360)
         lxml.etree.SubElement(pPr, f'{{{ns_uri}}}ind', {
             f'{{{ns_uri}}}left': left_dxa,
@@ -297,20 +1008,22 @@ def build_p_element(item):
         
         lxml.etree.SubElement(pPr, f'{{{ns_uri}}}jc', {f'{{{ns_uri}}}val': 'both'})
         
-        marker_run = lxml.etree.SubElement(p, f'{{{ns_uri}}}r')
-        marker_rPr = lxml.etree.SubElement(marker_run, f'{{{ns_uri}}}rPr')
-        lxml.etree.SubElement(marker_rPr, f'{{{ns_uri}}}rFonts', {
-            f'{{{ns_uri}}}ascii': 'Times New Roman',
-            f'{{{ns_uri}}}hAnsi': 'Times New Roman'
-        })
-        lxml.etree.SubElement(marker_rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '24'})
-        lxml.etree.SubElement(marker_rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '24'})
+        if not use_numpr:
+            # R4.2/R4.3 (default, baseline): literal textual marker + tab run.
+            marker_run = lxml.etree.SubElement(p, f'{{{ns_uri}}}r')
+            marker_rPr = lxml.etree.SubElement(marker_run, f'{{{ns_uri}}}rPr')
+            lxml.etree.SubElement(marker_rPr, f'{{{ns_uri}}}rFonts', {
+                f'{{{ns_uri}}}ascii': 'Times New Roman',
+                f'{{{ns_uri}}}hAnsi': 'Times New Roman'
+            })
+            lxml.etree.SubElement(marker_rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '24'})
+            lxml.etree.SubElement(marker_rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '24'})
+            
+            marker_t = lxml.etree.SubElement(marker_run, f'{{{ns_uri}}}t')
+            marker_t.text = item['marker'] + "\t"
+            marker_t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
         
-        marker_t = lxml.etree.SubElement(marker_run, f'{{{ns_uri}}}t')
-        marker_t.text = item['marker'] + "\t"
-        marker_t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-        
-        add_formatted_text(p, item['text'])
+        add_formatted_text(p, item['text'], rel_manager=rel_manager)
         
     elif item['type'] == 'paragraph':
         is_caption = item['text'].startswith('Gambar ') or item['text'].startswith('Tabel ') or item['text'].startswith('LAMPIRAN ')
@@ -347,9 +1060,9 @@ def build_p_element(item):
                 t_pref.text = prefix
                 t_pref.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
                 
-                add_formatted_text(p, suffix)
+                add_formatted_text(p, suffix, rel_manager=rel_manager)
             else:
-                add_formatted_text(p, item['text'])
+                add_formatted_text(p, item['text'], rel_manager=rel_manager)
         else:
             lxml.etree.SubElement(pPr, f'{{{ns_uri}}}pStyle', {f'{{{ns_uri}}}val': 'Normal'})
             lxml.etree.SubElement(pPr, f'{{{ns_uri}}}jc', {f'{{{ns_uri}}}val': 'both'})
@@ -366,7 +1079,7 @@ def build_p_element(item):
                 f'{{{ns_uri}}}left': '0'
             })
             
-            add_formatted_text(p, item['text'])
+            add_formatted_text(p, item['text'], rel_manager=rel_manager)
             
     return p
 
@@ -410,6 +1123,104 @@ def build_code_block_elements(item):
         
     return elements
 
+# --------------------------------------------------------------------------- #
+# Pipe table parsing (R5) — pure functions, Opt_In_By_Content.
+# --------------------------------------------------------------------------- #
+class Alignment(Enum):
+    """Per-column alignment of a pipe table, mapped directly to w:jc/@w:val.
+
+    NOTE: DEFAULT and LEFT share the value "left"; per Python Enum semantics
+    LEFT becomes an alias of DEFAULT. Both render to ``w:jc w:val="left"``.
+    """
+    DEFAULT = "left"   # no ':' -> default (left, identical to baseline cell)
+    LEFT = "left"      # :---
+    CENTER = "center"  # :---:
+    RIGHT = "right"    # ---:
+
+
+_SEPARATOR_CELL_RE = re.compile(r'^:?-+:?$')
+
+
+def _split_pipe_cells(line):
+    """Split a pipe-table line into trimmed cells, dropping outer-pipe empties."""
+    cells = [c.strip() for c in line.split('|')]
+    if cells and cells[0] == '':
+        cells = cells[1:]
+    if cells and cells[-1] == '':
+        cells = cells[:-1]
+    return cells
+
+
+def is_pipe_table_separator(line):
+    """True if ``line`` is a Baris_Pemisah: every cell matches ``^:?-+:?$``
+    after splitting on '|' (e.g. '---', ':---', ':---:', '---:')."""
+    cells = _split_pipe_cells(line)
+    if not cells:
+        return False
+    return all(_SEPARATOR_CELL_RE.match(c) for c in cells)
+
+
+def parse_alignment_row(line):
+    """Map each separator cell to an :class:`Alignment`
+    (LEFT ':---', CENTER ':---:', RIGHT '---:', DEFAULT '---')."""
+    alignments = []
+    for cell in _split_pipe_cells(line):
+        left = cell.startswith(':')
+        right = cell.endswith(':')
+        if left and right:
+            alignments.append(Alignment.CENTER)
+        elif right:
+            alignments.append(Alignment.RIGHT)
+        elif left:
+            alignments.append(Alignment.LEFT)
+        else:
+            alignments.append(Alignment.DEFAULT)
+    return alignments
+
+
+def detect_pipe_table(lines, start_idx):
+    """Detect a standard pipe table starting at ``lines[start_idx]``.
+
+    Requires that ``lines[start_idx]`` contains '|' AND ``lines[start_idx + 1]``
+    is a Baris_Pemisah with a matching column count. Collects following lines
+    that contain '|' until a blank line (or a non-pipe line / end of input).
+
+    Returns ``(end_idx, item)`` where ``end_idx`` is the index of the first line
+    after the table and ``item`` is
+    ``{'type':'table','lines':[header + data rows, WITHOUT separator],
+       'alignments':[...], 'is_pipe':True}``. Returns ``None`` when no pipe
+    table is present (so the caller falls through to existing behavior)."""
+    n = len(lines)
+    if start_idx + 1 >= n:
+        return None
+    header = lines[start_idx].strip()
+    sep = lines[start_idx + 1].strip()
+    if '|' not in header:
+        return None
+    if not is_pipe_table_separator(sep):
+        return None
+    if len(_split_pipe_cells(header)) != len(_split_pipe_cells(sep)):
+        return None
+
+    alignments = parse_alignment_row(sep)
+    data_lines = [header]
+    idx = start_idx + 2
+    while idx < n:
+        cur = lines[idx].strip()
+        if cur == '' or '|' not in cur:
+            break
+        data_lines.append(cur)
+        idx += 1
+
+    item = {
+        'type': 'table',
+        'lines': data_lines,
+        'alignments': alignments,
+        'is_pipe': True,
+    }
+    return (idx, item)
+
+
 def build_table_element(item):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     tbl = lxml.etree.Element(f'{{{ns_uri}}}tbl')
@@ -428,6 +1239,10 @@ def build_table_element(item):
             f'{{{ns_uri}}}color': 'auto'
         })
         
+    # Pipe-table per-column alignment metadata (R5). Absent for [TABLE] data,
+    # so that path stays byte-identical to the frozen baseline oracle.
+    alignments = item.get('alignments')
+
     rows_data = []
     for line in item['lines']:
         cells = [c.strip() for c in line.split('|')]
@@ -454,7 +1269,7 @@ def build_table_element(item):
         if is_first_row:
             lxml.etree.SubElement(trPr, f'{{{ns_uri}}}tblHeader')
             
-        for cell_text in row_cells:
+        for j, cell_text in enumerate(row_cells):
             tc = lxml.etree.SubElement(tr, f'{{{ns_uri}}}tc')
             tcPr = lxml.etree.SubElement(tc, f'{{{ns_uri}}}tcPr')
             lxml.etree.SubElement(tcPr, f'{{{ns_uri}}}tcW', {f'{{{ns_uri}}}w': '0', f'{{{ns_uri}}}type': 'auto'})
@@ -462,7 +1277,13 @@ def build_table_element(item):
             p = lxml.etree.SubElement(tc, f'{{{ns_uri}}}p')
             pPr = lxml.etree.SubElement(p, f'{{{ns_uri}}}pPr')
             lxml.etree.SubElement(pPr, f'{{{ns_uri}}}pStyle', {f'{{{ns_uri}}}val': 'Normal'})
-            lxml.etree.SubElement(pPr, f'{{{ns_uri}}}jc', {f'{{{ns_uri}}}val': 'left'})
+            # Without alignments (the [TABLE] path) this is always 'left',
+            # byte-identical to the oracle. With alignments, apply per-column jc.
+            if alignments and j < len(alignments):
+                jc_val = alignments[j].value
+            else:
+                jc_val = 'left'
+            lxml.etree.SubElement(pPr, f'{{{ns_uri}}}jc', {f'{{{ns_uri}}}val': jc_val})
             lxml.etree.SubElement(pPr, f'{{{ns_uri}}}ind', {f'{{{ns_uri}}}firstLine': '0', f'{{{ns_uri}}}left': '0'})
             
             lxml.etree.SubElement(pPr, f'{{{ns_uri}}}spacing', {
@@ -697,11 +1518,26 @@ def merge_draft_to_xml(xml_path, parsed_items):
             
     print(f"Removed {len(elements_to_remove)} placeholder elements.")
     
+    # Allocate a RelManager seeded with the existing relationship ids so any
+    # hyperlink rIds we hand out never collide with what is already present.
+    rels_path = os.path.join(os.path.dirname(xml_path), "_rels", "document.xml.rels")
+    existing_rel_ids = set()
+    if os.path.exists(rels_path):
+        try:
+            rels_tree = lxml.etree.parse(rels_path, parser)
+            for rel in rels_tree.getroot():
+                rid = rel.get('Id')
+                if rid:
+                    existing_rel_ids.add(rid)
+        except lxml.etree.XMLSyntaxError as e:
+            print(f"Warning: could not read existing rels {rels_path}: {e}")
+    rel_manager = RelManager(existing_ids=existing_rel_ids)
+    
     # Build and insert new XML elements
     new_elements = []
     for item in parsed_items:
         if item['type'] in ['heading', 'page_break', 'list_item', 'paragraph']:
-            p_elem = build_p_element(item)
+            p_elem = build_p_element(item, rel_manager)
             new_elements.append(p_elem)
         elif item['type'] == 'code_block':
             new_elements.extend(build_code_block_elements(item))
@@ -775,6 +1611,12 @@ def merge_draft_to_xml(xml_path, parsed_items):
     # Write back to XML
     tree.write(xml_path, encoding='utf-8', xml_declaration=True)
     print("document.xml updated successfully.")
+    
+    # Persist any external hyperlink relationships additively. When no links
+    # were emitted, this is a no-op and document.xml.rels stays untouched.
+    if rel_manager.has_new:
+        rel_manager.write(rels_path)
+        print(f"Wrote {len(rel_manager._new)} hyperlink relationship(s) to {rels_path}.")
 
 def resolve_path(p, workspace_root):
     """Resolve a path against the workspace root (R7.2, R7.3).
