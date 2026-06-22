@@ -670,6 +670,64 @@ def main():
         print(w)
     print(f"Narration check: {len(narration_warnings)} figure(s) without a narrative reference (non-fatal).")
 
+    # ============================================================ #
+    # Citation guard for Latar Belakang (WARNING ONLY -- never fatal).
+    #
+    # Academic rule (.kiro/steering/aturan-sitasi.md): the Latar Belakang is the
+    # most citation-dense section -- every substantial factual-claim paragraph
+    # should carry an APA in-text citation "(... Tahun)". Here we flag any
+    # sizeable body paragraph inside the "Latar Belakang" subsection that has no
+    # citation, unless it explicitly refers to the author's own data (kuesioner /
+    # responden / Lampiran), which is cited to the author's own material instead.
+    # This DOES NOT append to errors_found and DOES NOT change the exit code.
+    # ============================================================ #
+    print("Checking Latar Belakang citations (non-fatal warnings)...")
+    CITATION_RE = re.compile(r'\([^()]*(?:19|20)\d{2}[a-z]?\)')
+    SELF_DATA_RE = re.compile(r'kuesioner|responden|lampiran|gambar|tabel', re.I)
+
+    def _is_heading(pp):
+        return _content_style(pp).lower().startswith('heading')
+
+    # Locate the "Latar Belakang" heading and the extent of its subsection
+    # (until the next heading of any level).
+    lb_start = -1
+    for idx, p in enumerate(p_list):
+        if _is_heading(p) and 'latar belakang' in _content_text(p).lower():
+            lb_start = idx
+            break
+    citation_warnings = []
+    if lb_start != -1:
+        lb_end = len(p_list)
+        for j in range(lb_start + 1, len(p_list)):
+            if _is_heading(p_list[j]):
+                lb_end = j
+                break
+        for j in range(lb_start + 1, lb_end):
+            q = p_list[j]
+            if _is_heading(q):
+                continue
+            style_val = _content_style(q)
+            if style_val in ('Caption',) or style_val.startswith('TableofFigures'):
+                continue
+            if q.find(f'.//{{{W_NS}}}drawing') is not None:
+                continue
+            q_text = _content_text(q)
+            # Only sizeable claim paragraphs (skip short transitions/list lines).
+            if len(q_text) < 200:
+                continue
+            if CITATION_RE.search(q_text):
+                continue
+            if SELF_DATA_RE.search(q_text):
+                continue
+            citation_warnings.append(
+                f"[WARN][sitasi] Paragraf Latar Belakang tanpa sitasi: '{q_text[:70]}...'")
+    else:
+        print("  note: 'Latar Belakang' heading not found; citation check skipped.")
+
+    for w in citation_warnings:
+        print(w)
+    print(f"Citation check: {len(citation_warnings)} Latar Belakang paragraph(s) without a citation (non-fatal).")
+
     # 3. Report results
     if errors_found:
         print("\n=== VALIDATION FAILED ===")
