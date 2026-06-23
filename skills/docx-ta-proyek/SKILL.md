@@ -42,11 +42,11 @@ Unlike research theses (skripsi) which use a 5-chapter structure, project-based 
   * 2.1 Observasi
   * 2.2 Usulan Solusi
   * 2.3 Rancangan Proyek (User Interface, UML, ERD, etc.)
-  * 2.4 Rencana Pengujian Proyek (Black Box, White Box)
+  * 2.4 Rencana Pengujian Proyek (Black Box, UAT, Lighthouse)
 * **BAB III IMPLEMENTASI PROYEK**
   * 3.1 Profil Mitra (Nama, Deskripsi, Hubungan)
   * 3.2 Metode Implementasi
-  * 3.3 Metadata (Database description, Web Manifest, etc.)
+  * 3.3 Konfigurasi & Metadata Sistem (Database description, Proxy Analytics, Web Manifest)
   * 3.4 Laporan Implementasi Proyek (Logbook/activities list)
   * 3.5 Hasil Pengujian Proyek (UAT, Black Box results)
 * **BAB IV PENUTUP**

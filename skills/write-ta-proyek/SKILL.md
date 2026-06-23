@@ -141,12 +141,13 @@ The report draft MUST follow the 4-chapter project outline structure. Below is t
 * **2.1 Observasi**: Details on running systems, surveys/questionnaires, and domain expert interviews.
 * **2.2 Usulan Solusi**: Concept diagram and technical architecture.
   * **2.2.1 Identifikasi Kebutuhan Fungsional**: Grouped by User, Admin, and Integration/API requirements.
-  * **2.2.2 Identifikasi Kebutuhan Teknis**: Stacks (React SPA, Express API, Supabase DB, Umami Analytics, Unity WebGL).
+  * **2.2.2 Identifikasi Kebutuhan Teknis**: Stacks (React SPA, Vercel Serverless API berbasis Node.js, Supabase DB, Umami Analytics, Unity WebGL). Express.js hanya berperan sebagai proxy Umami + rate limiter.
+  * **2.2.3 Identifikasi Kebutuhan Non-Fungsional**: Performa (muat < 10 dtk), kompatibilitas mobile-first, keamanan (JWT, RLS, rate limiter), privasi, usabilitas/aksesibilitas, keterpeliharaan.
 * **2.3 Rancangan Proyek**
   * **2.3.1 Rencana Pengembangan**: Prototyping phases.
   * **2.3.2 Perancangan Information Architecture (IA)**: App hierarchy.
   * **2.3.3 Perancangan Unified Modelling Language (UML)**: Use Case, Activity, and Sequence diagrams.
-  * **2.3.4 Perancangan Sistem Spesifik**: System configurations (e.g., scheduled notifications, database trigger designs, RLS, reverse proxies).
+  * **2.3.4 Perancangan Modul Keamanan & Analitik**: Konfigurasi keamanan & analitik (RLS, trigger audit logs, reverse proxy Umami / rate limiter).
   * **2.3.5 Perancangan Entity Relationship Diagram (ERD)**: Data schema model.
   * **2.3.6 Perancangan Antarmuka**: Visual layout mocks for Public Dashboard and Admin Panel.
 * **2.4 Rencana Pengujian Proyek**: Test strategies (Black Box and UAT design).
@@ -157,12 +158,13 @@ The report draft MUST follow the 4-chapter project outline structure. Below is t
   * **3.1.2 Deskripsi Mitra**
   * **3.1.3 Hubungan Mitra dengan Proyek**
 * **3.2 Metode Implementasi**
-  * **3.2.1 Implementasi Back-end**: Express.js serverless functions, database schema implementation, SQL code snippets.
+  * **3.2.1 Implementasi Back-end**: Vercel Serverless Functions (Node.js), implementasi skema database, potongan kode SQL.
   * **3.2.2 Implementasi Front-end**: React SPA component details, routing, WebGL communications.
-* **3.3 Metadata**
+  * **3.2.3 Implementasi Integrasi (WebGL Bridge React–Unity)**: jembatan satu arah `SendMessage("NavigationReceiver","NavigateTo", unity_object_name)` + alur data `unity_object_name` (Unity menarik `/api/unity/data` sendiri).
+* **3.3 Konfigurasi & Metadata Sistem**
   * **3.3.1 Basis Data**: Schema tables and keys mapped to Unity.
-  * **3.3.2 Deskripsi Jenis Notifikasi / Proxy Analytics**: Reverse proxy settings and self-hosted tracker collect configurations.
-  * **3.3.3 Web Manifest / Web Assets**: Assets configurations.
+  * **3.3.2 Proxy Analytics (Umami)**: Reverse proxy Express.js (port 3001) ke Umami self-hosted (port 3000).
+  * **3.3.3 Web Manifest / Web Assets**: Konfigurasi aset & build WebGL (Brotli, IL2CPP).
 * **3.4 Laporan Implementasi Proyek**
   * **3.4.1 Logbook Implementasi Proyek**: Logbook table with activity lists and validation.
   * **3.4.2 Hasil Implementasi Back-end**: API endpoint returns and implementation code.
