@@ -15,7 +15,7 @@ graph TD
     A[Input Detail Proyek / PRD Baru] --> B(Skill: write-ta-proyek)
     B --> C{Audit Diskrepansi & Konsistensi}
     C -->|Gaps Ditemukan| D[Laporkan Inkonsistensi Istilah / Data Kurang]
-    C -->|Cocok / Approved| E[Draf Ditulis di laporan_draft.md]
+    C -->|Cocok / Approved| E[Draf Ditulis di Tugas_Akhir_Draft.md]
     E --> F[Sitasi Jurnal & Saran Gambar AI Placeholder]
     F --> G(Skill: docx-ta-proyek)
     G --> H[Konversi Markdown ke .docx Mentah]
@@ -31,7 +31,7 @@ graph TD
 Skill ini digunakan saat menyusun dan merevisi isi laporan bab demi bab secara interaktif.
 
 ### Fitur Utama:
-*   **Audit Real-Time**: AI mencocokkan input PRD baru Anda dengan draf yang sudah ditulis di `laporan_draft.md` untuk meminimalkan salah informasi.
+*   **Audit Real-Time**: AI mencocokkan input PRD baru Anda dengan draf yang sudah ditulis di `Tugas_Akhir_Draft.md` untuk meminimalkan salah informasi.
 *   **Konsistensi Istilah**: Melakukan validasi otomatis terhadap daftar istilah teknis yang tersimpan di `term_registry.json`. Jika dari awal memakai *user interface*, maka penggunaan *antarmuka* akan diperingatkan.
 *   **Sitasi Jurnal Otomatis**: 
     1. Mencari dokumen pendukung di folder `journal/` parent directory.
