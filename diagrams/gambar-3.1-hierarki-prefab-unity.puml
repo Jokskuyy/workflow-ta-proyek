@@ -1,0 +1,25 @@
+@startwbs gambar-3-1-hierarki-prefab-unity
+' Gambar 3.1 - Hierarki Prefab Gedung dengan Child Pointer di Unity
+' Sumber: PRD - Konvensi Struktur Scene Unity
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 13
+skinparam wbsDiagram {
+  BackgroundColor #F2F2F2
+  BorderColor #555555
+  ArrowColor #444444
+}
+
+title Gambar 3.1 — Hierarki Prefab Gedung dengan Child Pointer di Unity
+
+* [NamaGedung]\n(Prefab Gedung)
+** Pointer\n(parent unity_object_name)
+*** unity_object_name_1\n(target navigasi — gedung)
+*** unity_object_name_2\n(target navigasi — fasilitas)
+** Lantai 1
+** Lantai 2
+** Lantai N
+
+@endwbs

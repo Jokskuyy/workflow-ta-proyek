@@ -1,0 +1,55 @@
+@startuml gambar-2-14-activity-integrasi-data-denah
+' Gambar 2.14 - Activity Diagram: Integrasi Data Denah
+' Logika mitigasi ketersediaan data akademik eksternal (Skenario A, B, C)
+' Sumber: BAB II - 2.1.3 & 2.3.3 Activity Diagram
+' CATATAN: Label cabang Skenario A/B/C disesuaikan dengan narasi laporan.
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 13
+skinparam ArrowColor #444444
+skinparam ActivityBorderColor #555555
+skinparam ActivityBackgroundColor #F2F2F2
+skinparam ActivityDiamondBackgroundColor #ECECEC
+skinparam ActivityDiamondBorderColor #555555
+skinparam NoteBackgroundColor #FAFAFA
+skinparam NoteBorderColor #BBBBBB
+
+title Gambar 2.14 — Activity Diagram: Integrasi Data Denah\n(Mitigasi Ketersediaan Data Akademik Eksternal)
+
+start
+:Pengguna mengakses Public Dashboard / Denah Virtual;
+:Sistem meminta data profil & akademik kampus;
+
+if (Sumber data yang dibutuhkan?) then (Data internal\n(gedung, fasilitas, prodi))
+  :Ambil data dari Backend API\n(Supabase PostgreSQL);
+  :Sajikan data dinamis ke\ndashboard & Denah Virtual;
+else (Data akademik eksternal\n(statistik, akreditasi - UPA TIK))
+
+  if (Status ketersediaan data eksternal?) then (Tersedia & dapat di-embed)
+    :**Skenario A**\nData eksternal tersedia;
+    :Konsumsi / embed data dari\nsistem UPA TIK secara langsung;
+  elseif (Tersedia terbatas\n(kebijakan RLS / parsial)) then
+    :**Skenario B**\nData eksternal terbatas;
+    :Gunakan data internal Supabase\nyang dikelola Admin sebagai sumber;
+  else (Tidak tersedia)
+    :**Skenario C**\nData eksternal tidak tersedia;
+    :Tampilkan data fallback /\nplaceholder & catat log;
+  endif
+
+  :Gabungkan data ke dalam\ntampilan terpadu;
+endif
+
+:Render informasi pada antarmuka pengguna;
+note right
+  Strategi tiga skenario (A/B/C)
+  menjaga reliabilitas sistem
+  di tengah ketidakpastian
+  ketersediaan data akademik
+  eksternal.
+end note
+
+stop
+
+@enduml

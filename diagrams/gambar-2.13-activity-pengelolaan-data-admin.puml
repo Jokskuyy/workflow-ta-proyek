@@ -1,0 +1,74 @@
+@startuml gambar-2-13-activity-pengelolaan-data-admin
+' Gambar 2.13 - Activity Diagram: Pengelolaan Data oleh Admin (CRUD)
+' Sumber: BAB II - 2.3.3 Activity Diagram
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 13
+skinparam ArrowColor #444444
+skinparam ActivityBorderColor #555555
+skinparam ActivityBackgroundColor #F2F2F2
+skinparam ActivityDiamondBackgroundColor #ECECEC
+skinparam ActivityDiamondBorderColor #555555
+skinparam SwimlaneTitleFontColor #333333
+skinparam SwimlaneBorderColor #999999
+
+title Gambar 2.13 — Activity Diagram: Pengelolaan Data oleh Admin
+
+|Administrator|
+start
+:Membuka halaman Login Admin;
+:Memasukkan kredensial;
+
+|Sistem (Backend + Supabase)|
+:Verifikasi kredensial (Supabase Auth);
+if (Kredensial valid?) then (Tidak)
+  :Tampilkan pesan error;
+  stop
+else (Ya)
+  :Buka akses Admin Dashboard;
+endif
+
+|Administrator|
+:Memilih operasi pengelolaan data;
+switch (Jenis operasi CRUD)
+case (Create)
+  :Mengisi formulir tambah data;
+  |Sistem (Backend + Supabase)|
+  :Validasi input;
+  if (Input valid?) then (Tidak)
+    |Administrator|
+    :Perbaiki input;
+    detach
+  else (Ya)
+    :Simpan data baru ke database;
+  endif
+case (Read)
+  |Sistem (Backend + Supabase)|
+  :Ambil & tampilkan data;
+case (Update)
+  |Administrator|
+  :Mengubah data pada formulir edit;
+  |Sistem (Backend + Supabase)|
+  :Validasi & perbarui data;
+case (Delete)
+  |Administrator|
+  :Menekan tombol hapus;
+  :Menampilkan modal konfirmasi;
+  if (Konfirmasi hapus?) then (Batal)
+    :Tutup modal;
+    detach
+  else (Ya)
+    |Sistem (Backend + Supabase)|
+    :Hapus data dari database;
+  endif
+endswitch
+
+|Sistem (Backend + Supabase)|
+:Trigger menulis Audit Log\n(actor, aksi, tabel, data);
+:Tampilkan notifikasi berhasil;
+
+stop
+
+@enduml

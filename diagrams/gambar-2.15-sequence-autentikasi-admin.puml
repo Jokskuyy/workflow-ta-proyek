@@ -1,0 +1,53 @@
+@startuml gambar-2-15-sequence-autentikasi-admin
+' Gambar 2.15 - Sequence Diagram: Autentikasi Administrator
+' Sumber: BAB II - 2.3.3 Sequence Diagram (a)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 13
+skinparam sequenceArrowColor #444444
+skinparam sequenceLifeLineBorderColor #555555
+skinparam sequenceLifeLineBackgroundColor #F2F2F2
+skinparam participant {
+  BackgroundColor #F2F2F2
+  BorderColor #555555
+}
+skinparam actor {
+  BackgroundColor #ECECEC
+  BorderColor #555555
+}
+
+title Gambar 2.15 — Sequence Diagram: Autentikasi Administrator
+
+actor "Administrator" as Admin
+participant "Frontend React\n(Admin Dashboard)" as FE
+participant "Backend API\n(Express / Vercel)" as API
+participant "Supabase Auth" as Auth
+participant "Router Admin\n(Protected Route)" as Router
+
+Admin -> FE : Memasukkan username & kata sandi
+activate FE
+FE -> API : POST /login (kredensial)
+activate API
+API -> Auth : Verifikasi kredensial
+activate Auth
+Auth -->> API : Hasil verifikasi
+deactivate Auth
+
+alt Kredensial valid
+  API -->> FE : 200 OK + JWT token
+  FE -> FE : Simpan token (session)
+  FE -> Router : Buka akses router admin (token)
+  activate Router
+  Router -->> FE : Render Admin Dashboard
+  deactivate Router
+  FE -->> Admin : Menampilkan halaman dashboard admin
+else Kredensial tidak valid
+  API -->> FE : 401 Unauthorized
+  FE -->> Admin : Menampilkan pesan error login
+end
+deactivate API
+deactivate FE
+
+@enduml

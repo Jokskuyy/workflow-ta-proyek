@@ -11,28 +11,37 @@ UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAKARTA
 
 # DAFTAR GAMBAR
 
-Gambar 2.1 Diagram Arsitektur Sistem
-Gambar 2.2 Tahap Pengembangan
-Gambar 2.3 Entity-Relationship Diagram
-Gambar 2.4 Legenda Use Case Diagram
-Gambar 2.5 Use Case Diagram
-Gambar 2.6 Activity Diagram: Pengelolaan Data oleh Admin
-Gambar 2.7 Activity Diagram: Integrasi Data Denah
-Gambar 2.8 Sequence Diagram: Autentikasi Administrator
-Gambar 2.9 Sequence Diagram: Sinkronisasi Data Gedung dan Unity
-Gambar 2.10 Halaman Login Admin
-Gambar 2.11 Halaman Dashboard Admin
-Gambar 2.12 Modal Tambah Data Gedung
-Gambar 2.13 Modal Update Data Gedung
-Gambar 2.14 Modal Konfirmasi Hapus Data Gedung
-Gambar 2.15 Traffic Website Admin
-Gambar 2.16 Hero Section
-Gambar 2.17 Public Traffic Statistics Website
-Gambar 2.18 Bagian Fasilitas dan Aset
-Gambar 2.19 Modal List Fasilitas dan Aset
-Gambar 2.20 Modal Fasilitas dan Aset
-Gambar 2.21 Bagian Footer
-Gambar 2.22 Dokumentasi Wawancara dan Penandatanganan Pakta Integritas
+Gambar 2.1 Hasil Kuesioner: Profil Status Akademik Responden
+Gambar 2.2 Hasil Kuesioner: Efektivitas Media Navigasi Kampus Saat Ini
+Gambar 2.3 Hasil Kuesioner: Frekuensi Kesulitan Menemukan Lokasi
+Gambar 2.4 Hasil Kuesioner: Perilaku Pengguna Saat Mencari Lokasi
+Gambar 2.5 Hasil Kuesioner: Urgensi Kebutuhan Peta Virtual 3D
+Gambar 2.6 Hasil Kuesioner: Potensi Adopsi Denah Virtual 3D
+Gambar 2.7 Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus
+Gambar 2.8 Dokumentasi Wawancara dan Penandatanganan Pakta Integritas
+Gambar 2.9 Diagram Arsitektur Sistem
+Gambar 2.10 Tahap Pengembangan
+Gambar 2.11 Legenda Use Case Diagram
+Gambar 2.12 Use Case Diagram
+Gambar 2.13 Activity Diagram: Pengelolaan Data oleh Admin
+Gambar 2.14 Activity Diagram: Integrasi Data Denah
+Gambar 2.15 Sequence Diagram: Autentikasi Administrator
+Gambar 2.16 Sequence Diagram: Sinkronisasi Data Gedung dan Unity
+Gambar 2.17 Entity-Relationship Diagram
+Gambar 2.18 Halaman Login Admin
+Gambar 2.19 Halaman Dashboard Admin
+Gambar 2.20 Modal Tambah Data Gedung
+Gambar 2.21 Modal Update Data Gedung
+Gambar 2.22 Modal Konfirmasi Hapus Data Gedung
+Gambar 2.23 Traffic Website Admin
+Gambar 2.24 Hero Section
+Gambar 2.25 Public Traffic Statistics Website
+Gambar 2.26 Bagian Fasilitas dan Aset
+Gambar 2.27 Modal List Fasilitas dan Aset
+Gambar 2.28 Modal Fasilitas dan Aset
+Gambar 2.29 Bagian Footer
+Gambar 3.1 Hierarki Prefab Gedung dengan Child Pointer di Unity
+Gambar 3.2 Tampilan UI Database Sync Checker di Unity Editor
 
 # DAFTAR TABEL
 
@@ -202,31 +211,31 @@ Berdasarkan hasil kuesioner yang telah disebarkan kepada 21 responden, diperoleh
 
 Mayoritas responden merupakan sivitas akademika UPNVJ, yaitu sebesar 95,2%, sedangkan sisanya merupakan pengunjung eksternal. Hal ini menunjukkan bahwa data yang diperoleh cukup merepresentasikan pengalaman pengguna utama yang beraktivitas di lingkungan kampus secara rutin.
 
-Gambar 2.23 Hasil Kuesioner: Profil Status Akademik Responden
+Gambar 2.1 Hasil Kuesioner: Profil Status Akademik Responden
 
 Dari aspek efektivitas media navigasi yang tersedia, diperoleh bahwa persepsi responden terhadap papan penunjuk arah dan denah statis cenderung berada pada kategori cukup hingga kurang informatif. Hal ini terlihat dari distribusi jawaban yang menunjukkan bahwa hanya sebagian kecil responden yang menilai sistem navigasi saat ini sangat membantu, sementara sebagian lainnya masih merasakan keterbatasan dalam memahami informasi yang disajikan.
 
-Gambar 2.24 Hasil Kuesioner: Efektivitas Media Navigasi Kampus Saat Ini
+Gambar 2.2 Hasil Kuesioner: Efektivitas Media Navigasi Kampus Saat Ini
 
 Lebih lanjut, dalam satu semester terakhir, sebanyak 57,1% responden mengaku mengalami kesulitan menemukan lokasi sebanyak 1–3 kali, sementara 33,3% menyatakan tidak pernah mengalami kesulitan. Namun demikian, terdapat juga responden yang mengalami kesulitan lebih dari 3 kali, yang menunjukkan bahwa permasalahan navigasi masih terjadi secara berulang bagi sebagian pengguna.
 
-Gambar 2.25 Hasil Kuesioner: Frekuensi Kesulitan Menemukan Lokasi
+Gambar 2.3 Hasil Kuesioner: Frekuensi Kesulitan Menemukan Lokasi
 
 Dari sisi perilaku pengguna dalam mencari informasi lokasi, sebanyak 90,5% responden menyatakan bahwa mereka lebih mengandalkan bantuan orang lain, seperti bertanya kepada mahasiswa lain atau petugas kampus, dibandingkan menggunakan media navigasi yang tersedia. Hal ini mengindikasikan bahwa sistem navigasi yang ada belum mampu menjadi sumber informasi utama yang efektif.
 
-Gambar 2.26 Hasil Kuesioner: Perilaku Pengguna Saat Mencari Lokasi
+Gambar 2.4 Hasil Kuesioner: Perilaku Pengguna Saat Mencari Lokasi
 
 Terkait kebutuhan akan sistem yang lebih baik, mayoritas responden menyatakan bahwa keberadaan sistem peta virtual 3D interaktif yang terintegrasi dengan informasi fasilitas merupakan hal yang penting. Sebanyak 76,2% responden memberikan penilaian tinggi (skala 4 dan 5) terhadap pentingnya sistem tersebut, yang menunjukkan adanya kebutuhan yang signifikan terhadap solusi berbasis teknologi yang lebih interaktif.
 
-Gambar 2.27 Hasil Kuesioner: Urgensi Kebutuhan Peta Virtual 3D
+Gambar 2.5 Hasil Kuesioner: Urgensi Kebutuhan Peta Virtual 3D
 
 Selain itu, dalam hal potensi penggunaan, sebanyak 61,9% responden menyatakan akan menggunakan sistem denah virtual 3D ketika membutuhkan pencarian lokasi tertentu, sementara sebagian lainnya menyatakan akan menggunakan dalam kondisi tertentu atau jarang. Hal ini menunjukkan bahwa sistem yang diusulkan memiliki potensi adopsi yang baik, terutama dalam situasi yang membutuhkan orientasi lokasi.
 
-Gambar 2.28 Hasil Kuesioner: Potensi Adopsi Denah Virtual 3D
+Gambar 2.6 Hasil Kuesioner: Potensi Adopsi Denah Virtual 3D
 
 Dari aspek kebutuhan informasi, responden juga menunjukkan bahwa informasi yang paling penting untuk ditampilkan dalam sistem adalah nama gedung (95,2%), diikuti oleh fasilitas dalam ruangan (52,4%) dan kapasitas ruangan (38,1%). Temuan ini menjadi dasar dalam menentukan jenis data yang perlu disediakan oleh backend dan ditampilkan dalam sistem visualisasi.
 
-Gambar 2.29 Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus
+Gambar 2.7 Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus
 
 Berdasarkan keseluruhan hasil kuesioner tersebut, dapat disimpulkan bahwa terdapat kebutuhan nyata terhadap sistem navigasi kampus yang lebih interaktif, terintegrasi, dan berbasis data dinamis. Temuan ini memperkuat urgensi pengembangan sistem integrasi denah virtual berbasis 3D yang didukung oleh backend sebagai pusat distribusi data.
 
@@ -253,9 +262,9 @@ Berdasarkan pembagian tugas strategis tersebut, disepakati penentuan batasan lin
 
 Berdasarkan arahan narasumber, dirumuskanlah spesifikasi kebutuhan fungsional yang mencakup manajemen konten dinamis melalui Admin Dashboard serta penyediaan jalur distribusi data (API endpoints) untuk mendukung visualisasi pada Public Dashboard dan Denah Virtual. Lebih lanjut, narasumber menekankan krusialnya kebutuhan non-fungsional yang menitikberatkan pada aspek integritas data dan efisiensi waktu respons, mengingat backend sistem ini harus melayani permintaan data secara simultan dari antarmuka web dan engine 3D. Seluruh informasi teknis ini menjadi fondasi utama dalam penyusunan tiga skenario operasional sistem (Skenario A, B, dan C), yang dirancang sebagai strategi mitigasi risiko untuk menjaga reliabilitas sistem di tengah ketidakpastian ketersediaan data akademik eksternal.
 
-Selain wawancara dengan Kepala UPA TIK UPNVJ, penulis juga melakukan diskusi dan koordinasi dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi UPNVJ, yaitu Dr. dr. Ria Maria Theresa, SpKJ., MH. guna memverifikasi kebijakan pembagian data sarana prasarana. Berdasarkan wawancara tersebut, diperoleh hasil bahwa kebijakan administratif membatasi pembagian data mentah secara bebas demi menjaga keamanan informasi strategis kampus. Hambatan administratif ini justru memperkuat urgensi proyek yang diusulkan, yaitu penyediaan portal integrasi data yang aman berbasis Row Level Security (RLS) serta arsitektur backend-centric. Sebagai bukti penjaminan komitmen pengerjaan dan validasi lapangan, penulis melakukan penandatanganan pakta integritas dengan mitra serta dokumentasi pertemuan dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi (Wakil Rektor III) seperti yang ditunjukkan oleh Gambar 2.22.
+Selain wawancara dengan Kepala UPA TIK UPNVJ, penulis juga melakukan diskusi dan koordinasi dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi UPNVJ, yaitu Dr. dr. Ria Maria Theresa, SpKJ., MH. guna memverifikasi kebijakan pembagian data sarana prasarana. Berdasarkan wawancara tersebut, diperoleh hasil bahwa kebijakan administratif membatasi pembagian data mentah secara bebas demi menjaga keamanan informasi strategis kampus. Hambatan administratif ini justru memperkuat urgensi proyek yang diusulkan, yaitu penyediaan portal integrasi data yang aman berbasis Row Level Security (RLS) serta arsitektur backend-centric. Sebagai bukti penjaminan komitmen pengerjaan dan validasi lapangan, penulis melakukan penandatanganan pakta integritas dengan mitra serta dokumentasi pertemuan dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi (Wakil Rektor III) seperti yang ditunjukkan oleh Gambar 2.8.
 
-Gambar 2.22 Dokumentasi Wawancara dan Penandatanganan Pakta Integritas
+Gambar 2.8 Dokumentasi Wawancara dan Penandatanganan Pakta Integritas
 
 
 ## 2.2 Usulan Solusi
@@ -280,11 +289,11 @@ Secara umum, solusi yang diusulkan memiliki karakteristik sebagai berikut:
    a. Sistem dikembangkan melalui kolaborasi antara 3D Asset Designer, Simulator/Engine Developer, dan Full Stack Developer & System Integrator.
    b. Fokus utama penelitian ini berada pada pengembangan backend, dashboard web, dan integrasi sistem.
 
-Dengan pendekatan tersebut, sistem yang diusulkan diharapkan mampu mengatasi permasalahan navigasi yang teridentifikasi melalui survei, sekaligus menyediakan platform informasi kampus yang terintegrasi, dinamis, dan interaktif. Implementasi twin digital berskala besar pada infrastruktur gedung kampus mendukung manajemen fasilitas secara cerdas dan efisien (Siv, 2025). Sebelum merinci komponen teknis yang menjadi tanggung jawab penulis, struktur arsitektur sistem secara high-level disajikan pada Gambar 2.1.
+Dengan pendekatan tersebut, sistem yang diusulkan diharapkan mampu mengatasi permasalahan navigasi yang teridentifikasi melalui survei, sekaligus menyediakan platform informasi kampus yang terintegrasi, dinamis, dan interaktif. Implementasi twin digital berskala besar pada infrastruktur gedung kampus mendukung manajemen fasilitas secara cerdas dan efisien (Siv, 2025). Sebelum merinci komponen teknis yang menjadi tanggung jawab penulis, struktur arsitektur sistem secara high-level disajikan pada Gambar 2.9.
 
-Gambar 2.1 Diagram Arsitektur Sistem
+Gambar 2.9 Diagram Arsitektur Sistem
 
-Sebagaimana diilustrasikan pada Gambar 2.1, arsitektur sistem dirancang dengan alur kerja yang saling terhubung antar ketiga peran tersebut:
+Sebagaimana diilustrasikan pada Gambar 2.9, arsitektur sistem dirancang dengan alur kerja yang saling terhubung antar ketiga peran tersebut:
 
 1. Integrasi Aset Visual
    Aset 3D yang dihasilkan oleh 3D Asset Designer diekspor dan diimpor ke dalam sistem Denah Virtual yang dikelola oleh Simulator/Engine Developer.
@@ -337,6 +346,28 @@ Untuk membangun komponen proyek Full Stack yang telah dirinci, proyek ini mengan
    a. Dipilih sebagai platform analitik yang ramah privasi (GDPR compliant) tanpa cookie.
    b. Menggunakan Express.js proxy di port 3001 untuk mengamankan data collect metrik dari ad-blocker browser client.
 
+### 2.2.3 Identifikasi Kebutuhan Non-Fungsional
+
+Selain kebutuhan fungsional dan teknis, sistem juga harus memenuhi sejumlah kebutuhan non-fungsional yang menjadi tolok ukur kualitas layanan. Kebutuhan ini menjadi acuan utama pada tahap pengujian performa (Lighthouse) dan penerimaan pengguna (UAT).
+
+1. Performa (Performance)
+   a. Halaman publik beserta modul denah virtual 3D harus termuat dalam waktu kurang dari 10 detik pada koneksi normal.
+   b. Aset Unity WebGL dikompresi (Brotli) dan diterapkan strategi pemuatan adaptif (connection-aware preloading) untuk menekan waktu transfer.
+2. Kompatibilitas & Aksesibilitas (Compatibility)
+   a. Antarmuka harus responsif dan dapat diakses dengan baik melalui peramban perangkat seluler (mobile-first) sebagai platform utama pengguna, serta tetap optimal pada desktop.
+   b. Antarmuka mendukung dua bahasa (Indonesia dan Inggris) dengan preferensi tersimpan secara persisten.
+3. Keamanan (Security)
+   a. Seluruh operasi modifikasi data wajib diproteksi autentikasi JWT (Supabase Auth).
+   b. Akses data diatur pada level basis data melalui Row-Level Security (RLS): anonim hanya dapat membaca (SELECT), sedangkan operasi tulis hanya untuk pengguna terautentikasi.
+   c. Operasi sensitif dibatasi melalui mekanisme rate limiter.
+4. Privasi (Privacy)
+   a. Pemantauan lalu lintas tidak mengumpulkan data pribadi (PII) dan tidak menggunakan cookie pelacak.
+5. Usabilitas & Aksesibilitas (Usability & Accessibility)
+   a. Sistem menampilkan loading screen informatif (progress bar) saat engine 3D dimuat.
+   b. Modal konfirmasi penghapusan data dilengkapi focus trap untuk aksesibilitas keyboard.
+6. Keterpeliharaan (Maintainability)
+   a. Perubahan data gedung/fasilitas melalui Admin Panel harus langsung tercermin pada kemampuan navigasi denah virtual tanpa membangun ulang (rebuild) aplikasi 3D.
+
 ## 2.3 Rancangan Proyek
 
 ### 2.3.1 Rencana Pengembangan
@@ -352,9 +383,9 @@ Proses pengembangan proyek ini mengikuti model Prototyping yang terbagi ke dalam
 4. Iterasi Perbaikan (Iteration)
    Memperbaiki bug fungsionalitas CRUD, RLS database, atau koneksi API berdasarkan hasil evaluasi sebelum dinyatakan siap rilis.
 
-Tahapan pengembangan ini secara visual digambarkan pada Gambar 2.2.
+Tahapan pengembangan ini secara visual digambarkan pada Gambar 2.10.
 
-Gambar 2.2 Tahap Pengembangan
+Gambar 2.10 Tahap Pengembangan
 
 ### 2.3.2 Perancangan Information Architecture (IA)
 
@@ -372,28 +403,28 @@ Perancangan Information Architecture membagi aplikasi web ke dalam dua zona akse
 Interaksi sistem dan diagram alir data dirancang menggunakan tiga jenis diagram UML. Unified Modelling Language (UML) merupakan standar pemodelan visual untuk menspesifikasikan, menggambarkan, membangun, dan mendokumentasikan artefak sistem perangkat lunak (Kurniawan, 2018).
 
 1. Use Case Diagram
-   Aktor 'User' memiliki hak akses read-only untuk melihat visualisasi grafik profil dan denah virtual. Aktor 'Admin' harus melalui use case login sebelum diberikan hak akses penuh untuk melakukan operasi CRUD data. Legenda simbol use case ditunjukkan oleh Gambar 2.4, sedangkan diagram use case sistem terinci pada Gambar 2.5.
+   Aktor 'User' memiliki hak akses read-only untuk melihat visualisasi grafik profil dan denah virtual. Aktor 'Admin' harus melalui use case login sebelum diberikan hak akses penuh untuk melakukan operasi CRUD data. Legenda simbol use case ditunjukkan oleh Gambar 2.11, sedangkan diagram use case sistem terinci pada Gambar 2.12.
    
-   Gambar 2.4 Legenda Use Case Diagram
+   Gambar 2.11 Legenda Use Case Diagram
    
-   Gambar 2.5 Use Case Diagram
+   Gambar 2.12 Use Case Diagram
 
 2. Activity Diagram
-   Alur kerja pengelolaan data CRUD oleh administrator digambarkan pada Gambar 2.6, sedangkan alur logika mitigasi skenario ketersediaan data akademik eksternal (Skenario A, B, C) digambarkan pada Gambar 2.7.
+   Alur kerja pengelolaan data CRUD oleh administrator digambarkan pada Gambar 2.13, sedangkan alur logika mitigasi skenario ketersediaan data akademik eksternal (Skenario A, B, C) digambarkan pada Gambar 2.14.
    
-   Gambar 2.6 Activity Diagram: Pengelolaan Data oleh Admin
+   Gambar 2.13 Activity Diagram: Pengelolaan Data oleh Admin
    
-   Gambar 2.7 Activity Diagram: Integrasi Data Denah
+   Gambar 2.14 Activity Diagram: Integrasi Data Denah
 
 3. Sequence Diagram
-   a. Autentikasi Admin: Memetakan proses login dari frontend React, pengiriman kredensial ke backend API, verifikasi ke Supabase Auth, pengembalian JWT token, dan pembukaan akses router admin, seperti yang diilustrasikan pada Gambar 2.8.
-   b. Sinkronisasi Data: Memetakan aliran pembaruan field `unity_object_name` dari Admin Dashboard, penyimpanan ke database Supabase, penarikan data JSON oleh Unity `BuildingDatabase` via HTTP request, dan pencocokan nama GameObject visual di scene, seperti yang diilustrasikan pada Gambar 2.9.
+   a. Autentikasi Admin: Memetakan proses login dari frontend React, pengiriman kredensial ke backend API, verifikasi ke Supabase Auth, pengembalian JWT token, dan pembukaan akses router admin, seperti yang diilustrasikan pada Gambar 2.15.
+   b. Sinkronisasi Data: Memetakan aliran pembaruan field `unity_object_name` dari Admin Dashboard, penyimpanan ke database Supabase, penarikan data JSON oleh Unity `BuildingDatabase` via HTTP request, dan pencocokan nama GameObject visual di scene, seperti yang diilustrasikan pada Gambar 2.16.
    
-   Gambar 2.8 Sequence Diagram: Autentikasi Administrator
+   Gambar 2.15 Sequence Diagram: Autentikasi Administrator
    
-   Gambar 2.9 Sequence Diagram: Sinkronisasi Data Gedung dan Unity
+   Gambar 2.16 Sequence Diagram: Sinkronisasi Data Gedung dan Unity
 
-### 2.3.4 Perancangan Sistem Spesifik
+### 2.3.4 Perancangan Modul Keamanan & Analitik
 
 Perancangan modul keamanan data dan mitigasi penelusuran lalu lintas web mencakup spesifikasi arsitektur berikut:
 
@@ -410,9 +441,9 @@ Perancangan modul keamanan data dan mitigasi penelusuran lalu lintas web mencaku
 
 ### 2.3.5 Perancangan Entity Relationship Diagram (ERD)
 
-Rancangan struktur data relasional untuk sistem integrasi denah virtual kampus dan dashboard profil UPNVJ divisualisasikan melalui skema Entity-Relationship Diagram (ERD) yang dapat dilihat pada Gambar 2.3. Entity Relationship Diagram (ERD) adalah suatu model untuk menjelaskan hubungan antar data dalam basis data relasional berdasarkan objek-objek dasar data yang mempunyai hubungan antar relasi tersebut ('Afiifah et al., 2022). Struktur basis data ini dirancang pada RDBMS PostgreSQL untuk menghubungkan profil akademik, aset fisik kampus, dan log aktivitas audit secara terintegrasi.
+Rancangan struktur data relasional untuk sistem integrasi denah virtual kampus dan dashboard profil UPNVJ divisualisasikan melalui skema Entity-Relationship Diagram (ERD) yang dapat dilihat pada Gambar 2.17. Entity Relationship Diagram (ERD) adalah suatu model untuk menjelaskan hubungan antar data dalam basis data relasional berdasarkan objek-objek dasar data yang mempunyai hubungan antar relasi tersebut ('Afiifah et al., 2022). Struktur basis data ini dirancang pada RDBMS PostgreSQL untuk menghubungkan profil akademik, aset fisik kampus, dan log aktivitas audit secara terintegrasi.
 
-Gambar 2.3 Entity-Relationship Diagram
+Gambar 2.17 Entity-Relationship Diagram
 
 Penjelasan mengenai struktur tabel, kolom, tipe data, serta aturan relasi antartabel dijabarkan sebagai berikut:
 
@@ -507,24 +538,24 @@ Penjelasan mengenai struktur tabel, kolom, tipe data, serta aturan relasi antart
 Rancangan antarmuka pengguna diwujudkan melalui serangkaian mockup visual:
 
 1. Bagian Admin Dashboard
-   Mockup halaman login admin disajikan pada Gambar 2.10, halaman utama dashboard admin pada Gambar 2.11, modal formulir tambah data pada Gambar 2.12, modal formulir edit data pada Gambar 2.13, modal konfirmasi hapus data pada Gambar 2.14, serta visualisasi statistik analitik admin pada Gambar 2.15.
+   Mockup halaman login admin disajikan pada Gambar 2.18, halaman utama dashboard admin pada Gambar 2.19, modal formulir tambah data pada Gambar 2.20, modal formulir edit data pada Gambar 2.21, modal konfirmasi hapus data pada Gambar 2.22, serta visualisasi statistik analitik admin pada Gambar 2.23.
    
-   Gambar 2.10 Halaman Login Admin
-   Gambar 2.11 Halaman Dashboard Admin
-   Gambar 2.12 Modal Tambah Data Gedung
-   Gambar 2.13 Modal Update Data Gedung
-   Gambar 2.14 Modal Konfirmasi Hapus Data Gedung
-   Gambar 2.15 Traffic Website Admin
+   Gambar 2.18 Halaman Login Admin
+   Gambar 2.19 Halaman Dashboard Admin
+   Gambar 2.20 Modal Tambah Data Gedung
+   Gambar 2.21 Modal Update Data Gedung
+   Gambar 2.22 Modal Konfirmasi Hapus Data Gedung
+   Gambar 2.23 Traffic Website Admin
 
 2. Bagian Public Dashboard
-   Mockup hero section disajikan pada Gambar 2.16, visualisasi analitik publik pada Gambar 2.17, bagian pencarian fasilitas dan aset pada Gambar 2.18, modal daftar fasilitas kategori pada Gambar 2.19, modal detail spesifik fasilitas unggulan pada Gambar 2.20, dan footer halaman pada Gambar 2.21.
+   Mockup hero section disajikan pada Gambar 2.24, visualisasi analitik publik pada Gambar 2.25, bagian pencarian fasilitas dan aset pada Gambar 2.26, modal daftar fasilitas kategori pada Gambar 2.27, modal detail spesifik fasilitas unggulan pada Gambar 2.28, dan footer halaman pada Gambar 2.29.
    
-   Gambar 2.16 Hero Section
-   Gambar 2.17 Public Traffic Statistics Website
-   Gambar 2.18 Bagian Fasilitas dan Aset
-   Gambar 2.19 Modal List Fasilitas dan Aset
-   Gambar 2.20 Modal Fasilitas dan Aset
-   Gambar 2.21 Bagian Footer
+   Gambar 2.24 Hero Section
+   Gambar 2.25 Public Traffic Statistics Website
+   Gambar 2.26 Bagian Fasilitas dan Aset
+   Gambar 2.27 Modal List Fasilitas dan Aset
+   Gambar 2.28 Modal Fasilitas dan Aset
+   Gambar 2.29 Bagian Footer
 
 ## 2.4 Rencana Pengujian Proyek
 
@@ -588,7 +619,7 @@ Administrator Sistem (Staf Pengelola) | 1. Mengelola data konten kampus melalui 
 
 ## 3.2 Metode Implementasi
 
-Implementasi sistem dalam proyek ini dilakukan menggunakan pendekatan prototyping yang iteratif. Proses pengembangan secara eksklusif difokuskan pada kontribusi penulis selaku Full Stack Web Developer & System Integrator.
+Implementasi sistem dalam proyek ini dilakukan menggunakan pendekatan prototyping yang iteratif. Proses pengembangan secara eksklusif difokuskan pada kontribusi penulis selaku Full Stack Web Developer & System Integrator. Subbab ini menguraikan **metode dan teknik implementasi** (cara membangun) tiap komponen, sedangkan bukti keluaran dan hasil akhirnya disajikan pada Subbab 3.4.
 
 ### 3.2.1 Implementasi Back-end
 
@@ -785,7 +816,17 @@ const handleStopNavigation = () => {
 
 Pada perangkat seluler, sistem secara dinamis mendeteksi jenis interaksi layar sentuh dan menampilkan prefab virtual joystick untuk pergerakan karakter, serta tombol melepaskan kamera Pointer Lock yang diintegrasikan agar responsif untuk pengalaman mobile.
 
-## 3.3 Metadata
+### 3.2.3 Implementasi Integrasi (WebGL Bridge React–Unity)
+
+Sebagai System Integrator, kontribusi inti penulis adalah menjembatani dua dunia yang berbeda: antarmuka web (React) dan engine 3D (Unity WebGL). Integrasi ini diwujudkan melalui dua mekanisme utama yang bekerja secara komplementer.
+
+1. Jembatan Komunikasi Satu Arah (React → Unity)
+   Komunikasi runtime bersifat satu arah dari React menuju Unity menggunakan pustaka `react-unity-webgl`. Saat pengguna memilih lokasi pada hasil pencarian, frontend memanggil `sendMessage("NavigationReceiver", "NavigateTo", unity_object_name)` untuk memicu sistem pathfinding di dalam scene. Sebaliknya, tidak ada callback dari Unity ke React (di luar lingkup); seluruh informasi tekstual gedung/fasilitas tetap disajikan di sisi React.
+
+2. Jembatan Data melalui `unity_object_name`
+   Field `unity_object_name` berfungsi sebagai kunci penghubung tunggal antara baris data di basis data (tabel `gedung`/`fasilitas`) dan GameObject pada scene Unity. Unity menarik data secara mandiri melalui permintaan `HTTP GET /api/unity/data` saat inisialisasi, lalu mencocokkan nama objek secara case-insensitive. Alur sinkronisasi data ini telah dipetakan pada Gambar 2.16, sehingga setiap perubahan data melalui Admin Panel langsung tercermin pada kemampuan navigasi denah virtual tanpa perlu membangun ulang aplikasi 3D.
+
+## 3.3 Konfigurasi & Metadata Sistem
 
 ### 3.3.1 Basis Data
 
@@ -869,6 +910,8 @@ Visualisasi Unity WebGL dikompilasi menggunakan kompresi Brotli guna memperkecil
 
 ## 3.4 Laporan Implementasi Proyek
 
+Subbab ini menyajikan **bukti dan hasil keluaran** dari implementasi yang metodenya telah diuraikan pada Subbab 3.2, mencakup logbook aktivitas serta hasil nyata pada sisi backend dan frontend.
+
 ### 3.4.1 Logbook Implementasi Proyek
 
 Logbook aktivitas implementasi proyek dari awal perencanaan hingga tahap evaluasi akhir dirinci pada Tabel 3.2.
@@ -884,7 +927,7 @@ Minggu ke- | Aktivitas Pengembangan | Kontribusi Peran Full Stack | Validasi Use
 17-20 | Testing & Evaluation | Melakukan pengujian performa Lighthouse, melakukan uji fungsionalitas Black Box, menyusun laporan Tugas Akhir | [TBD: Evaluasi UAT Selesai]
 [/TABLE]
 
-### 3.4.2 Hasil Implementasi Back-end
+### 3.4.2 Hasil & Bukti Implementasi Back-end
 
 Backend API berhasil diimplementasikan dan dideploy di Vercel. Hasil keluaran data JSON terstruktur untuk endpoint `GET /api/unity/data` yang dikonsumsi oleh Unity `BuildingDatabase.cs` adalah sebagai berikut:
 
@@ -917,7 +960,7 @@ Backend API berhasil diimplementasikan dan dideploy di Vercel. Hasil keluaran da
 }
 ```
 
-### 3.4.3 Hasil Implementasi Front-end
+### 3.4.3 Hasil & Bukti Implementasi Front-end
 
 Frontend React SPA berhasil dideploy secara statis. Antarmuka pengguna menyajikan:
 

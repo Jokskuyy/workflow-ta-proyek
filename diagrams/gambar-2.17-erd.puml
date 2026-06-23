@@ -1,0 +1,91 @@
+@startuml gambar-2-17-erd
+' Gambar 2.17 - Entity-Relationship Diagram
+' Sumber: PRD - Skema Database (Supabase Cloud / PostgreSQL)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam ArrowColor #444444
+skinparam entity {
+  BackgroundColor #F2F2F2
+  BorderColor #555555
+}
+hide circle
+skinparam linetype ortho
+
+title Gambar 2.17 — Entity-Relationship Diagram
+
+entity "gedung" as gedung {
+  * id : PK
+  --
+  nama_gedung
+  deskripsi_gedung
+  lokasi
+  jumlah_lantai
+  foto_url
+  unity_object_name
+}
+
+entity "fasilitas" as fasilitas {
+  * id : PK
+  --
+  nama_fasilitas
+  deskripsi_fasilitas
+  tipe_fasilitas
+  color
+  lantai
+  # id_gedung : FK
+  foto_url
+  unity_object_name
+}
+
+entity "fakultas" as fakultas {
+  * id : PK
+  --
+  nama_fakultas
+  deskripsi_fakultas
+  email
+  website
+  # id_gedung_utama : FK
+}
+
+entity "program_studi" as prodi {
+  * id : PK
+  --
+  nama_prodi
+  jenjang : D3/S1/S2/S3
+  # id_fakultas : FK
+  akreditasi
+}
+
+entity "admin_users" as admin {
+  * id : PK
+  --
+  username
+  password_hash
+  nama_lengkap
+  role
+  created_at
+}
+
+entity "audit_logs" as audit {
+  * id : PK
+  --
+  # actor_id : FK
+  actor_email
+  action : INSERT/UPDATE/DELETE
+  table_name
+  record_id
+  old_data
+  new_data
+  created_at
+}
+
+' Relasi
+gedung ||--o{ fasilitas : memiliki
+gedung ||--o{ fakultas : "gedung utama"
+fakultas ||--o{ prodi : menaungi
+admin ||--o{ audit : mencatat
+
+@enduml

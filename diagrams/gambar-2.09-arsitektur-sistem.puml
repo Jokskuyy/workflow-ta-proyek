@@ -1,0 +1,68 @@
+@startuml gambar-2-09-arsitektur-sistem
+' Gambar 2.9 - Diagram Arsitektur Sistem (versi terkini, mengacu PRD)
+' Menggantikan arsitektur lama (BuildingDataReceiver/BuildingClickHandler - deprecated)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam ArrowColor #444444
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #F2F2F2
+  BorderColor #555555
+}
+skinparam component {
+  BackgroundColor #F7F7F7
+  BorderColor #666666
+}
+skinparam database {
+  BackgroundColor #ECECEC
+  BorderColor #555555
+}
+skinparam actor {
+  BackgroundColor #ECECEC
+  BorderColor #555555
+}
+
+title Gambar 2.9 — Diagram Arsitektur Sistem
+
+actor "Pengguna Publik" as User
+actor "Administrator" as Admin
+
+rectangle "Browser (Klien)" as Browser {
+  component "React SPA\n(Vite)\n- Dashboard Publik\n- Admin Panel\n- Panel Pencarian\n- Multi-bahasa" as React
+  component "Unity WebGL Canvas\n- Scene 3D Kampus\n- NavMesh Pathfinding\n- First-person Control" as UnityCanvas
+  React -right-> UnityCanvas : SendMessage\n(\"NavigationReceiver\",\n\"NavigateTo\") — satu arah
+}
+
+rectangle "Vercel" as Vercel {
+  component "Static Hosting\n(dist/, unity-builds/)" as Static
+  component "Serverless Functions\n/api/unity/data\n/api/unity/names\n/api/buildings, /api/rooms\n/api/health" as Serverless
+}
+
+rectangle "Server Kampus" as Kampus {
+  component "Express.js (:3001)\n- Proxy Umami\n- Rate limiter" as Express
+  component "Umami Analytics\n(Docker :3000)" as Umami
+  Express -right-> Umami : proxy
+}
+
+database "Supabase Cloud\n- PostgreSQL\n- Auth (JWT)\n- Row Level Security" as Supabase
+
+' Alur pengguna
+User --> React : Akses dashboard & denah
+Admin --> React : Login & CRUD data
+
+' Frontend ke layanan
+React --> Static : Muat aset (SPA + WebGL)
+React --> Serverless : REST API (data gedung/fasilitas)
+React --> Supabase : Auth & query (RLS)
+React --> Express : Statistik analitik
+
+' Unity menarik data sendiri (runtime)
+UnityCanvas --> Serverless : HTTP GET /api/unity/data
+
+' Serverless ke database
+Serverless --> Supabase : Query data
+
+@enduml

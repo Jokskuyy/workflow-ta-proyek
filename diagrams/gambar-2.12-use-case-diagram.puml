@@ -1,0 +1,88 @@
+@startuml gambar-2-12-use-case-diagram
+' Gambar 2.12 - Use Case Diagram
+' Sumber: BAB II - 2.2.1 Kebutuhan Fungsional & 2.3.3 Use Case
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 13
+skinparam ArrowColor #444444
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #F2F2F2
+  BorderColor #555555
+  ArrowColor #444444
+}
+skinparam actor {
+  BackgroundColor #ECECEC
+  BorderColor #555555
+}
+
+title Gambar 2.12 — Use Case Diagram Sistem Integrasi Denah Virtual UPNVJ
+
+left to right direction
+
+actor "Pengguna Publik\n(User)" as User
+actor "Administrator" as Admin
+actor "Engine Unity\n(Denah Virtual 3D)" as Unity
+
+rectangle "Sistem Integrasi Denah Virtual UPNVJ" {
+
+  ' ----- Use case Pengguna Publik (read-only) -----
+  usecase "Melihat Statistik\nTraffic Website" as UC1
+  usecase "Melihat Profil Kampus\n(Akreditasi, Fasilitas, Aset)" as UC2
+  usecase "Melihat Detail\nAset / Fasilitas" as UC3
+  usecase "Melihat Denah\nVirtual 3D" as UC4
+  usecase "Mengganti Bahasa\n(ID / EN)" as UC5
+
+  ' ----- Use case Administrator -----
+  usecase "Login Admin\n(Autentikasi JWT)" as UC6
+  usecase "Melihat Widget\nAnalitik Kunjungan" as UC7
+  usecase "Kelola Data Gedung\n(CRUD)" as UC8
+  usecase "Kelola Data Fasilitas\n(CRUD)" as UC9
+  usecase "Kelola Data Fakultas\n(CRUD)" as UC10
+  usecase "Kelola Data\nProgram Studi (CRUD)" as UC11
+  usecase "Konfirmasi\nHapus Data" as UC12
+  usecase "Melihat Audit Logs\n(read-only)" as UC13
+
+  ' ----- Use case Integrasi API (3D Engine) -----
+  usecase "Menyediakan Data\n(GET /api/unity/data)" as UC14
+  usecase "Menyediakan Daftar Nama\n(GET /api/unity/names)" as UC15
+}
+
+' Asosiasi Pengguna Publik
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+
+' Asosiasi Administrator
+Admin --> UC6
+Admin --> UC7
+Admin --> UC8
+Admin --> UC9
+Admin --> UC10
+Admin --> UC11
+Admin --> UC13
+
+' Admin juga dapat mengakses fungsi publik
+Admin --> UC2
+
+' Relasi include / extend
+UC7 ..> UC6 : <<include>>
+UC8 ..> UC6 : <<include>>
+UC9 ..> UC6 : <<include>>
+UC10 ..> UC6 : <<include>>
+UC11 ..> UC6 : <<include>>
+UC13 ..> UC6 : <<include>>
+UC12 ..> UC8 : <<extend>>
+UC12 ..> UC9 : <<extend>>
+UC12 ..> UC10 : <<extend>>
+UC12 ..> UC11 : <<extend>>
+
+' Asosiasi Engine Unity (sistem-ke-sistem)
+Unity --> UC14
+Unity --> UC15
+
+@enduml

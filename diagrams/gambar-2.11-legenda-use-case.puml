@@ -1,0 +1,43 @@
+@startuml gambar-2-11-legenda-use-case
+' Gambar 2.11 - Legenda Use Case Diagram
+' Sumber: BAB II - 2.3.3 (legenda simbol use case)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 13
+skinparam ArrowColor #444444
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #F2F2F2
+  BorderColor #555555
+}
+skinparam actor {
+  BackgroundColor #ECECEC
+  BorderColor #555555
+}
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #999999
+}
+
+title Gambar 2.11 — Legenda Use Case Diagram
+
+actor "Aktor" as A
+usecase "Use Case" as U
+rectangle "Batas Sistem\n(System Boundary)" as Bnd
+
+A -[hidden]down- U
+U -[hidden]down- Bnd
+
+legend right
+  | Simbol | Notasi | Keterangan |
+  | Aktor | Stick figure (gambar orang) | Entitas (pengguna/sistem) yang berinteraksi dengan sistem |
+  | Use Case | Elips | Fungsi atau layanan yang disediakan sistem |
+  | Batas Sistem | Persegi panjang | Ruang lingkup / batas cakupan sistem |
+  | —————— | Garis lurus (association) | Hubungan interaksi antara aktor dan use case |
+  | ----▷ <<include>> | Garis putus + panah | Use case wajib memanggil use case lain |
+  | ----▷ <<extend>> | Garis putus + panah | Use case opsional yang memperluas use case dasar |
+endlegend
+
+@enduml

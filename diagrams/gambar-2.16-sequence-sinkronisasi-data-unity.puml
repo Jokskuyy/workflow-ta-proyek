@@ -1,0 +1,60 @@
+@startuml gambar-2-16-sequence-sinkronisasi-data-unity
+' Gambar 2.16 - Sequence Diagram: Sinkronisasi Data Gedung dan Unity
+' Sumber: BAB II - 2.3.3 Sequence Diagram (b) + PRD (alur unity_object_name)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 13
+skinparam sequenceArrowColor #444444
+skinparam sequenceLifeLineBorderColor #555555
+skinparam sequenceLifeLineBackgroundColor #F2F2F2
+skinparam participant {
+  BackgroundColor #F2F2F2
+  BorderColor #555555
+}
+skinparam actor {
+  BackgroundColor #ECECEC
+  BorderColor #555555
+}
+
+title Gambar 2.16 — Sequence Diagram: Sinkronisasi Data Gedung dan Unity
+
+actor "Administrator" as Admin
+participant "Admin Dashboard\n(React)" as FE
+participant "Backend API\n(/api/unity/data)" as API
+database "Supabase\n(PostgreSQL)" as DB
+participant "Unity WebGL\nBuildingDatabase" as Unity
+participant "Scene 3D\n(GameObject)" as Scene
+
+== Tahap 1: Pembaruan Data oleh Admin ==
+Admin -> FE : Memperbarui field unity_object_name\n(data gedung/fasilitas)
+activate FE
+FE -> DB : Simpan perubahan (UPDATE)
+activate DB
+DB -->> FE : Konfirmasi tersimpan
+deactivate DB
+FE -->> Admin : Notifikasi berhasil
+deactivate FE
+
+== Tahap 2: Penarikan Data oleh Unity (saat game start) ==
+Unity -> API : HTTP GET /api/unity/data
+activate Unity
+activate API
+API -> DB : Query data gedung & fasilitas\n(+ unity_object_name)
+activate DB
+DB -->> API : Result set
+deactivate DB
+API -->> Unity : Response JSON\n{ gedung[], fasilitas[] }
+deactivate API
+Unity -> Unity : Cache realNames &\nunityObjectNames (isLoaded = true)
+
+== Tahap 3: Pencocokan GameObject di Scene ==
+Unity -> Scene : Lookup Transform berdasarkan\nunity_object_name (case-insensitive)
+activate Scene
+Scene -->> Unity : Referensi GameObject target
+deactivate Scene
+Unity -> Unity : Siap untuk navigasi\n(NavigationReceiver)
+deactivate Unity
+
+@enduml
