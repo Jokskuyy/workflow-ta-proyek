@@ -302,7 +302,7 @@ Sebagaimana diilustrasikan pada Gambar 2.9, arsitektur sistem dirancang dengan a
 3. Alur Administrator (Admin)
    Administrator memiliki jalur akses khusus melalui Frontend Admin Dashboard untuk mengelola data konten kampus (seperti data gedung, fasilitas, fakultas, dan program studi) melalui mekanisme CRUD.
 4. Pusat Pertukaran Data
-   Seluruh interaksi data bermuara pada satu titik pusat, yaitu Backend Main API yang dikembangkan menggunakan Node.js dan Express.js pada serverless function Vercel. Komponen ini bertindak sebagai pusat data yang melayani permintaan dari Denah Virtual Unity (agar gedung dapat menampilkan informasi saat diklik) dan menyediakan data untuk kedua dashboard.
+   Seluruh interaksi data bermuara pada satu titik pusat, yaitu Backend Main API berbasis Node.js yang di-deploy sebagai Vercel Serverless Functions. Komponen ini bertindak sebagai pusat data yang melayani permintaan dari Denah Virtual Unity (Unity menarik data gedung/fasilitas secara mandiri melalui endpoint `/api/unity/data` saat runtime untuk keperluan navigasi/pathfinding) dan menyediakan data untuk kedua dashboard.
 
 Fokus utama dari usulan solusi dalam laporan ini akan menitikberatkan pada pengembangan komponen Full Stack Web yang terdiri dari empat modul fungsional berikut:
 
@@ -1021,7 +1021,7 @@ Berdasarkan umpan balik dari responden pengujian UAT, tindakan perbaikan sistem 
 
 Berdasarkan hasil pengembangan, implementasi, dan pengujian sistem integrasi denah virtual kampus dan dashboard profil UPNVJ Kampus Pondok Labu, dapat ditarik beberapa kesimpulan sebagai berikut:
 
-1. Sistem integrasi denah virtual berbasis visualisasi 3D interaktif dan dashboard profil kampus berhasil dirancang dan diimplementasikan secara Full Stack dengan mengintegrasikan frontend React SPA, serverless API Express, database PostgreSQL Supabase, dan engine Unity WebGL.
+1. Sistem integrasi denah virtual berbasis visualisasi 3D interaktif dan dashboard profil kampus berhasil dirancang dan diimplementasikan secara Full Stack dengan mengintegrasikan frontend React SPA, RESTful API serverless (Vercel Functions berbasis Node.js), database PostgreSQL Supabase, dan engine Unity WebGL.
 2. Aturan keamanan data relasional berhasil diterapkan secara andal menggunakan Row-Level Security (RLS) di tingkat database serta mekanisme pencatatan audit logs yang menjamin akuntabilitas perubahan data oleh administrator.
 3. Integrasi data dinamis satu arah dari React ke Unity menggunakan metode `SendMessage` terbukti stabil dalam memicu NavMesh pathfinding rute visual 3D berdasarkan pencarian spasial pengguna di frontend web.
 4. Evaluasi fungsionalitas sistem (Black Box) dan tingkat penerimaan pengguna (UAT) akan disimpulkan di sini setelah seluruh rangkaian pengujian selesai dilaksanakan. [TBD: Kesimpulan Hasil Uji]
