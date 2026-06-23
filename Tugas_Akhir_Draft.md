@@ -1038,19 +1038,25 @@ Beberapa saran yang direkomendasikan untuk pengembangan sistem lebih lanjut di m
 
 # DAFTAR PUSTAKA
 
-Aliyah, A., Hartono, N., & Muin, A. A. (2024). Penggunaan User Acceptance Testing (UAT) pada pengujian sistem informasi pengelolaan keuangan dan inventaris barang. *Switch: Jurnal Sains dan Teknologi Informasi*, 3(1), 84–100. https://doi.org/10.62951/switch.v3i1.330
+'Afiifah, K., Azzahra, Z. F., & Anggoro, A. D. (2022). Analisis teknik Entity-Relationship Diagram dalam perancangan database: Sebuah literature review. *INTECH (Informatika dan Teknologi)*, 3(1), 8–14. https://doi.org/10.54895/intech.v3i1.1261
 
-Ghai, V. (2025). Exploring the future career potential of Blender 3D as a professional tool. *International Journal of Advance Research*. https://www.ijariit.com/manuscript/exploring-the-future-career-potential-of-blender-3d-as-a-professional-tool/
+Aliyah, A., Hartono, N., & Muin, A. A. (2024). Penggunaan User Acceptance Testing (UAT) pada pengujian sistem informasi pengelolaan keuangan dan inventaris barang. *Switch: Jurnal Sains dan Teknologi Informasi*, 3(1), 84–100. https://doi.org/10.62951/switch.v3i1.330
 
 Jamaludin, J., & Saepuloh, L. (2024). Tren riset twin digital smart campus. *Sang Pencerah: Jurnal Ilmiah Universitas Muhammadiyah Buton*, 10(2), 408–425. https://doi.org/10.35326/pencerah.v10i2.5317
 
 Kurniawan, T. A. (2018). Pemodelan Use Case (UML): Evaluasi terhadap beberapa kesalahan dalam praktik. *Jurnal Teknologi Informasi dan Ilmu Komputer (JTIIK)*, 5(1), 77–86. https://doi.org/10.25126/jtiik.201851610
+
+Maulida, M., Zahro, F., Hakim, R., & Akbar, M. S. (2025). Pengujian black box testing pada sistem website pemesanan online Toko Ayam Krispy. *Jurnal Media Akademik (JMA)*, 3(5). https://doi.org/10.62281/v3i5.1908
+
+Muharam, Y., Anggara, M. B., & Hanafi, T. J. (2023). Implementasi peta 3 dimensi menggunakan metode IMSDD (Interactive Multimedia System Design and Development) dan WebGL API berbasis web (Studi kasus di SMP Karya Pembangunan 2 Majalaya). *Jurnal Informatika-COMPUTING*, 10, 20–30. https://doi.org/10.55222/computing.v10i01.1155
 
 Pricillia, T., & Zulfachmi (2021). Perbandingan metode pengembangan perangkat lunak (Waterfall, Prototype, RAD). *Jurnal Bangkit Indonesia*, 10(1), 6–12. https://doi.org/10.52771/bangkitindonesia.v10i1.153
 
 Putra, I. G. W. W., Dharma, E. M., & Permana, P. T. H. (2026). Implementasi relational database dengan Row-Level Security (RLS) pada sistem inventory menggunakan Supabase dan React Native Expo (Studi kasus Bengkel Sari Merta). *JATI (Jurnal Mahasiswa Teknik Informatika)*, 10(2), 2443–2448. https://ejournal.itn.ac.id/index.php/jati/article/view/8282
 
 Siv, T. (2025). A framework for scalable digital twin deployment in smart campus building facility management. *arXiv*. https://doi.org/10.48550/arXiv.2512.12149
+
+Syarif, S., & Risdiansyah, D. (2024). Pemanfaatan metode prototype dalam perancangan sistem informasi penjualan berbasis website. *Jurnal Ekonomi Manajemen dan Bisnis (JEMB)*, 2(1), 12–25. https://doi.org/10.54895/jemb.v2i1.2312
 
 Taurusta, C., Asiddiq, A. M., Suprianto, S., & Setiawan, H. (2024). Visualisasi gedung kampus 1 Universitas Muhammadiyah Sidoarjo menggunakan augmented reality sebagai media informasi. *Journal of Technology and System Information*, 1(1), 55–70. https://doi.org/10.47134/jtsi.v1i1.2146
 
