@@ -101,22 +101,7 @@ To automate the formatting of your `.docx` document:
 
 ## Formatting Specifications (UPNVJ FIK 2025)
 
-| Element | Specification |
-|---------|---------------|
-| **Paper Size** | A4 |
-| **Margins** | Top = 3cm, Bottom = 3cm, Left = 4cm, Right = 3cm |
-| **Font Name** | Times New Roman (all text, including styles, headers, footers, tables, and captions) |
-| **Font Size** | Body (12pt), Headings (12pt Bold), Chapter Titles (14pt Bold Centered), Abstracts (11pt) |
-| **Line Spacing** | Body & Headings (1.5), Captions & Bibliography (1.0) |
-| **Indentations** | Body paragraphs (1.0cm first-line indent), Bibliography (1.0cm hanging indent) |
-| **Table Captions** | Placed **above** the table, centered, e.g., **Tabel 1.1** Description (no trailing dot after number) |
-| **Figure Captions** | Placed **below** the figure, centered, e.g., **Gambar 2.3** Description (no trailing dot after number) |
-| **Front Matter Pages** | Lower Roman numerals (`i, ii, iii...`) centered at the bottom |
-| **Body Pages** | Arabic numerals (`1, 2, 3...`) centered at the bottom, restarting at page 1 for Chapter 1 |
-| **TOC & bibliography** | Center-aligned title, unnumbered Heading1, fonts forced to Times New Roman |
-| **Page Splits** | Table of Contents (Daftar Isi), Table of Figures (Daftar Gambar), Table of Tables (Daftar Tabel) must be on separate pages |
-| **Cover Page** | Cover page must be on its own page and separated from the rest of the document |
-| **Images & Figures** | Must preserve their original aspect ratio and must not be stretched or distorted. Sizing must adjust dynamically based on actual image dimensions. |
+Spesifikasi format lengkap (margin, font, caption, page split, lampiran, gambar) ada pada sumber kanonik bersama: **`../references/format-spec-upnvj.md`**.
 
 ## Handling Discrepancies & Ambiguities
 
@@ -126,58 +111,9 @@ To automate the formatting of your `.docx` document:
 
 ## 4-Chapter Report Outline (Tugas Akhir Proyek UPNVJ FIK 2025)
 
-The report draft MUST follow the 4-chapter project outline structure. Below is the detailed chapter and subchapter layout mapping UPNVJ FIK 2025 guidelines and senior thesis styles:
+Draf WAJIB mengikuti struktur 4 bab. Kerangka lengkap & **terkini** (selaras PRD), termasuk sub-bab 2.2.3, 2.3.4, 3.2.3, dan penamaan terbaru, ada pada sumber kanonik bersama: **`../references/outline-4bab.md`**.
 
-### BAB I PENDAHULUAN
-* **1.1 Latar Belakang**: Explains smart campus context, spatial navigation difficulties, collaborative roles, and the author's full-stack development/system integration focus.
-* **1.2 Identifikasi Masalah**: Enumerated list of problems (using numbered/lettered lists).
-* **1.3 Batasan Masalah**: Ruiz-scoped limits (A4 size, Pondok Labu campus, full-stack dev limits, Supabase auth, RLS, WebGL bridge limits).
-* **1.4 Tujuan dan Manfaat**
-  * **1.4.1 Tujuan**: Expected system goals.
-  * **1.4.2 Manfaat**: Practical gains for users, managers, and the institution.
-* **1.5 Jadwal Kegiatan**: Project schedule (using Gantt chart or table format).
-
-### BAB II RANCANGAN PROYEK
-* **2.1 Observasi**: Details on running systems, surveys/questionnaires, and domain expert interviews.
-* **2.2 Usulan Solusi**: Concept diagram and technical architecture.
-  * **2.2.1 Identifikasi Kebutuhan Fungsional**: Grouped by User, Admin, and Integration/API requirements.
-  * **2.2.2 Identifikasi Kebutuhan Teknis**: Stacks (React SPA, Vercel Serverless API berbasis Node.js, Supabase DB, Umami Analytics, Unity WebGL). Express.js hanya berperan sebagai proxy Umami + rate limiter.
-  * **2.2.3 Identifikasi Kebutuhan Non-Fungsional**: Performa (muat < 10 dtk), kompatibilitas mobile-first, keamanan (JWT, RLS, rate limiter), privasi, usabilitas/aksesibilitas, keterpeliharaan.
-* **2.3 Rancangan Proyek**
-  * **2.3.1 Rencana Pengembangan**: Prototyping phases.
-  * **2.3.2 Perancangan Information Architecture (IA)**: App hierarchy.
-  * **2.3.3 Perancangan Unified Modelling Language (UML)**: Use Case, Activity, and Sequence diagrams.
-  * **2.3.4 Perancangan Modul Keamanan & Analitik**: Konfigurasi keamanan & analitik (RLS, trigger audit logs, reverse proxy Umami / rate limiter).
-  * **2.3.5 Perancangan Entity Relationship Diagram (ERD)**: Data schema model.
-  * **2.3.6 Perancangan Antarmuka**: Visual layout mocks for Public Dashboard and Admin Panel.
-* **2.4 Rencana Pengujian Proyek**: Test strategies (Black Box and UAT design).
-
-### BAB III IMPLEMENTASI PROYEK
-* **3.1 Profil Mitra**
-  * **3.1.1 Nama Organisasi/Lembaga Mitra**
-  * **3.1.2 Deskripsi Mitra**
-  * **3.1.3 Hubungan Mitra dengan Proyek**
-* **3.2 Metode Implementasi**
-  * **3.2.1 Implementasi Back-end**: Vercel Serverless Functions (Node.js), implementasi skema database, potongan kode SQL.
-  * **3.2.2 Implementasi Front-end**: React SPA component details, routing, WebGL communications.
-  * **3.2.3 Implementasi Integrasi (WebGL Bridge React–Unity)**: jembatan satu arah `SendMessage("NavigationReceiver","NavigateTo", unity_object_name)` + alur data `unity_object_name` (Unity menarik `/api/unity/data` sendiri).
-* **3.3 Konfigurasi & Metadata Sistem**
-  * **3.3.1 Basis Data**: Schema tables and keys mapped to Unity.
-  * **3.3.2 Proxy Analytics (Umami)**: Reverse proxy Express.js (port 3001) ke Umami self-hosted (port 3000).
-  * **3.3.3 Web Manifest / Web Assets**: Konfigurasi aset & build WebGL (Brotli, IL2CPP).
-* **3.4 Laporan Implementasi Proyek**
-  * **3.4.1 Logbook Implementasi Proyek**: Logbook table with activity lists and validation.
-  * **3.4.2 Hasil Implementasi Back-end**: API endpoint returns and implementation code.
-  * **3.4.3 Hasil Implementasi Front-end**: Mocks, screenshots, and visual page outputs.
-* **3.5 Hasil Pengujian Proyek**
-  * **3.5.1 Black Box Testing**: Sceanrios execution table.
-  * **3.5.2 Lighthouse Testing / Performance testing**: Performance and SEO benchmark metrics.
-  * **3.5.3 User Acceptance Test (UAT)**: Likert questionnaire details and overall satisfaction rating computations.
-  * **3.5.4 Implementasi Hasil User Acceptance Test (UAT)**: Post-test system improvements.
-
-### BAB IV PENUTUP
-* **4.1 Kesimpulan**: Concise summary of results.
-* **4.2 Saran**: Sustainability and future roadmap recommendations.
+Penekanan tiap sub-bab dapat berbeda per peran/branch — lihat `laporan-tim/<peran>/outline-laporan.md`.
 
 ## Drafting & File Outputs
 
