@@ -345,6 +345,12 @@ Untuk membangun komponen proyek Full Stack yang telah dirinci, proyek ini mengan
 4. Analytics Tracking Platform: Umami Analytics (Self-hosted via Docker)
    a. Dipilih sebagai platform analitik yang ramah privasi (GDPR compliant) tanpa cookie.
    b. Menggunakan Express.js proxy di port 3001 untuk mengamankan data collect metrik dari ad-blocker browser client.
+5. Modul Penunjang Frontend:
+   a. Tailwind CSS (v4) untuk penyusunan antarmuka yang efisien melalui pendekatan utility-first.
+   b. Recharts untuk visualisasi data metrik kampus dalam bentuk grafik.
+   c. Fuse.js untuk implementasi pencarian cerdas (fuzzy search) pada sisi klien.
+   d. Lucide React untuk pustaka ikon berbasis vektor (SVG).
+   e. TypeScript untuk pengetesan tipe data secara statis (static typing) yang menjamin stabilitas integrasi sistem.
 
 ### 2.2.3 Identifikasi Kebutuhan Non-Fungsional
 

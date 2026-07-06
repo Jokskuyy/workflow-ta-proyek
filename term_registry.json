@@ -1,0 +1,25 @@
+{
+  "istilah_teknis": {
+    "dashboard": "dashboard",
+    "user interface": "user interface",
+    "backend": "backend",
+    "frontend": "frontend",
+    "database": "database",
+    "3d model": "model 3D",
+    "virtual reality": "realitas virtual",
+    "smart campus": "Smart Campus",
+    "api": "API",
+    "rest api": "REST API",
+    "row level security": "Row Level Security",
+    "rls": "RLS",
+    "use case": "use case",
+    "black box": "Black Box",
+    "user acceptance testing": "User Acceptance Testing",
+    "uat": "UAT",
+    "entity relationship diagram": "Entity Relationship Diagram",
+    "erd": "ERD",
+    "pointer": "pointer",
+    "prefab": "prefab"
+  },
+  "catatan": "Registry ini menjaga konsistensi istilah di seluruh laporan TA."
+}
