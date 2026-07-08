@@ -135,7 +135,7 @@ Usulan jadwal kegiatan untuk penyelesaian proyek ini dirinci dalam bentuk Gantt 
 
 Tabel 1.2 Jadwal Kegiatan
 
-[TABLE]
+[TABLE gantt]
 Aktivitas | Bulan 1 | Bulan 2 | Bulan 3 | Bulan 4 | Bulan 5
 Desain Arsitektur & UI | X |  |  |  | 
 Pengembangan Backend |  | X | X |  | 

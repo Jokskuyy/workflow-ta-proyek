@@ -232,7 +232,7 @@ def test_unit_snapshot_draft_entries_match_baseline_spans():
     assert result.section_found is True
 
     baseline = _baseline_entry_spans()
-    assert len(result) == len(baseline) == 8
+    assert len(result) == len(baseline) == 11
 
     for entry, base_spans in zip(result, baseline):
         # Text + italic-span structure must match the captured baseline.
@@ -244,7 +244,9 @@ def test_unit_snapshot_draft_entries_match_baseline_spans():
 def test_unit_reference_key_surname_and_year():
     result = mrg.parse_bibliography_entries(str(DRAFT))
     keys = [mrg.reference_key(e) for e in result]
-    assert keys[0] == ('aliyah', '2024')
+    # First entry is "'Afiifah ... (2022)"; the leading transliteration
+    # apostrophe is stripped from the key (see reference_key()).
+    assert keys[0] == ('afiifah', '2022')
     assert ('siv', '2025') in keys
     assert ('putra', '2026') in keys
 

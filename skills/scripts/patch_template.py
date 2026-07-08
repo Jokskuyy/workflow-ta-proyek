@@ -420,7 +420,33 @@ def main():
     tree.write(xml_path, encoding='utf-8', xml_declaration=True)
     print("SUCCESS: document.xml patched and saved.")
     
-
+    # Copy new screenshots over the old mockup images in word/media
+    media_dir = "unpacked_ta/word/media"
+    replacements = {
+        "login-page.png": "image18.png",
+        "header+gedung-view.png": "image19.png",
+        "modal-create-gedung.png": "image20.png",
+        "modal-edit-gedung.png": "image21.png",
+        "modal-konfirmasi-delete-gedung.png": "image22.png",
+        "section-admin-traffic-view.png": "image23.png",
+        "section-header+hero.png": "image24.png",
+        "traffic-web-public.png": "image25.png",
+        "section fasilitas-asset(dan gedung).png": "image26.png",
+        "modal-fasilitas-aset.png": "image27.png",
+        "modal-detail-gedung.png": "image28.png",
+        "section-footer.png": "image32.png",
+        "erd_schema.png": "image13.png"
+    }
+    
+    print("Replacing mockup image files with real screenshots...")
+    for src_name, dest_name in replacements.items():
+        src_path = os.path.join("dokumentasi", src_name)
+        dest_path = os.path.join(media_dir, dest_name)
+        if os.path.exists(src_path):
+            shutil.copy2(src_path, dest_path)
+            print(f"  Replaced {dest_name} with {src_name}")
+        else:
+            print(f"  Warning: Screenshot not found: {src_path}")
 
 if __name__ == '__main__':
     main()

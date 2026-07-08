@@ -369,6 +369,21 @@ SECTPR_ORDER = [
     'bidi', 'rtlGutter', 'docGrid', 'printerSettings', 'sectPrChange'
 ]
 
+# Official CT_TblPr child order from the OOXML schema.
+TBLPR_ORDER = [
+    'tblStyle', 'tblpPr', 'tblOverlap', 'bidiVisual',
+    'tblStyleRowBandSize', 'tblStyleColBandSize', 'tblW', 'jc',
+    'tblCellSpacing', 'tblInd', 'tblBorders', 'shd', 'tblLayout',
+    'tblCellMar', 'tblLook', 'tblCaption', 'tblDescription', 'tblPrChange'
+]
+
+# Official CT_TcPr child order from the OOXML schema.
+TCPR_ORDER = [
+    'cnfStyle', 'tcW', 'gridSpan', 'hMerge', 'vMerge', 'tcBorders', 'shd',
+    'noWrap', 'tcMar', 'textDirection', 'tcFitText', 'vAlign', 'hideMark',
+    'headers', 'cellIns', 'cellDel', 'cellMerge', 'tcPrChange'
+]
+
 def sort_element_children(parent, order_list):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     def key_func(child):
@@ -807,79 +822,311 @@ def scale_lembar_pengesahan(p, namespaces, unpacked_dir=None, rel_map=None):
                     except ValueError:
                         pass
 
+def compute_printable_width(root, namespaces):
+    """Return the printable page width in dxa (twips) from the document's page setup.
+
+    Reads ``pgSz@w`` minus ``pgMar@left`` and ``pgMar@right`` from the body
+    ``sectPr`` (``w:body/w:sectPr``, falling back to the last ``sectPr`` in the
+    body when no direct child ``sectPr`` exists). Each value falls back to a safe
+    default matching the project's real page setup (``w=11906``, ``left=2268``,
+    ``right=1701`` -> ``7937`` dxa) when it is missing or unparseable.
+
+    This helper is strictly read-only: it never mutates ``sectPr`` (or any other
+    element). It only inspects attributes to compute the printable width.
+    """
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    DEFAULT_W = 11906
+    DEFAULT_LEFT = 2268
+    DEFAULT_RIGHT = 1701
+
+    # Locate the section properties: prefer the body's direct-child sectPr,
+    # otherwise fall back to the last sectPr found anywhere in the body.
+    sectPr = None
+    body = root.find('w:body', namespaces)
+    search_scope = body if body is not None else root
+    if search_scope is not None:
+        sectPr = search_scope.find('w:sectPr', namespaces)
+        if sectPr is None:
+            sect_list = search_scope.findall('.//w:sectPr', namespaces)
+            if sect_list:
+                sectPr = sect_list[-1]
+
+    def _parse_attr(elem, attr, default):
+        if elem is None:
+            return default
+        raw = elem.get(f'{{{ns_uri}}}{attr}')
+        if raw is None:
+            return default
+        try:
+            return int(raw)
+        except (TypeError, ValueError):
+            return default
+
+    pgSz = sectPr.find('w:pgSz', namespaces) if sectPr is not None else None
+    pgMar = sectPr.find('w:pgMar', namespaces) if sectPr is not None else None
+
+    width = _parse_attr(pgSz, 'w', DEFAULT_W)
+    left = _parse_attr(pgMar, 'left', DEFAULT_LEFT)
+    right = _parse_attr(pgMar, 'right', DEFAULT_RIGHT)
+
+    printable = width - left - right
+    if printable <= 0:
+        # Degenerate/unusable geometry -> fall back to the known-good default.
+        return DEFAULT_W - DEFAULT_LEFT - DEFAULT_RIGHT
+    return printable
+
+
+def count_table_columns(tbl, namespaces):
+    """Return the structural column count of a ``w:tbl``.
+
+    The count is derived purely from structure (never from cell text):
+
+      * when a ``w:tblGrid`` with ``w:gridCol`` children exists, the count is
+        ``len(tblGrid/gridCol)``;
+      * otherwise it is the maximum number of grid columns spanned by any row,
+        i.e. ``max`` over rows of ``sum(w:tc/w:tcPr/w:gridSpan@val)`` (a cell
+        without ``gridSpan`` counts as one column).
+
+    Returns ``0`` for a table with no grid and no rows/cells.
+    """
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+
+    tblGrid = tbl.find('w:tblGrid', namespaces)
+    if tblGrid is not None:
+        cols = tblGrid.findall('w:gridCol', namespaces)
+        if cols:
+            return len(cols)
+
+    max_cols = 0
+    for row in tbl.findall('w:tr', namespaces):
+        span_total = 0
+        for tc in row.findall('w:tc', namespaces):
+            span = 1
+            tcPr = tc.find('w:tcPr', namespaces)
+            if tcPr is not None:
+                gridSpan = tcPr.find('w:gridSpan', namespaces)
+                if gridSpan is not None:
+                    raw = gridSpan.get(f'{{{ns_uri}}}val')
+                    try:
+                        parsed = int(raw)
+                        if parsed > 0:
+                            span = parsed
+                    except (TypeError, ValueError):
+                        span = 1
+            span_total += span
+        if span_total > max_cols:
+            max_cols = span_total
+    return max_cols
+
+
+def column_ratios_from_grid(tbl, namespaces, n_cols):
+    """Return a list of ``n_cols`` column proportions (summing to 1.0).
+
+    When the table's existing ``w:tblGrid`` has exactly ``n_cols`` ``w:gridCol``
+    entries whose widths are parseable and sum to a positive value, those widths
+    are used as proportions (each divided by their total). Otherwise the width
+    is split evenly (``1/n_cols`` per column).
+
+    This helper is read-only and structure-driven: it never inspects cell text
+    and never hardcodes a width by column count. Returns ``[]`` when
+    ``n_cols <= 0``.
+    """
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+
+    if n_cols <= 0:
+        return []
+
+    even = [1.0 / n_cols] * n_cols
+
+    tblGrid = tbl.find('w:tblGrid', namespaces)
+    if tblGrid is None:
+        return even
+
+    cols = tblGrid.findall('w:gridCol', namespaces)
+    if len(cols) != n_cols:
+        return even
+
+    widths = []
+    for gc in cols:
+        raw = gc.get(f'{{{ns_uri}}}w')
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            return even
+        if value < 0:
+            return even
+        widths.append(value)
+
+    total = sum(widths)
+    if total <= 0:
+        return even
+    return [w / total for w in widths]
+
+
+def distribute_width(printable, ratios, overrides=None):
+    """Distribute ``printable`` dxa across columns, summing exactly to ``printable``.
+
+    ``ratios`` is a per-column proportion list (e.g. from
+    :func:`column_ratios_from_grid`). An optional ``overrides`` proportion list
+    replaces ``ratios`` when it is supplied, has the same length, and sums to a
+    positive value -- letting callers pass non-hardcoded per-column ratios
+    without keying anything to cell text or a specific column count.
+
+    Each column width is ``floor(printable * ratio / sum(ratios))``; the leftover
+    remainder (so the total is exact) is added to the last column. Handles
+    ``n_cols == 1`` (the single column receives the full ``printable``). Returns
+    ``[]`` for an empty ratio list.
+    """
+    effective = list(ratios)
+
+    if overrides is not None:
+        overrides = list(overrides)
+        if len(overrides) == len(effective) and sum(overrides) > 0 \
+                and all(o >= 0 for o in overrides):
+            effective = overrides
+
+    n = len(effective)
+    if n == 0:
+        return []
+
+    total = sum(effective)
+    if total <= 0:
+        # Degenerate ratios -> fall back to an even split.
+        effective = [1.0 / n] * n
+        total = 1.0
+
+    widths = [int(printable * r / total) for r in effective]
+    widths[-1] += printable - sum(widths)
+    return widths
+
+
 def format_all_tables(root, namespaces):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+
+    def qn(tag):
+        return f'{{{ns_uri}}}{tag}'
+
+    # Compute the printable width once from the document's own page setup.
+    printable = compute_printable_width(root, namespaces)
+
+    # Consistent, content-agnostic borders and cell padding for every table.
+    BORDER_SIDES = ('top', 'left', 'bottom', 'right', 'insideH', 'insideV')
+    BORDER_ATTRS = {'val': 'single', 'sz': '4', 'color': '000000'}
+    CELL_MARGIN_DXA = {'top': '0', 'left': '108', 'bottom': '0', 'right': '108'}
+
     tbl_count = 0
     for tbl in root.findall('.//w:tbl', namespaces):
         tbl_count += 1
         tblPr = tbl.find('w:tblPr', namespaces)
         if tblPr is None:
-            tblPr = lxml.etree.Element(f'{{{ns_uri}}}tblPr')
+            tblPr = lxml.etree.Element(qn('tblPr'))
             tbl.insert(0, tblPr)
-        
-        # Center table horizontally
+
+        # Center table horizontally (preserved behavior).
         set_child_element(tblPr, 'jc', {'val': 'center'})
-        
-        # Format rows and cells
+
         rows = tbl.findall('w:tr', namespaces)
         if not rows:
+            # Nothing structural to size; keep any tblPr children schema-valid.
+            sort_element_children(tblPr, TBLPR_ORDER)
             continue
-            
-        # Check if this is Tabel 1.2 (Jadwal Kegiatan)
-        first_row_cells = rows[0].findall('w:tc', namespaces)
-        is_tabel_1_2 = False
-        if len(first_row_cells) == 6:
-            first_cell_text = "".join(first_row_cells[0].itertext()).strip()
-            if "Aktivitas" in first_cell_text:
-                is_tabel_1_2 = True
-                
-        # Customize tblGrid for Tabel 1.2
-        if is_tabel_1_2:
-            tblGrid = tbl.find('w:tblGrid', namespaces)
-            if tblGrid is not None:
-                for gc in list(tblGrid):
-                    tblGrid.remove(gc)
-                lxml.etree.SubElement(tblGrid, f'{{{ns_uri}}}gridCol', {f'{{{ns_uri}}}w': '3500'})
-                for _ in range(5):
-                    lxml.etree.SubElement(tblGrid, f'{{{ns_uri}}}gridCol', {f'{{{ns_uri}}}w': '900'})
-        
+
+        # --- Structure-driven width fitting (no content probing) --------------
+        n_cols = count_table_columns(tbl, namespaces)
+        if n_cols <= 0:
+            n_cols = 1
+        ratios = column_ratios_from_grid(tbl, namespaces, n_cols)
+        col_widths = distribute_width(printable, ratios)
+
+        # Total preferred width + fixed layout so the table fits the page.
+        set_child_element(tblPr, 'tblW', {'w': str(printable), 'type': 'dxa'})
+        set_child_element(tblPr, 'tblLayout', {'type': 'fixed'})
+
+        # Consistent borders (all sides + insideH/insideV) and cell padding.
+        tblBorders = set_child_element(tblPr, 'tblBorders')
+        for side in BORDER_SIDES:
+            set_child_element(tblBorders, side, BORDER_ATTRS)
+        tblCellMar = set_child_element(tblPr, 'tblCellMar')
+        for side in ('top', 'left', 'bottom', 'right'):
+            set_child_element(tblCellMar, side, {'w': CELL_MARGIN_DXA[side], 'type': 'dxa'})
+
+        # Keep tblPr children in valid OOXML schema order.
+        sort_element_children(tblPr, TBLPR_ORDER)
+
+        # Rewrite tblGrid so gridCol widths equal the distributed widths.
+        tblGrid = tbl.find('w:tblGrid', namespaces)
+        if tblGrid is None:
+            tblGrid = lxml.etree.Element(qn('tblGrid'))
+            tbl.insert(list(tbl).index(tblPr) + 1, tblGrid)
+        for gc in list(tblGrid):
+            tblGrid.remove(gc)
+        for w in col_widths:
+            gc = lxml.etree.SubElement(tblGrid, qn('gridCol'))
+            gc.set(qn('w'), str(w))
+
+        # --- Per-row / per-cell formatting ------------------------------------
         for row_idx, row in enumerate(rows):
             is_header = (row_idx == 0)
-            cells = row.findall('w:tc', namespaces)
-            for cell_idx, cell in enumerate(cells):
+
+            # Mark the first row as a repeating header row.
+            if is_header:
+                trPr = row.find('w:trPr', namespaces)
+                if trPr is None:
+                    trPr = lxml.etree.Element(qn('trPr'))
+                    row.insert(0, trPr)
+                set_child_element(trPr, 'tblHeader', {'val': 'true'})
+
+            col_cursor = 0
+            for cell in row.findall('w:tc', namespaces):
                 tcPr = cell.find('w:tcPr', namespaces)
                 if tcPr is None:
-                    tcPr = lxml.etree.Element(f'{{{ns_uri}}}tcPr')
+                    tcPr = lxml.etree.Element(qn('tcPr'))
                     cell.insert(0, tcPr)
-                
-                # Apply column width if it's Tabel 1.2
-                if is_tabel_1_2:
-                    col_width = '3500' if cell_idx == 0 else '900'
-                    set_child_element(tcPr, 'tcW', {'w': col_width, 'type': 'dxa'})
-                
-                # Vertical alignment
+
+                # Determine how many grid columns this cell spans.
+                span = 1
+                gridSpan = tcPr.find('w:gridSpan', namespaces)
+                if gridSpan is not None:
+                    raw = gridSpan.get(qn('val'))
+                    try:
+                        parsed = int(raw)
+                        if parsed > 0:
+                            span = parsed
+                    except (TypeError, ValueError):
+                        span = 1
+
+                # Cell width = sum of the widths of the columns it spans.
+                start = min(col_cursor, len(col_widths))
+                end = min(col_cursor + span, len(col_widths))
+                cell_width = sum(col_widths[start:end])
+                if cell_width <= 0 and col_widths:
+                    cell_width = col_widths[min(col_cursor, len(col_widths) - 1)]
+                col_cursor += span
+                set_child_element(tcPr, 'tcW', {'w': str(cell_width), 'type': 'dxa'})
+
+                # Vertical alignment.
                 if is_header:
                     set_child_element(tcPr, 'vAlign', {'val': 'center'})
                 else:
-                    set_child_element(tcPr, 'vAlign', {'val': 'center'} if is_tabel_1_2 else {'val': 'top'})
-                
-                # Process cell paragraphs
+                    set_child_element(tcPr, 'vAlign', {'val': 'top'})
+
+                # Keep tcPr children in valid OOXML schema order.
+                sort_element_children(tcPr, TCPR_ORDER)
+
+                # Process cell paragraphs.
                 for p in cell.findall('w:p', namespaces):
                     pPr = p.find('w:pPr', namespaces)
                     if pPr is None:
-                        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                        pPr = lxml.etree.Element(qn('pPr'))
                         p.insert(0, pPr)
-                    
-                    # Horizontal alignment
+
+                    # Horizontal alignment: header centered, body left.
                     if is_header:
                         set_child_element(pPr, 'jc', {'val': 'center'})
                     else:
-                        if is_tabel_1_2 and cell_idx > 0:
-                            set_child_element(pPr, 'jc', {'val': 'center'})
-                        else:
-                            set_child_element(pPr, 'jc', {'val': 'left'})
-                        
-                    # Clear indentation
+                        set_child_element(pPr, 'jc', {'val': 'left'})
+
+                    # Clear indentation and keep pPr children ordered.
                     set_child_element(pPr, 'ind', {'left': '0', 'firstLine': '0', 'right': '0'})
                     sort_element_children(pPr, PPR_ORDER)
     print(f"  Formatted {tbl_count} tables in document.xml.")
