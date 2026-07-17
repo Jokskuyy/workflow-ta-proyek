@@ -8,8 +8,8 @@ fatal finding (appended to ``errors_found``) only when explicitly configured via
 env ``TA_CITATION_FATAL=1``. The structural guards (R6.1/6.2/6.4/6.5) stay
 non-fatal and additive in all cases.
 
-Also asserts the two validator copies (scratch/ and skills/scripts/) are kept
-byte-identical (Task 8.8 sync requirement).
+Also asserts, when runtime bootstrap has materialized the complete scratch set,
+that the generated validator copy is byte-identical to its tracked source.
 """
 import importlib
 import sys
@@ -18,12 +18,14 @@ from pathlib import Path
 import pytest
 
 # --------------------------------------------------------------------------- #
-# Import the canonical validator (scratch copy) as a module.
+# Import the tracked canonical validator as a module. The scratch copy is a
+# generated runtime artifact and may be stale or absent before build bootstrap.
 # --------------------------------------------------------------------------- #
 ROOT = Path(__file__).resolve().parents[1]
 SCRATCH = ROOT / "scratch"
-if str(SCRATCH) not in sys.path:
-    sys.path.insert(0, str(SCRATCH))
+SKILLS = ROOT / "skills" / "scripts"
+if str(SKILLS) not in sys.path:
+    sys.path.insert(0, str(SKILLS))
 
 vds = importlib.import_module("validate_docx_structure")
 
