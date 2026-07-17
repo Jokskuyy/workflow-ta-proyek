@@ -14,6 +14,61 @@ WP_NS = 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing'
 MAX_WIDTH_EMU = 5400000
 EMU_PER_TWIP = 635  # printable page-height threshold uses twips * 635 (matches injector)
 
+# Canonical UPNVJ FIK page geometry (OOXML twips): A4 portrait with a 4 cm
+# binding margin on the left and 3 cm on the top, right, and bottom.
+EXPECTED_PAGE_SIZE_DXA = {'w': 11906, 'h': 16838}
+EXPECTED_MARGINS_DXA = {
+    'top': 1701,
+    'right': 1701,
+    'bottom': 1701,
+    'left': 2268,
+}
+
+
+def validate_page_layout(doc_root):
+    """Return fatal findings for any section that violates campus geometry."""
+    body = doc_root.find(f'{{{W_NS}}}body')
+    if body is None:
+        return ["[layout] document body is missing; page layout cannot be validated."]
+
+    sections = list(body.iter(f'{{{W_NS}}}sectPr'))
+    if not sections:
+        return ["[layout] no w:sectPr found; A4 size and margins are undefined."]
+
+    findings = []
+    for section_number, sect_pr in enumerate(sections, start=1):
+        pg_sz = sect_pr.find(f'{{{W_NS}}}pgSz')
+        pg_mar = sect_pr.find(f'{{{W_NS}}}pgMar')
+        if pg_sz is None:
+            findings.append(f"[layout] section {section_number} is missing w:pgSz.")
+        else:
+            for name, expected in EXPECTED_PAGE_SIZE_DXA.items():
+                raw = pg_sz.get(f'{{{W_NS}}}{name}')
+                if raw != str(expected):
+                    findings.append(
+                        f"[layout] section {section_number} pgSz@{name}={raw!r}; "
+                        f"expected {expected} twips (A4 portrait)."
+                    )
+            orientation = pg_sz.get(f'{{{W_NS}}}orient')
+            if orientation not in (None, 'portrait'):
+                findings.append(
+                    f"[layout] section {section_number} orientation={orientation!r}; "
+                    "expected portrait."
+                )
+
+        if pg_mar is None:
+            findings.append(f"[layout] section {section_number} is missing w:pgMar.")
+        else:
+            for name, expected in EXPECTED_MARGINS_DXA.items():
+                raw = pg_mar.get(f'{{{W_NS}}}{name}')
+                if raw != str(expected):
+                    cm = 4 if name == 'left' else 3
+                    findings.append(
+                        f"[layout] section {section_number} margin {name}={raw!r}; "
+                        f"expected {expected} twips ({cm} cm)."
+                    )
+    return findings
+
 
 def _md5_bytes(b):
     """Hex MD5 of a byte string."""
@@ -40,6 +95,104 @@ def _content_style(p):
     if pStyle is None:
         return ""
     return pStyle.get(f'{{{W_NS}}}val') or ""
+
+
+def collect_figure_narration_errors(p_list, bab1_idx=-1):
+    """Return fatal findings for figures without an explicit narrative mention.
+
+    Every ``Gambar X.Y`` caption in the report body must be referenced by an
+    ordinary paragraph in the same chapter.  The reference must occur in the
+    middle of a sentence, rather than starting a paragraph/sentence with the
+    figure label.  This mirrors the canonical UPNVJ writing rule and keeps the
+    check independent from visual placement of the drawing/caption pair.
+    """
+
+    heading1_idxs = [
+        i for i, paragraph in enumerate(p_list)
+        if _content_style(paragraph).lower() == 'heading1'
+    ]
+
+    def chapter_range(caption_idx):
+        start = 0
+        for heading_idx in heading1_idxs:
+            if heading_idx <= caption_idx:
+                start = heading_idx
+            else:
+                break
+        end = len(p_list)
+        for heading_idx in heading1_idxs:
+            if heading_idx > caption_idx:
+                end = heading_idx
+                break
+        return start, end
+
+    findings = []
+    for caption_idx, paragraph in enumerate(p_list):
+        if bab1_idx != -1 and caption_idx < bab1_idx:
+            continue
+
+        style = _content_style(paragraph)
+        text = _content_text(paragraph)
+        is_figure_caption = (
+            style.lower() == 'caption'
+            and re.match(r'^Gambar\s+[0-9]', text, re.IGNORECASE)
+        )
+        if not is_figure_caption:
+            continue
+
+        caption_match = re.match(r'^Gambar\s+([0-9]+\.[0-9]+)', text, re.IGNORECASE)
+        if not caption_match:
+            continue
+
+        figure_number = caption_match.group(1)
+        reference_re = re.compile(
+            r'\bGambar\s+' + re.escape(figure_number) + r'\b',
+            re.IGNORECASE,
+        )
+        chapter_start, chapter_end = chapter_range(caption_idx)
+        has_reference = False
+        has_valid_reference = False
+
+        for narrative_idx in range(chapter_start, chapter_end):
+            if narrative_idx == caption_idx:
+                continue
+            narrative = p_list[narrative_idx]
+            narrative_style = _content_style(narrative)
+            if narrative_style == 'Caption':
+                continue
+            if narrative_style.lower().startswith('heading'):
+                continue
+            if narrative_style.lower() in ('tableoffigures', 'table of figures'):
+                continue
+            if narrative.find(f'.//{{{W_NS}}}drawing') is not None:
+                continue
+
+            narrative_text = _content_text(narrative)
+            if not narrative_text:
+                continue
+            for reference_match in reference_re.finditer(narrative_text):
+                has_reference = True
+                # Empty prefix means the label starts the paragraph.  A terminal
+                # punctuation mark means it starts a later sentence.
+                prefix = narrative_text[:reference_match.start()].rstrip()
+                if prefix and not re.search(r'[.!?]\s*$', prefix):
+                    has_valid_reference = True
+                    break
+            if has_valid_reference:
+                break
+
+        if not has_reference:
+            findings.append(
+                f'[narration] Gambar {figure_number} tidak memiliki paragraf '
+                f'narasi yang menyebut "Gambar {figure_number}" dalam bab yang sama.'
+            )
+        elif not has_valid_reference:
+            findings.append(
+                f'[narration] Rujukan Gambar {figure_number} mengawali kalimat; '
+                'rujukan harus ditempatkan di tengah kalimat narasi.'
+            )
+
+    return findings
 
 
 def _resolve_caption_indices_content(body, caption_match):
@@ -364,6 +517,14 @@ def main():
     print("Iterating paragraphs for structure validation...")
     
     errors_found = []
+    print("Checking A4 page size and campus margins on every section...")
+    layout_errors = validate_page_layout(doc_root)
+    errors_found.extend(layout_errors)
+    if not layout_errors:
+        print(
+            "SUCCESS: All sections use A4 portrait with left=4 cm and "
+            "top/right/bottom=3 cm."
+        )
     first_gambar_checked = False
     gambar_count = 0
     tabel_count = 0
@@ -759,81 +920,25 @@ def main():
                     )
 
     # ============================================================ #
-    # Narration guard (WARNING ONLY -- never fatal).
+    # Figure narration guard (FATAL).
     #
-    # For every figure caption ("Gambar X.Y ...") confirm that, within the SAME
-    # chapter (Heading1 .. next Heading1), at least one ordinary body paragraph
-    # (Normal style, NOT a Caption, NOT a drawing paragraph) references the
-    # figure via \bGambar\s+X\.Y\b. If none does, print a clearly-labelled
-    # [WARN][narration] line. This DOES NOT append to errors_found and DOES NOT
-    # change the exit code.
+    # Each figure must be explicitly mentioned by an ordinary narrative
+    # paragraph in the same chapter, with the label placed mid-sentence.  A
+    # missing/invalid mention is a campus-format violation and therefore blocks
+    # the build instead of being silently tolerated as a warning.
     # ============================================================ #
-    print("Checking figure narration references (non-fatal warnings)...")
-
-    def _h1_val(pp):
-        ppr = pp.find('w:pPr', namespaces)
-        ps = ppr.find('w:pStyle', namespaces) if ppr is not None else None
-        return ps.get(f'{{{W_NS}}}val') if ps is not None else ""
-
-    # Heading1 boundaries (chapter starts) within the document body.
-    heading1_idxs = [i for i, pp in enumerate(p_list)
-                     if _h1_val(pp) in ('Heading1', 'heading1')]
-
-    def _chapter_range(cap_idx):
-        start = 0
-        for hi in heading1_idxs:
-            if hi <= cap_idx:
-                start = hi
-            else:
-                break
-        end = len(p_list)
-        for hi in heading1_idxs:
-            if hi > cap_idx:
-                end = hi
-                break
-        return start, end
-
-    narration_warnings = []
-    for idx, p in enumerate(p_list):
-        is_in_body = (bab1_idx == -1 or idx >= bab1_idx)
-        if not is_in_body:
-            continue
-        pStyle_val = _content_style(p)
-        text = _content_text(p)
-        is_gambar_caption = (re.match(r'^Gambar\s+[0-9]', text, re.IGNORECASE)
-                             or (pStyle_val == 'Caption' and text.lower().startswith('gambar')))
-        if not is_gambar_caption:
-            continue
-        m = re.match(r'^Gambar\s+([0-9]+\.[0-9]+)', text, re.IGNORECASE)
-        if not m:
-            continue
-        fig_num = m.group(1)
-        ref_re = re.compile(r'\bGambar\s+' + re.escape(fig_num) + r'\b', re.IGNORECASE)
-        c_start, c_end = _chapter_range(idx)
-        found_ref = False
-        for j in range(c_start, c_end):
-            if j == idx:
-                continue
-            q = p_list[j]
-            q_style = _content_style(q)
-            if q_style == 'Caption':
-                continue
-            if q.find(f'.//{{{W_NS}}}drawing') is not None:
-                continue
-            # Treat empty/un-styled body text as Normal narrative; exclude only
-            # explicit Caption/drawing paragraphs above.
-            q_text = _content_text(q)
-            if not q_text:
-                continue
-            if ref_re.search(q_text):
-                found_ref = True
-                break
-        if not found_ref:
-            narration_warnings.append(f"[WARN][narration] Gambar {fig_num} has no referencing narrative paragraph")
-
-    for w in narration_warnings:
-        print(w)
-    print(f"Narration check: {len(narration_warnings)} figure(s) without a narrative reference (non-fatal).")
+    print("Checking figure narration references (fatal)...")
+    narration_errors = collect_figure_narration_errors(p_list, bab1_idx)
+    errors_found.extend(narration_errors)
+    for finding in narration_errors:
+        print(finding)
+    if narration_errors:
+        print(
+            f"Narration check: {len(narration_errors)} figure(s) violate the "
+            "mandatory narrative-reference rule."
+        )
+    else:
+        print("SUCCESS: Every figure has an explicit mid-sentence narrative reference.")
 
     # ============================================================ #
     # Citation guard for Latar Belakang (WARNING ONLY -- never fatal).
