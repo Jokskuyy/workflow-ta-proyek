@@ -3,6 +3,19 @@ import os
 import re
 import sys
 
+# Canonical UPNVJ FIK page geometry. OOXML stores these values in twips
+# (1 cm ~= 567 twips): A4 portrait, 4 cm left, and 3 cm on the other sides.
+# Keep layout writes and width calculations tied to these constants so a future
+# formatting change cannot silently make tables use different page geometry.
+A4_PAGE_WIDTH_DXA = 11906
+A4_PAGE_HEIGHT_DXA = 16838
+MARGIN_LEFT_DXA = 2268
+MARGIN_TOP_DXA = 1701
+MARGIN_RIGHT_DXA = 1701
+MARGIN_BOTTOM_DXA = 1701
+HEADER_DISTANCE_DXA = 720
+FOOTER_DISTANCE_DXA = 720
+
 # Tabel angka Romawi untuk Nomor_Bab (I=1 .. X=10).
 ROMAN = {
     "I": 1, "II": 2, "III": 3, "IV": 4, "V": 5,
@@ -409,6 +422,35 @@ def set_child_element(parent, tag_name, attribs=None):
             elif k.startswith('{'): elem.set(k, str(v))
             else: elem.set(f'{{{ns_uri}}}{k}', str(v))
     return elem
+
+
+def apply_upnvj_page_layout(sect_pr):
+    """Apply the canonical A4 + 4/3/3/3 cm layout to one ``w:sectPr``.
+
+    The helper is intentionally idempotent and preserves unrelated section
+    properties such as header/footer references and page-numbering settings.
+    """
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    pg_sz = set_child_element(sect_pr, 'pgSz', {
+        'w': str(A4_PAGE_WIDTH_DXA),
+        'h': str(A4_PAGE_HEIGHT_DXA),
+    })
+    # A stale landscape flag can override otherwise-correct portrait dimensions.
+    orient_attr = f'{{{ns_uri}}}orient'
+    if orient_attr in pg_sz.attrib:
+        del pg_sz.attrib[orient_attr]
+
+    set_child_element(sect_pr, 'pgMar', {
+        'top': str(MARGIN_TOP_DXA),
+        'right': str(MARGIN_RIGHT_DXA),
+        'bottom': str(MARGIN_BOTTOM_DXA),
+        'left': str(MARGIN_LEFT_DXA),
+        'header': str(HEADER_DISTANCE_DXA),
+        'footer': str(FOOTER_DISTANCE_DXA),
+        'gutter': '0',
+    })
+    sort_element_children(sect_pr, SECTPR_ORDER)
+    return sect_pr
 
 def fix_whitespace_preservation(root):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
@@ -828,16 +870,17 @@ def compute_printable_width(root, namespaces):
     Reads ``pgSz@w`` minus ``pgMar@left`` and ``pgMar@right`` from the body
     ``sectPr`` (``w:body/w:sectPr``, falling back to the last ``sectPr`` in the
     body when no direct child ``sectPr`` exists). Each value falls back to a safe
-    default matching the project's real page setup (``w=11906``, ``left=2268``,
-    ``right=1701`` -> ``7937`` dxa) when it is missing or unparseable.
+    default matching the canonical UPNVJ page setup (``w=11906``,
+    ``left=2268``, ``right=1701`` -> ``7937`` dxa) when it is missing or
+    unparseable.
 
     This helper is strictly read-only: it never mutates ``sectPr`` (or any other
     element). It only inspects attributes to compute the printable width.
     """
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
-    DEFAULT_W = 11906
-    DEFAULT_LEFT = 2268
-    DEFAULT_RIGHT = 1701
+    DEFAULT_W = A4_PAGE_WIDTH_DXA
+    DEFAULT_LEFT = MARGIN_LEFT_DXA
+    DEFAULT_RIGHT = MARGIN_RIGHT_DXA
 
     # Locate the section properties: prefer the body's direct-child sectPr,
     # otherwise fall back to the last sectPr found anywhere in the body.
@@ -2138,12 +2181,7 @@ def format_document_xmls(unpacked_dir):
             
             set_child_element(sectPr, 'type', {'val': 'nextPage'})
             set_child_element(sectPr, 'pgNumType', {'fmt': 'lowerRoman', 'start': '1'})
-            set_child_element(sectPr, 'pgSz', {'w': '11906', 'h': '16838'})
-            set_child_element(sectPr, 'pgMar', {
-                'top': '1701', 'right': '1701', 'bottom': '1701', 'left': '2268',
-                'header': '720', 'footer': '720', 'gutter': '0'
-            })
-            sort_element_children(sectPr, SECTPR_ORDER)
+            apply_upnvj_page_layout(sectPr)
             
             pPr_sect.append(sectPr)
             sort_element_children(pPr_sect, PPR_ORDER)
@@ -2154,17 +2192,24 @@ def format_document_xmls(unpacked_dir):
 
         # Final section break (body section)
         final_sectPr = body.find('w:sectPr', namespaces)
-        if final_sectPr is not None:
-            pg_num_type = set_child_element(final_sectPr, 'pgNumType', {'fmt': 'decimal'})
-            start_attr = f'{{{ns_uri}}}start'
-            if start_attr in pg_num_type.attrib:
-                del pg_num_type.attrib[start_attr]
-            set_child_element(final_sectPr, 'pgSz', {'w': '11906', 'h': '16838'})
-            set_child_element(final_sectPr, 'pgMar', {
-                'top': '1701', 'right': '1701', 'bottom': '1701', 'left': '2268',
-                'header': '720', 'footer': '720', 'gutter': '0'
-            })
-            sort_element_children(final_sectPr, SECTPR_ORDER)
+        if final_sectPr is None:
+            final_sectPr = lxml.etree.Element(f'{{{ns_uri}}}sectPr')
+            body.append(final_sectPr)
+        pg_num_type = set_child_element(final_sectPr, 'pgNumType', {'fmt': 'decimal'})
+        start_attr = f'{{{ns_uri}}}start'
+        if start_attr in pg_num_type.attrib:
+            del pg_num_type.attrib[start_attr]
+        apply_upnvj_page_layout(final_sectPr)
+
+        # Defensive final pass: every remaining section (including inherited or
+        # nested template section breaks) must use the same campus geometry.
+        all_sect_pr = list(body.iter(f'{{{ns_uri}}}sectPr'))
+        for section_properties in all_sect_pr:
+            apply_upnvj_page_layout(section_properties)
+        print(
+            "Applied canonical A4 margins to %d section(s): "
+            "left=4 cm; top/right/bottom=3 cm." % len(all_sect_pr)
+        )
             
         # Strip all dirty flags from fldChar elements to prevent Word 
         # from showing "update fields" dialog on open.

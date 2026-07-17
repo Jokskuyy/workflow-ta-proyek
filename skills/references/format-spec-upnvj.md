@@ -14,6 +14,7 @@
 | **Indentations** | Body (1.0cm first-line indent), Bibliography (1.0cm hanging indent) |
 | **Table Captions** | **Di atas** tabel, center, "Tabel 1.1 ..." (tanpa titik setelah nomor) |
 | **Figure Captions** | **Di bawah** gambar, center, "Gambar 2.3 ..." (tanpa titik setelah nomor) |
+| **Figure Narration** | Setiap gambar wajib dirujuk secara eksplisit sebagai "Gambar X.Y" dalam paragraf narasi biasa pada bab yang sama. Rujukan ditempatkan di tengah kalimat, bukan sebagai kata pertama paragraf/kalimat. Pelanggaran bersifat fatal dan menggagalkan build. |
 | **Front Matter Pages** | Romawi (`i, ii, iii...`) center di bawah |
 | **Body Pages** | Arab (`1, 2, 3...`) center di bawah, restart di BAB I |
 | **TOC & Bibliography** | Judul center, Heading1 tanpa nomor, font dipaksa Times New Roman |
