@@ -98,6 +98,7 @@ def parse_markdown(md_path):
     code_lang = ""
     in_table = False
     table_lines = []
+    table_mode = None
     
     # List item regex
     # Matches: 1. , a. , 1) , a)
@@ -137,19 +138,26 @@ def parse_markdown(md_path):
             code_lines.append(line.rstrip('\r\n'))
             continue
             
-        # Handle tables
-        if stripped.startswith('[TABLE]'):
+        # Handle tables. A block opens with ``[TABLE]`` and may carry an
+        # optional mode token, e.g. ``[TABLE gantt]`` to render X-marked
+        # month cells as colored bars instead of the letter "X".
+        if stripped.startswith('[TABLE') and not stripped.startswith('[/'):
             in_table = True
             table_lines = []
+            inner = stripped[len('[TABLE'):]
+            inner = inner.split(']', 1)[0].strip()
+            table_mode = inner or None
             continue
             
         if stripped.endswith('[/TABLE]'):
             in_table = False
             items.append({
                 'type': 'table',
-                'lines': table_lines
+                'lines': table_lines,
+                'mode': table_mode
             })
             table_lines = []
+            table_mode = None
             continue
             
         if in_table:
@@ -523,8 +531,13 @@ def _parse_authors(raw):
 
 
 def reference_key(entry):
-    """Matching key for an entry: (first-author surname lowercased, year)."""
+    """Matching key for an entry: (first-author surname lowercased, year).
+
+    Leading non-alphanumeric characters (e.g. the transliteration apostrophe in
+    "'Afiifah") are stripped so the key matches the in-text citation form.
+    """
     surname = entry.authors[0].lower() if entry.authors else ""
+    surname = surname.lstrip("'\"`’‘").strip()
     return (surname, entry.year or "")
 
 
@@ -745,8 +758,16 @@ def collect_unbalanced_emphasis_warnings(lines):
     lines produce no warning. (Property 15)
     """
     warnings = []
+    in_fence = False
     for idx, line in enumerate(lines or []):
         content = line.rstrip('\r\n')
+        # Fenced code blocks (```lang ... ```) are literal code, not prose, so
+        # their backticks/asterisks must not be counted as emphasis markers.
+        if content.lstrip().startswith('```'):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
         if not _emphasis_balanced(content):
             warnings.append(
                 f"[WARN][emphasis] Penanda emphasis tak seimbang pada baris "
@@ -771,9 +792,16 @@ def _extract_citation_keys(body_text):
             if not ym:
                 continue
             year = ym.group(1)
+            # Only a plausible publication year (1900-2099) is a citation year;
+            # this rejects code-block noise such as port numbers (3000/3001).
+            if not (year.isdigit() and 1900 <= int(year) <= 2099):
+                continue
             name_part = part.split(',', 1)[0].strip()
             name_part = _ET_AL_RE.sub('', name_part).strip()
             name_part = name_part.split('&', 1)[0].strip()
+            # Strip leading transliteration quotes so the citation key matches
+            # the normalized reference key (see reference_key()).
+            name_part = name_part.lstrip("'\"`’‘").strip()
             if not name_part:
                 continue
             keys.append((name_part.lower(), year, name_part))
@@ -1243,6 +1271,12 @@ def build_table_element(item):
     # so that path stays byte-identical to the frozen baseline oracle.
     alignments = item.get('alignments')
 
+    # Optional rendering mode, e.g. 'gantt' (color-code X-marked cells).
+    mode = item.get('mode')
+    is_gantt = (mode == 'gantt')
+    # Single uniform light-orange bar color for all gantt cells.
+    gantt_fill = 'FCE4D6'
+
     rows_data = []
     for line in item['lines']:
         cells = [c.strip() for c in line.split('|')]
@@ -1256,11 +1290,20 @@ def build_table_element(item):
         return tbl
         
     num_cols = max(len(r) for r in rows_data)
+
+    # Pad ragged rows so every row has the full column count. Without this,
+    # a row whose trailing cells are empty (e.g. "... | X |  |  |  |") loses
+    # its last cell when the line is stripped and split, leaving a visual
+    # "hole" in the last column(s) of the rendered table.
+    for r in rows_data:
+        while len(r) < num_cols:
+            r.append('')
     tblGrid = lxml.etree.SubElement(tbl, f'{{{ns_uri}}}tblGrid')
     for _ in range(num_cols):
         lxml.etree.SubElement(tblGrid, f'{{{ns_uri}}}gridCol', {f'{{{ns_uri}}}w': '2000'})
         
     is_first_row = True
+    data_row_idx = 0
     for row_cells in rows_data:
         tr = lxml.etree.SubElement(tbl, f'{{{ns_uri}}}tr')
         
@@ -1273,6 +1316,17 @@ def build_table_element(item):
             tc = lxml.etree.SubElement(tr, f'{{{ns_uri}}}tc')
             tcPr = lxml.etree.SubElement(tc, f'{{{ns_uri}}}tcPr')
             lxml.etree.SubElement(tcPr, f'{{{ns_uri}}}tcW', {f'{{{ns_uri}}}w': '0', f'{{{ns_uri}}}type': 'auto'})
+
+            # Gantt mode: an "X" in a data cell (any column past the first,
+            # which holds the activity label) becomes a colored bar instead of
+            # the letter. Each activity (data row) gets its own distinct color.
+            if is_gantt and not is_first_row and j > 0 and cell_text.strip().upper() == 'X':
+                lxml.etree.SubElement(tcPr, f'{{{ns_uri}}}shd', {
+                    f'{{{ns_uri}}}val': 'clear',
+                    f'{{{ns_uri}}}color': 'auto',
+                    f'{{{ns_uri}}}fill': gantt_fill
+                })
+                cell_text = ''
             
             p = lxml.etree.SubElement(tc, f'{{{ns_uri}}}p')
             pPr = lxml.etree.SubElement(p, f'{{{ns_uri}}}pPr')
@@ -1301,6 +1355,8 @@ def build_table_element(item):
                 
             add_formatted_text(p, cell_text, default_rPr)
             
+        if not is_first_row:
+            data_row_idx += 1
         is_first_row = False
         
     return tbl

@@ -2,6 +2,8 @@
 
 Repository ini berisi dokumen tugas akhir proyek dan otomatisasi formatting sesuai dengan pedoman **Tugas Akhir Skema Proyek Fakultas Ilmu Komputer UPN Veteran Jakarta 2025**.
 
+Dokumentasi lengkap seluruh fitur, aturan penulisan, format kampus, pipeline, validasi, testing, dan troubleshooting tersedia di **[DOKUMENTASI-PIPELINE.md](DOKUMENTASI-PIPELINE.md)**. AI agent sebaiknya mulai dari **[AGENTS.md](AGENTS.md)** agar dapat memilih file yang relevan tanpa memindai seluruh codebase.
+
 Untuk memudahkan pengerjaan, proses penulisan dan perapian format dibagi menjadi **dua skill utama**:
 1. **`write-ta-proyek`**: Skill untuk memandu dan menghasilkan konten tulisan yang konsisten secara akademik.
 2. **`docx-ta-proyek`**: Skill otomatisasi formatting dokumen Word (`.docx`) menggunakan manipulasi XML terstruktur.
@@ -21,7 +23,8 @@ graph TD
     G --> H[Konversi Markdown ke .docx Mentah]
     H --> I[Eksekusi format_ta_proyek.py]
     I --> J[Otomatis: Margins, Scaling Logo Cover, Page Breaks, Font Times New Roman]
-    J --> K[Output Terformat: Tugas_Akhir_Formatted.docx & PDF]
+    J --> K[Validasi Struktur, Gambar, Narasi, dan Sitasi]
+    K --> L[Output Terformat: Tugas_Akhir_Formatted.docx]
 ```
 
 ---
