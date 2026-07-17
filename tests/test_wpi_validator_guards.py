@@ -115,7 +115,15 @@ def test_missing_draft_skips_guards_without_error(monkeypatch, tmp_path, capsys)
 def test_both_validator_copies_are_byte_identical():
     """Task 8.8: the scratch/ and skills/scripts/ validator copies must stay in
     sync (kept byte-identical so the guard wiring cannot diverge)."""
-    scratch_bytes = (ROOT / "scratch" / "validate_docx_structure.py").read_bytes()
+    scratch_dir = ROOT / "scratch"
+    runtime_names = (
+        "merge_draft_to_docx.py",
+        "validate_docx_structure.py",
+        "inject_all_images.py",
+    )
+    if not all((scratch_dir / name).exists() for name in runtime_names):
+        pytest.skip("scratch runtime set has not been materialized by build_pipeline.py")
+    scratch_bytes = (scratch_dir / "validate_docx_structure.py").read_bytes()
     skills_bytes = (ROOT / "skills" / "scripts" / "validate_docx_structure.py").read_bytes()
     assert scratch_bytes == skills_bytes, (
         "validate_docx_structure.py copies diverged; re-sync scratch/ and skills/scripts/"

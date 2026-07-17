@@ -151,9 +151,14 @@ def test_scope_guard_scratch_skills_copies_byte_identical(name):
     # A clean clone legitimately has no generated scratch copy.  If runtime
     # bootstrap has run, the generated copy must be byte-identical to its
     # tracked skills source.
+    runtime_names = (
+        "merge_draft_to_docx.py",
+        "validate_docx_structure.py",
+        "inject_all_images.py",
+    )
+    if not all((SCRATCH / runtime_name).exists() for runtime_name in runtime_names):
+        pytest.skip("scratch runtime set has not been materialized by build_pipeline.py")
     scratch_copy = SCRATCH / name
-    if not scratch_copy.exists():
-        pytest.skip("scratch runtime copy has not been materialized by build_pipeline.py")
     assert filecmp.cmp(scratch_copy, SKILLS / name, shallow=False), name
 
 

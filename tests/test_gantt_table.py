@@ -1,5 +1,5 @@
 """Tests for the gantt [TABLE gantt] mode and ragged-row padding in
-``build_table_element`` (scratch/merge_draft_to_docx.py).
+``build_table_element`` (skills/scripts/merge_draft_to_docx.py).
 
 Covers:
   * ragged rows (rows whose trailing empty cells were stripped) are padded to
@@ -16,8 +16,8 @@ from pathlib import Path
 import lxml.etree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRATCH = ROOT / "scratch"
-sys.path.insert(0, str(SCRATCH))
+SKILLS = ROOT / "skills" / "scripts"
+sys.path.insert(0, str(SKILLS))
 
 import merge_draft_to_docx as mrg  # noqa: E402
 
