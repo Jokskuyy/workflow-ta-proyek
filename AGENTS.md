@@ -8,10 +8,11 @@ Dokumen ini adalah entry point untuk AI agent. Tujuannya agar agent dapat memaha
 
 Repository ini menghasilkan laporan Tugas Akhir Proyek UPNVJ FIK 2025.
 
-Ada dua workflow terpisah:
+Ada tiga tahap yang tetap terpisah:
 
-1. `skills/scripts/alur_penulisan/` memproses dan menjaga kualitas Markdown. Workflow ini hanya berjalan jika `run_alur()` dipanggil secara eksplisit.
-2. `skills/scripts/build_pipeline.py` mengubah template dan `Tugas_Akhir_Draft.md` menjadi `Tugas_Akhir_Formatted.docx`, lalu memvalidasinya.
+1. `skills/scripts/generate_content.py` dapat meminta proposal konten dari AI/provider secara opsional. Default-nya hanya suggest + diff; draf baru ditulis dengan `--apply` eksplisit.
+2. `skills/scripts/alur_penulisan/` memproses dan menjaga kualitas Markdown secara deterministik. Workflow ini hanya berjalan jika `run_alur()` dipanggil secara eksplisit.
+3. `skills/scripts/build_pipeline.py` mengubah template dan `Tugas_Akhir_Draft.md` menjadi `Tugas_Akhir_Formatted.docx`, lalu memvalidasinya. Build tidak pernah memanggil provider AI.
 
 Alur DOCX:
 
@@ -50,6 +51,7 @@ Sebelum mengubah apa pun:
 | Mengubah tabel | `skills/scripts/merge_draft_to_docx.py`, `skills/scripts/format_ta_proyek.py` | seluruh `tests/test_table_*`, `tests/test_gantt_table.py`, `tests/test_wpi_tables.py` |
 | Mengubah sitasi/writing guard | `.kiro/steering/aturan-sitasi.md`, `skills/scripts/merge_draft_to_docx.py`, `skills/scripts/validate_docx_structure.py` | `tests/test_wpi_guards.py`, `tests/test_wpi_validator_guards.py`, `tests/test_wpi_bibliography.py` |
 | Mengubah workflow penulisan otomatis | `.kiro/specs/automated-writing-workflow/`, `skills/scripts/alur_penulisan/pipeline.py`, `skills/scripts/alur_penulisan/__init__.py` | `tests/test_alur_*`, `tests/test_awf_*`, `tests/test_draft_io.py` |
+| Mengubah generator konten AI | `.kiro/specs/agentic-content-generation/`, `skills/scripts/alur_penulisan/agentic_generation.py`, `skills/scripts/alur_penulisan/generation_providers.py` | `skills/scripts/generate_content.py`, `tests/test_agentic_content_generation.py` |
 | Mengubah build/packaging | `skills/scripts/build_pipeline.py`, `skills/scripts/unpack.py`, `skills/scripts/pack.py`, `skills/scripts/update_fields_com.py` | validator final dan build end-to-end |
 | Menambah patch konten proyek | `skills/scripts/patch_template.py` | Draf, hasil build, dan test/regression baru yang spesifik |
 | Dokumentasi/troubleshooting | `DOKUMENTASI-PIPELINE.md`, `README.md` | Script yang perilakunya sedang didokumentasikan |
@@ -88,15 +90,17 @@ Jika implementasi menyimpang dari sumber dengan prioritas lebih tinggi, laporkan
 - Margin atas, kanan, dan bawah 3 cm = 1701 twips.
 - Semua section harus memakai ukuran dan margin yang sama.
 - Font utama Times New Roman.
-- Body 12 pt, justify, spasi 1,5, first-line indent 1 cm.
+- Body 12 pt, justify, spasi 1,15, first-line indent 1 cm.
 - Caption spasi 1,0 dan center.
 - Bibliografi spasi 1,0 dengan hanging indent 1 cm.
-- Front matter memakai nomor Romawi; body restart nomor Arab dari BAB I.
+- Front matter memakai nomor Romawi di kanan bawah (sampul tanpa nomor).
+- Body restart nomor Arab dari `1` pada BAB I; pembuka setiap BAB di tengah bawah dan halaman lanjutannya di kanan atas.
 
 ### 5.2 Gambar dan narasi
 
 - Caption gambar berada di bawah gambar dan menggunakan style `Caption`.
 - Format caption: `Gambar X.Y Deskripsi`, tanpa titik setelah nomor.
+- Untuk draf yang sudah memakai referensi eksplisit, setiap gambar `post_com` ditulis sebagai marker `[FIGURE:<id-manifest>]` pada satu baris tepat sebelum caption. ID adalah pencarian utama; `caption_match` hanya menjadi assertion bahwa caption yang bersebelahan benar. Draf branch lama tanpa marker masih didukung melalui fallback caption sampai dimigrasikan.
 - Counter gambar restart per bab dan mengikuti urutan baca.
 - Setiap caption gambar wajib memiliki paragraf narasi biasa yang menyebut `Gambar X.Y` dalam bab yang sama.
 - Rujukan harus berada di tengah kalimat. Rujukan pada awal paragraf atau tepat setelah `.`, `!`, atau `?` adalah pelanggaran fatal.
@@ -108,7 +112,7 @@ Jika implementasi menyimpang dari sumber dengan prioritas lebih tinggi, laporkan
 ### 5.3 Integritas gambar C1–C4
 
 - C1: byte gambar duplikat berdasarkan MD5 ditolak kecuali direkonsiliasi secara sah.
-- C2: entry manifest `post_com` harus menemukan tepat satu caption kecuali masuk `unresolved_allow`.
+- C2: entry manifest `post_com` harus menghasilkan tepat satu drawing bernama `FIGURE:<id>`, tepat satu caption target, dan keduanya harus bersebelahan. Jika sebuah draf memakai marker, draf tersebut wajib memuat seluruh ID manifest branch itu tepat satu kali.
 - C3: byte media di DOCX harus sama dengan file `images/<file>`.
 - C4: drawing/caption tidak boleh terpisah oleh page split yang tidak sah.
 - `source` pada manifest adalah provenance; perbedaan path source saja bukan kegagalan jika byte final benar.
@@ -139,6 +143,7 @@ Jika implementasi menyimpang dari sumber dengan prioritas lebih tinggi, laporkan
 - Klaim eksternal harus memiliki sumber.
 - Latar Belakang tanpa sitasi substantif adalah warning, bukan fatal.
 - Cross-check sitasi dua arah adalah warning secara default; hanya fatal ketika dikonfigurasi.
+- Sitasi in-text memakai author-year tanpa koma sebelum tahun: `(Nama Tahun)` atau `(Nama et al. Tahun)`.
 - Jangan mengarang fakta atau hasil pengujian. Gunakan `project_facts.json`; jika belum tersedia gunakan `[TBD: ...]`.
 - Jangan membuat sumber fiktif. Gunakan `[BUTUH SITASI]` jika sumber belum tersedia.
 
@@ -150,7 +155,7 @@ Jika implementasi menyimpang dari sumber dengan prioritas lebih tinggi, laporkan
 | `archive/Tugas Akhir.docx` | Template sumber build |
 | `project_facts.json` | Fakta yang boleh dinyatakan; data tidak tersedia menjadi TBD |
 | `term_registry.json` | Bentuk istilah kanonik; ketidakkonsistenan dilaporkan, tidak diam-diam diganti |
-| `images/manifest.json` | Aset gambar, caption target, provenance, dan metode injeksi |
+| `images/manifest.json` | Sumber ID stabil, aset gambar, assertion caption, provenance, dan metode injeksi |
 | `images/manifest_reconcile.json` | Exception C1/C2 yang memang sah |
 | `merge_config.json` | Config opsional path `draft` dan `xml`; prioritas CLI > config > default |
 | `TA_DRAFT_PATH` | Override lokasi draf untuk writing guard validator |
@@ -208,6 +213,35 @@ C:\Python312\python.exe -m pytest -q tests
 ```
 
 Jangan memakai `pytest -q` tanpa target. Itu juga mengoleksi script diagnostik legacy `test_*.py` di `scratch/` yang bukan bagian suite resmi.
+
+### Generator konten AI opsional
+
+Siapkan request untuk AI agent lain tanpa mengubah draf:
+
+```powershell
+C:\Python312\python.exe skills/scripts/generate_content.py --section 3.2.1 --prepare-out scratch/generation-request.json
+```
+
+Validasi respons dalam mode suggest (default, tidak menulis draf):
+
+```powershell
+C:\Python312\python.exe skills/scripts/generate_content.py --section 3.2.1 --response-file scratch/generation-candidate.json
+```
+
+Penulisan hanya diizinkan setelah diff ditinjau:
+
+```powershell
+C:\Python312\python.exe skills/scripts/generate_content.py --section 3.2.1 --response-file scratch/generation-candidate.json --apply
+```
+
+Agent harus mengingat batas berikut:
+
+- branch selain `laporan/iman|dwikhi|faiz` menghasilkan `HELD` sebelum I/O/provider;
+- `--fact` bersifat opt-in; jangan mengirim seluruh `project_facts.json` ke provider eksternal;
+- response wajib JSON terstruktur dengan provenance fakta/sitasi/klaim belum terverifikasi;
+- jangan membuat sitasi atau caption/aset gambar baru dari generator;
+- jangan pernah menambahkan `--apply` tanpa meninjau issues dan diff;
+- request/result pada `scratch/` adalah artefak lokal dan tidak boleh dianggap source of truth.
 
 ### Validator final
 
@@ -288,6 +322,14 @@ Validator harus mengumpulkan semua fatal findings sebelum gagal agar pengguna me
 - Perilaku diverifikasi terhadap code/test, bukan hanya spec lama.
 - Path dan command dapat dijalankan dari root repository.
 - `DOKUMENTASI-PIPELINE.md`, README, dan `AGENTS.md` tidak saling bertentangan.
+
+### Perubahan generator konten AI
+
+- Mode tanpa `--apply` terbukti tidak memanggil write.
+- Branch tidak dikenal berhenti sebelum read/provider.
+- Kandidat invalid tidak mengubah draf.
+- Apply mempertahankan seluruh baris lama, idempoten, dan membatalkan write bila hash sumber berubah.
+- Fakta, sitasi, TBD, daftar, heading, istilah, serta rujukan Gambar/Tabel memiliki regression test.
 
 ## 12. Known traps
 

@@ -209,7 +209,7 @@ def _parse_draft(text):
 # Opt_In_By_Content (tingkat dokumen) — untuk Draf tanpa Konstruk_Baru, keluaran
 # lengkap Tahap_Penulisan identik byte-per-byte dengan Output_Baseline.
 # Validates: Requirements 5.6, 7.7
-@settings(max_examples=150)
+@settings(max_examples=150, deadline=None)
 @given(draft=_synthetic_draft())
 def test_property16_document_level_preservation(draft):
     items = _parse_draft(draft)

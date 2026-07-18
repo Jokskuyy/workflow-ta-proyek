@@ -12,7 +12,7 @@ Dokumen desain ini menjelaskan rancangan **Alur_Penulisan** — sistem orkestras
 **Sumber kebenaran yang dihormati:**
 
 1. Aturan penulisan — `.kiro/steering/aturan-penulisan.md` (larangan bullet, hierarki penomoran `1.`→`a.`→`1)`→`a)`, penyebutan Gambar/Tabel di tengah kalimat, definisi + sitasi pada sub-bab teori, konsistensi istilah, penomoran gambar mengikuti reading order).
-2. Aturan sitasi — `.kiro/steering/aturan-sitasi.md` (APA in-text `(Nama, Tahun)`/`(Nama et al., Tahun)`, setiap sitasi wajib punya entri di Daftar Pustaka, penanda `[BUTUH SITASI]`).
+2. Aturan sitasi — `.kiro/steering/aturan-sitasi.md` (author-year tanpa koma `(Nama Tahun)`/`(Nama et al. Tahun)`, setiap sitasi wajib punya entri di Daftar Pustaka, penanda `[BUTUH SITASI]`).
 3. Kerangka bab kanonik — `skills/references/outline-4bab.md` (struktur BAB I–IV beserta sub-bab baku).
 4. Basis fakta — `project_facts.json` (sumber kebenaran fakta/angka; bila belum ada gunakan `[TBD: ...]`).
 5. Konteks proyek & peran branch — `.kiro/steering/konteks-proyek.md`, `PANDUAN-TIM.md`.

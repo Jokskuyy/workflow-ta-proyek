@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 
 import pytest
+import xml.etree.ElementTree as ET
 
 # --------------------------------------------------------------------------- #
 # Import the tracked canonical validator as a module. The scratch copy is a
@@ -30,14 +31,39 @@ if str(SKILLS) not in sys.path:
 vds = importlib.import_module("validate_docx_structure")
 
 
+def _docx_paragraph(text, style="Normal"):
+    paragraph = ET.Element(f"{{{vds.W_NS}}}p")
+    p_pr = ET.SubElement(paragraph, f"{{{vds.W_NS}}}pPr")
+    p_style = ET.SubElement(p_pr, f"{{{vds.W_NS}}}pStyle")
+    p_style.set(f"{{{vds.W_NS}}}val", style)
+    run = ET.SubElement(paragraph, f"{{{vds.W_NS}}}r")
+    ET.SubElement(run, f"{{{vds.W_NS}}}t").text = text
+    return paragraph
+
+
+def test_citation_punctuation_validator_enforces_no_comma_only_in_body():
+    paragraphs = [
+        _docx_paragraph("BAB I PENDAHULUAN", "Heading1"),
+        _docx_paragraph("Pernyataan sah (Nama Penulis 2024)."),
+        _docx_paragraph("Pernyataan lama (Nama Penulis, 2024)."),
+        _docx_paragraph("DAFTAR PUSTAKA", "Heading1"),
+        _docx_paragraph("Nama Penulis, A. (2024). Judul referensi."),
+    ]
+
+    findings = vds.collect_citation_punctuation_errors(paragraphs, bab1_idx=0)
+
+    assert len(findings) == 1
+    assert "(Nama Penulis, 2024)" in findings[0]
+
+
 # A draft with a guaranteed two-way citation mismatch:
-#   - in-text "(Nonexistent, 2099)" has no matching reference entry (R1.5)
+#   - in-text "(Nonexistent 2099)" has no matching reference entry (R1.5)
 #   - the only entry "Smith (2010)" is never cited (R1.6)
 _DRAFT_WITH_MISMATCH = """# BAB I PENDAHULUAN
 
 ## Latar Belakang
 
-Menurut penelitian terbaru (Nonexistent, 2099), topik ini penting untuk dikaji.
+Menurut penelitian terbaru (Nonexistent 2099), topik ini penting untuk dikaji.
 
 # DAFTAR PUSTAKA
 

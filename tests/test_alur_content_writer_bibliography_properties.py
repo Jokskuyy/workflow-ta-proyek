@@ -53,7 +53,7 @@ def cited_paragraphs(draw: st.DrawFn):
     """Return ``(paragraph, bibliography, sources)``.
 
     ``sources`` is a list of ``(name, year, covered)`` triples; each triple
-    becomes one single-source APA citation ``(name, year)`` embedded in the
+    becomes one single-source author-year citation ``(name year)`` embedded in the
     paragraph. ``covered`` marks whether the source has a matching Daftar Pustaka
     entry. Surnames are unique so every citation is distinct and locatable.
     """
@@ -74,7 +74,7 @@ def cited_paragraphs(draw: st.DrawFn):
 
     # Weave each citation into its own sentence; no parentheses/years elsewhere.
     sentences = [
-        f"Pernyataan faktual bagian ini menjelaskan sesuatu ({name}, {year})"
+        f"Pernyataan faktual bagian ini menjelaskan sesuatu ({name} {year})"
         for name, year, _covered in sources
     ]
     text = ". ".join(sentences) + "."
@@ -119,7 +119,7 @@ def test_property_6_citation_without_bibliography_entry_is_marked(data) -> None:
     uncovered = [(name, year) for name, year, covered in sources if not covered]
 
     for name, year in uncovered:
-        raw = f"({name}, {year})"
+        raw = f"({name} {year})"
 
         # The citation is NOT treated as validated: bibliography coverage fails.
         matching = [c for c in find_citations(paragraph.text) if c.raw == raw]

@@ -59,7 +59,7 @@ def factual_claims(draw: st.DrawFn) -> str:
     """Generate a non-empty factual claim with no citation and no observation cue.
 
     The claim is a sentence built from a neutral vocabulary; it never contains an
-    APA citation ``(Nama, Tahun)`` (no parentheses/years), never contains the
+    author-year citation ``(Nama Tahun)`` (no parentheses/years), never contains the
     Penanda_Sitasi_Kurang, and never matches the author-observation exemption.
     """
     words = draw(st.lists(st.sampled_from(_WORDS), min_size=1, max_size=20))
@@ -75,6 +75,11 @@ def factual_claims(draw: st.DrawFn) -> str:
 def _strip_markers(text: str) -> str:
     """Remove every Penanda_Sitasi_Kurang and normalize whitespace for comparison."""
     return " ".join(text.replace(MISSING_CITATION_MARKER, "").split())
+
+
+def test_citation_parser_accepts_no_comma_and_rejects_legacy_comma():
+    assert len(find_citations("Definisi ini didukung (Nama Penulis 2024).")) == 1
+    assert find_citations("Definisi ini memakai format lama (Nama Penulis, 2024).") == []
 
 
 # --------------------------------------------------------------------------- #

@@ -6,8 +6,8 @@ the project's citation rules (``.kiro/steering/aturan-sitasi.md``):
 
 * Exactly **one** definition paragraph is placed as the *first* paragraph of the
   sub-chapter, stating the definition of the main concept (Requirement 2.1).
-* The definition paragraph must carry at least one attached APA in-text citation
-  ``(Nama, Tahun)`` / ``(Nama et al., Tahun)`` (Requirement 2.2). Because this
+* The definition paragraph must carry at least one attached author-year citation
+  ``(Nama Tahun)`` / ``(Nama et al. Tahun)`` (Requirement 2.2). Because this
   workflow must never fabricate sources, a generated definition scaffold has no
   citation and is therefore flagged.
 * A factual claim that is neither common knowledge nor the author's own
@@ -47,12 +47,15 @@ MISSING_CITATION_MARKER = "[BUTUH SITASI]"
 # --------------------------------------------------------------------------- #
 # APA in-text citation grammar
 # --------------------------------------------------------------------------- #
-# A parenthetical group, e.g. ``(Muharam et al., 2023; Taurusta et al., 2024)``.
+# A parenthetical group, e.g. ``(Muharam et al. 2023; Taurusta et al. 2024)``.
 _PAREN_RE = re.compile(r"\(([^()]*)\)")
 
-# A single source inside a group: ``Nama, Tahun`` / ``Nama et al., Tahun`` where
+# A single source inside a group: ``Nama Tahun`` / ``Nama et al. Tahun`` where
 # Tahun is a 4-digit year with an optional disambiguation letter (``2023a``).
-_SOURCE_RE = re.compile(r"^\s*(?P<name>.+?)\s*,\s*(?P<year>\d{4}[a-z]?)\s*$")
+# A comma is intentionally rejected by the campus-specific citation rule.
+_SOURCE_RE = re.compile(
+    r"^\s*(?P<name>[^,;]+?)\s+(?P<year>\d{4}[a-z]?)\s*$"
+)
 
 # A 4-digit year (with optional letter), used when normalizing bibliography keys.
 _YEAR_RE = re.compile(r"\b(\d{4}[a-z]?)\b")
@@ -110,7 +113,7 @@ class Citation:
 def find_citations(text: str) -> "list[Citation]":
     """Return every APA in-text citation group found in ``text``.
 
-    Only parenthetical groups that contain at least one ``Nama, Tahun`` source
+    Only parenthetical groups that contain at least one ``Nama Tahun`` source
     are returned; parentheses used for other purposes are ignored.
     """
     citations: list[Citation] = []
@@ -288,7 +291,7 @@ def mark_paragraph_citations(
         missing = bib.missing_sources(citation)
         if missing:
             text = _insert_marker_after(text, citation.end)
-            missing_desc = "; ".join(f"{name}, {year}" for name, year in missing)
+            missing_desc = "; ".join(f"{name} {year}" for name, year in missing)
             findings.append(
                 Finding(
                     kind=FindingKind.MISSING_CITATION,

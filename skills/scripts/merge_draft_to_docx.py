@@ -60,6 +60,16 @@ for prefix, uri in {
 # tests/test_wpi_lists.py backward-compat test).
 LIST_INDENT_UNIT = 3
 
+# w:spacing@line with lineRule="auto" uses 240ths of a line. The canonical
+# body/list spacing is 1.15 lines, therefore Word expects 276.
+MAIN_LINE_SPACING_AUTO = '276'
+
+# Stable, human-readable figure reference.  The marker is kept as a normal
+# paragraph until the post-COM injector replaces it with the exact manifest
+# asset.  Restricting the id alphabet keeps the marker unambiguous in both
+# Markdown and OOXML drawing metadata.
+FIGURE_MARKER_RE = re.compile(r'^\[FIGURE:([a-z0-9][a-z0-9_-]*)\]$')
+
 
 def compute_list_level(indent_spaces, marker):
     """Return the nesting level of a list item from its leading indentation.
@@ -222,6 +232,91 @@ def parse_markdown(md_path):
             })
             
     return items
+
+
+def figure_marker_id(item):
+    """Return the stable figure id carried by a parsed paragraph, if any."""
+    if item.get('type') != 'paragraph':
+        return None
+    match = FIGURE_MARKER_RE.fullmatch(item.get('text', '').strip())
+    return match.group(1) if match else None
+
+
+def validate_figure_markers(parsed_items, manifest_path):
+    """Validate an opt-in complete set of ``[FIGURE:<id>]`` markers.
+
+    Drafts without markers retain the legacy merge behaviour for compatibility.
+    Once one marker is used, however, every ``post_com`` manifest figure must be
+    named exactly once and immediately followed by its expected caption.  This
+    prevents a typo or a similarly named caption from selecting the wrong file.
+    """
+    marker_rows = []
+    malformed = []
+    for idx, item in enumerate(parsed_items):
+        if item.get('type') != 'paragraph':
+            continue
+        text = item.get('text', '').strip()
+        marker_id = figure_marker_id(item)
+        if marker_id:
+            marker_rows.append((idx, marker_id))
+        elif text.upper().startswith('[FIGURE:'):
+            malformed.append(text)
+
+    if malformed:
+        return [
+            "malformed figure marker; expected [FIGURE:<lowercase-id>]: " + value
+            for value in malformed
+        ]
+    if not marker_rows:
+        return []
+
+    try:
+        with open(manifest_path, 'r', encoding='utf-8-sig') as f:
+            manifest = json.load(f)
+    except (OSError, json.JSONDecodeError) as exc:
+        return [f"cannot validate figure markers because manifest is unreadable: {exc}"]
+
+    post_com = {
+        entry['id']: entry
+        for entry in manifest.get('images', [])
+        if entry.get('inject_method') == 'post_com' and entry.get('id')
+    }
+    seen = {}
+    errors = []
+    for item_idx, marker_id in marker_rows:
+        seen.setdefault(marker_id, []).append(item_idx)
+        entry = post_com.get(marker_id)
+        if entry is None:
+            errors.append(f"unknown figure marker [FIGURE:{marker_id}]")
+            continue
+        if item_idx + 1 >= len(parsed_items):
+            errors.append(f"[FIGURE:{marker_id}] is not followed by a caption")
+            continue
+        next_item = parsed_items[item_idx + 1]
+        caption = next_item.get('text', '').strip() if next_item.get('type') == 'paragraph' else ''
+        caption_match = entry.get('caption_match', '')
+        if not re.match(r'^Gambar\s+[0-9]+\.[0-9]+\s+\S', caption, re.IGNORECASE):
+            errors.append(
+                f"[FIGURE:{marker_id}] must be immediately followed by a Gambar caption"
+            )
+        elif caption_match not in caption:
+            errors.append(
+                f"[FIGURE:{marker_id}] caption does not contain expected text "
+                f"{caption_match!r}: {caption!r}"
+            )
+
+    for marker_id, positions in seen.items():
+        if len(positions) != 1:
+            errors.append(
+                f"figure marker [FIGURE:{marker_id}] occurs {len(positions)} times; expected once"
+            )
+    missing = sorted(set(post_com) - set(seen))
+    if missing:
+        errors.append(
+            "missing figure marker(s): "
+            + ", ".join(f"[FIGURE:{marker_id}]" for marker_id in missing)
+        )
+    return errors
 
 # --------------------------------------------------------------------------- #
 # Inline tokenizer (R2) — pure token model + left->right scanner.
@@ -780,7 +875,7 @@ def _extract_citation_keys(body_text):
     """Extract in-text APA citation keys from ``body_text``.
 
     Returns a list of ``(surname_lower, year, display_name)`` tuples. Handles
-    ``(Nama, Tahun)``, ``(Nama et al., Tahun)``, ``(Nama & Lain, Tahun)`` and
+    ``(Nama Tahun)``, ``(Nama et al. Tahun)``, ``(Nama & Lain Tahun)`` and
     multiple sources in one parenthesis separated by ';'.
     """
     keys = []
@@ -796,7 +891,7 @@ def _extract_citation_keys(body_text):
             # this rejects code-block noise such as port numbers (3000/3001).
             if not (year.isdigit() and 1900 <= int(year) <= 2099):
                 continue
-            name_part = part.split(',', 1)[0].strip()
+            name_part = part[:ym.start()].strip().rstrip(',').strip()
             name_part = _ET_AL_RE.sub('', name_part).strip()
             name_part = name_part.split('&', 1)[0].strip()
             # Strip leading transliteration quotes so the citation key matches
@@ -833,7 +928,7 @@ def collect_citation_crosscheck_warnings(body_text, entries, *, fatal=False):
         if key not in entry_keys and key not in seen_missing:
             seen_missing.add(key)
             warnings.append(
-                f"[WARN][sitasi] Sitasi ({display}, {year}) tidak memiliki "
+                f"[WARN][sitasi] Sitasi ({display} {year}) tidak memiliki "
                 f"Entri_Referensi padanan pada Daftar_Pustaka."
             )
 
@@ -1030,7 +1125,7 @@ def build_p_element(item, rel_manager=None):
         lxml.etree.SubElement(pPr, f'{{{ns_uri}}}spacing', {
             f'{{{ns_uri}}}before': '0',
             f'{{{ns_uri}}}after': '0',
-            f'{{{ns_uri}}}line': '360',
+            f'{{{ns_uri}}}line': MAIN_LINE_SPACING_AUTO,
             f'{{{ns_uri}}}lineRule': 'auto'
         })
         
@@ -1098,7 +1193,7 @@ def build_p_element(item, rel_manager=None):
             lxml.etree.SubElement(pPr, f'{{{ns_uri}}}spacing', {
                 f'{{{ns_uri}}}before': '0',
                 f'{{{ns_uri}}}after': '0',
-                f'{{{ns_uri}}}line': '360',
+                f'{{{ns_uri}}}line': MAIN_LINE_SPACING_AUTO,
                 f'{{{ns_uri}}}lineRule': 'auto'
             })
             
@@ -1558,8 +1653,16 @@ def merge_draft_to_xml(xml_path, parsed_items):
         
     print(f"Found BAB 1 heading paragraph at index {bab1_idx}. Preserving cover page.")
     
-    # Extract drawings (restricted to index >= bab1_idx)
-    drawings_map = extract_drawings_from_xml(xml_path, bab1_idx)
+    # Explicit figure markers are resolved later by the post-COM injector.
+    # Do not also re-inject fuzzy-matched template drawings, otherwise legacy
+    # survey images can be duplicated before the exact marker replacement.
+    has_explicit_figure_markers = any(figure_marker_id(item) for item in parsed_items)
+    if has_explicit_figure_markers:
+        drawings_map = {}
+        print("Explicit [FIGURE:<id>] markers detected; skipped legacy template-drawing matching.")
+    else:
+        # Backward-compatible path for older drafts without explicit markers.
+        drawings_map = extract_drawings_from_xml(xml_path, bab1_idx)
     
     # Preserve the last sectPr element
     sectPr = body.find('w:sectPr', namespaces)
@@ -1750,6 +1853,15 @@ def main(argv=None):
     print("Parsing draft Markdown file...")
     items = parse_markdown(str(md_path))
     print(f"Parsed {len(items)} items from Markdown.")
+
+    marker_errors = validate_figure_markers(
+        items, workspace_root / "images" / "manifest.json"
+    )
+    if marker_errors:
+        print("Error: invalid explicit figure references; document.xml was not modified.")
+        for error in marker_errors:
+            print(f"- {error}")
+        sys.exit(1)
 
     print("Merging into document.xml using lxml...")
     merge_draft_to_xml(str(xml_path), items)

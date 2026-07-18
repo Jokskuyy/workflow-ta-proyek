@@ -59,7 +59,7 @@ untuk Daftar_Pustaka. Dengan demikian:
 - Himpunan entri yang dirender mengikuti isi `# DAFTAR PUSTAKA` Draf (saat ini 8
   entri), bukan ke-9 entri hardcoded lama.
 - Pemeriksaan silang sitasi (Kriteria 5, 6, 7, 8) tetap berlaku. Ketidakcocokan
-  saat ini seperti `(Muharam et al., 2023)` yang tidak memiliki Entri_Referensi
+  saat ini seperti `(Muharam et al. 2023)` yang tidak memiliki Entri_Referensi
   padanan pada Draf akan **muncul sebagai peringatan non-fatal** (default non-fatal
   per `.kiro/steering/aturan-sitasi.md`) hingga penulis memperbaiki isi Draf, bukan
   sebagai kegagalan.
@@ -87,7 +87,7 @@ untuk Daftar_Pustaka. Dengan demikian:
 - **Entri_Referensi**: Satu butir Daftar_Pustaka bergaya APA, yang dapat memuat
   rentang teks miring (mis. nama jurnal).
 - **Sitasi_In_Text**: Penyebutan sumber di dalam narasi bergaya APA, berpola
-  `(Nama, Tahun)` atau `(Nama et al., Tahun)`, sesuai `.kiro/steering/aturan-sitasi.md`.
+  `(Nama Tahun)` atau `(Nama et al. Tahun)`, sesuai `.kiro/steering/aturan-sitasi.md`.
 - **Rentang_Miring**: Bagian Entri_Referensi yang dirender dengan `w:i`/`w:iCs`
   (mis. nama jurnal/sumber), pada Markdown ditulis dengan `*...*`.
 - **Konstruk_Inline**: Markup teks dalam baris: tebal `**...**`, miring `*...*`,
@@ -127,7 +127,7 @@ tidak perlu di-hardcode di Python dan inkonsistensi sitasi terdeteksi otomatis.
    perataan `jc=both`.
 4. THE Penulis_Bibliografi SHALL mempertahankan urutan Entri_Referensi sesuai urutan
    kemunculannya pada bagian `# DAFTAR PUSTAKA` di Draf.
-5. WHEN sebuah Sitasi_In_Text berpola `(Nama, Tahun)` atau `(Nama et al., Tahun)` tidak
+5. WHEN sebuah Sitasi_In_Text berpola `(Nama Tahun)` atau `(Nama et al. Tahun)` tidak
    memiliki Entri_Referensi padanan pada Daftar_Pustaka, THE Validator SHALL menghasilkan
    satu peringatan non-fatal yang menyebut nama dan tahun sitasi tersebut.
 6. WHEN sebuah Entri_Referensi pada Daftar_Pustaka tidak pernah dirujuk oleh
@@ -157,7 +157,7 @@ tidak perlu di-hardcode di Python dan inkonsistensi sitasi terdeteksi otomatis.
 > Catatan (Open Issue — RESOLVED): Pengguna memilih Draf sebagai sumber kebenaran
 > Daftar_Pustaka (Option B, lihat bagian Temuan Awal). Preservasi R1 berlaku pada
 > format/gaya (Kriteria 9) dan himpunan entri mengikuti Draf saat ini (8 entri),
-> bukan 9 entri hardcoded lama. Sitasi `(Muharam et al., 2023)` yang ada di narasi
+> bukan 9 entri hardcoded lama. Sitasi `(Muharam et al. 2023)` yang ada di narasi
 > saat ini tidak memiliki padanan pada `# DAFTAR PUSTAKA` Draf, sehingga akan
 > memicu peringatan non-fatal Kriteria 5 hingga penulis memperbaiki isi Draf.
 

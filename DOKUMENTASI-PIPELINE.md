@@ -8,13 +8,16 @@ Dokumen ini adalah panduan teknis dan operasional terpadu untuk repository lapor
 
 ## Ringkasan sistem
 
-Repository memiliki dua workflow yang saling melengkapi:
+Repository memiliki tiga tahap yang saling melengkapi tetapi tetap terpisah:
 
-1. **Workflow penulisan Markdown** membantu menjaga kerangka empat bab, fakta proyek, konsistensi istilah, posisi rujukan gambar/tabel, dan isi wajib. Workflow ini tersedia sebagai library Python dan hanya mengubah `Tugas_Akhir_Draft.md` ketika dipanggil secara eksplisit.
-2. **Pipeline DOCX** menggabungkan draf ke template, menerapkan format kampus, memperbarui field Word, menyuntikkan gambar, lalu menjalankan validasi final. Output utamanya adalah `Tugas_Akhir_Formatted.docx`.
+1. **Generator konten AI opsional** membuat request/proposal/diff untuk satu subbab. Mode default tidak menulis draf; apply harus diotorisasi eksplisit.
+2. **Workflow penulisan Markdown deterministik** membantu menjaga kerangka empat bab, fakta proyek, konsistensi istilah, posisi rujukan gambar/tabel, dan isi wajib. Workflow ini tersedia sebagai library Python dan hanya mengubah `Tugas_Akhir_Draft.md` ketika dipanggil secara eksplisit.
+3. **Pipeline DOCX** menggabungkan draf ke template, menerapkan format kampus, memperbarui field Word, menyuntikkan gambar, lalu menjalankan validasi final. Output utamanya adalah `Tugas_Akhir_Formatted.docx`; pipeline ini tidak memanggil provider AI.
 
 ```mermaid
 flowchart LR
+    L["AI/provider opsional"] --> M["Guard + proposal/diff"]
+    M -->|"hanya --apply"| A
     A["Tugas_Akhir_Draft.md"] --> B["Merge Markdown ke Word XML"]
     C["archive/Tugas Akhir.docx"] --> D["Unpack template"]
     D --> B
@@ -55,9 +58,10 @@ Empat script di `scratch/` disalin ulang dari `skills/scripts/` setiap build: `m
 | `Tugas_Akhir_Formatted.docx` | Output build final |
 | `project_facts.json` | Basis fakta untuk mencegah klaim yang belum terverifikasi |
 | `term_registry.json` | Registry istilah kanonik |
-| `images/manifest.json` | Daftar 31 aset gambar dan aturan pencocokan caption |
-| `images/manifest_reconcile.json` | Allow-list kasus duplikat atau gambar yang memang tidak disuntikkan lewat caption |
+| `images/manifest.json` | Daftar aset gambar branch, ID stabil, dan assertion caption |
+| `images/manifest_reconcile.json` | Allow-list exception integritas yang sah dan khusus branch; jangan disalin buta antarbranch |
 | `skills/scripts/build_pipeline.py` | Orkestrator build end-to-end |
+| `skills/scripts/generate_content.py` | CLI proposal AI provider-neutral; suggest default, apply eksplisit |
 | `skills/scripts/alur_penulisan/` | Library workflow penulisan Markdown |
 | `skills/references/` | Format dan outline kanonik |
 | `.kiro/steering/` | Aturan penulisan, sitasi, dan konteks proyek |
@@ -269,6 +273,122 @@ for finding in result.report.findings:
 
 Pemanggilan dengan status `COMPLETED` akan mengubah `Tugas_Akhir_Draft.md`. Commit atau backup draf terlebih dahulu jika perubahan ingin mudah dibandingkan.
 
+## Generator konten AI opsional
+
+Generator pada `skills/scripts/generate_content.py` adalah tahap opsional di
+depan workflow Markdown. Generator ini tidak dipanggil oleh `run_alur()` maupun
+`build_pipeline.py`, sehingga build DOCX biasa tidak memerlukan model AI,
+jaringan, atau API key.
+
+Perilaku penulisannya sengaja eksplisit:
+
+| Pemanggilan | Dampak ke `Tugas_Akhir_Draft.md` |
+|---|---|
+| `--prepare-out` | Tidak menulis draf; hanya membuat paket request JSON |
+| provider tanpa `--apply` | Tidak menulis draf; menampilkan kandidat tervalidasi dan unified diff |
+| provider dengan `--apply` | Menambahkan body kandidat ke subbab target setelah seluruh guard lulus |
+
+Jadi, perubahan AI **tidak otomatis masuk ke file Markdown**. Penulisan baru
+terjadi ketika pengguna menambahkan `--apply` setelah memeriksa proposal/diff.
+Build formatter tidak pernah mengaktifkan flag tersebut secara otomatis.
+
+### Alur yang direkomendasikan untuk AI agent mana pun
+
+1. Buat request agentik. File request dapat berisi isi subbab dan fakta yang
+   dipilih, sehingga simpan di lokasi lokal/ignored dan jangan commit jika
+   memuat informasi sensitif.
+
+   ```powershell
+   C:\Python312\python.exe skills/scripts/generate_content.py `
+     --section 3.2.1 `
+     --instruction "Tambahkan penjelasan alur implementasi API tanpa mengulang paragraf lama" `
+     --fact testing_status.black_box_testing.completed `
+     --prepare-out scratch/generation-request.json
+   ```
+
+2. Berikan JSON itu kepada AI agent. Agent harus mengembalikan kandidat dengan
+   kontrak berikut, tanpa code fence atau teks tambahan:
+
+   ```json
+   {
+     "section_id": "3.2.1",
+     "markdown": "Body Markdown tanpa heading.",
+     "fact_claims": [
+       {"key": "testing_status.black_box_testing.completed", "value": "true"}
+     ],
+     "citations_used": ["(Aliyah et al. 2024)"],
+     "unverified_claims": [],
+     "notes": []
+   }
+   ```
+
+3. Simpan respons sebagai `scratch/generation-candidate.json`, lalu validasi
+   dalam mode suggest. Perintah ini tidak mengubah draf.
+
+   ```powershell
+   C:\Python312\python.exe skills/scripts/generate_content.py `
+     --section 3.2.1 `
+     --fact testing_status.black_box_testing.completed `
+     --response-file scratch/generation-candidate.json
+   ```
+
+4. Setelah diff disetujui, jalankan perintah yang sama dengan otorisasi apply:
+
+   ```powershell
+   C:\Python312\python.exe skills/scripts/generate_content.py `
+     --section 3.2.1 `
+     --fact testing_status.black_box_testing.completed `
+     --response-file scratch/generation-candidate.json `
+     --apply
+   ```
+
+Apply hanya menambahkan body sebelum heading berikutnya. Heading dan semua baris
+lama dipertahankan. Kandidat yang sudah ada tidak diduplikasi. Jika draf berubah
+ketika provider sedang bekerja, pemeriksaan hash membatalkan apply agar edit
+manual tidak tertimpa. Gunakan daftar `--fact` yang sama saat prepare, suggest,
+dan apply agar provenance kandidat tetap identik.
+
+### Fakta, privasi, dan provider HTTP
+
+Tidak ada isi `project_facts.json` yang dikirim ke provider secara default.
+Pilih hanya fakta yang benar-benar diperlukan menggunakan `--fact` berulang:
+
+```powershell
+C:\Python312\python.exe skills/scripts/generate_content.py `
+  --section 3.5.1 `
+  --fact testing_status.black_box_testing.completed `
+  --endpoint http://127.0.0.1:8080/generate
+```
+
+Endpoint juga dapat disetel melalui `TA_GENERATOR_ENDPOINT` lalu diaktifkan
+dengan flag `--endpoint` tanpa nilai; bearer token dibaca dari
+`TA_GENERATOR_TOKEN`, dan hint model opsional dari `TA_GENERATOR_MODEL`.
+Jangan menaruh token dalam repository, command yang akan di-commit, atau file
+request. Adaptor HTTP menerima request JSON provider-neutral dan harus
+mengembalikan kandidat langsung, `{"candidate": {...}}`, atau
+`{"content": "{...json...}"}`.
+
+### Guard kandidat
+
+Apply ditolak jika kandidat:
+
+- berasal dari branch selain `laporan/iman`, `laporan/dwikhi`, atau
+  `laporan/faiz`;
+- menargetkan subbab lain, membuat heading/page break, atau memakai bullet;
+- mendeklarasikan nilai fakta yang berbeda dari `project_facts.json`;
+- memakai fakta yang tidak tersedia tanpa `[TBD: ...]`;
+- memakai sitasi yang tidak ada pada Daftar Pustaka atau metadata sitasinya
+  tidak sama dengan body;
+- membuat caption/aset Gambar/Tabel baru, rujukan di awal kalimat, rujukan
+  lintas bab, atau rujukan ke objek yang belum ada;
+- memperkenalkan inkonsistensi istilah baru; atau
+- mendapati draf berubah setelah request dibuat.
+
+Klaim belum terverifikasi boleh tetap berada dalam proposal hanya bila diberi
+`[BUTUH SITASI]` dan dicatat pada `unverified_claims`; hasilnya dilaporkan sebagai
+warning untuk pemeriksaan manusia. Guard ini memverifikasi aturan mekanis dan
+provenance yang dideklarasikan, bukan menggantikan penilaian semantik penulis.
+
 ## Pipeline DOCX end-to-end
 
 ### Perintah utama
@@ -329,8 +449,8 @@ Merge berhenti sebelum menulis jika draf tidak dapat dibaca atau parent director
 | Margin bawah | 3 cm |
 | Jarak header/footer | 720 twips |
 | Font utama | Times New Roman pada body, style, tabel, caption, header, dan footer |
-| Body | 12 pt, justify, spasi 1,5, first-line indent 1 cm |
-| Heading | 12 pt bold, spasi 1,5 |
+| Body | 12 pt, justify, spasi 1,15, first-line indent 1 cm |
+| Heading | 12 pt bold, spasi 1,15 |
 | Judul bab | 14 pt bold, center |
 | Abstrak | 11 pt |
 | Caption | 12 pt, center, spasi 1,0, tanpa first-line indent |
@@ -342,8 +462,9 @@ Seluruh `sectPr` yang tersisa dipaksa kembali ke A4 dan margin yang sama, sehing
 
 ### Nomor halaman dan daftar otomatis
 
-- Front matter memakai angka Romawi kecil, restart dari `i`, di tengah bawah.
-- Body memakai angka Arab, restart dari `1` pada BAB I, di tengah bawah.
+- Front matter memakai angka Romawi di kanan bawah; sampul tidak menampilkan nomor.
+- Body memakai angka Arab dan restart dari `1` pada BAB I.
+- Halaman pembuka setiap BAB menampilkan nomor di tengah bawah; halaman lanjutan BAB menampilkannya di kanan atas.
 - Cover, halaman pengesahan, dan daftar utama diisolasi agar tidak bercampur pada halaman yang sama.
 - Daftar Isi, Daftar Gambar, Daftar Tabel, dan Daftar Lampiran dibuat sebagai field Word dinamis.
 - Daftar Lampiran hanya mengambil heading lampiran pada TOC level 9.
@@ -391,7 +512,7 @@ Setiap entry `images/manifest.json` memiliki field berikut:
 |---|---|
 | `id` | Identifier stabil gambar |
 | `file` | Nama aset di direktori `images/` |
-| `caption_match` | Teks pencocokan caption target |
+| `caption_match` | Assertion teks caption yang harus tepat setelah marker; bukan locator utama |
 | `source` | Catatan asal/provenance aset |
 | `inject_method` | Metode injeksi; pipeline aktif menggunakan `post_com` |
 | `cx`, `cy` | Ukuran opsional jika didefinisikan |
@@ -399,24 +520,32 @@ Setiap entry `images/manifest.json` memiliki field berikut:
 Prosedur menambah gambar:
 
 1. Simpan file di `images/`.
-2. Tambahkan entry manifest dengan `id` unik dan `caption_match` yang hanya cocok ke satu caption.
-3. Tambahkan caption `Gambar X.Y ...` pada draf.
+2. Tambahkan entry manifest dengan `id` unik, path `file`, dan `caption_match`.
+3. Tepat sebelum caption pada draf, tulis marker ID eksplisit pada baris sendiri:
+
+   ```markdown
+   [FIGURE:diagram_arsitektur]
+   Gambar 2.9 Diagram Arsitektur Sistem
+   ```
+
 4. Tambahkan narasi pada bab yang sama, misalnya `Alur tersebut ditunjukkan pada Gambar X.Y ...`.
-5. Jalankan build.
+5. Jalankan build. Marker diganti oleh drawing dan ID disimpan pada metadata OOXML sebagai `FIGURE:<id>`.
 6. Periksa hasil visual dan validator.
 
-`images/manifest_reconcile.json` hanya digunakan untuk kasus yang sah tetapi tidak mengikuti jalur standar. Saat ini terdapat sembilan `unresolved_allow`: dua foto lampiran dan tujuh grafik survei yang diletakkan melalui mekanisme lain. Hapus allow-list apabila aset tersebut kelak diubah menjadi gambar berbasis caption `post_com`.
+Begitu satu marker dipakai, merge mewajibkan semua entry `post_com` milik manifest branch tersebut hadir tepat satu kali, menolak ID asing/duplikat, dan menolak caption yang tidak bersebelahan sebelum `document.xml` ditulis. Jalur pencocokan drawing template lama dinonaktifkan agar gambar tidak terduplikasi. Draf branch lama tanpa marker masih dapat memakai fallback caption untuk kompatibilitas sampai dimigrasikan.
+
+`images/manifest_reconcile.json` hanya digunakan untuk exception yang sah dan dapat dijelaskan. Karena daftar exception mengikuti aset dan isi laporan masing-masing anggota, file manifest dan reconcile bukan bagian dari sinkronisasi pipeline umum antarbranch.
 
 ### Kontrak integritas C1–C4
 
 | Kode | Pemeriksaan |
 |---|---|
 | C1 | Konten gambar duplikat berdasarkan MD5 harus ditolak kecuali di-allow-list |
-| C2 | Setiap entry `post_com` harus menemukan tepat satu caption target kecuali di-allow-list |
+| C2 | Setiap entry `post_com` memiliki tepat satu ID drawing, satu caption target, dan adjacency `[drawing][caption]` |
 | C3 | Byte media di DOCX harus cocok dengan file sumber di `images/` berdasarkan MD5 |
 | C4 | Drawing/caption tidak boleh terpisah oleh page split yang tidak sah |
 
-Jika sebuah caption sudah memiliki drawing tepat sebelumnya, injector mengganti relationship/media drawing tersebut, bukan menambahkan salinan baru.
+Injector mencari `[FIGURE:<id>]` secara exact, menggantinya dengan drawing, lalu memberi drawing nama metadata `FIGURE:<id>`. `caption_match` diperiksa sebagai assertion sehingga nama caption yang mirip tidak dapat memilih file lain. Jika sebuah caption sudah memiliki drawing tepat sebelumnya, injector mengganti relationship/media drawing tersebut, bukan menambahkan salinan baru.
 
 ## Validasi
 

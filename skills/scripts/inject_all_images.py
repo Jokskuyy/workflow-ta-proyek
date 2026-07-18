@@ -25,6 +25,8 @@ EMU_PER_TWIP = 635
 
 WORD_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships'
+CONTENT_TYPES_NS = 'http://schemas.openxmlformats.org/package/2006/content-types'
+FIGURE_MARKER_PREFIX = '[FIGURE:'
 
 # Default reconciliation file (shared with the validator). Lists are empty by
 # default so every duplicate-content (C1) and unresolved-caption (C2) defect
@@ -152,6 +154,99 @@ def resolve_caption_indices(body, caption_match, namespaces):
     return matches
 
 
+def resolve_figure_marker_indices(body, figure_id):
+    """Return direct-body paragraph indices for one exact stable marker."""
+    expected = f"[FIGURE:{figure_id}]"
+    return [
+        idx for idx, child in enumerate(list(body))
+        if child.tag == f'{{{WORD_NS}}}p' and _para_text(child) == expected
+    ]
+
+
+def resolve_figure_target(body, item, namespaces):
+    """Resolve one manifest item to its caption, preferring its exact marker.
+
+    Returns ``(mode, locator_idx, caption_idx, error)``.  ``mode`` is
+    ``marker`` for the stable Markdown reference or ``legacy_caption`` for
+    backward-compatible documents that contain no marker for the item.
+    """
+    item_id = item.get('id', item.get('file', '<unknown>'))
+    caption_match = item.get('caption_match', '')
+    marker_matches = resolve_figure_marker_indices(body, item_id)
+    if marker_matches:
+        if len(marker_matches) != 1:
+            return 'marker', None, None, (
+                f"[C2] entry '{item_id}' marker [FIGURE:{item_id}] resolved to "
+                f"{len(marker_matches)} paragraphs; expected exactly 1."
+            )
+        marker_idx = marker_matches[0]
+        children = list(body)
+        caption_idx = marker_idx + 1
+        if caption_idx >= len(children):
+            return 'marker', marker_idx, None, (
+                f"[C2] entry '{item_id}' marker is not immediately followed by its caption."
+            )
+        caption_p = children[caption_idx]
+        caption_matches = (
+            caption_p.tag == f'{{{WORD_NS}}}p'
+            and _para_style(caption_p, namespaces) == 'Caption'
+            and caption_match in _para_text(caption_p)
+        )
+        if not caption_matches:
+            return 'marker', marker_idx, caption_idx, (
+                f"[C2] entry '{item_id}' marker must be immediately followed by a Caption "
+                f"paragraph containing {caption_match!r}."
+            )
+        return 'marker', marker_idx, caption_idx, None
+
+    caption_matches = resolve_caption_indices(body, caption_match, namespaces)
+    if len(caption_matches) != 1:
+        return 'legacy_caption', None, None, (
+            f"[C2] entry '{item_id}' caption_match '{caption_match}' resolved to "
+            f"{len(caption_matches)} caption paragraph(s); expected exactly 1."
+        )
+    return 'legacy_caption', caption_matches[0], caption_matches[0], None
+
+
+def ensure_media_content_types(content_types_root, image_files):
+    """Ensure every injected media extension has an OPC content type.
+
+    Word may remove the PNG default while saving the pre-injection package if
+    no PNG drawing remains at that stage.  Adding PNG parts without restoring
+    this declaration produces a ZIP/XML package that our structural parser can
+    read but Microsoft Word correctly rejects as corrupt.
+    """
+    mime_by_extension = {
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+    }
+    existing = {
+        (node.get('Extension') or '').lower()
+        for node in content_types_root.findall(f'{{{CONTENT_TYPES_NS}}}Default')
+    }
+    added = []
+    for image_file in image_files:
+        extension = os.path.splitext(image_file)[1].lstrip('.').lower()
+        if extension in existing:
+            continue
+        content_type = mime_by_extension.get(extension)
+        if content_type is None:
+            raise ValueError(
+                f"Unsupported image extension '.{extension}' for '{image_file}'; "
+                "add an explicit OPC content type before injection."
+            )
+        lxml.etree.SubElement(
+            content_types_root,
+            f'{{{CONTENT_TYPES_NS}}}Default',
+            Extension=extension,
+            ContentType=content_type,
+        )
+        existing.add(extension)
+        added.append(extension)
+    return added
+
+
 def generate_drawing_xml(r_id, cx, cy, name, docpr_id):
     """Generate w:drawing XML element with specified properties."""
     cx, cy = scaled_dimensions(cx, cy)
@@ -267,6 +362,17 @@ def inject_all_images(docx_path):
 
     post_com_items = [it for it in manifest["images"] if it.get("inject_method") == "post_com"]
 
+    # Word COM can drop the PNG declaration when the intermediate document has
+    # no remaining PNG drawings. Restore every media content type before any
+    # new part is added so the final package opens without Word repair.
+    content_types_path = os.path.join(temp_dir, "[Content_Types].xml")
+    content_types_tree = lxml.etree.parse(content_types_path, parser)
+    added_content_types = ensure_media_content_types(
+        content_types_tree.getroot(), [item["file"] for item in post_com_items]
+    )
+    if added_content_types:
+        print("Added OPC media content type(s): " + ", ".join(added_content_types))
+
     # ----------------------------------------------------------------- #
     # PRE-PASS: validate exactly-one resolution (C2), file presence, and
     # global content uniqueness (C1) BEFORE mutating the document, so the run
@@ -280,18 +386,19 @@ def inject_all_images(docx_path):
         img_file = item["file"]
         src_path = os.path.join("images", img_file)
 
-        match_count = len(resolve_caption_indices(body, caption_match, namespaces))
+        mode, _locator_idx, _caption_idx, resolution_error = resolve_figure_target(
+            body, item, namespaces
+        )
 
-        # C2: exactly-one caption resolution (no silent skip).
-        if match_count != 1:
-            if item_id in unresolved_allow and match_count == 0:
+        # C2: exactly-one marker/caption resolution (no silent skip).
+        if resolution_error:
+            legacy_match_count = len(resolve_caption_indices(body, caption_match, namespaces))
+            if (mode == 'legacy_caption' and item_id in unresolved_allow
+                    and legacy_match_count == 0):
                 print(f"RECONCILED (unresolved_allow): '{item_id}' resolves to 0 captions; "
                       f"intentionally skipped.")
                 continue
-            errors.append(
-                f"[C2] entry '{item_id}' caption_match '{caption_match}' resolved to "
-                f"{match_count} caption paragraph(s); expected exactly 1."
-            )
+            errors.append(resolution_error)
             continue
 
         # Injectable entry must have its curated image on disk.
@@ -335,20 +442,29 @@ def inject_all_images(docx_path):
         src_path = os.path.join("images", img_file)
 
         # Re-resolve against the (possibly mutated) body.
-        matches = resolve_caption_indices(body, caption_match, namespaces)
-        if len(matches) != 1:
+        mode, locator_idx, caption_idx, resolution_error = resolve_figure_target(
+            body, item, namespaces
+        )
+        if resolution_error:
             # Reconciled, intentionally-omitted entry: skip when it is
             # allow-listed AND resolves to 0 captions. This mirrors the pre-pass
             # reconciliation rule (which keys on caption count, not file
             # existence) so an allow-listed entry whose image happens to exist on
             # disk is skipped consistently rather than tripping the guard below.
-            if item_id in unresolved_allow and len(matches) == 0:
+            matches = resolve_caption_indices(body, caption_match, namespaces)
+            if mode == 'legacy_caption' and item_id in unresolved_allow and len(matches) == 0:
                 continue
             # Defensive: should never happen after the pre-pass.
-            print(f"Error: entry '{item_id}' no longer resolves to exactly one caption.")
+            print(f"Error: {resolution_error}")
             shutil.rmtree(temp_dir)
             sys.exit(1)
-        caption_idx = matches[0]
+
+        # Replace the explicit Markdown marker itself.  In the legacy fallback
+        # there is no marker, so the caption remains the insertion locator.
+        if mode == 'marker':
+            marker_p = list(body)[locator_idx]
+            body.remove(marker_p)
+            caption_idx -= 1
 
         # Remove any existing drawing immediately preceding the caption.
         children = list(body)
@@ -409,7 +525,8 @@ def inject_all_images(docx_path):
             cy = item["cy"]
 
         docpr_id += 1
-        p_drawing = generate_drawing_xml(r_id, cx, cy, new_img_name, docpr_id)
+        drawing_identity = f"FIGURE:{item_id}"
+        p_drawing = generate_drawing_xml(r_id, cx, cy, drawing_identity, docpr_id)
 
         # C4: page-break-before only when the RENDERED (bounding-box scaled)
         # height exceeds the printable page-height threshold. The legacy native
@@ -433,7 +550,10 @@ def inject_all_images(docx_path):
             lxml.etree.SubElement(pPr_cap, f'{{{ns_uri}}}keepLines')
 
         body.insert(caption_idx, p_drawing)
-        print(f"Injected {img_file} before '{caption_match}' (rId={r_id}, size={w}x{h})")
+        print(
+            f"Injected [FIGURE:{item_id}] from {img_file} before '{caption_match}' "
+            f"(mode={mode}, rId={r_id}, size={w}x{h})"
+        )
 
     # ----------------------------------------------------------------- #
     # POST-COM keep-props pass: the Word COM field-update step normalizes
@@ -470,6 +590,7 @@ def inject_all_images(docx_path):
     # Write changes
     rels_tree.write(rels_path, encoding='utf-8', xml_declaration=True)
     doc_tree.write(doc_path, encoding='utf-8', xml_declaration=True)
+    content_types_tree.write(content_types_path, encoding='utf-8', xml_declaration=True)
 
     # Re-zip
     output_docx = docx_path
