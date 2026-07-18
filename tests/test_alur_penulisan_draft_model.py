@@ -38,7 +38,7 @@ SAMPLE_DRAFT = """# BAB I PENDAHULUAN
 
 ## 1.1 Latar Belakang
 
-Ini adalah paragraf pertama dengan penjelasan (Penulis, 2024).
+Ini adalah paragraf pertama dengan penjelasan (Penulis 2024).
 
    1. Item pertama
    2. Item kedua

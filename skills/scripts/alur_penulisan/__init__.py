@@ -107,6 +107,24 @@ from .report import (
     make_tbd_marker,
     mandatory_sections,
 )
+from .agentic_generation import (
+    CandidateFactClaim,
+    ContentGenerationProvider,
+    GenerationCandidate,
+    GenerationIssue,
+    GenerationRequest,
+    GenerationResult,
+    GenerationSeverity,
+    GenerationStatus,
+    build_generation_request,
+    extract_bibliography_entries,
+    load_term_registry,
+    prepare_generation_request,
+    propose_section_append,
+    run_agentic_generation,
+    validate_candidate,
+)
+from .generation_providers import HttpJsonProvider, ResponseFileProvider
 
 __all__ = [
     # exceptions
@@ -207,4 +225,22 @@ __all__ = [
     "RunResult",
     "RunStatus",
     "DEFAULT_DRAFT_PATH",
+    # optional agentic content generation (suggest by default; explicit apply)
+    "CandidateFactClaim",
+    "ContentGenerationProvider",
+    "GenerationCandidate",
+    "GenerationIssue",
+    "GenerationRequest",
+    "GenerationResult",
+    "GenerationSeverity",
+    "GenerationStatus",
+    "build_generation_request",
+    "extract_bibliography_entries",
+    "load_term_registry",
+    "prepare_generation_request",
+    "propose_section_append",
+    "run_agentic_generation",
+    "validate_candidate",
+    "HttpJsonProvider",
+    "ResponseFileProvider",
 ]

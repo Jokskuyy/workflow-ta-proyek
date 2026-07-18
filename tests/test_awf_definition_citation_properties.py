@@ -113,7 +113,7 @@ def definition_scenario(draw: st.DrawFn):
         year = draw(st.sampled_from(_YEARS))
         et_al = draw(st.booleans())
         author = f"{name} et al." if et_al else name
-        definition_text = f"{title} {body} ({author}, {year})"
+        definition_text = f"{title} {body} ({author} {year})"
         # Decide whether the Daftar Pustaka actually backs this citation.
         if draw(st.booleans()):
             bib = BibliographyResult.from_keys([f"{name}, {year}"])
