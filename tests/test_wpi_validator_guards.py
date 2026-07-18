@@ -8,34 +8,62 @@ fatal finding (appended to ``errors_found``) only when explicitly configured via
 env ``TA_CITATION_FATAL=1``. The structural guards (R6.1/6.2/6.4/6.5) stay
 non-fatal and additive in all cases.
 
-Also asserts the two validator copies (scratch/ and skills/scripts/) are kept
-byte-identical (Task 8.8 sync requirement).
+Also asserts, when runtime bootstrap has materialized the complete scratch set,
+that the generated validator copy is byte-identical to its tracked source.
 """
 import importlib
 import sys
 from pathlib import Path
 
 import pytest
+import xml.etree.ElementTree as ET
 
 # --------------------------------------------------------------------------- #
-# Import the canonical validator (scratch copy) as a module.
+# Import the tracked canonical validator as a module. The scratch copy is a
+# generated runtime artifact and may be stale or absent before build bootstrap.
 # --------------------------------------------------------------------------- #
 ROOT = Path(__file__).resolve().parents[1]
 SCRATCH = ROOT / "scratch"
-if str(SCRATCH) not in sys.path:
-    sys.path.insert(0, str(SCRATCH))
+SKILLS = ROOT / "skills" / "scripts"
+if str(SKILLS) not in sys.path:
+    sys.path.insert(0, str(SKILLS))
 
 vds = importlib.import_module("validate_docx_structure")
 
 
+def _docx_paragraph(text, style="Normal"):
+    paragraph = ET.Element(f"{{{vds.W_NS}}}p")
+    p_pr = ET.SubElement(paragraph, f"{{{vds.W_NS}}}pPr")
+    p_style = ET.SubElement(p_pr, f"{{{vds.W_NS}}}pStyle")
+    p_style.set(f"{{{vds.W_NS}}}val", style)
+    run = ET.SubElement(paragraph, f"{{{vds.W_NS}}}r")
+    ET.SubElement(run, f"{{{vds.W_NS}}}t").text = text
+    return paragraph
+
+
+def test_citation_punctuation_validator_enforces_no_comma_only_in_body():
+    paragraphs = [
+        _docx_paragraph("BAB I PENDAHULUAN", "Heading1"),
+        _docx_paragraph("Pernyataan sah (Nama Penulis 2024)."),
+        _docx_paragraph("Pernyataan lama (Nama Penulis, 2024)."),
+        _docx_paragraph("DAFTAR PUSTAKA", "Heading1"),
+        _docx_paragraph("Nama Penulis, A. (2024). Judul referensi."),
+    ]
+
+    findings = vds.collect_citation_punctuation_errors(paragraphs, bab1_idx=0)
+
+    assert len(findings) == 1
+    assert "(Nama Penulis, 2024)" in findings[0]
+
+
 # A draft with a guaranteed two-way citation mismatch:
-#   - in-text "(Nonexistent, 2099)" has no matching reference entry (R1.5)
+#   - in-text "(Nonexistent 2099)" has no matching reference entry (R1.5)
 #   - the only entry "Smith (2010)" is never cited (R1.6)
 _DRAFT_WITH_MISMATCH = """# BAB I PENDAHULUAN
 
 ## Latar Belakang
 
-Menurut penelitian terbaru (Nonexistent, 2099), topik ini penting untuk dikaji.
+Menurut penelitian terbaru (Nonexistent 2099), topik ini penting untuk dikaji.
 
 # DAFTAR PUSTAKA
 
@@ -115,7 +143,15 @@ def test_missing_draft_skips_guards_without_error(monkeypatch, tmp_path, capsys)
 def test_both_validator_copies_are_byte_identical():
     """Task 8.8: the scratch/ and skills/scripts/ validator copies must stay in
     sync (kept byte-identical so the guard wiring cannot diverge)."""
-    scratch_bytes = (ROOT / "scratch" / "validate_docx_structure.py").read_bytes()
+    scratch_dir = ROOT / "scratch"
+    runtime_names = (
+        "merge_draft_to_docx.py",
+        "validate_docx_structure.py",
+        "inject_all_images.py",
+    )
+    if not all((scratch_dir / name).exists() for name in runtime_names):
+        pytest.skip("scratch runtime set has not been materialized by build_pipeline.py")
+    scratch_bytes = (scratch_dir / "validate_docx_structure.py").read_bytes()
     skills_bytes = (ROOT / "skills" / "scripts" / "validate_docx_structure.py").read_bytes()
     assert scratch_bytes == skills_bytes, (
         "validate_docx_structure.py copies diverged; re-sync scratch/ and skills/scripts/"

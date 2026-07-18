@@ -1,7 +1,43 @@
 import lxml.etree
+import copy
 import os
 import re
 import sys
+
+# Canonical UPNVJ FIK page geometry. OOXML stores these values in twips
+# (1 cm ~= 567 twips): A4 portrait, 4 cm left, and 3 cm on the other sides.
+# Keep layout writes and width calculations tied to these constants so a future
+# formatting change cannot silently make tables use different page geometry.
+A4_PAGE_WIDTH_DXA = 11906
+A4_PAGE_HEIGHT_DXA = 16838
+MARGIN_LEFT_DXA = 2268
+MARGIN_TOP_DXA = 1701
+MARGIN_RIGHT_DXA = 1701
+MARGIN_BOTTOM_DXA = 1701
+HEADER_DISTANCE_DXA = 720
+FOOTER_DISTANCE_DXA = 720
+
+OFFICE_REL_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
+PACKAGE_REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships'
+CONTENT_TYPES_NS = 'http://schemas.openxmlformats.org/package/2006/content-types'
+HEADER_REL_TYPE = OFFICE_REL_NS + '/header'
+FOOTER_REL_TYPE = OFFICE_REL_NS + '/footer'
+HEADER_CONTENT_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml'
+FOOTER_CONTENT_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml'
+
+# For w:spacing with lineRule="auto", Word stores line height in 240ths of a
+# line. The corrected campus requirement is 1.15 lines: 1.15 * 240 = 276.
+MAIN_LINE_SPACING_AUTO = '276'
+
+
+def main_line_spacing_attrs(before='0', after='0'):
+    """Return canonical OOXML spacing attributes for body/heading paragraphs."""
+    return {
+        'before': str(before),
+        'after': str(after),
+        'line': MAIN_LINE_SPACING_AUTO,
+        'lineRule': 'auto',
+    }
 
 # Tabel angka Romawi untuk Nomor_Bab (I=1 .. X=10).
 ROMAN = {
@@ -369,6 +405,21 @@ SECTPR_ORDER = [
     'bidi', 'rtlGutter', 'docGrid', 'printerSettings', 'sectPrChange'
 ]
 
+# Official CT_TblPr child order from the OOXML schema.
+TBLPR_ORDER = [
+    'tblStyle', 'tblpPr', 'tblOverlap', 'bidiVisual',
+    'tblStyleRowBandSize', 'tblStyleColBandSize', 'tblW', 'jc',
+    'tblCellSpacing', 'tblInd', 'tblBorders', 'shd', 'tblLayout',
+    'tblCellMar', 'tblLook', 'tblCaption', 'tblDescription', 'tblPrChange'
+]
+
+# Official CT_TcPr child order from the OOXML schema.
+TCPR_ORDER = [
+    'cnfStyle', 'tcW', 'gridSpan', 'hMerge', 'vMerge', 'tcBorders', 'shd',
+    'noWrap', 'tcMar', 'textDirection', 'tcFitText', 'vAlign', 'hideMark',
+    'headers', 'cellIns', 'cellDel', 'cellMerge', 'tcPrChange'
+]
+
 def sort_element_children(parent, order_list):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     def key_func(child):
@@ -394,6 +445,345 @@ def set_child_element(parent, tag_name, attribs=None):
             elif k.startswith('{'): elem.set(k, str(v))
             else: elem.set(f'{{{ns_uri}}}{k}', str(v))
     return elem
+
+
+def build_page_number_part(kind, alignment, include_page):
+    """Build a deterministic header/footer part for one page-number role."""
+    if kind not in ('header', 'footer'):
+        raise ValueError("kind must be 'header' or 'footer'")
+    if alignment not in ('left', 'center', 'right'):
+        raise ValueError("alignment must be left, center, or right")
+
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    root_tag = 'hdr' if kind == 'header' else 'ftr'
+    style_id = 'Header' if kind == 'header' else 'Footer'
+    root = lxml.etree.Element(f'{{{ns_uri}}}{root_tag}', nsmap={'w': ns_uri})
+    p = lxml.etree.SubElement(root, f'{{{ns_uri}}}p')
+    p_pr = lxml.etree.SubElement(p, f'{{{ns_uri}}}pPr')
+    set_child_element(p_pr, 'pStyle', {'val': style_id})
+    set_child_element(p_pr, 'jc', {'val': alignment})
+    sort_element_children(p_pr, PPR_ORDER)
+
+    if include_page:
+        for field_type in ('begin',):
+            run = lxml.etree.SubElement(p, f'{{{ns_uri}}}r')
+            set_child_element(run, 'fldChar', {'fldCharType': field_type})
+
+        instr_run = lxml.etree.SubElement(p, f'{{{ns_uri}}}r')
+        instr = set_child_element(instr_run, 'instrText', {'space': 'preserve'})
+        instr.text = ' PAGE '
+
+        separate_run = lxml.etree.SubElement(p, f'{{{ns_uri}}}r')
+        set_child_element(separate_run, 'fldChar', {'fldCharType': 'separate'})
+
+        value_run = lxml.etree.SubElement(p, f'{{{ns_uri}}}r')
+        value_r_pr = lxml.etree.SubElement(value_run, f'{{{ns_uri}}}rPr')
+        set_child_element(
+            value_r_pr,
+            'rFonts',
+            {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'},
+        )
+        set_child_element(value_r_pr, 'sz', {'val': '24'})
+        set_child_element(value_r_pr, 'szCs', {'val': '24'})
+        value_text = lxml.etree.SubElement(value_run, f'{{{ns_uri}}}t')
+        value_text.text = '1'
+
+        end_run = lxml.etree.SubElement(p, f'{{{ns_uri}}}r')
+        set_child_element(end_run, 'fldChar', {'fldCharType': 'end'})
+
+    return root
+
+
+def ensure_page_number_parts(unpacked_dir):
+    """Create/reuse page-number parts and return their document rIds.
+
+    Fixed role-based part names make this helper idempotent. The parts are
+    intentionally explicit so Word cannot inherit the Roman footer into an
+    Arabic body section through an implicit "Link to Previous" relationship.
+    """
+    specs = {
+        'body_default_header': (
+            'ta-header-body-default.xml', 'header', 'right', True,
+            HEADER_REL_TYPE, HEADER_CONTENT_TYPE,
+        ),
+        'blank_header': (
+            'ta-header-blank.xml', 'header', 'right', False,
+            HEADER_REL_TYPE, HEADER_CONTENT_TYPE,
+        ),
+        'front_default_footer': (
+            'ta-footer-front-default.xml', 'footer', 'right', True,
+            FOOTER_REL_TYPE, FOOTER_CONTENT_TYPE,
+        ),
+        'body_first_footer': (
+            'ta-footer-body-first.xml', 'footer', 'center', True,
+            FOOTER_REL_TYPE, FOOTER_CONTENT_TYPE,
+        ),
+        'blank_footer': (
+            'ta-footer-blank.xml', 'footer', 'center', False,
+            FOOTER_REL_TYPE, FOOTER_CONTENT_TYPE,
+        ),
+    }
+    rels_path = os.path.join(unpacked_dir, 'word', '_rels', 'document.xml.rels')
+    content_types_path = os.path.join(unpacked_dir, '[Content_Types].xml')
+    parser = lxml.etree.XMLParser(remove_blank_text=False)
+    rels_tree = lxml.etree.parse(rels_path, parser)
+    rels_root = rels_tree.getroot()
+    content_types_tree = lxml.etree.parse(content_types_path, parser)
+    content_types_root = content_types_tree.getroot()
+
+    numeric_ids = []
+    for relationship in rels_root:
+        rid = relationship.get('Id', '')
+        if rid.startswith('rId') and rid[3:].isdigit():
+            numeric_ids.append(int(rid[3:]))
+    next_rid = max(numeric_ids, default=0) + 1
+
+    reference_ids = {}
+    for role, (target, kind, alignment, include_page, rel_type, content_type) in specs.items():
+        part_path = os.path.join(unpacked_dir, 'word', target)
+        part_root = build_page_number_part(kind, alignment, include_page)
+        lxml.etree.ElementTree(part_root).write(
+            part_path,
+            encoding='utf-8',
+            xml_declaration=True,
+            standalone=True,
+        )
+
+        relationship = next(
+            (
+                item for item in rels_root
+                if item.get('Type') == rel_type and item.get('Target') == target
+            ),
+            None,
+        )
+        if relationship is None:
+            rid = f'rId{next_rid}'
+            next_rid += 1
+            relationship = lxml.etree.SubElement(
+                rels_root,
+                f'{{{PACKAGE_REL_NS}}}Relationship',
+                Id=rid,
+                Type=rel_type,
+                Target=target,
+            )
+        reference_ids[role] = relationship.get('Id')
+
+        part_name = f'/word/{target}'
+        override = next(
+            (
+                item for item in content_types_root
+                if item.tag == f'{{{CONTENT_TYPES_NS}}}Override'
+                and item.get('PartName') == part_name
+            ),
+            None,
+        )
+        if override is None:
+            override = lxml.etree.SubElement(
+                content_types_root,
+                f'{{{CONTENT_TYPES_NS}}}Override',
+            )
+            override.set('PartName', part_name)
+        override.set('ContentType', content_type)
+
+    rels_tree.write(rels_path, encoding='utf-8', xml_declaration=True, standalone=True)
+    content_types_tree.write(
+        content_types_path,
+        encoding='utf-8',
+        xml_declaration=True,
+        standalone=True,
+    )
+    return reference_ids
+
+
+def _is_numbered_chapter_heading(paragraph, namespaces):
+    """True for a numbered Heading1 chapter, excluding front-matter headings."""
+    ns_uri = namespaces['w']
+    p_pr = paragraph.find('w:pPr', namespaces)
+    if p_pr is None:
+        return False
+    p_style = p_pr.find('w:pStyle', namespaces)
+    if p_style is None or p_style.get(f'{{{ns_uri}}}val') != 'Heading1':
+        return False
+    num_pr = p_pr.find('w:numPr', namespaces)
+    if num_pr is None:
+        return False
+    ilvl = num_pr.find('w:ilvl', namespaces)
+    return ilvl is None or ilvl.get(f'{{{ns_uri}}}val', '0') == '0'
+
+
+def _apply_page_number_section(sect_pr, reference_ids, *, front, start, next_page):
+    """Apply header/footer roles and numbering rules to one section."""
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    for tag_name in ('headerReference', 'footerReference'):
+        for existing in list(sect_pr.findall(f'{{{ns_uri}}}{tag_name}')):
+            sect_pr.remove(existing)
+
+    if front:
+        refs = (
+            ('headerReference', 'default', reference_ids['blank_header']),
+            ('headerReference', 'first', reference_ids['blank_header']),
+            ('footerReference', 'default', reference_ids['front_default_footer']),
+            ('footerReference', 'first', reference_ids['blank_footer']),
+        )
+        number_format = 'lowerRoman'
+    else:
+        refs = (
+            ('headerReference', 'default', reference_ids['body_default_header']),
+            ('headerReference', 'first', reference_ids['blank_header']),
+            ('footerReference', 'default', reference_ids['blank_footer']),
+            ('footerReference', 'first', reference_ids['body_first_footer']),
+        )
+        number_format = 'decimal'
+
+    for tag_name, ref_type, rid in refs:
+        ref = lxml.etree.Element(f'{{{ns_uri}}}{tag_name}')
+        ref.set(f'{{{ns_uri}}}type', ref_type)
+        ref.set(f'{{{OFFICE_REL_NS}}}id', rid)
+        sect_pr.append(ref)
+
+    if next_page:
+        set_child_element(sect_pr, 'type', {'val': 'nextPage'})
+    else:
+        type_element = sect_pr.find(f'{{{ns_uri}}}type')
+        if type_element is not None:
+            sect_pr.remove(type_element)
+
+    pg_num_type = set_child_element(sect_pr, 'pgNumType', {'fmt': number_format})
+    start_attr = f'{{{ns_uri}}}start'
+    if start is None:
+        pg_num_type.attrib.pop(start_attr, None)
+    else:
+        pg_num_type.set(start_attr, str(start))
+    set_child_element(sect_pr, 'titlePg', {})
+    apply_upnvj_page_layout(sect_pr)
+    sort_element_children(sect_pr, SECTPR_ORDER)
+
+
+def configure_report_sections(
+    body,
+    namespaces,
+    original_sect_pr,
+    reference_ids,
+    chapter_paragraphs=None,
+):
+    """Create one front-matter section and one section per numbered BAB.
+
+    The first page of every BAB uses a centered footer page number, later pages
+    use a right-aligned header, Roman front matter uses a right-aligned footer,
+    and the first Arabic section explicitly restarts at page 1.
+    """
+    ns_uri = namespaces['w']
+    body_final = body.find('w:sectPr', namespaces)
+    source_sect_pr = (
+        original_sect_pr if original_sect_pr is not None else body_final
+    )
+    template = copy.deepcopy(source_sect_pr)
+    if template is None:
+        template = lxml.etree.Element(f'{{{ns_uri}}}sectPr')
+
+    for paragraph in body.findall('w:p', namespaces):
+        p_pr = paragraph.find('w:pPr', namespaces)
+        sect_pr = p_pr.find('w:sectPr', namespaces) if p_pr is not None else None
+        if sect_pr is not None:
+            p_pr.remove(sect_pr)
+    if body_final is not None:
+        body.remove(body_final)
+
+    children = list(body)
+    chapters = [
+        paragraph for paragraph in (chapter_paragraphs or [])
+        if paragraph in children
+    ]
+    if not chapters:
+        chapters = [
+            child for child in children
+            if child.tag == f'{{{ns_uri}}}p'
+            and _is_numbered_chapter_heading(child, namespaces)
+        ]
+    if not chapters:
+        chapters = [
+            child for child in children
+            if child.tag == f'{{{ns_uri}}}p'
+            and (_paragraph_style(child, namespaces) or '') == 'Heading1'
+            and 'PENDAHULUAN' in _paragraph_text(child, namespaces).upper()
+        ][:1]
+    if not chapters:
+        raise RuntimeError('Cannot configure page numbering: no BAB heading found.')
+
+    chapter_set = set(chapters)
+    for child in children:
+        body.remove(child)
+
+    started_chapters = 0
+    for child in children:
+        if child in chapter_set:
+            break_paragraph = lxml.etree.Element(f'{{{ns_uri}}}p')
+            break_p_pr = lxml.etree.SubElement(
+                break_paragraph,
+                f'{{{ns_uri}}}pPr',
+            )
+            section_properties = copy.deepcopy(template)
+            if started_chapters == 0:
+                _apply_page_number_section(
+                    section_properties,
+                    reference_ids,
+                    front=True,
+                    start=1,
+                    next_page=True,
+                )
+            else:
+                _apply_page_number_section(
+                    section_properties,
+                    reference_ids,
+                    front=False,
+                    start=1 if started_chapters == 1 else None,
+                    next_page=True,
+                )
+            break_p_pr.append(section_properties)
+            sort_element_children(break_p_pr, PPR_ORDER)
+            body.append(break_paragraph)
+            started_chapters += 1
+        body.append(child)
+
+    final_section = copy.deepcopy(template)
+    _apply_page_number_section(
+        final_section,
+        reference_ids,
+        front=False,
+        start=1 if started_chapters == 1 else None,
+        next_page=False,
+    )
+    body.append(final_section)
+    return started_chapters + 1
+
+
+def apply_upnvj_page_layout(sect_pr):
+    """Apply the canonical A4 + 4/3/3/3 cm layout to one ``w:sectPr``.
+
+    The helper is intentionally idempotent and preserves unrelated section
+    properties such as header/footer references and page-numbering settings.
+    """
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    pg_sz = set_child_element(sect_pr, 'pgSz', {
+        'w': str(A4_PAGE_WIDTH_DXA),
+        'h': str(A4_PAGE_HEIGHT_DXA),
+    })
+    # A stale landscape flag can override otherwise-correct portrait dimensions.
+    orient_attr = f'{{{ns_uri}}}orient'
+    if orient_attr in pg_sz.attrib:
+        del pg_sz.attrib[orient_attr]
+
+    set_child_element(sect_pr, 'pgMar', {
+        'top': str(MARGIN_TOP_DXA),
+        'right': str(MARGIN_RIGHT_DXA),
+        'bottom': str(MARGIN_BOTTOM_DXA),
+        'left': str(MARGIN_LEFT_DXA),
+        'header': str(HEADER_DISTANCE_DXA),
+        'footer': str(FOOTER_DISTANCE_DXA),
+        'gutter': '0',
+    })
+    sort_element_children(sect_pr, SECTPR_ORDER)
+    return sect_pr
 
 def fix_whitespace_preservation(root):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
@@ -484,7 +874,7 @@ def ensure_toc9_style(styles_root):
         pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
         style.append(pPr)
     
-    set_child_element(pPr, 'spacing', {'before': '0', 'after': '0', 'line': '360', 'lineRule': 'auto'})
+    set_child_element(pPr, 'spacing', main_line_spacing_attrs())
     set_child_element(pPr, 'ind', {'left': '1'})
     set_child_element(pPr, 'jc', {'val': 'left'})
     sort_element_children(pPr, PPR_ORDER)
@@ -807,79 +1197,312 @@ def scale_lembar_pengesahan(p, namespaces, unpacked_dir=None, rel_map=None):
                     except ValueError:
                         pass
 
+def compute_printable_width(root, namespaces):
+    """Return the printable page width in dxa (twips) from the document's page setup.
+
+    Reads ``pgSz@w`` minus ``pgMar@left`` and ``pgMar@right`` from the body
+    ``sectPr`` (``w:body/w:sectPr``, falling back to the last ``sectPr`` in the
+    body when no direct child ``sectPr`` exists). Each value falls back to a safe
+    default matching the canonical UPNVJ page setup (``w=11906``,
+    ``left=2268``, ``right=1701`` -> ``7937`` dxa) when it is missing or
+    unparseable.
+
+    This helper is strictly read-only: it never mutates ``sectPr`` (or any other
+    element). It only inspects attributes to compute the printable width.
+    """
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    DEFAULT_W = A4_PAGE_WIDTH_DXA
+    DEFAULT_LEFT = MARGIN_LEFT_DXA
+    DEFAULT_RIGHT = MARGIN_RIGHT_DXA
+
+    # Locate the section properties: prefer the body's direct-child sectPr,
+    # otherwise fall back to the last sectPr found anywhere in the body.
+    sectPr = None
+    body = root.find('w:body', namespaces)
+    search_scope = body if body is not None else root
+    if search_scope is not None:
+        sectPr = search_scope.find('w:sectPr', namespaces)
+        if sectPr is None:
+            sect_list = search_scope.findall('.//w:sectPr', namespaces)
+            if sect_list:
+                sectPr = sect_list[-1]
+
+    def _parse_attr(elem, attr, default):
+        if elem is None:
+            return default
+        raw = elem.get(f'{{{ns_uri}}}{attr}')
+        if raw is None:
+            return default
+        try:
+            return int(raw)
+        except (TypeError, ValueError):
+            return default
+
+    pgSz = sectPr.find('w:pgSz', namespaces) if sectPr is not None else None
+    pgMar = sectPr.find('w:pgMar', namespaces) if sectPr is not None else None
+
+    width = _parse_attr(pgSz, 'w', DEFAULT_W)
+    left = _parse_attr(pgMar, 'left', DEFAULT_LEFT)
+    right = _parse_attr(pgMar, 'right', DEFAULT_RIGHT)
+
+    printable = width - left - right
+    if printable <= 0:
+        # Degenerate/unusable geometry -> fall back to the known-good default.
+        return DEFAULT_W - DEFAULT_LEFT - DEFAULT_RIGHT
+    return printable
+
+
+def count_table_columns(tbl, namespaces):
+    """Return the structural column count of a ``w:tbl``.
+
+    The count is derived purely from structure (never from cell text):
+
+      * when a ``w:tblGrid`` with ``w:gridCol`` children exists, the count is
+        ``len(tblGrid/gridCol)``;
+      * otherwise it is the maximum number of grid columns spanned by any row,
+        i.e. ``max`` over rows of ``sum(w:tc/w:tcPr/w:gridSpan@val)`` (a cell
+        without ``gridSpan`` counts as one column).
+
+    Returns ``0`` for a table with no grid and no rows/cells.
+    """
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+
+    tblGrid = tbl.find('w:tblGrid', namespaces)
+    if tblGrid is not None:
+        cols = tblGrid.findall('w:gridCol', namespaces)
+        if cols:
+            return len(cols)
+
+    max_cols = 0
+    for row in tbl.findall('w:tr', namespaces):
+        span_total = 0
+        for tc in row.findall('w:tc', namespaces):
+            span = 1
+            tcPr = tc.find('w:tcPr', namespaces)
+            if tcPr is not None:
+                gridSpan = tcPr.find('w:gridSpan', namespaces)
+                if gridSpan is not None:
+                    raw = gridSpan.get(f'{{{ns_uri}}}val')
+                    try:
+                        parsed = int(raw)
+                        if parsed > 0:
+                            span = parsed
+                    except (TypeError, ValueError):
+                        span = 1
+            span_total += span
+        if span_total > max_cols:
+            max_cols = span_total
+    return max_cols
+
+
+def column_ratios_from_grid(tbl, namespaces, n_cols):
+    """Return a list of ``n_cols`` column proportions (summing to 1.0).
+
+    When the table's existing ``w:tblGrid`` has exactly ``n_cols`` ``w:gridCol``
+    entries whose widths are parseable and sum to a positive value, those widths
+    are used as proportions (each divided by their total). Otherwise the width
+    is split evenly (``1/n_cols`` per column).
+
+    This helper is read-only and structure-driven: it never inspects cell text
+    and never hardcodes a width by column count. Returns ``[]`` when
+    ``n_cols <= 0``.
+    """
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+
+    if n_cols <= 0:
+        return []
+
+    even = [1.0 / n_cols] * n_cols
+
+    tblGrid = tbl.find('w:tblGrid', namespaces)
+    if tblGrid is None:
+        return even
+
+    cols = tblGrid.findall('w:gridCol', namespaces)
+    if len(cols) != n_cols:
+        return even
+
+    widths = []
+    for gc in cols:
+        raw = gc.get(f'{{{ns_uri}}}w')
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            return even
+        if value < 0:
+            return even
+        widths.append(value)
+
+    total = sum(widths)
+    if total <= 0:
+        return even
+    return [w / total for w in widths]
+
+
+def distribute_width(printable, ratios, overrides=None):
+    """Distribute ``printable`` dxa across columns, summing exactly to ``printable``.
+
+    ``ratios`` is a per-column proportion list (e.g. from
+    :func:`column_ratios_from_grid`). An optional ``overrides`` proportion list
+    replaces ``ratios`` when it is supplied, has the same length, and sums to a
+    positive value -- letting callers pass non-hardcoded per-column ratios
+    without keying anything to cell text or a specific column count.
+
+    Each column width is ``floor(printable * ratio / sum(ratios))``; the leftover
+    remainder (so the total is exact) is added to the last column. Handles
+    ``n_cols == 1`` (the single column receives the full ``printable``). Returns
+    ``[]`` for an empty ratio list.
+    """
+    effective = list(ratios)
+
+    if overrides is not None:
+        overrides = list(overrides)
+        if len(overrides) == len(effective) and sum(overrides) > 0 \
+                and all(o >= 0 for o in overrides):
+            effective = overrides
+
+    n = len(effective)
+    if n == 0:
+        return []
+
+    total = sum(effective)
+    if total <= 0:
+        # Degenerate ratios -> fall back to an even split.
+        effective = [1.0 / n] * n
+        total = 1.0
+
+    widths = [int(printable * r / total) for r in effective]
+    widths[-1] += printable - sum(widths)
+    return widths
+
+
 def format_all_tables(root, namespaces):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+
+    def qn(tag):
+        return f'{{{ns_uri}}}{tag}'
+
+    # Compute the printable width once from the document's own page setup.
+    printable = compute_printable_width(root, namespaces)
+
+    # Consistent, content-agnostic borders and cell padding for every table.
+    BORDER_SIDES = ('top', 'left', 'bottom', 'right', 'insideH', 'insideV')
+    BORDER_ATTRS = {'val': 'single', 'sz': '4', 'color': '000000'}
+    CELL_MARGIN_DXA = {'top': '0', 'left': '108', 'bottom': '0', 'right': '108'}
+
     tbl_count = 0
     for tbl in root.findall('.//w:tbl', namespaces):
         tbl_count += 1
         tblPr = tbl.find('w:tblPr', namespaces)
         if tblPr is None:
-            tblPr = lxml.etree.Element(f'{{{ns_uri}}}tblPr')
+            tblPr = lxml.etree.Element(qn('tblPr'))
             tbl.insert(0, tblPr)
-        
-        # Center table horizontally
+
+        # Center table horizontally (preserved behavior).
         set_child_element(tblPr, 'jc', {'val': 'center'})
-        
-        # Format rows and cells
+
         rows = tbl.findall('w:tr', namespaces)
         if not rows:
+            # Nothing structural to size; keep any tblPr children schema-valid.
+            sort_element_children(tblPr, TBLPR_ORDER)
             continue
-            
-        # Check if this is Tabel 1.2 (Jadwal Kegiatan)
-        first_row_cells = rows[0].findall('w:tc', namespaces)
-        is_tabel_1_2 = False
-        if len(first_row_cells) == 6:
-            first_cell_text = "".join(first_row_cells[0].itertext()).strip()
-            if "Aktivitas" in first_cell_text:
-                is_tabel_1_2 = True
-                
-        # Customize tblGrid for Tabel 1.2
-        if is_tabel_1_2:
-            tblGrid = tbl.find('w:tblGrid', namespaces)
-            if tblGrid is not None:
-                for gc in list(tblGrid):
-                    tblGrid.remove(gc)
-                lxml.etree.SubElement(tblGrid, f'{{{ns_uri}}}gridCol', {f'{{{ns_uri}}}w': '3500'})
-                for _ in range(5):
-                    lxml.etree.SubElement(tblGrid, f'{{{ns_uri}}}gridCol', {f'{{{ns_uri}}}w': '900'})
-        
+
+        # --- Structure-driven width fitting (no content probing) --------------
+        n_cols = count_table_columns(tbl, namespaces)
+        if n_cols <= 0:
+            n_cols = 1
+        ratios = column_ratios_from_grid(tbl, namespaces, n_cols)
+        col_widths = distribute_width(printable, ratios)
+
+        # Total preferred width + fixed layout so the table fits the page.
+        set_child_element(tblPr, 'tblW', {'w': str(printable), 'type': 'dxa'})
+        set_child_element(tblPr, 'tblLayout', {'type': 'fixed'})
+
+        # Consistent borders (all sides + insideH/insideV) and cell padding.
+        tblBorders = set_child_element(tblPr, 'tblBorders')
+        for side in BORDER_SIDES:
+            set_child_element(tblBorders, side, BORDER_ATTRS)
+        tblCellMar = set_child_element(tblPr, 'tblCellMar')
+        for side in ('top', 'left', 'bottom', 'right'):
+            set_child_element(tblCellMar, side, {'w': CELL_MARGIN_DXA[side], 'type': 'dxa'})
+
+        # Keep tblPr children in valid OOXML schema order.
+        sort_element_children(tblPr, TBLPR_ORDER)
+
+        # Rewrite tblGrid so gridCol widths equal the distributed widths.
+        tblGrid = tbl.find('w:tblGrid', namespaces)
+        if tblGrid is None:
+            tblGrid = lxml.etree.Element(qn('tblGrid'))
+            tbl.insert(list(tbl).index(tblPr) + 1, tblGrid)
+        for gc in list(tblGrid):
+            tblGrid.remove(gc)
+        for w in col_widths:
+            gc = lxml.etree.SubElement(tblGrid, qn('gridCol'))
+            gc.set(qn('w'), str(w))
+
+        # --- Per-row / per-cell formatting ------------------------------------
         for row_idx, row in enumerate(rows):
             is_header = (row_idx == 0)
-            cells = row.findall('w:tc', namespaces)
-            for cell_idx, cell in enumerate(cells):
+
+            # Mark the first row as a repeating header row.
+            if is_header:
+                trPr = row.find('w:trPr', namespaces)
+                if trPr is None:
+                    trPr = lxml.etree.Element(qn('trPr'))
+                    row.insert(0, trPr)
+                set_child_element(trPr, 'tblHeader', {'val': 'true'})
+
+            col_cursor = 0
+            for cell in row.findall('w:tc', namespaces):
                 tcPr = cell.find('w:tcPr', namespaces)
                 if tcPr is None:
-                    tcPr = lxml.etree.Element(f'{{{ns_uri}}}tcPr')
+                    tcPr = lxml.etree.Element(qn('tcPr'))
                     cell.insert(0, tcPr)
-                
-                # Apply column width if it's Tabel 1.2
-                if is_tabel_1_2:
-                    col_width = '3500' if cell_idx == 0 else '900'
-                    set_child_element(tcPr, 'tcW', {'w': col_width, 'type': 'dxa'})
-                
-                # Vertical alignment
+
+                # Determine how many grid columns this cell spans.
+                span = 1
+                gridSpan = tcPr.find('w:gridSpan', namespaces)
+                if gridSpan is not None:
+                    raw = gridSpan.get(qn('val'))
+                    try:
+                        parsed = int(raw)
+                        if parsed > 0:
+                            span = parsed
+                    except (TypeError, ValueError):
+                        span = 1
+
+                # Cell width = sum of the widths of the columns it spans.
+                start = min(col_cursor, len(col_widths))
+                end = min(col_cursor + span, len(col_widths))
+                cell_width = sum(col_widths[start:end])
+                if cell_width <= 0 and col_widths:
+                    cell_width = col_widths[min(col_cursor, len(col_widths) - 1)]
+                col_cursor += span
+                set_child_element(tcPr, 'tcW', {'w': str(cell_width), 'type': 'dxa'})
+
+                # Vertical alignment.
                 if is_header:
                     set_child_element(tcPr, 'vAlign', {'val': 'center'})
                 else:
-                    set_child_element(tcPr, 'vAlign', {'val': 'center'} if is_tabel_1_2 else {'val': 'top'})
-                
-                # Process cell paragraphs
+                    set_child_element(tcPr, 'vAlign', {'val': 'top'})
+
+                # Keep tcPr children in valid OOXML schema order.
+                sort_element_children(tcPr, TCPR_ORDER)
+
+                # Process cell paragraphs.
                 for p in cell.findall('w:p', namespaces):
                     pPr = p.find('w:pPr', namespaces)
                     if pPr is None:
-                        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                        pPr = lxml.etree.Element(qn('pPr'))
                         p.insert(0, pPr)
-                    
-                    # Horizontal alignment
+
+                    # Horizontal alignment: header centered, body left.
                     if is_header:
                         set_child_element(pPr, 'jc', {'val': 'center'})
                     else:
-                        if is_tabel_1_2 and cell_idx > 0:
-                            set_child_element(pPr, 'jc', {'val': 'center'})
-                        else:
-                            set_child_element(pPr, 'jc', {'val': 'left'})
-                        
-                    # Clear indentation
+                        set_child_element(pPr, 'jc', {'val': 'left'})
+
+                    # Clear indentation and keep pPr children ordered.
                     set_child_element(pPr, 'ind', {'left': '0', 'firstLine': '0', 'right': '0'})
                     sort_element_children(pPr, PPR_ORDER)
     print(f"  Formatted {tbl_count} tables in document.xml.")
@@ -1216,26 +1839,26 @@ def format_document_xmls(unpacked_dir):
                     pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
                     style.append(pPr)
                 if style_id == 'Normal':
-                    set_child_element(pPr, 'spacing', {'before': '0', 'after': '0', 'line': '360', 'lineRule': 'auto'})
+                    set_child_element(pPr, 'spacing', main_line_spacing_attrs())
                     set_child_element(pPr, 'jc', {'val': 'both'})
                     set_child_element(pPr, 'ind', {'firstLine': '0', 'left': '0'})
                 elif style_id == 'ListParagraph':
-                    set_child_element(pPr, 'spacing', {'before': '0', 'after': '0', 'line': '360', 'lineRule': 'auto'})
+                    set_child_element(pPr, 'spacing', main_line_spacing_attrs())
                 elif style_id == 'Caption':
                     set_child_element(pPr, 'spacing', {'before': '120', 'after': '120', 'line': '240', 'lineRule': 'auto'})
                     set_child_element(pPr, 'jc', {'val': 'center'})
                     set_child_element(pPr, 'ind', {'firstLine': '0', 'left': '0'})
                 elif style_id in ['TOC1', 'TOC2', 'TOC3', 'TableofFigures']:
-                    set_child_element(pPr, 'spacing', {'before': '0', 'after': '0', 'line': '360', 'lineRule': 'auto'})
+                    set_child_element(pPr, 'spacing', main_line_spacing_attrs())
                     tabs = set_child_element(pPr, 'tabs')
                     for child in list(tabs):
                         tabs.remove(child)
                     set_child_element(tabs, 'tab', {'val': 'right', 'leader': 'dot', 'pos': '7927'})
                 elif style_id.startswith('Heading'):
                     if style_id in ['Heading1', 'Heading2']:
-                        set_child_element(pPr, 'spacing', {'before': '240', 'after': '120', 'line': '360', 'lineRule': 'auto'})
+                        set_child_element(pPr, 'spacing', main_line_spacing_attrs('240', '120'))
                     else:
-                        set_child_element(pPr, 'spacing', {'before': '120', 'after': '60', 'line': '360', 'lineRule': 'auto'})
+                        set_child_element(pPr, 'spacing', main_line_spacing_attrs('120', '60'))
                     set_child_element(pPr, 'ind', {'firstLine': '0', 'left': '0'})
                     if style_id == 'Heading1':
                         set_child_element(pPr, 'jc', {'val': 'center'})
@@ -1255,6 +1878,18 @@ def format_document_xmls(unpacked_dir):
         body = root.find('w:body', namespaces)
         if body is None: return
         
+        # Capture BAB paragraph identities before heading text is normalized. This
+        # prevents another level-1 heading with numbering from becoming a false
+        # chapter section merely because it shares the same Word style/numId.
+        chapter_paragraphs = []
+        for paragraph in body.findall('w:p', namespaces):
+            p_pr = paragraph.find('w:pPr', namespaces)
+            p_style = p_pr.find('w:pStyle', namespaces) if p_pr is not None else None
+            style_id = p_style.get(f'{{{ns_uri}}}val') if p_style is not None else ''
+            text = _paragraph_text(paragraph, namespaces)
+            if style_id == 'Heading1' and parse_chapter_number(text) is not None:
+                chapter_paragraphs.append(paragraph)
+
         # Find the original paragraph-level sectPr from the template to preserve header/footer references
         original_sectPr = None
         for p_elem in body.findall('w:p', namespaces):
@@ -1262,7 +1897,6 @@ def format_document_xmls(unpacked_dir):
             if pPr_elem is not None:
                 sectPr_elem = pPr_elem.find('w:sectPr', namespaces)
                 if sectPr_elem is not None:
-                    import copy
                     original_sectPr = copy.deepcopy(sectPr_elem)
                     break
                     
@@ -1754,7 +2388,13 @@ def format_document_xmls(unpacked_dir):
                 # Correct in-text citations
                 text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text])
                 if 'Aliyah Aliyah' in text:
-                    cleaned_text = text.replace('Aliyah Aliyah et al., 2024', 'Aliyah et al., 2024')
+                    cleaned_text = text.replace(
+                        'Aliyah Aliyah et al., 2024',
+                        'Aliyah et al. 2024',
+                    ).replace(
+                        'Aliyah Aliyah et al. 2024',
+                        'Aliyah et al. 2024',
+                    )
                     for r in p.findall(f'{{{ns_uri}}}r', namespaces): p.remove(r)
                     new_r = lxml.etree.Element(f'{{{ns_uri}}}r')
                     new_t = lxml.etree.Element(f'{{{ns_uri}}}t')
@@ -1825,12 +2465,12 @@ def format_document_xmls(unpacked_dir):
                             jc_elem = pPr.find('w:jc', namespaces)
                             jc_val = jc_elem.get(f'{{{ns_uri}}}val', 'both') if jc_elem is not None else 'both'
                             if jc_val not in ['center', 'right']: set_child_element(pPr, 'jc', {'val': 'both'})
-                            set_child_element(pPr, 'spacing', {'before': '0', 'after': '0', 'line': '360', 'lineRule': 'auto'})
+                            set_child_element(pPr, 'spacing', main_line_spacing_attrs())
                         elif pStyle_val == 'ListParagraph':
                             if pPr is None:
                                 pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
                                 p.insert(0, pPr)
-                            set_child_element(pPr, 'spacing', {'before': '0', 'after': '0', 'line': '360', 'lineRule': 'auto'})
+                            set_child_element(pPr, 'spacing', main_line_spacing_attrs())
                         elif pStyle_val == 'Caption':
                             if pPr is None:
                                 pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
@@ -1859,65 +2499,31 @@ def format_document_xmls(unpacked_dir):
                 if pPr is not None: sort_element_children(pPr, PPR_ORDER)
                 
 
-        # Remove any existing paragraph-level section breaks to avoid duplicates
-        for p_elem in body.findall('w:p', namespaces):
-            pPr_elem = p_elem.find('w:pPr', namespaces)
-            if pPr_elem is not None:
-                sectPr_elem = pPr_elem.find('w:sectPr', namespaces)
-                if sectPr_elem is not None:
-                    pPr_elem.remove(sectPr_elem)
-
-        # Insert dedicated section break paragraph before BAB I PENDAHULUAN
-        bab1_idx_new = -1
-        children_new = list(body)
-        for idx, child in enumerate(children_new):
-            if child.tag.endswith('p'):
-                pPr = child.find('w:pPr', namespaces)
-                pStyle = pPr.find('w:pStyle', namespaces) if pPr is not None else None
-                pStyle_val = pStyle.get(f'{{{ns_uri}}}val') if pStyle is not None else ""
-                text = "".join([t.text for t in child.iter(f'{{{ns_uri}}}t') if t.text])
-                if pStyle_val == 'Heading1' and 'PENDAHULUAN' in text.upper():
-                    bab1_idx_new = idx
-                    break
-
-        if bab1_idx_new != -1:
-            p_sect = lxml.etree.Element(f'{{{ns_uri}}}p')
-            pPr_sect = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-            
-            if original_sectPr is not None:
-                sectPr = original_sectPr
-            else:
-                sectPr = lxml.etree.Element(f'{{{ns_uri}}}sectPr')
-            
-            set_child_element(sectPr, 'type', {'val': 'nextPage'})
-            set_child_element(sectPr, 'pgNumType', {'fmt': 'lowerRoman', 'start': '1'})
-            set_child_element(sectPr, 'pgSz', {'w': '11906', 'h': '16838'})
-            set_child_element(sectPr, 'pgMar', {
-                'top': '1701', 'right': '1701', 'bottom': '1701', 'left': '2268',
-                'header': '720', 'footer': '720', 'gutter': '0'
-            })
-            sort_element_children(sectPr, SECTPR_ORDER)
-            
-            pPr_sect.append(sectPr)
-            sort_element_children(pPr_sect, PPR_ORDER)
-            p_sect.append(pPr_sect)
-            
-            body.insert(bab1_idx_new, p_sect)
-            print(f"Inserted dedicated section break paragraph before BAB I PENDAHULUAN at index {bab1_idx_new}")
-
-        # Final section break (body section)
-        final_sectPr = body.find('w:sectPr', namespaces)
-        if final_sectPr is not None:
-            pg_num_type = set_child_element(final_sectPr, 'pgNumType', {'fmt': 'decimal'})
-            start_attr = f'{{{ns_uri}}}start'
-            if start_attr in pg_num_type.attrib:
-                del pg_num_type.attrib[start_attr]
-            set_child_element(final_sectPr, 'pgSz', {'w': '11906', 'h': '16838'})
-            set_child_element(final_sectPr, 'pgMar', {
-                'top': '1701', 'right': '1701', 'bottom': '1701', 'left': '2268',
-                'header': '720', 'footer': '720', 'gutter': '0'
-            })
-            sort_element_children(final_sectPr, SECTPR_ORDER)
+        if chapter_paragraphs:
+            page_number_reference_ids = ensure_page_number_parts(unpacked_dir)
+            section_count = configure_report_sections(
+                body,
+                namespaces,
+                original_sectPr,
+                page_number_reference_ids,
+                chapter_paragraphs,
+            )
+            print(
+                "Configured %d report section(s): Roman front matter at bottom-right; "
+                "BAB first pages at bottom-center; continuation pages at top-right; "
+                "Arabic numbering restarts at 1 on BAB I." % section_count
+            )
+        else:
+            # Partial DOCX fixtures and reusable fragments may contain tables or
+            # styles without any report chapters. Preserve their sections while
+            # still enforcing the canonical page geometry.
+            all_sect_pr = list(body.iter(f'{{{ns_uri}}}sectPr'))
+            for section_properties in all_sect_pr:
+                apply_upnvj_page_layout(section_properties)
+            print(
+                "Skipped report page-number sectioning: no explicit BAB heading "
+                "was present; canonical geometry was retained."
+            )
             
         # Strip all dirty flags from fldChar elements to prevent Word 
         # from showing "update fields" dialog on open.

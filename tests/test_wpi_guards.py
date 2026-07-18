@@ -121,7 +121,7 @@ def _entries_from_keys(keys):
 
 def _body_from_keys(keys):
     """Build body text containing one in-text citation per key."""
-    return " ".join(f"({s.capitalize()}, {y})" for s, y in keys)
+    return " ".join(f"({s.capitalize()} {y})" for s, y in keys)
 
 
 # =========================================================================== #
@@ -298,7 +298,7 @@ def test_unit_escaped_asterisk_is_balanced():
 
 
 def test_unit_citation_fatal_flag_sets_has_fatal():
-    body = "(Unknown, 2024)"
+    body = "(Unknown 2024)"
     warnings, has_fatal = mrg.collect_citation_crosscheck_warnings(
         body, [], fatal=True)
     assert warnings  # there is a mismatch

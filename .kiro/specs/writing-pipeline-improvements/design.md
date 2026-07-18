@@ -280,7 +280,7 @@ def collect_unclosed_table_warnings(lines) -> list[str]:   # R6.4
 def collect_unbalanced_emphasis_warnings(lines) -> list[str]:  # R6.5
 def collect_citation_crosscheck_warnings(body_text, entries, *, fatal=False):  # R1.5/1.6/6.3
     """Dua arah:
-    - sitasi in-text (Nama, Tahun)/(Nama et al., Tahun) tanpa entri -> warning.
+    - sitasi in-text (Nama Tahun)/(Nama et al. Tahun) tanpa entri -> warning.
     - entri tak pernah dirujuk -> warning.
     Kembalikan (warnings, has_fatal). 'fatal' dikontrol konfigurasi (R1.7)."""
 ```

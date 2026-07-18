@@ -22,8 +22,8 @@ import lxml.etree
 # Import from the canonical Mesin_Merge script.
 # --------------------------------------------------------------------------- #
 ROOT = Path(__file__).resolve().parents[1]
-SCRATCH = ROOT / "scratch"
-sys.path.insert(0, str(SCRATCH))
+SCRIPTS = ROOT / "skills" / "scripts"
+sys.path.insert(0, str(SCRIPTS))
 
 import merge_draft_to_docx as mrg  # noqa: E402
 
@@ -40,10 +40,10 @@ def _serialize(el):
 
 
 # --------------------------------------------------------------------------- #
-# Frozen baseline builder: a VERBATIM snapshot of the pre-numPr list_item
-# rendering (literal textual marker run). Used as the preservation oracle for
+# Frozen baseline builder: a snapshot of the literal-marker rendering after the
+# campus-wide 1.15 spacing correction. Used as the preservation oracle for
 # R4.2/R4.3 so the default path is proven byte-identical to Output_Baseline.
-# DO NOT track refactors here - this is intentionally frozen.
+# Do not track ordinary refactors here; requirement changes may update it.
 # --------------------------------------------------------------------------- #
 def _baseline_list_p(item):
     ns_uri = NS
@@ -62,7 +62,7 @@ def _baseline_list_p(item):
     lxml.etree.SubElement(pPr, f'{{{ns_uri}}}spacing', {
         f'{{{ns_uri}}}before': '0',
         f'{{{ns_uri}}}after': '0',
-        f'{{{ns_uri}}}line': '360',
+        f'{{{ns_uri}}}line': '276',
         f'{{{ns_uri}}}lineRule': 'auto'
     })
 
@@ -148,6 +148,14 @@ def test_r42_default_has_no_numpr():
     item = {'type': 'list_item', 'level': 1, 'marker': '1.', 'text': 'First item'}
     p = mrg.build_p_element(item)
     assert p.find(_q('pPr')).find(_q('numPr')) is None
+
+
+def test_list_paragraph_uses_canonical_1_15_spacing():
+    item = {'type': 'list_item', 'level': 1, 'marker': '1.', 'text': 'First item'}
+    spacing = mrg.build_p_element(item).find(_q('pPr')).find(_q('spacing'))
+    assert mrg.MAIN_LINE_SPACING_AUTO == '276'
+    assert spacing.get(_q('line')) == '276'
+    assert spacing.get(_q('lineRule')) == 'auto'
 
 
 def test_r42_explicit_disabled_has_no_numpr():
