@@ -45,7 +45,7 @@ Sumber kebenaran tunggal tiap branch adalah **`Tugas_Akhir_Draft.md`** di root. 
 6. **Lampiran**: format `LAMPIRAN 1.`, tiap lampiran pisah halaman (`---`), tidak muncul di Daftar Isi.
 
 ### Aturan sitasi
-Detail di `.kiro/steering/aturan-sitasi.md`. Inti: gaya **APA in-text** `(Nama, Tahun)` / `(Nama et al., Tahun)`; setiap sitasi wajib punya entri di `# DAFTAR PUSTAKA` dan sebaliknya; jangan mengarang sumber (tandai `[BUTUH SITASI]`).
+Detail di `.kiro/steering/aturan-sitasi.md`. Inti: gaya author-year tanpa koma sebelum tahun, yaitu `(Nama Tahun)` / `(Nama et al. Tahun)`; setiap sitasi wajib punya entri di `# DAFTAR PUSTAKA` dan sebaliknya; jangan mengarang sumber (tandai `[BUTUH SITASI]`).
 
 ### File pendukung penulisan
 | File | Fungsi |
@@ -97,10 +97,10 @@ Karena pergeseran halaman, buka `.docx` di Word → klik kanan tabel **DAFTAR IS
 | Elemen | Nilai |
 |---|---|
 | Kertas / Margin | A4 / Atas 3cm, Bawah 3cm, **Kiri 4cm**, Kanan 3cm |
-| Font | Times New Roman — Body 12pt (1.5), Judul Bab 14pt Bold Center, Caption 12pt (1.0) |
+| Font | Times New Roman — Body 12pt (1.15), Judul Bab 14pt Bold Center, Caption 12pt (1.0) |
 | Caption Tabel | **di atas** tabel, center, "Tabel 1.1 ..." (tanpa titik setelah nomor) |
 | Caption Gambar | **di bawah** gambar, center, "Gambar 2.3 ..." |
-| Nomor halaman | Romawi (i, ii, ...) untuk front matter; Arab (1, 2, ...) mulai BAB I |
+| Nomor halaman | Romawi di kanan bawah untuk front matter; Arab restart dari 1 pada BAB I; pembuka BAB di tengah bawah dan halaman lanjutan di kanan atas |
 | Page split | Daftar Isi/Gambar/Tabel/Lampiran di halaman terpisah; cover sendiri |
 | Gambar | Pertahankan rasio aspek (tidak distorsi) |
 
@@ -113,8 +113,8 @@ Folder `diagrams/` berisi 10 diagram **PlantUML** (`.puml`) + hasil render `.png
 Render ulang (mis. setelah mengedit `.puml`):
 ```bash
 # dari folder diagrams/ (plantuml.jar sudah ada di sana)
-java -jar plantuml.jar -tpng *.puml
-java -jar plantuml.jar -tsvg *.puml
+java -jar plantuml.jar -charset UTF-8 -tpng *.puml
+java -jar plantuml.jar -charset UTF-8 -tsvg *.puml
 ```
 Alternatif tanpa instalasi: tempel isi `.puml` ke https://www.plantuml.com/plantuml/uml. Diagram alur tambahan (Mermaid) ada di `diagram_alur_sistem.md` (render di https://mermaid.live).
 
@@ -122,9 +122,16 @@ Alternatif tanpa instalasi: tempel isi `.puml` ke https://www.plantuml.com/plant
 
 ## 7. Gambar & Manifest
 
-- `images/manifest.json` memetakan berkas gambar ke caption "Gambar x.y" untuk injeksi otomatis ke `.docx` (tahap 7 pipeline / `scratch/inject_all_images.py`).
+- `images/manifest.json` memetakan ID stabil ke berkas gambar milik branch. Untuk draf baru atau yang sudah dimigrasikan, Markdown menyebut gambar secara exact dengan marker `[FIGURE:<id>]` tepat sebelum caption; draf lama tetap memiliki fallback caption.
 - Screenshot antarmuka & dokumentasi ada di `dokumentasi/`.
-- Saat menambah gambar baru: simpan filenya, daftarkan di `manifest.json` dengan nomor caption yang sesuai, lalu rebuild.
+- Saat menambah gambar baru: simpan aset, daftarkan ID di manifest, lalu tulis dua baris berikut dan rebuild:
+
+  ```markdown
+  [FIGURE:diagram_arsitektur]
+  Gambar 2.9 Diagram Arsitektur Sistem
+  ```
+
+  `caption_match` memverifikasi caption, sedangkan pencarian aset memakai ID exact. Setiap gambar tetap wajib disebut di tengah kalimat narasi pada bab yang sama. Jangan menyalin manifest, aset, atau marker laporan anggota lain saat hanya menyinkronkan pipeline.
 
 ---
 

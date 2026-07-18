@@ -12,9 +12,10 @@ dipertanggungjawabkan secara akademik dan konsisten dengan Daftar Pustaka.
 ## Prinsip utama
 
 - Setiap **klaim faktual yang bukan pengetahuan umum** wajib didukung sitasi.
-- Gaya sitasi: **APA in-text** — `(Nama, Tahun)`, `(Nama et al., Tahun)`.
+- Gaya sitasi author-year sesuai ketentuan kampus: **tanpa koma sebelum tahun**
+  — `(Nama Tahun)`, `(Nama et al. Tahun)`.
   Beberapa sumber dalam satu kurung dipisah titik koma dan diurutkan alfabetis:
-  `(Muharam et al., 2023; Taurusta et al., 2024)`.
+  `(Muharam et al. 2023; Taurusta et al. 2024)`.
 - Setiap sitasi in-text **harus ada** entri padanannya di Daftar Pustaka, dan
   sebaliknya tidak boleh ada entri Daftar Pustaka yang tidak pernah dirujuk.
 
@@ -56,5 +57,5 @@ Yang **tidak perlu** sitasi eksternal:
 
 Pola yang sama seperti guard "wajib narasi gambar" bisa diterapkan: validator
 dapat memberi **peringatan non-fatal** bila ada paragraf di Latar Belakang yang
-memuat klaim namun tidak memuat pola sitasi `(... , Tahun)`. Aktifkan hanya
+memuat klaim namun tidak memuat pola sitasi `(... Tahun)`. Aktifkan hanya
 bila diminta.

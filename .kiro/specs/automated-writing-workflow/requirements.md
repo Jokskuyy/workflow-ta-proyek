@@ -22,7 +22,7 @@ Alur ini **wajib menghormati** aturan yang sudah ditetapkan:
 - **Basis_Fakta**: Berkas `project_facts.json` yang menjadi sumber kebenaran fakta dan angka proyek.
 - **Placeholder_TBD**: Penanda teks berbentuk `[TBD: ...]` untuk fakta/angka yang belum tersedia di Basis_Fakta.
 - **Penanda_Sitasi_Kurang**: Penanda teks `[BUTUH SITASI]` untuk klaim faktual yang belum memiliki rujukan.
-- **Sitasi_APA**: Sitasi dalam-teks bergaya APA berbentuk `(Nama, Tahun)` atau `(Nama et al., Tahun)`.
+- **Sitasi_APA**: Sitasi author-year sesuai ketentuan kampus berbentuk `(Nama Tahun)` atau `(Nama et al. Tahun)`, tanpa koma sebelum tahun.
 - **Rujukan_Objek**: Kalimat yang merujuk "Gambar x.y" atau "Tabel x.y" di dalam Berkas_Draf.
 - **Daftar_Berjenjang**: Daftar bernomor dengan hierarki `1.` → `a.` → `1)` → `a)`.
 - **Peran_Branch**: Lingkup penulisan yang terkait branch aktif (`laporan/iman`, `laporan/dwikhi`, `laporan/faiz`).
@@ -49,7 +49,7 @@ Alur ini **wajib menghormati** aturan yang sudah ditetapkan:
 #### Acceptance Criteria
 
 1. WHEN Alur_Penulisan menyusun konten sebuah Sub_Bab_Teori, THE Alur_Penulisan SHALL menempatkan tepat satu paragraf definisi yang memuat pernyataan definisi konsep utama Sub_Bab_Teori tersebut sebagai paragraf ke-1 (paragraf pertama) sub-bab.
-2. WHEN Alur_Penulisan menuliskan paragraf definisi sebuah Sub_Bab_Teori, THE Alur_Penulisan SHALL menyertakan paling sedikit satu Sitasi_APA berformat in-text `(Nama, Tahun)` atau `(Nama et al., Tahun)` yang menempel langsung pada pernyataan definisi tersebut.
+2. WHEN Alur_Penulisan menuliskan paragraf definisi sebuah Sub_Bab_Teori, THE Alur_Penulisan SHALL menyertakan paling sedikit satu Sitasi_APA berformat in-text `(Nama Tahun)` atau `(Nama et al. Tahun)` yang menempel langsung pada pernyataan definisi tersebut.
 3. IF Alur_Penulisan menuliskan klaim faktual yang bukan pengetahuan umum dan bukan hasil observasi penulis sendiri serta belum memiliki Sitasi_APA, THEN THE Alur_Penulisan SHALL menandai klaim tersebut dengan Penanda_Sitasi_Kurang tepat pada posisi klaim dan SHALL mempertahankan teks klaim tanpa menghapusnya.
 4. IF Alur_Penulisan menyelesaikan konten sebuah Sub_Bab_Teori tanpa paragraf definisi bersitasi pada paragraf ke-1, THEN THE Alur_Penulisan SHALL menandai paragraf pertama Sub_Bab_Teori tersebut dengan Penanda_Sitasi_Kurang tanpa menghapus konten yang sudah ditulis.
 5. IF sebuah Sitasi_APA pada Sub_Bab_Teori tidak memiliki entri padanan pada Daftar Pustaka, THEN THE Alur_Penulisan SHALL menandai sitasi tersebut dengan Penanda_Sitasi_Kurang dan tidak memperlakukan klaim terkait sebagai klaim yang sudah tervalidasi.

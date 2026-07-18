@@ -164,6 +164,12 @@ def _caption_p_xml(text: str) -> str:
     )
 
 
+def _marker_p(figure_id: str):
+    return LET.fromstring(
+        f'<w:p xmlns:w="{W}"><w:r><w:t>[FIGURE:{figure_id}]</w:t></w:r></w:p>'
+    )
+
+
 def _minimal_docx(path: Path, caption_texts, pg_h: int = 15840,
                   top: int = 1440, bottom: int = 1440) -> None:
     """Write a tiny injector-ready .docx with the given Caption paragraphs and a
@@ -412,6 +418,97 @@ def test_unit_resolve_caption_indices_zero_one_multiple():
                                  "Gambar 2.3 Tidak Cocok",
                                  f"Gambar 2.4 {match}"])
     assert inj.resolve_caption_indices(body2, match, ns) == [0, 2]
+
+
+def test_unit_exact_marker_selects_its_adjacent_caption_despite_similar_caption():
+    item = {
+        "id": "fig_exact",
+        "file": "exact.png",
+        "caption_match": "Diagram Yang Mirip",
+        "inject_method": "post_com",
+    }
+    body = _body_from_captions(
+        ["Gambar 2.1 Diagram Yang Mirip", "Gambar 2.2 Diagram Yang Mirip"]
+    )
+    body.insert(1, _marker_p("fig_exact"))
+    mode, marker_idx, caption_idx, error = inj.resolve_figure_target(body, item, WNS)
+    assert error is None
+    assert (mode, marker_idx, caption_idx) == ("marker", 1, 2)
+
+
+def test_injector_replaces_marker_and_persists_exact_id(tmp_path, monkeypatch):
+    item = {
+        "id": "fig_exact",
+        "file": "exact.png",
+        "caption_match": "Diagram Yang Mirip",
+        "inject_method": "post_com",
+    }
+    project = tmp_path / "exact_marker"
+    docx = _setup_inject_project(
+        project,
+        [item],
+        ["Gambar 2.1 Diagram Yang Mirip", "Gambar 2.2 Diagram Yang Mirip"],
+        {"exact.png": (40, 30, (10, 120, 200))},
+    )
+    entries = read_all(docx)
+    doc = parse_doc(entries)
+    body_of(doc).insert(1, _marker_p("fig_exact"))
+    entries[DOC] = serialize_doc(doc)
+    write_all(entries, docx)
+
+    _run_injector(project, docx, monkeypatch)
+    out = read_all(docx)
+    out_doc = parse_doc(out)
+    assert "[FIGURE:fig_exact]" not in " ".join(
+        para_text(p) for p in body_of(out_doc).findall("w:p", NS)
+    )
+    doc_pr = out_doc.find('.//wp:docPr[@name="FIGURE:fig_exact"]', NS)
+    assert doc_pr is not None
+    drawing_p = doc_pr.getparent()
+    while drawing_p is not None and drawing_p.tag != f"{{{W}}}p":
+        drawing_p = drawing_p.getparent()
+    children = list(body_of(out_doc))
+    drawing_idx = children.index(drawing_p)
+    assert para_text(children[drawing_idx + 1]) == "Gambar 2.2 Diagram Yang Mirip"
+
+
+def test_injector_restores_missing_png_content_type(tmp_path, monkeypatch):
+    """A Word-COM intermediate may contain no PNG Default declaration.
+
+    Injecting a PNG into that package must restore ``image/png`` or Microsoft
+    Word reports the otherwise well-formed DOCX as corrupt.
+    """
+    item = {
+        "id": "fig_png",
+        "file": "fig.png",
+        "caption_match": "Diagram PNG",
+        "inject_method": "post_com",
+    }
+    project = tmp_path / "missing_png_type"
+    docx = _setup_inject_project(
+        project,
+        [item],
+        ["Gambar 2.1 Diagram PNG"],
+        {"fig.png": (24, 24, (20, 40, 60))},
+    )
+    entries = read_all(docx)
+    content_types = LET.fromstring(entries["[Content_Types].xml"])
+    for node in list(content_types):
+        if (node.get("Extension") or "").lower() == "png":
+            content_types.remove(node)
+    entries["[Content_Types].xml"] = LET.tostring(
+        content_types, xml_declaration=True, encoding="UTF-8", standalone=True
+    )
+    write_all(entries, docx)
+
+    _run_injector(project, docx, monkeypatch)
+    out_types = LET.fromstring(read_all(docx)["[Content_Types].xml"])
+    defaults = {
+        (node.get("Extension") or "").lower(): node.get("ContentType")
+        for node in out_types
+        if node.tag.endswith("Default")
+    }
+    assert defaults["png"] == "image/png"
 
 
 def test_unit_injector_caption_resolution_zero_one_multiple(tmp_path, monkeypatch):
