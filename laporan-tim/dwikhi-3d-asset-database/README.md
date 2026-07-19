@@ -24,6 +24,7 @@ Berdasarkan pembagian peran (BAB II — Wawancara Stakeholder), kontribusi:
 - SQL DDL skema, contoh policy RLS, dan kode trigger audit log.
 
 ## Acuan
+- Kontrak konten bersama dan include: `../../content/README.md`
 - PRD (bagian "Skema Database" & "Konvensi Struktur Scene Unity"): `../../PRD_Konsolidasi_TA.md`
 - Kerangka laporan: `outline-laporan.md`
 - Kode Unity & skema DB: repo eksternal (lihat `../../PANDUAN-TIM.md`).

@@ -28,6 +28,7 @@ Berdasarkan pembagian peran (BAB II — Wawancara Stakeholder), kontribusi:
 - Diagram konfigurasi build WebGL.
 
 ## Acuan
+- Kontrak konten bersama dan include: `../../content/README.md`
 - PRD (bagian "Modul Unity (C#)", "Build & Performa WebGL", "Testing Decisions"): `../../PRD_Konsolidasi_TA.md`
 - Kerangka laporan: `outline-laporan.md`
 - Kode Unity: repo eksternal (lihat `../../PANDUAN-TIM.md`).

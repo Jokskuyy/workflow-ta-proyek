@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "black_box_testing": {
+    "total_scenarios": 24,
+    "initial_result": {
+      "passed_scenarios": 23,
+      "failed_scenarios": [
+        "BB-20"
+      ],
+      "success_rate": "95.83%"
+    },
+    "root_cause": "Script testing Unity ikut terkompilasi ke build WebGL sehingga label tujuan menggunakan unity_object_name.",
+    "corrective_action": "Memisahkan script testing dari build WebGL produksi dan memulihkan nama tampilan fasilitas pada label tujuan.",
+    "final_result": {
+      "passed_scenarios": 24,
+      "failed_scenarios": [],
+      "success_rate": "100.00%",
+      "retested_scenario": "BB-20"
+    },
+    "evidence_status": "Hasil awal tersedia pada Hasil_BlackBox.docx; retest dikonfirmasi pemilik proyek dan lampiran formal masih perlu dilengkapi."
+  },
+  "user_acceptance_testing": {
+    "respondents": {
+      "total_unique": 5,
+      "public_questionnaire": 4,
+      "admin_questionnaire": 4
+    },
+    "likert_scale": "1-5",
+    "public_dashboard": {
+      "score": 140,
+      "maximum_score": 180,
+      "mean": 3.89,
+      "percentage": "77.78%"
+    },
+    "admin_dashboard": {
+      "score": 186,
+      "maximum_score": 220,
+      "mean": 4.23,
+      "percentage": "84.55%"
+    },
+    "combined": {
+      "score": 326,
+      "maximum_score": 400,
+      "percentage": "81.50%"
+    },
+    "revision_status": {
+      "UAT-R01": "needs_verification",
+      "UAT-R02": "needs_verification",
+      "UAT-R03": "needs_verification",
+      "UAT-R04": "needs_verification",
+      "UAT-R05": "needs_verification",
+      "UAT-R06": "needs_verification",
+      "UAT-R07": "needs_verification",
+      "UAT-R08": "needs_verification",
+      "UAT-R09": "needs_verification",
+      "UAT-R10": "needs_verification",
+      "UAT-R11": "per_branch_verification"
+    }
+  }
+}
