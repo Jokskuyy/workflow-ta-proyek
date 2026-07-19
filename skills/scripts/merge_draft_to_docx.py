@@ -70,6 +70,141 @@ MAIN_LINE_SPACING_AUTO = '276'
 # Markdown and OOXML drawing metadata.
 FIGURE_MARKER_RE = re.compile(r'^\[FIGURE:([a-z0-9][a-z0-9_-]*)\]$')
 
+# Shared Markdown fragments are expanded in memory before parsing.  The draft
+# itself remains the branch-owned composition file, while reusable paragraphs
+# and tables live under content/shared/.  Keeping the directive inside an HTML
+# comment makes older editors ignore it without mistaking it for report prose.
+INCLUDE_DIRECTIVE_RE = re.compile(
+    r'^\s*<!--\s*PIPELINE:INCLUDE\s+(.+?)\s*-->\s*$'
+)
+MAX_INCLUDE_DEPTH = 10
+
+
+class MarkdownIncludeError(ValueError):
+    """Raised when a shared Markdown include cannot be resolved safely."""
+
+
+def find_workspace_root(script_path=None):
+    """Return the repository root for canonical and runtime script copies.
+
+    The tracked script lives in ``skills/scripts/`` while the build copies it
+    to ``scratch/``.  Supporting both locations makes include validation
+    runnable directly from the canonical source as well as during a build.
+    """
+    script = Path(script_path or __file__).resolve()
+    if script.parent.name == "scripts" and script.parent.parent.name == "skills":
+        return script.parents[2]
+    return script.parents[1]
+
+
+def _resolve_include_path(raw_path, workspace_root):
+    """Resolve one include path and reject paths outside the repository."""
+    value = (raw_path or "").strip()
+    if ((value.startswith('"') and value.endswith('"')) or
+            (value.startswith("'") and value.endswith("'"))):
+        value = value[1:-1].strip()
+    if not value:
+        raise MarkdownIncludeError("path include kosong")
+
+    candidate = Path(value)
+    if candidate.is_absolute():
+        raise MarkdownIncludeError(
+            f"path include harus relatif terhadap root repository: {value}"
+        )
+    if candidate.suffix.lower() != ".md":
+        raise MarkdownIncludeError(
+            f"include hanya menerima file Markdown (.md): {value}"
+        )
+
+    root = Path(workspace_root).resolve()
+    resolved = (root / candidate).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError as exc:
+        raise MarkdownIncludeError(
+            f"path include keluar dari root repository: {value}"
+        ) from exc
+    return resolved
+
+
+def infer_workspace_root(md_path):
+    """Infer a repository root for direct parsing of a draft or wrapper file."""
+    source = Path(md_path).resolve()
+    for candidate in (source.parent, *source.parents):
+        if (candidate / ".git").exists() or (candidate / "AGENTS.md").is_file():
+            return candidate
+    return source.parent
+
+
+def expand_markdown_includes(md_path, workspace_root=None):
+    """Expand ``PIPELINE:INCLUDE`` directives without changing source files.
+
+    Paths are relative to ``workspace_root``. Missing files, duplicate reuse,
+    recursion, malformed directives, non-Markdown files, and path traversal are
+    fatal. Directives inside fenced code blocks remain literal examples.
+
+    Returns ``(expanded_text, included_paths)`` where included paths are
+    absolute ``Path`` objects in expansion order.
+    """
+    root = Path(workspace_root or infer_workspace_root(md_path)).resolve()
+    source = Path(md_path).resolve()
+    included = []
+    seen = set()
+
+    def _expand(path, stack, depth):
+        if depth > MAX_INCLUDE_DEPTH:
+            chain = " -> ".join(str(p) for p in stack + [path])
+            raise MarkdownIncludeError(
+                f"kedalaman include melebihi {MAX_INCLUDE_DEPTH}: {chain}"
+            )
+        if not path.is_file():
+            raise MarkdownIncludeError(f"file include tidak ditemukan: {path}")
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError as exc:
+            raise MarkdownIncludeError(
+                f"file include tidak dapat dibaca: {path}: {exc}"
+            ) from exc
+
+        output = []
+        in_code_block = False
+        for line_number, line in enumerate(text.splitlines(keepends=True), start=1):
+            stripped = line.strip()
+            if stripped.startswith("```"):
+                in_code_block = not in_code_block
+                output.append(line)
+                continue
+
+            match = None if in_code_block else INCLUDE_DIRECTIVE_RE.match(line)
+            if not in_code_block and "PIPELINE:INCLUDE" in line and match is None:
+                raise MarkdownIncludeError(
+                    f"directive include tidak valid pada {path}:{line_number}"
+                )
+            if match is None:
+                output.append(line)
+                continue
+
+            target = _resolve_include_path(match.group(1), root)
+            if target in stack:
+                chain = " -> ".join(str(p) for p in stack + [target])
+                raise MarkdownIncludeError(f"include rekursif terdeteksi: {chain}")
+            if target in seen:
+                raise MarkdownIncludeError(
+                    f"file include digunakan lebih dari satu kali: {target}"
+                )
+
+            seen.add(target)
+            included.append(target)
+            fragment = _expand(target, stack + [target], depth + 1)
+            output.append(fragment)
+            if fragment and not fragment.endswith(("\n", "\r")):
+                output.append("\n")
+
+        return "".join(output)
+
+    expanded = _expand(source, [source], 0)
+    return expanded, included
+
 
 def compute_list_level(indent_spaces, marker):
     """Return the nesting level of a list item from its leading indentation.
@@ -92,15 +227,15 @@ def compute_list_level(indent_spaces, marker):
     return 1 + (indent_spaces // LIST_INDENT_UNIT)
 
 
-def parse_markdown(md_path):
+def parse_markdown(md_path, workspace_root=None):
     items = []
     
     if not os.path.exists(md_path):
         print(f"Error: {md_path} not found.")
         return items
         
-    with open(md_path, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
+    expanded_text, _ = expand_markdown_includes(md_path, workspace_root)
+    lines = expanded_text.splitlines(keepends=True)
         
     in_chapter_or_later = False
     in_code_block = False
@@ -575,8 +710,12 @@ def _load_draft_text(draft_path_or_text):
         return s
     try:
         if os.path.exists(s):
-            with open(s, encoding='utf-8') as f:
-                return f.read()
+            expanded, _ = expand_markdown_includes(
+                s, workspace_root=infer_workspace_root(s)
+            )
+            return expanded
+    except MarkdownIncludeError:
+        raise
     except (OSError, ValueError):
         pass
     return s
@@ -1814,9 +1953,9 @@ def read_path_config(workspace_root):
 
 
 def main(argv=None):
-    # workspace_root = repo root. This script lives in scratch/, so parents[1]
-    # is the repository root directory (e.g. .../document).
-    workspace_root = Path(__file__).resolve().parents[1]
+    # The source is runnable from skills/scripts/ and the runtime copy from
+    # scratch/. Both locations resolve to the same repository root.
+    workspace_root = find_workspace_root()
 
     # Path resolution priority: argv > config file (optional) > relative defaults.
     parser = argparse.ArgumentParser(
@@ -1827,6 +1966,11 @@ def main(argv=None):
     parser.add_argument("document_xml", nargs="?", default=None,
                         help="Path to the output document.xml "
                              "(default: unpacked_ta/word/document.xml)")
+    parser.add_argument(
+        "--check-includes",
+        action="store_true",
+        help="Validate and parse Markdown includes without writing document.xml",
+    )
     args = parser.parse_args(argv)
 
     cfg = read_path_config(workspace_root)
@@ -1845,13 +1989,17 @@ def main(argv=None):
     if not os.access(md_path, os.R_OK):
         print(f"Error: draft file is not readable: {md_path}")
         sys.exit(1)
-    # The output document.xml's parent directory must exist.
-    if not xml_path.parent.is_dir():
+    # The output document.xml's parent directory must exist for a real merge.
+    if not args.check_includes and not xml_path.parent.is_dir():
         print(f"Error: output directory does not exist: {xml_path.parent}")
         sys.exit(1)
 
     print("Parsing draft Markdown file...")
-    items = parse_markdown(str(md_path))
+    try:
+        items = parse_markdown(str(md_path), workspace_root=workspace_root)
+    except MarkdownIncludeError as exc:
+        print(f"Error: invalid Markdown include: {exc}")
+        sys.exit(1)
     print(f"Parsed {len(items)} items from Markdown.")
 
     marker_errors = validate_figure_markers(
@@ -1862,6 +2010,10 @@ def main(argv=None):
         for error in marker_errors:
             print(f"- {error}")
         sys.exit(1)
+
+    if args.check_includes:
+        print("Markdown includes are valid; document.xml was not modified.")
+        return
 
     print("Merging into document.xml using lxml...")
     merge_draft_to_xml(str(xml_path), items)

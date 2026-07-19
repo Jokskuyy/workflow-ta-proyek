@@ -77,6 +77,24 @@ Skill mekanis berbasis Python yang mengoreksi seluruh struktur `.docx` secara in
 
 ---
 
+## Konten Bersama Tiga Laporan
+
+Bagian yang harus identik antarlaporan disimpan satu kali di `content/shared/`. Draf setiap branch menyisipkannya dengan directive berikut:
+
+```md
+<!-- PIPELINE:INCLUDE content/shared/testing/uat.md -->
+```
+
+Pipeline memperluas include di memori sebelum Markdown diubah menjadi DOCX. Judul, identitas, fokus masalah, implementasi, dan kesimpulan kontribusi tetap berada di branch masing-masing. Kontrak lengkap untuk manusia dan AI agent tersedia di **[content/README.md](content/README.md)**.
+
+Validasi include tanpa membuat DOCX:
+
+```powershell
+C:\Python312\python.exe skills/scripts/merge_draft_to_docx.py --check-includes
+```
+
+---
+
 ## Cara Menjalankan Pipeline Formatter
 
 1.  **Unpack** berkas `.docx` mentah ke folder xml:

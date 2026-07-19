@@ -677,9 +677,12 @@ def _run_writing_guards(errors_found):
         print("  note: draft 'Tugas_Akhir_Draft.md' not found; writing guards skipped.")
         return
     try:
-        with open(draft_path, encoding="utf-8") as f:
-            draft_text = f.read()
-    except OSError as e:
+        if hasattr(mrg, "_load_draft_text"):
+            draft_text = mrg._load_draft_text(draft_path)
+        else:
+            with open(draft_path, encoding="utf-8") as f:
+                draft_text = f.read()
+    except (OSError, ValueError) as e:
         print(f"  note: could not read draft '{draft_path}': {e}; writing guards skipped.")
         return
     draft_lines = draft_text.splitlines()
