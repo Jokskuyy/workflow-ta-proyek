@@ -2,7 +2,7 @@
 
 Dokumen ini adalah panduan teknis dan operasional terpadu untuk repository laporan Tugas Akhir Proyek UPNVJ FIK 2025. Isinya mencakup sumber data, aturan penulisan, format kampus, workflow penulisan otomatis, konversi Markdown ke DOCX, pengelolaan gambar dan tabel, validasi, pengujian, serta troubleshooting.
 
-> Status dokumentasi: diselaraskan dengan codebase pada 17 Juli 2026.
+> Status dokumentasi: diselaraskan dengan codebase pada 19 Juli 2026.
 >
 > Jika terdapat perbedaan, sumber kanonik pada bagian [Urutan sumber acuan](#urutan-sumber-acuan) harus didahulukan. Dokumentasi ini menjelaskan perilaku implementasi yang aktif, tetapi tidak menggantikan aturan kampus resmi.
 
@@ -12,13 +12,15 @@ Repository memiliki tiga tahap yang saling melengkapi tetapi tetap terpisah:
 
 1. **Generator konten AI opsional** membuat request/proposal/diff untuk satu subbab. Mode default tidak menulis draf; apply harus diotorisasi eksplisit.
 2. **Workflow penulisan Markdown deterministik** membantu menjaga kerangka empat bab, fakta proyek, konsistensi istilah, posisi rujukan gambar/tabel, dan isi wajib. Workflow ini tersedia sebagai library Python dan hanya mengubah `Tugas_Akhir_Draft.md` ketika dipanggil secara eksplisit.
-3. **Pipeline DOCX** menggabungkan draf ke template, menerapkan format kampus, memperbarui field Word, menyuntikkan gambar, lalu menjalankan validasi final. Output utamanya adalah `Tugas_Akhir_Formatted.docx`; pipeline ini tidak memanggil provider AI.
+3. **Pipeline DOCX** memperluas shared content ke draf di memori, menggabungkan hasilnya ke template, menerapkan format kampus, memperbarui field Word, menyuntikkan gambar, lalu menjalankan validasi final. Output utamanya adalah `Tugas_Akhir_Formatted.docx`; pipeline ini tidak memanggil provider AI.
 
 ```mermaid
 flowchart LR
     L["AI/provider opsional"] --> M["Guard + proposal/diff"]
     M -->|"hanya --apply"| A
-    A["Tugas_Akhir_Draft.md"] --> B["Merge Markdown ke Word XML"]
+    S["content/shared/*.md"] --> A["Komposisi include di memori"]
+    R["Tugas_Akhir_Draft.md per branch"] --> A
+    A --> B["Merge Markdown ke Word XML"]
     C["archive/Tugas Akhir.docx"] --> D["Unpack template"]
     D --> B
     B --> E["Patch konten proyek"]
@@ -44,8 +46,9 @@ Gunakan urutan berikut ketika mengubah isi atau aturan:
 | 6 | `.kiro/steering/konteks-proyek.md` | Arsitektur dan fakta umum sistem |
 | 7 | `project_facts.json` | Fakta dan status implementasi yang boleh dinyatakan |
 | 8 | `term_registry.json` | Bentuk istilah teknis yang konsisten |
-| 9 | `skills/scripts/` | Implementasi pipeline yang dilacak Git |
-| 10 | `scratch/` | Salinan runtime; bukan sumber utama untuk diedit |
+| 9 | `content/shared/` dan draf/role content branch | Isi laporan aktif yang diturunkan dari fakta serta aturan kanonik |
+| 10 | `skills/scripts/` | Implementasi pipeline yang dilacak Git |
+| 11 | `scratch/` | Salinan runtime; bukan sumber utama untuk diedit |
 
 Empat script di `scratch/` disalin ulang dari `skills/scripts/` setiap build: `merge_draft_to_docx.py`, `patch_template.py`, `inject_all_images.py`, dan `validate_docx_structure.py`. Perubahan permanen harus dilakukan pada versi di `skills/scripts/`.
 
@@ -54,6 +57,9 @@ Empat script di `scratch/` disalin ulang dari `skills/scripts/` setiap build: `m
 | Berkas/direktori | Keterangan |
 |---|---|
 | `Tugas_Akhir_Draft.md` | Sumber isi utama mulai BAB I; front matter dipertahankan dari template |
+| `content/README.md` | Kontrak shared content, role content, keamanan identitas, dan penggunaan include |
+| `content/shared/` | Sumber kanonik bagian laporan yang identik pada semua branch |
+| `content/roles/` | Lokasi opsional narasi khusus peran; tidak boleh menduplikasi shared content |
 | `archive/Tugas Akhir.docx` | Template Word sumber |
 | `Tugas_Akhir_Formatted.docx` | Output build final |
 | `project_facts.json` | Basis fakta untuk mencegah klaim yang belum terverifikasi |
@@ -193,6 +199,30 @@ Pemeriksa istilah:
 | `\*` | Asterisk literal |
 | `---` | Page break |
 | `# DAFTAR PUSTAKA` | Awal bibliografi dinamis |
+| `<!-- PIPELINE:INCLUDE content/shared/...md -->` | Menyisipkan fragment Markdown bersama sebelum parsing |
+
+### Komposisi shared content
+
+Directive include harus berada pada satu baris dan path-nya relatif terhadap root repository. Ekspansi berlangsung di memori sehingga pipeline tidak menulis ulang draf atau fragment. Fragment dapat berisi paragraf, tabel, daftar, kode, marker gambar, atau Markdown lain yang didukung parser. Fragment isi yang ditempatkan setelah heading tidak mengulang heading tersebut.
+
+```md
+## 1.1 Latar Belakang
+
+<!-- PIPELINE:INCLUDE content/shared/bab1/latar-belakang-umum.md -->
+```
+
+Kondisi berikut menghentikan merge sebelum `document.xml` ditulis:
+
+- file tidak ditemukan atau tidak dapat dibaca;
+- path absolut atau path traversal keluar repository;
+- ekstensi bukan `.md`;
+- directive malformed;
+- fragment yang sama digunakan lebih dari sekali;
+- include rekursif atau kedalamannya melebihi batas.
+
+Directive yang berada di dalam fenced code block dianggap contoh literal. Writing guard dan pembacaan bibliografi menggunakan hasil ekspansi yang sama dengan merger.
+
+Konten bersama saat ini meliputi konteks umum Latar Belakang, hasil Black Box, rekapitulasi UAT, dan matriks tindak lanjut UAT. Angka serta status terstrukturnya disimpan di `content/shared/testing/results.json` dan harus sama pada semua laporan. Narasi fokus, implementasi, bukti kontribusi, judul, dan identitas tetap branch-specific. Raw XLSX/PDF bertanda tangan tidak menjadi shared content; laporan memakai ringkasan anonim.
 
 ### Tabel blok
 
@@ -405,7 +435,7 @@ C:\Python312\python.exe skills/scripts/build_pipeline.py
 |---|---|---|
 | 0 | `build_pipeline.py` | Menghentikan Word, memeriksa lock output, dan menyinkronkan script runtime ke `scratch/` |
 | 1 | `unpack.py` | Mengekstrak template secara aman ke `unpacked_ta/` |
-| 2 | `merge_draft_to_docx.py` | Mem-parse Markdown dan mengganti isi laporan pada `document.xml` |
+| 2 | `merge_draft_to_docx.py` | Memperluas include, mem-parse Markdown, dan mengganti isi laporan pada `document.xml` |
 | 3 | `patch_template.py` | Menerapkan patch khusus proyek untuk diskrepansi database/CRUD BAB II |
 | 4 | `add_numbering_preset.py` | Menambahkan preset numbering ke package Word |
 | 5 | `format_ta_proyek.py` | Menerapkan format halaman, style, caption, daftar, tabel, gambar, dan penomoran |
@@ -435,6 +465,14 @@ Urutan prioritas lokasi input merge adalah:
 3. Default `Tugas_Akhir_Draft.md` dan `unpacked_ta/word/document.xml`.
 
 Merge berhenti sebelum menulis jika draf tidak dapat dibaca atau parent directory XML tidak tersedia.
+
+Untuk memvalidasi komposisi tanpa membuat DOCX, jalankan:
+
+```powershell
+C:\Python312\python.exe skills/scripts/merge_draft_to_docx.py --check-includes
+```
+
+Perintah tersebut membaca draf dan fragment, mem-parse hasil komposisi, serta memeriksa marker gambar, tetapi tidak menyentuh `document.xml`.
 
 ## Aturan format DOCX
 
@@ -724,6 +762,13 @@ C:\Python312\python.exe skills/scripts/update_fields_com.py Tugas_Akhir_Formatte
 - Periksa argumen CLI dan `merge_config.json`.
 - Ingat prioritasnya adalah CLI, config, lalu default.
 - Untuk validator writing guard, periksa `TA_DRAFT_PATH`.
+
+### Include shared content gagal
+
+- Jalankan `skills/scripts/merge_draft_to_docx.py --check-includes` untuk memperoleh path atau baris yang gagal.
+- Pastikan directive berada pada satu baris, path relatif terhadap root, dan file berekstensi `.md`.
+- Jangan menyalin isi fragment ke draf untuk melewati error karena tindakan tersebut membuat tiga laporan drift.
+- Baca `content/README.md` sebelum memindahkan isi antara shared content dan role content.
 
 ## Checklist perubahan fitur atau aturan
 

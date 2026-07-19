@@ -15,5 +15,6 @@ Peran **Full Stack Developer & System Integrator**:
 2.9, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17 (lihat `../../diagrams/`).
 
 ## Acuan
+- Kontrak konten bersama dan include: `../../content/README.md`
 - PRD: `../../PRD_Konsolidasi_TA.md`
 - Panduan branch tim: `../../PANDUAN-TIM.md`

@@ -18,11 +18,17 @@ Folder ini berisi **panduan & kerangka laporan** untuk tiap anggota tim. Penulis
 
 ## Sumber Daya Bersama (tersedia di repo ini)
 
+- **Kontrak konten bersama untuk manusia/AI:** `../content/README.md`
+- **Fragment laporan yang identik:** `../content/shared/`
 - **PRD (acuan kebutuhan):** `../PRD_Konsolidasi_TA.md`
 - **Diagram (PlantUML + PNG/SVG):** `../diagrams/`
 - **Diagram alur (Mermaid):** `../diagram_alur_sistem.md`
 - **Screenshot antarmuka:** `../dokumentasi/`
 - **Toolkit penulisan & format:** `../skills/`, `../scratch/`, `../tests/`
+
+## Aturan AI Agent dan Shared Content
+
+AI agent pada branch mana pun harus mulai dari `../AGENTS.md`. Jika `Tugas_Akhir_Draft.md` memuat `PIPELINE:INCLUDE`, agent wajib membaca fragment target sebelum menyimpulkan atau mengubah isi subbab. Angka pengujian, temuan UAT, dan konteks proyek bersama diubah pada `../content/shared/`; fokus kontribusi dan identitas tetap berada pada branch masing-masing.
 
 ## Relevansi Diagram per Anggota
 
