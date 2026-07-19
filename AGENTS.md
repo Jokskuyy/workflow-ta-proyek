@@ -12,14 +12,14 @@ Ada tiga tahap yang tetap terpisah:
 
 1. `skills/scripts/generate_content.py` dapat meminta proposal konten dari AI/provider secara opsional. Default-nya hanya suggest + diff; draf baru ditulis dengan `--apply` eksplisit.
 2. `skills/scripts/alur_penulisan/` memproses dan menjaga kualitas Markdown secara deterministik. Workflow ini hanya berjalan jika `run_alur()` dipanggil secara eksplisit.
-3. `skills/scripts/build_pipeline.py` mengubah template dan `Tugas_Akhir_Draft.md` menjadi `Tugas_Akhir_Formatted.docx`, lalu memvalidasinya. Build tidak pernah memanggil provider AI.
+3. `skills/scripts/build_pipeline.py` mengomposisikan `Tugas_Akhir_Draft.md` dengan fragment `content/shared/`, mengubah hasilnya bersama template menjadi `Tugas_Akhir_Formatted.docx`, lalu memvalidasinya. Komposisi berlangsung di memori dan build tidak pernah memanggil provider AI.
 
 Alur DOCX:
 
 ```text
 archive/Tugas Akhir.docx
         +
-Tugas_Akhir_Draft.md
+Tugas_Akhir_Draft.md -- include --> content/shared/*.md
         |
         v
 unpack -> merge -> project patch -> numbering -> formatting
@@ -55,6 +55,7 @@ Sebelum mengubah apa pun:
 | Mengubah build/packaging | `skills/scripts/build_pipeline.py`, `skills/scripts/unpack.py`, `skills/scripts/pack.py`, `skills/scripts/update_fields_com.py` | validator final dan build end-to-end |
 | Menambah patch konten proyek | `skills/scripts/patch_template.py` | Draf, hasil build, dan test/regression baru yang spesifik |
 | Dokumentasi/troubleshooting | `DOKUMENTASI-PIPELINE.md`, `README.md` | Script yang perilakunya sedang didokumentasikan |
+| Mengubah konten bersama tiga laporan | `content/README.md`, fragment terkait di `content/shared/`, `project_facts.json`, `term_registry.json` | `Tugas_Akhir_Draft.md`, `tests/test_markdown_shared_includes.py`, panduan peran yang relevan |
 
 Jangan membaca semua file `.kiro/specs/` secara default. Baca spec yang sesuai dengan fitur yang sedang diubah. Spec menjelaskan riwayat requirement/desain; code dan test aktif menentukan perilaku implementasi saat ini.
 
@@ -76,8 +77,9 @@ Jika informasi bertentangan, gunakan urutan berikut:
 4. `.kiro/steering/aturan-penulisan.md` dan `.kiro/steering/aturan-sitasi.md`.
 5. `.kiro/steering/konteks-proyek.md`.
 6. `project_facts.json` dan `term_registry.json`.
-7. Code aktif di `skills/scripts/` beserta test di `tests/`.
-8. Dokumentasi ringkasan seperti `DOKUMENTASI-PIPELINE.md`, `PANDUAN-FITUR.md`, atau README.
+7. Fragment laporan aktif di `content/shared/` dan konten branch di `Tugas_Akhir_Draft.md`/`content/roles/`.
+8. Code aktif di `skills/scripts/` beserta test di `tests/`.
+9. Dokumentasi ringkasan seperti `DOKUMENTASI-PIPELINE.md`, `PANDUAN-FITUR.md`, atau README.
 
 Jika implementasi menyimpang dari sumber dengan prioritas lebih tinggi, laporkan drift dan perbaiki code/test/dokumentasi secara konsisten sesuai scope tugas.
 
@@ -147,11 +149,23 @@ Jika implementasi menyimpang dari sumber dengan prioritas lebih tinggi, laporkan
 - Jangan mengarang fakta atau hasil pengujian. Gunakan `project_facts.json`; jika belum tersedia gunakan `[TBD: ...]`.
 - Jangan membuat sumber fiktif. Gunakan `[BUTUH SITASI]` jika sumber belum tersedia.
 
+### 5.7 Konten bersama tiga laporan
+
+- `content/shared/` adalah sumber kanonik untuk fakta dan narasi yang harus identik pada tiga laporan.
+- `Tugas_Akhir_Draft.md` mengomposisikan fragment dengan directive satu baris `<!-- PIPELINE:INCLUDE path/relatif.md -->`.
+- Fragment shared tidak boleh memuat nama, NIM, tanda tangan, judul personal, atau klaim kontribusi satu anggota.
+- Angka Black Box/UAT dan status produk tidak boleh disalin ulang ke file role. File role hanya menjelaskan kontribusi dan buktinya.
+- Latar Belakang memakai konteks proyek bersama lalu dilanjutkan fokus masalah per role. Rumusan masalah, batasan, tujuan khusus, implementasi, judul, dan kesimpulan kontribusi tetap branch-specific.
+- Temuan UAT, kebutuhan produk, dan status build final sama untuk semua laporan. Bentuk solusi boleh berbeda dari saran awal jika matriks menjelaskan ekuivalensi masalah, solusi, bukti, dan retest.
+- Raw XLSX/PDF atau bukti bertanda tangan bukan shared content. Gunakan ringkasan anonim yang telah diverifikasi.
+
 ## 6. Sumber data dan konfigurasi
 
 | Sumber | Kontrak |
 |---|---|
 | `Tugas_Akhir_Draft.md` | Merge membaca mulai `# BAB I`/`# BAB 1`; front matter berasal dari template |
+| `content/README.md` | Kontrak ownership dan komposisi shared content versus role content |
+| `content/shared/` | Fragment fakta/narasi/tabel bersama yang diperluas di memori sebelum parser berjalan; hasil pengujian terstruktur berada di `content/shared/testing/results.json` |
 | `archive/Tugas Akhir.docx` | Template sumber build |
 | `project_facts.json` | Fakta yang boleh dinyatakan; data tidak tersedia menjadi TBD |
 | `term_registry.json` | Bentuk istilah kanonik; ketidakkonsistenan dilaporkan, tidak diam-diam diganti |
@@ -174,12 +188,17 @@ Parser mendukung:
 - pipe table dengan alignment Markdown;
 - `---` sebagai page break;
 - `# DAFTAR PUSTAKA` sebagai bibliografi dinamis.
+- `<!-- PIPELINE:INCLUDE content/shared/...md -->` sebagai include deterministik relatif terhadap root repository.
+
+Include yang hilang, absolut, keluar dari repository, bukan `.md`, digunakan lebih dari sekali, malformed, atau rekursif merupakan fatal sebelum `document.xml` ditulis. Directive di dalam fenced code block tetap literal. Fragment yang dimasukkan setelah sebuah heading tidak boleh mengulang heading tersebut.
 
 Writing guard murni mengumpulkan warning untuk heading jump, urutan BAB, tabel tidak tertutup, emphasis tidak seimbang, dan cross-check sitasi. Jangan menjadikan warning tersebut fatal tanpa requirement eksplisit.
 
 ## 8. Aturan edit dan ownership file
 
 - Ubah script ter-track di `skills/scripts/`.
+- Ubah fakta bersama pada fragment kanonik di `content/shared/`, bukan dengan menyalinnya ke tiga draf.
+- Baca `content/README.md` sebelum mengubah bagian yang memakai `PIPELINE:INCLUDE`. Jangan edit isi shared secara tidak langsung melalui generator konten per-role.
 - Jangan mengandalkan edit langsung di `scratch/merge_draft_to_docx.py`, `scratch/patch_template.py`, `scratch/inject_all_images.py`, atau `scratch/validate_docx_structure.py`; build akan menimpanya.
 - `patch_template.py` adalah satu-satunya lokasi yang memang boleh berisi transformasi content-specific. Formatter umum harus tetap berbasis struktur.
 - `Tugas_Akhir_Formatted.docx`, `unpacked_ta/`, dan media package adalah hasil build, bukan source of truth.
@@ -213,6 +232,14 @@ C:\Python312\python.exe -m pytest -q tests
 ```
 
 Jangan memakai `pytest -q` tanpa target. Itu juga mengoleksi script diagnostik legacy `test_*.py` di `scratch/` yang bukan bagian suite resmi.
+
+### Validasi shared content tanpa membuat DOCX
+
+```powershell
+C:\Python312\python.exe skills/scripts/merge_draft_to_docx.py --check-includes
+```
+
+Perintah ini tidak menulis draf, XML, atau DOCX. Jalankan sebelum build setelah mengubah directive atau fragment bersama.
 
 ### Generator konten AI opsional
 
@@ -323,6 +350,14 @@ Validator harus mengumpulkan semua fatal findings sebelum gagal agar pengguna me
 - Path dan command dapat dijalankan dari root repository.
 - `DOKUMENTASI-PIPELINE.md`, README, dan `AGENTS.md` tidak saling bertentangan.
 
+### Perubahan shared content
+
+- Sumber kanonik hanya ada satu di `content/shared/`; tidak ada salinan isi pada draf atau role content.
+- `--check-includes` dan `tests/test_markdown_shared_includes.py` lulus.
+- Shared fragment anonim dan bebas identitas/judul personal.
+- Angka/fakta konsisten dengan `project_facts.json`, istilah konsisten dengan `term_registry.json`, dan status UAT memiliki bukti atau TBD.
+- Perubahan pipeline/dokumentasi dapat disebarkan ke semua branch tanpa menimpa `Tugas_Akhir_Draft.md` atau konten role masing-masing.
+
 ### Perubahan generator konten AI
 
 - Mode tanpa `--apply` terbukti tidak memanggil write.
@@ -334,6 +369,7 @@ Validator harus mengumpulkan semua fatal findings sebelum gagal agar pengguna me
 ## 12. Known traps
 
 - Worktree sering kotor. Jangan menganggap semua perubahan adalah milik agent.
+- Include tidak membuat salinan fisik. AI yang hanya membaca `Tugas_Akhir_Draft.md` wajib mengikuti marker ke `content/shared/` sebelum menyimpulkan isi subbab.
 - `build_pipeline.py` mematikan semua proses Word; jangan menjalankannya tanpa memperingatkan pengguna jika mungkin ada dokumen belum disimpan.
 - LibreOffice bukan jalur utama. Instalasi lokal dapat rusak dengan error `bootstrap.ini`; gunakan Word COM. `pack.py --force` hanya workaround dan wajib diikuti injector serta validator.
 - Update field COM dapat gagal sebagai warning pada `pack.py`; periksa daftar otomatis secara manual jika itu terjadi.
