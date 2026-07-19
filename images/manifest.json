@@ -4,63 +4,63 @@
       "id": "diagram_arsitektur",
       "file": "diagram_arsitektur.png",
       "caption_match": "Diagram Arsitektur Sistem",
-      "source": "unpacked_ta/word/media/image22.png",
+      "source": "diagrams/gambar-2-09-arsitektur-sistem.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_tahap_pengembangan",
-      "file": "diagram_tahap_pengembangan.jpg",
+      "file": "diagram_tahap_pengembangan.png",
       "caption_match": "Tahap Pengembangan",
-      "source": "unpacked_ta/word/media/image23.png",
+      "source": "diagrams/gambar-2-10-tahap-pengembangan.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_erd",
       "file": "diagram_erd.png",
       "caption_match": "Entity-Relationship Diagram",
-      "source": "dokumentasi/erd_schema.png",
+      "source": "diagrams/gambar-2-17-erd.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_use_case_legenda",
       "file": "diagram_use_case_legenda.png",
       "caption_match": "Legenda Use Case Diagram",
-      "source": "unpacked_ta/word/media/image25.png",
+      "source": "diagrams/gambar-2-11-legenda-use-case.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_use_case",
-      "file": "diagram_use_case.jpg",
+      "file": "diagram_use_case.png",
       "caption_match": "Use Case Diagram",
-      "source": "unpacked_ta/word/media/image26.png",
+      "source": "diagrams/gambar-2-12-use-case-diagram.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_activity_kelola_data",
       "file": "diagram_activity_kelola_data.png",
       "caption_match": "Activity Diagram: Pengelolaan Data oleh Admin",
-      "source": "unpacked_ta/word/media/image27.png",
+      "source": "diagrams/gambar-2-13-activity-pengelolaan-data-admin.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_activity_integrasi",
       "file": "diagram_activity_integrasi.png",
       "caption_match": "Activity Diagram: Integrasi Data Denah",
-      "source": "unpacked_ta/word/media/image28.png",
+      "source": "diagrams/gambar-2-14-activity-integrasi-data-denah.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_sequence_autentikasi",
       "file": "diagram_sequence_autentikasi.png",
       "caption_match": "Sequence Diagram: Autentikasi Administrator",
-      "source": "dokumentasi/sequence_autentikasi.png",
+      "source": "diagrams/gambar-2-15-sequence-autentikasi-admin.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_sequence_sinkronisasi",
       "file": "diagram_sequence_sinkronisasi.png",
       "caption_match": "Sequence Diagram: Sinkronisasi Data Gedung dan Unity",
-      "source": "dokumentasi/sequence_sinkronisasi.png",
+      "source": "diagrams/gambar-2-16-sequence-sinkronisasi-data-unity.png",
       "inject_method": "post_com"
     },
     {
@@ -170,51 +170,51 @@
     },
     {
       "id": "survey_01_profil",
-      "file": "survey_01_profil.png",
-      "caption_match": "Hasil Kuesioner: Profil Status Akademik",
-      "source": "unpacked_ta/word/media/image4.png",
+      "file": "surveys/survey_01_profil.png",
+      "caption_match": "Hasil Kuesioner: Profil Status Akademik Responden",
+      "source": "archive/Tugas Akhir.docx#word/media/image3.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_02_efektivitas",
-      "file": "survey_02_efektivitas.png",
-      "caption_match": "Hasil Kuesioner: Efektivitas Informasi",
-      "source": "unpacked_ta/word/media/image5.png",
+      "file": "surveys/survey_02_efektivitas.png",
+      "caption_match": "Hasil Kuesioner: Efektivitas Media Navigasi Kampus Saat Ini",
+      "source": "archive/Tugas Akhir.docx#word/media/image4.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_03_frekuensi",
-      "file": "survey_03_frekuensi.png",
-      "caption_match": "Hasil Kuesioner: Frekuensi Akses Denah",
-      "source": "unpacked_ta/word/media/image6.png",
+      "file": "surveys/survey_03_frekuensi.png",
+      "caption_match": "Hasil Kuesioner: Frekuensi Kesulitan Menemukan Lokasi",
+      "source": "archive/Tugas Akhir.docx#word/media/image5.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_04_perilaku",
-      "file": "survey_04_perilaku.png",
-      "caption_match": "Hasil Kuesioner: Perilaku Pencarian Lokasi",
-      "source": "unpacked_ta/word/media/image7.png",
+      "file": "surveys/survey_04_perilaku.png",
+      "caption_match": "Hasil Kuesioner: Perilaku Pengguna Saat Mencari Lokasi",
+      "source": "archive/Tugas Akhir.docx#word/media/image6.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_05_urgensi",
-      "file": "survey_05_urgensi.png",
-      "caption_match": "Hasil Kuesioner: Urgensi Kebutuhan Denah",
-      "source": "unpacked_ta/word/media/image8.png",
+      "file": "surveys/survey_05_urgensi.png",
+      "caption_match": "Hasil Kuesioner: Urgensi Kebutuhan Peta Virtual 3D",
+      "source": "archive/Tugas Akhir.docx#word/media/image7.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_06_adopsi",
-      "file": "survey_06_adopsi.png",
-      "caption_match": "Hasil Kuesioner: Tingkat Adopsi Potensial",
-      "source": "unpacked_ta/word/media/image9.png",
+      "file": "surveys/survey_06_adopsi.png",
+      "caption_match": "Hasil Kuesioner: Potensi Adopsi Denah Virtual 3D",
+      "source": "archive/Tugas Akhir.docx#word/media/image8.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_07_prioritas",
-      "file": "survey_07_prioritas.png",
-      "caption_match": "Hasil Kuesioner: Prioritas Fitur",
-      "source": "unpacked_ta/word/media/image10.png",
+      "file": "surveys/survey_07_prioritas.png",
+      "caption_match": "Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus",
+      "source": "archive/Tugas Akhir.docx#word/media/image9.png",
       "inject_method": "post_com"
     }
   ]

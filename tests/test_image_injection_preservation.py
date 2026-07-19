@@ -147,7 +147,7 @@ PRESERVE_PBT = settings(
 
 
 # =========================================================================== #
-# Recorded baselines (observed on the UNFIXED captured artifact)
+# Recorded baselines for the current, deliberately curated output artifact.
 # =========================================================================== #
 
 # --- Property 5: captions present that NO manifest entry targets ----------- #
@@ -170,19 +170,21 @@ RESTART_CAPTIONS = {
     "Tabel 3.1 Hubungan Mitra dengan Proyek",
 }
 EXPECTED_SEQ_GAMBAR_COUNT = 31
-EXPECTED_SEQ_TABEL_COUNT = 6
+EXPECTED_SEQ_TABEL_COUNT = 9
 
 # --- Property 7: scaled extents of every injected figure (noChangeAspect) -- #
-# Recorded (cx, cy) EMU extents; all within width and aspect-locked on unfixed code.
+# Recorded (cx, cy) EMU extents; all within width and aspect-locked. Updated
+# when the invalid legacy diagrams were replaced by their canonical PlantUML
+# renders and survey assets were referenced from images/surveys/.
 FIGURE_EXTENTS = [
-    (5400000, 2334146), (5400000, 2529798), (5400000, 2580598), (5400000, 2298033),
-    (5400000, 2766042), (5400000, 2342074), (5400000, 2729916), (5400000, 3037499),
-    (5400000, 1945088), (4219575, 4695825), (4038600, 5343525), (5246820, 5760000),
-    (5303461, 5760000), (5400000, 4860823), (3829050, 2466975), (5400000, 2862541),
-    (5400000, 5400000), (3954550, 5759999), (5400000, 5373996), (4609756, 5760000),
-    (4622006, 5760000), (4333875, 3009900), (5400000, 5189678), (5400000, 2443764),
-    (5400000, 4072771), (5400000, 2392239), (4231729, 5759999), (5400000, 4056750),
-    (5400000, 2755891), (3953357, 5760000), (4229083, 5760000),
+    (3842685, 5760000), (3953357, 5760000), (3954550, 5759999), (4229083, 5760000),
+    (4231729, 5759999), (4333875, 3009900), (4599104, 5760000), (4609756, 5760000),
+    (4622006, 5760000), (4969589, 5760000), (5400000, 2298033), (5400000, 2334146),
+    (5400000, 2342074), (5400000, 2392239), (5400000, 2443764), (5400000, 2529799),
+    (5400000, 2580599), (5400000, 2729916), (5400000, 2755891), (5400000, 2766043),
+    (5400000, 3037499), (5400000, 3195305), (5400000, 3977713), (5400000, 4056750),
+    (5400000, 4072771), (5400000, 4149818), (5400000, 4194174), (5400000, 4477215),
+    (5400000, 4673280), (5400000, 5189678), (5400000, 5373996),
 ]
 
 # --- Property 8: structural invariants ------------------------------------- #
