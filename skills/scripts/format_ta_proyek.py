@@ -1,5 +1,6 @@
 import lxml.etree
 import copy
+import hashlib
 import os
 import re
 import sys
@@ -38,6 +39,21 @@ def main_line_spacing_attrs(before='0', after='0'):
         'line': MAIN_LINE_SPACING_AUTO,
         'lineRule': 'auto',
     }
+
+
+def make_explicit_page_break_paragraph(namespaces):
+    """Create a standalone page break that survives Word field regeneration."""
+    ns_uri = namespaces['w']
+    paragraph = lxml.etree.Element(f'{{{ns_uri}}}p')
+    p_pr = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}pPr')
+    set_child_element(p_pr, 'pStyle', {'val': 'Normal'})
+    set_child_element(p_pr, 'spacing', main_line_spacing_attrs())
+    sort_element_children(p_pr, PPR_ORDER)
+    run = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}r')
+    lxml.etree.SubElement(
+        run, f'{{{ns_uri}}}br', {f'{{{ns_uri}}}type': 'page'}
+    )
+    return paragraph
 
 # Tabel angka Romawi untuk Nomor_Bab (I=1 .. X=10).
 ROMAN = {
@@ -225,6 +241,44 @@ def _paragraph_style(p, ns):
 _CAPTION_TEXT_PATTERN = re.compile(
     r"^(Gambar|Tabel)\s+([0-9]+(?:\.[0-9]+)*)\.?\s*(.*)$", re.IGNORECASE
 )
+_SEMANTIC_CAPTION_PATTERN = re.compile(
+    r"^\[(FIGCAPTION|TABLECAPTION):"
+    r"(?:([a-z0-9][a-z0-9_-]*)\|)?(.+)\]$"
+)
+_SEMANTIC_REFERENCE_PATTERN = re.compile(
+    r"\[(FIGREF|TABREF):([a-z0-9][a-z0-9_-]*)\]"
+)
+
+
+def parse_semantic_caption(text):
+    """Return ``(label, semantic_id, description)`` for a caption token.
+
+    The merge parser binds the source-only marker to its adjacent caption and
+    emits ``[FIGCAPTION:id|Description]`` or
+    ``[TABLECAPTION:id|Description]`` in intermediate OOXML.  Accepting the
+    public unbound form as well keeps this helper useful for focused tests,
+    while the merge validator is responsible for rejecting missing IDs in a
+    real build.
+    """
+    if not text:
+        return None
+    match = _SEMANTIC_CAPTION_PATTERN.fullmatch(str(text).strip())
+    if not match:
+        return None
+    label = "Gambar" if match.group(1) == "FIGCAPTION" else "Tabel"
+    return label, match.group(2), match.group(3).strip()
+
+
+def make_crossref_bookmark(label, semantic_id):
+    """Build a deterministic, Word-safe bookmark name (maximum 40 chars)."""
+    prefix = "fig" if str(label).lower() == "gambar" else "tbl"
+    raw_id = str(semantic_id).lower()
+    safe_id = re.sub(r"[^a-z0-9_]", "_", raw_id)
+    base = f"{prefix}_{safe_id}"
+    if len(base) <= 40 and safe_id == raw_id:
+        return base
+    digest = hashlib.sha1(f"{prefix}_{raw_id}".encode("utf-8")).hexdigest()[:8]
+    return f"{base[:31]}_{digest}"
 
 
 def parse_caption_text(text):
@@ -249,6 +303,10 @@ def parse_caption_text(text):
     s = str(text).strip()
     if not s:
         return None
+    semantic = parse_semantic_caption(s)
+    if semantic is not None:
+        label, _semantic_id, desc = semantic
+        return (label, None, desc)
     m = _CAPTION_TEXT_PATTERN.match(s)
     if not m:
         return None
@@ -1659,7 +1717,9 @@ def build_toc_entry(caption_text, page_num, bookmark_name):
 def replace_mentions_in_paragraph(text):
     return text
 
-def format_caption_paragraph_clean(p, label, prefix, seq_name, default_val, desc, namespaces):
+def format_caption_paragraph_clean(
+        p, label, prefix, seq_name, default_val, desc, namespaces,
+        semantic_bookmark=None, semantic_bookmark_id=None):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     
     pPr = p.find('w:pPr', namespaces)
@@ -1676,18 +1736,28 @@ def format_caption_paragraph_clean(p, label, prefix, seq_name, default_val, desc
     set_child_element(pPr, 'ind', {'firstLine': '0', 'left': '0'})
     sort_element_children(pPr, PPR_ORDER)
     
-    # Extract bookmarks (resilient to namespaces)
+    # Extract pre-existing bookmarks (resilient to namespaces).  When this
+    # function is re-run, do not preserve the semantic bookmark that is about
+    # to be rebuilt around the visible caption number.
     bookmarks = []
+    replaced_bookmark_ids = set()
     for elem in list(p):
         if elem.tag.endswith('bookmarkStart'):
             bm_id = elem.get(f'{{{ns_uri}}}id') or elem.get('id')
             bm_name = elem.get(f'{{{ns_uri}}}name') or elem.get('name')
             if bm_id is not None:
-                bookmarks.append(('start', bm_id, bm_name or ""))
+                if bm_name == semantic_bookmark:
+                    replaced_bookmark_ids.add(str(bm_id))
+                else:
+                    bookmarks.append(('start', bm_id, bm_name or ""))
         elif elem.tag.endswith('bookmarkEnd'):
             bm_id = elem.get(f'{{{ns_uri}}}id') or elem.get('id')
             if bm_id is not None:
                 bookmarks.append(('end', bm_id, None))
+    bookmarks = [
+        row for row in bookmarks
+        if not (row[0] == 'end' and str(row[1]) in replaced_bookmark_ids)
+    ]
             
     # Clear all child elements except pPr
     for elem in list(p):
@@ -1701,6 +1771,12 @@ def format_caption_paragraph_clean(p, label, prefix, seq_name, default_val, desc
             bms.set(f'{{{ns_uri}}}id', str(bm_id))
             bms.set(f'{{{ns_uri}}}name', str(bm_name))
             p.append(bms)
+
+    if semantic_bookmark and semantic_bookmark_id is not None:
+        semantic_start = lxml.etree.Element(f'{{{ns_uri}}}bookmarkStart')
+        semantic_start.set(f'{{{ns_uri}}}id', str(semantic_bookmark_id))
+        semantic_start.set(f'{{{ns_uri}}}name', semantic_bookmark)
+        p.append(semantic_start)
             
     # Label prefix, e.g. "Gambar 2."
     r1 = lxml.etree.Element(f'{{{ns_uri}}}r')
@@ -1750,6 +1826,14 @@ def format_caption_paragraph_clean(p, label, prefix, seq_name, default_val, desc
     fld6 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "end"})
     r6.append(fld6)
     p.append(r6)
+
+    # The stable bookmark deliberately spans only ``Gambar/Tabel C.k`` and
+    # not the description.  A Word REF field therefore renders a compact,
+    # automatically updated narrative reference such as ``Gambar 2.9``.
+    if semantic_bookmark and semantic_bookmark_id is not None:
+        semantic_end = lxml.etree.Element(f'{{{ns_uri}}}bookmarkEnd')
+        semantic_end.set(f'{{{ns_uri}}}id', str(semantic_bookmark_id))
+        p.append(semantic_end)
     
     # Description
     r7 = lxml.etree.Element(f'{{{ns_uri}}}r')
@@ -1771,6 +1855,128 @@ def format_caption_paragraph_clean(p, label, prefix, seq_name, default_val, desc
             bme = lxml.etree.Element(f'{{{ns_uri}}}bookmarkEnd')
             bme.set(f'{{{ns_uri}}}id', str(bm_id))
             p.append(bme)
+
+
+def next_bookmark_numeric_id(root, namespaces):
+    """Return an unused numeric bookmark id for the current document tree."""
+    ns_uri = namespaces['w']
+    values = []
+    for element in root.iter(f'{{{ns_uri}}}bookmarkStart'):
+        raw = element.get(f'{{{ns_uri}}}id') or element.get('id')
+        try:
+            values.append(int(raw))
+        except (TypeError, ValueError):
+            continue
+    return max(values, default=0) + 1
+
+
+def replace_semantic_references_in_paragraph(p, targets, namespaces):
+    """Replace semantic Markdown references with cached Word ``REF`` fields.
+
+    ``targets`` is keyed by ``("FIGREF"|"TABREF", id)`` and contains a
+    bookmark name plus the cached visible value.  Caching keeps the document
+    readable in headless renderers, while Word can refresh the same field when
+    caption numbering changes.
+
+    Returns ``(replacement_count, unresolved_tokens)``.  Only text-bearing
+    runs are rewritten; surrounding run properties are preserved.
+    """
+    ns_uri = namespaces['w']
+    xml_space = '{http://www.w3.org/XML/1998/namespace}space'
+    replacement_count = 0
+
+    def _append_rpr(run, source_rpr):
+        if source_rpr is not None:
+            run.append(copy.deepcopy(source_rpr))
+
+    def _text_run(value, source_rpr):
+        run = lxml.etree.Element(f'{{{ns_uri}}}r')
+        _append_rpr(run, source_rpr)
+        text_element = lxml.etree.SubElement(run, f'{{{ns_uri}}}t')
+        text_element.text = value
+        if value.startswith(' ') or value.endswith(' '):
+            text_element.set(xml_space, 'preserve')
+        return run
+
+    def _field_runs(bookmark, visible, source_rpr):
+        begin_run = lxml.etree.Element(f'{{{ns_uri}}}r')
+        _append_rpr(begin_run, source_rpr)
+        lxml.etree.SubElement(
+            begin_run, f'{{{ns_uri}}}fldChar',
+            {f'{{{ns_uri}}}fldCharType': 'begin'},
+        )
+
+        instruction_run = lxml.etree.Element(f'{{{ns_uri}}}r')
+        _append_rpr(instruction_run, source_rpr)
+        instruction = lxml.etree.SubElement(
+            instruction_run, f'{{{ns_uri}}}instrText'
+        )
+        instruction.text = f' REF {bookmark} \\h '
+        instruction.set(xml_space, 'preserve')
+
+        separate_run = lxml.etree.Element(f'{{{ns_uri}}}r')
+        _append_rpr(separate_run, source_rpr)
+        lxml.etree.SubElement(
+            separate_run, f'{{{ns_uri}}}fldChar',
+            {f'{{{ns_uri}}}fldCharType': 'separate'},
+        )
+
+        result_run = _text_run(visible, source_rpr)
+
+        end_run = lxml.etree.Element(f'{{{ns_uri}}}r')
+        _append_rpr(end_run, source_rpr)
+        lxml.etree.SubElement(
+            end_run, f'{{{ns_uri}}}fldChar',
+            {f'{{{ns_uri}}}fldCharType': 'end'},
+        )
+        return [begin_run, instruction_run, separate_run, result_run, end_run]
+
+    # Work on a snapshot because matching runs are removed during traversal.
+    for run in list(p.findall('.//w:r', namespaces)):
+        text_elements = run.findall('w:t', namespaces)
+        if not text_elements:
+            continue
+        run_text = ''.join(element.text or '' for element in text_elements)
+        matches = list(_SEMANTIC_REFERENCE_PATTERN.finditer(run_text))
+        if not matches:
+            continue
+        # A mixed-content run is rare and unsafe to split mechanically because
+        # tabs/drawings would lose their exact position.  Leave it unresolved
+        # so the caller/validator can report the source token.
+        if any(child.tag not in {
+                f'{{{ns_uri}}}rPr', f'{{{ns_uri}}}t'} for child in run):
+            continue
+
+        parent = run.getparent()
+        if parent is None:
+            continue
+        insert_at = parent.index(run)
+        source_rpr = run.find('w:rPr', namespaces)
+        generated = []
+        cursor = 0
+        if any(targets.get((match.group(1), match.group(2))) is None
+               for match in matches):
+            continue
+        for match in matches:
+            key = (match.group(1), match.group(2))
+            target = targets.get(key)
+            if match.start() > cursor:
+                generated.append(_text_run(run_text[cursor:match.start()], source_rpr))
+            generated.extend(_field_runs(
+                target['bookmark'], target['display'], source_rpr
+            ))
+            replacement_count += 1
+            cursor = match.end()
+        if cursor < len(run_text):
+            generated.append(_text_run(run_text[cursor:], source_rpr))
+        parent.remove(run)
+        for offset, element in enumerate(generated):
+            parent.insert(insert_at + offset, element)
+
+    unresolved = [match.group(0) for match in _SEMANTIC_REFERENCE_PATTERN.finditer(
+        _paragraph_text(p, namespaces)
+    )]
+    return replacement_count, unresolved
 
 def insert_dynamic_toc_field(body, insertion_idx, field_instruction, namespaces):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
@@ -2174,6 +2380,21 @@ def format_document_xmls(unpacked_dir):
                         else:
                             print(f"  Removing redundant empty paragraph in front-matter transition at index {idx}")
                     else:
+                        if (child.tag.endswith('sdt') and lembar_pengesahan_processed
+                                and need_page_break_after_lp):
+                            # Word regenerates TOC SDT paragraphs during COM
+                            # field update and may discard pageBreakBefore from
+                            # the heading itself. A standalone break before the
+                            # SDT prevents "DAFTAR ISI" leaking onto the approval
+                            # page and survives that regeneration.
+                            reconstructed_children.append(
+                                make_explicit_page_break_paragraph(namespaces)
+                            )
+                            need_page_break_after_lp = False
+                            print(
+                                "  Inserted durable page break before Daftar Isi "
+                                f"SDT at index {idx}"
+                            )
                         reconstructed_children.append(child)
                 continue
                 
@@ -2278,6 +2499,8 @@ def format_document_xmls(unpacked_dir):
         # (Heading1) via parse_chapter_number, lalu nomori tiap kapsi gambar/tabel
         # per-bab memakai CaptionRegistry. Deskripsi diambil VERBATIM dari draf.
         registry = CaptionRegistry()
+        semantic_targets = {}
+        bookmark_numeric_id = next_bookmark_numeric_id(root, namespaces)
         current_chapter = None
         for idx, child in enumerate(children):
             if not child.tag.endswith('p'):
@@ -2303,6 +2526,8 @@ def format_document_xmls(unpacked_dir):
             if not is_caption_para:
                 continue
             label, old_number, desc = parsed
+            semantic = parse_semantic_caption(text_clean)
+            semantic_id = semantic[1] if semantic is not None else None
             chapter = current_chapter
             if chapter is None:
                 # Fallback R1.7/R2.6: kapsi sebelum BAB pertama -> pakai 1 + peringatan.
@@ -2315,7 +2540,22 @@ def format_document_xmls(unpacked_dir):
                 new_number, k, _ = registry.next_table(chapter, old_number)
             # format_caption_paragraph_clean dipakai apa adanya: default_val=k -> kapsi
             # pertama bab (k==1) memancarkan opsi restart SEQ "\r 1" (R1.4/R2.3).
-            format_caption_paragraph_clean(p, label, f"{chapter}.", label, k, desc, namespaces)
+            bookmark_name = None
+            assigned_bookmark_id = None
+            if semantic_id:
+                bookmark_name = make_crossref_bookmark(label, semantic_id)
+                assigned_bookmark_id = bookmark_numeric_id
+                bookmark_numeric_id += 1
+                ref_kind = 'FIGREF' if label == 'Gambar' else 'TABREF'
+                semantic_targets[(ref_kind, semantic_id)] = {
+                    'bookmark': bookmark_name,
+                    'display': f"{label} {new_number}",
+                }
+            format_caption_paragraph_clean(
+                p, label, f"{chapter}.", label, k, desc, namespaces,
+                semantic_bookmark=bookmark_name,
+                semantic_bookmark_id=assigned_bookmark_id,
+            )
             collected_captions.append({
                 "type": label,
                 "text": f"{label} {new_number} {desc}".strip(),
@@ -2348,6 +2588,30 @@ def format_document_xmls(unpacked_dir):
                     ref_warnings.extend(warns)
         for warn_msg in ref_warnings:
             print("  [REF] %s" % warn_msg)
+
+        # Convert stable source tokens to real Word REF fields.  Their cached
+        # values keep headless/PDF output correct before Word refreshes fields.
+        semantic_ref_count = 0
+        unresolved_semantic_refs = []
+        for idx, child in enumerate(children):
+            if not child.tag.endswith('p') or idx <= section1_last_p_idx:
+                continue
+            if is_inside_table(child):
+                continue
+            if (_paragraph_style(child, namespaces) or "Normal") == 'Caption':
+                continue
+            count, unresolved = replace_semantic_references_in_paragraph(
+                child, semantic_targets, namespaces
+            )
+            semantic_ref_count += count
+            unresolved_semantic_refs.extend(unresolved)
+        if semantic_ref_count:
+            print(
+                "  Inserted %d semantic figure/table REF field(s)."
+                % semantic_ref_count
+            )
+        for token in sorted(set(unresolved_semantic_refs)):
+            print("  [WARNING] Semantic reference was not resolved: %s" % token)
 
         for idx, child in enumerate(children):
             if child.tag.endswith('tbl'): continue

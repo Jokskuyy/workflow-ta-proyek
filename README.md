@@ -39,7 +39,7 @@ Skill ini digunakan saat menyusun dan merevisi isi laporan bab demi bab secara i
 *   **Guard Sitasi**: Kandidat hanya boleh memakai sitasi yang sudah memiliki entri pada Daftar Pustaka. Pencarian dan verifikasi sumber baru dilakukan sebagai pekerjaan riset terpisah, bukan ditambahkan otomatis oleh generator.
 *   **Guard Fakta**: Nilai proyek harus sama persis dengan `project_facts.json`; data yang belum tersedia ditandai `[TBD: ...]`.
 *   **Suggest Secara Default**: Generator tidak mengubah `Tugas_Akhir_Draft.md` sampai pengguna meninjau diff dan memberi `--apply` eksplisit.
-*   **Gambar Tetap Terkontrol**: Generator teks tidak membuat caption/aset baru dan hanya boleh merujuk Gambar/Tabel yang sudah ada, di tengah kalimat dan pada bab yang sama.
+*   **Gambar/Tabel Tetap Terkontrol**: Generator teks tidak membuat caption/aset baru dan hanya boleh memakai `[FIGREF:<id>]`/`[TABREF:<id>]` yang sudah ada serta diletakkan di tengah kalimat.
 
 ### Generator konten opsional
 
@@ -73,7 +73,8 @@ Skill mekanis berbasis Python yang mengoreksi seluruh struktur `.docx` secara in
 *   **Penomoran Halaman**: Front matter memakai angka Romawi di kanan bawah (sampul tanpa nomor). Angka Arab di-reset menjadi `1` pada **BAB I PENDAHULUAN**; halaman pembuka setiap BAB menampilkan nomor di tengah bawah, sedangkan halaman lanjutannya di kanan atas.
 *   **Margins**: Mengatur batas kertas standar A4 dengan batas Left = 4cm, Right/Top/Bottom = 3cm.
 *   **Typography**: Memaksa semua elemen teks menggunakan **Times New Roman** (Body: 12pt spasi 1.15, Caption: 12pt spasi 1.0, Judul Bab: 14pt Bold Centered).
-*   **Referensi Gambar Exact**: Draf yang sudah dimigrasikan menulis `[FIGURE:<id-manifest>]` tepat sebelum caption. Pipeline mengganti marker dengan aset branch yang ID-nya sama dan menyimpan ID tersebut pada metadata drawing, sehingga caption atau nama file yang mirip tidak tertukar. Fallback caption tetap tersedia untuk draf branch lama.
+*   **Caption dan Referensi Berbasis ID**: Gambar memakai `[FIGURE:id]` + `[FIGCAPTION:...]` + `[FIGREF:id]`; tabel memakai `[TABLE-ID:id]` + `[TABLECAPTION:...]` + `[TABREF:id]`. Pipeline membuat nomor `SEQ`, bookmark stabil, dan field `REF` otomatis sehingga penyisipan objek tidak memerlukan renumbering Markdown. Fallback caption bernomor tetap tersedia untuk draf branch lama.
+*   **Gambar dan Caption Satu Halaman**: Drawing ditempatkan tepat sebelum caption, diberi rantai `keepNext`/`keepLines`, dan diskalakan dengan cadangan tinggi caption agar pasangan tidak terpisah oleh pergantian halaman.
 
 ---
 

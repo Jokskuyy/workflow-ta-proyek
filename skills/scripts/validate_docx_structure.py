@@ -16,6 +16,7 @@ PACKAGE_REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships'
 CONTENT_TYPES_NS = 'http://schemas.openxmlformats.org/package/2006/content-types'
 MAX_WIDTH_EMU = 5400000
 EMU_PER_TWIP = 635  # printable page-height threshold uses twips * 635 (matches injector)
+FIGURE_CAPTION_RESERVE_EMU = 1080000  # 3 cm; must match inject_all_images.py
 
 # Canonical UPNVJ FIK page geometry (OOXML twips): A4 portrait with a 4 cm
 # binding margin on the left and 3 cm on the top, right, and bottom.
@@ -46,6 +47,11 @@ REQUIRED_MAIN_LINE_SPACING_STYLES = (
     'TOC9',
     'TableofFigures',
 )
+UNRESOLVED_SOURCE_TOKEN_RE = re.compile(
+    r'\[(?:FIGREF|TABREF|FIGCAPTION|TABLECAPTION|TABLE-ID):[^\]]*\]'
+)
+SEMANTIC_BOOKMARK_RE = re.compile(r'^(?:fig|tbl)_[a-z0-9_]+$')
+REF_FIELD_RE = re.compile(r'\bREF\s+([A-Za-z][A-Za-z0-9_]*)\b', re.IGNORECASE)
 
 
 def validate_page_layout(doc_root):
@@ -171,6 +177,76 @@ def validate_main_line_spacing(styles_root):
                 f"[spacing] style '{style_id}' resolves to line={line!r}, "
                 f"lineRule={line_rule!r}; expected line='276', lineRule='auto' "
                 "(1.15 lines)."
+            )
+    return findings
+
+
+def validate_semantic_cross_references(doc_root):
+    """Validate source-token removal and Word bookmark/REF integrity."""
+    body = doc_root.find(f'{{{W_NS}}}body')
+    if body is None:
+        return ['[crossref] document body is missing.']
+
+    findings = []
+    bookmark_rows = {}
+    referenced_names = []
+    for paragraph_index, paragraph in enumerate(body.iter(f'{{{W_NS}}}p')):
+        visible_text = ''.join(
+            node.text or '' for node in paragraph.iter(f'{{{W_NS}}}t')
+        )
+        for token in UNRESOLVED_SOURCE_TOKEN_RE.findall(visible_text):
+            findings.append(
+                f"[crossref] paragraph {paragraph_index} contains unresolved "
+                f"source token {token!r}."
+            )
+
+        paragraph_instructions = ' '.join(
+            node.text or '' for node in paragraph.iter(f'{{{W_NS}}}instrText')
+        )
+        for match in REF_FIELD_RE.finditer(paragraph_instructions):
+            referenced_names.append(match.group(1))
+
+        end_ids = {
+            node.get(f'{{{W_NS}}}id')
+            for node in paragraph.iter(f'{{{W_NS}}}bookmarkEnd')
+        }
+        for start in paragraph.iter(f'{{{W_NS}}}bookmarkStart'):
+            name = start.get(f'{{{W_NS}}}name', '')
+            if not SEMANTIC_BOOKMARK_RE.fullmatch(name):
+                continue
+            bookmark_id = start.get(f'{{{W_NS}}}id')
+            bookmark_rows.setdefault(name, []).append(paragraph_index)
+            expected_label = 'Gambar' if name.startswith('fig_') else 'Tabel'
+            if bookmark_id not in end_ids:
+                findings.append(
+                    f"[crossref] semantic bookmark {name!r} at paragraph "
+                    f"{paragraph_index} has no matching bookmarkEnd."
+                )
+            if not visible_text.startswith(expected_label + ' '):
+                findings.append(
+                    f"[crossref] semantic bookmark {name!r} is not attached "
+                    f"to a visible {expected_label} caption."
+                )
+            if f'SEQ {expected_label}' not in paragraph_instructions:
+                findings.append(
+                    f"[crossref] semantic bookmark {name!r} caption is missing "
+                    f"the SEQ {expected_label} field."
+                )
+
+    for name, positions in sorted(bookmark_rows.items()):
+        if len(positions) != 1:
+            findings.append(
+                f"[crossref] semantic bookmark {name!r} occurs "
+                f"{len(positions)} times at paragraphs {positions}; expected once."
+            )
+        if name not in referenced_names:
+            findings.append(
+                f"[crossref] semantic bookmark {name!r} has no REF field."
+            )
+    for name in sorted(set(referenced_names)):
+        if SEMANTIC_BOOKMARK_RE.fullmatch(name) and name not in bookmark_rows:
+            findings.append(
+                f"[crossref] REF field targets missing semantic bookmark {name!r}."
             )
     return findings
 
@@ -573,6 +649,98 @@ def _printable_height_emu_content(doc_root):
     return (h - top - bottom) * EMU_PER_TWIP
 
 
+def collect_figure_same_page_errors(body, printable_height_emu):
+    """Return fatal C4 findings for broken drawing/caption page contracts.
+
+    Word keeps two adjacent paragraphs on one page when the drawing paragraph
+    has ``keepNext`` and both paragraphs have ``keepLines``, provided the pair
+    can fit in the printable height.  The injector reserves 3 cm for the
+    caption when scaling; this validator checks the same structural contract.
+    """
+    findings = []
+    children = list(body) if body is not None else []
+    for idx, drawing_p in enumerate(children):
+        if drawing_p.tag != f'{{{W_NS}}}p':
+            continue
+        drawing = drawing_p.find(f'.//{{{W_NS}}}drawing')
+        if drawing is None:
+            continue
+
+        ext = drawing.find(f'.//{{{WP_NS}}}extent')
+        try:
+            rendered_height = int(ext.get('cy')) if ext is not None else None
+        except (TypeError, ValueError):
+            rendered_height = None
+        drawing_p_pr = drawing_p.find(f'{{{W_NS}}}pPr')
+        has_page_break_before = bool(
+            drawing_p_pr is not None
+            and drawing_p_pr.find(f'{{{W_NS}}}pageBreakBefore') is not None
+        )
+        if (rendered_height is not None
+                and rendered_height > printable_height_emu
+                and not has_page_break_before):
+            findings.append(
+                f"[C4] drawing paragraph {idx} is too tall (image height "
+                f"{rendered_height} EMU > printable page height "
+                f"{printable_height_emu} EMU) but lacks w:pageBreakBefore."
+            )
+
+        doc_pr = drawing.find(f'.//{{{WP_NS}}}docPr')
+        identity = doc_pr.get('name', '') if doc_pr is not None else ''
+        next_p = children[idx + 1] if idx + 1 < len(children) else None
+        next_text = (
+            _content_text(next_p)
+            if next_p is not None and next_p.tag == f'{{{W_NS}}}p'
+            else ''
+        )
+        next_is_caption = bool(
+            next_p is not None
+            and next_p.tag == f'{{{W_NS}}}p'
+            and _content_style(next_p) == 'Caption'
+            and re.match(r'^Gambar\s+[0-9]+\.[0-9]+\b', next_text, re.IGNORECASE)
+        )
+        is_report_figure = identity.startswith('FIGURE:') or next_is_caption
+        if not is_report_figure:
+            continue
+
+        figure_name = identity or next_text or f'paragraph {idx}'
+        if not next_is_caption:
+            findings.append(
+                f"[C4] {figure_name!r} is not immediately followed by its Gambar "
+                "caption; the pair cannot be guaranteed on one page."
+            )
+            continue
+
+        caption_p_pr = next_p.find(f'{{{W_NS}}}pPr')
+        for prop in ('keepNext', 'keepLines'):
+            if (drawing_p_pr is None
+                    or drawing_p_pr.find(f'{{{W_NS}}}{prop}') is None):
+                findings.append(
+                    f"[C4] {figure_name!r} drawing is missing w:{prop}; "
+                    "drawing and caption may be split across pages."
+                )
+        for prop in ('keepNext', 'keepLines'):
+            if (caption_p_pr is None
+                    or caption_p_pr.find(f'{{{W_NS}}}{prop}') is None):
+                findings.append(
+                    f"[C4] caption {next_text!r} is missing w:{prop}; the "
+                    "drawing/caption same-page chain is incomplete."
+                )
+
+        if rendered_height is None:
+            findings.append(
+                f"[C4] {figure_name!r} has no valid rendered height; same-page "
+                "fit with its caption cannot be validated."
+            )
+        elif rendered_height + FIGURE_CAPTION_RESERVE_EMU > printable_height_emu:
+            findings.append(
+                f"[C4] {figure_name!r} plus the 3 cm caption reserve requires "
+                f"{rendered_height + FIGURE_CAPTION_RESERVE_EMU} EMU, exceeding "
+                f"the printable page height {printable_height_emu} EMU."
+            )
+    return findings
+
+
 # ============================================================ #
 # Writing guards (R6) + citation cross-check (R1.5/1.6/6.3/1.7).
 #
@@ -870,6 +1038,11 @@ def main():
     errors_found.extend(spacing_errors)
     if not spacing_errors:
         print("SUCCESS: Body, heading, list, and automatic-list styles use 1.15 spacing.")
+    print("Checking stable figure/table bookmarks and REF fields...")
+    crossref_errors = validate_semantic_cross_references(doc_root)
+    errors_found.extend(crossref_errors)
+    if not crossref_errors:
+        print("SUCCESS: Stable caption bookmarks and semantic REF fields are valid.")
     first_gambar_checked = False
     gambar_count = 0
     tabel_count = 0
@@ -1282,30 +1455,22 @@ def main():
                 f"Reconcile legitimate reuse via duplicate_content_allow."
             )
 
-    # --- C4: oversized image lacking pageBreakBefore (page-split safety) --- #
+    # --- C4: drawing and caption must remain on the same page. --- #
     page_height_threshold = _printable_height_emu_content(doc_root)
-    print(f"Checking page-split safety (printable page-height threshold {page_height_threshold} EMU)...")
-    if body_el is not None:
-        for fig_idx, p in enumerate(body_el.findall(f'{{{W_NS}}}p')):
-            drawing = p.find(f'.//{{{W_NS}}}drawing')
-            if drawing is None:
-                continue
-            ext = drawing.find(f'.//{{{WP_NS}}}extent')
-            if ext is None or ext.get('cy') is None:
-                continue
-            try:
-                cy = int(ext.get('cy'))
-            except ValueError:
-                continue
-            if cy > page_height_threshold:
-                pPr = p.find(f'{{{W_NS}}}pPr')
-                has_pbb = pPr is not None and pPr.find(f'{{{W_NS}}}pageBreakBefore') is not None
-                if not has_pbb:
-                    errors_found.append(
-                        f"[C4] drawing paragraph {fig_idx} is too tall (image height {cy} EMU > "
-                        f"printable page height {page_height_threshold} EMU) but lacks "
-                        f"w:pageBreakBefore; the image and its caption can split across a page break."
-                    )
+    print(
+        "Checking page-split safety: drawing/caption same-page contract "
+        f"(printable height {page_height_threshold} EMU, caption reserve "
+        f"{FIGURE_CAPTION_RESERVE_EMU} EMU)..."
+    )
+    same_page_errors = collect_figure_same_page_errors(
+        body_el, page_height_threshold
+    )
+    errors_found.extend(same_page_errors)
+    if same_page_errors:
+        for finding in same_page_errors:
+            print(finding)
+    else:
+        print("SUCCESS: Every drawing and Gambar caption pair is constrained to one page.")
 
     # ============================================================ #
     # Figure narration guard (FATAL).

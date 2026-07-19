@@ -17,6 +17,10 @@ import re
 # ------------------------------------------------------------------ #
 BODY_MAX_W_EMU = 5400000   # 15 cm
 BODY_MAX_H_EMU = 5760000   # 16 cm
+# Reserve enough printable height for a multi-line 12 pt caption plus its
+# paragraph spacing.  C4 requires the drawing and caption to fit on one page.
+# This value must match validate_docx_structure.py.
+FIGURE_CAPTION_RESERVE_EMU = 1080000  # 3 cm
 
 # Legacy alias kept only as the printable-height fallback below.
 MAX_WIDTH = 5400000
@@ -89,18 +93,21 @@ def get_image_dimensions(filepath):
     return 800, 600
 
 
-def scaled_dimensions(cx, cy):
+def scaled_dimensions(cx, cy, max_height_emu=None):
     """Aspect-preserving bounding-box scale applied to every BODY figure.
 
     Scales the native (cx, cy) to fit INSIDE the shared box
-    (BODY_MAX_W_EMU x BODY_MAX_H_EMU) using a SINGLE factor on both axes, so
-    the aspect ratio is preserved (no stretch). Never upscales (scale capped at
-    1.0). Callers use the returned values for BOTH wp:extent and a:ext (so
-    wp == ae) and to reason about the rendered height for the C4 page-break
-    decision."""
+    (BODY_MAX_W_EMU x BODY_MAX_H_EMU) and an optional page-aware height cap
+    using a SINGLE factor on both axes, so the aspect ratio is preserved (no
+    stretch). Never upscales (scale capped at 1.0). Callers use the returned
+    values for BOTH wp:extent and a:ext (so wp == ae) and to enforce the C4
+    same-page drawing/caption contract."""
     if cx <= 0 or cy <= 0:
         return cx, cy
-    scale = min(BODY_MAX_W_EMU / cx, BODY_MAX_H_EMU / cy, 1.0)
+    height_cap = BODY_MAX_H_EMU
+    if max_height_emu is not None:
+        height_cap = min(height_cap, max(1, int(max_height_emu)))
+    scale = min(BODY_MAX_W_EMU / cx, height_cap / cy, 1.0)
     return int(cx * scale), int(cy * scale)
 
 
@@ -247,9 +254,9 @@ def ensure_media_content_types(content_types_root, image_files):
     return added
 
 
-def generate_drawing_xml(r_id, cx, cy, name, docpr_id):
+def generate_drawing_xml(r_id, cx, cy, name, docpr_id, max_height_emu=None):
     """Generate w:drawing XML element with specified properties."""
-    cx, cy = scaled_dimensions(cx, cy)
+    cx, cy = scaled_dimensions(cx, cy, max_height_emu=max_height_emu)
 
     xml = f'''<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" 
              xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" 
@@ -526,14 +533,24 @@ def inject_all_images(docx_path):
 
         docpr_id += 1
         drawing_identity = f"FIGURE:{item_id}"
-        p_drawing = generate_drawing_xml(r_id, cx, cy, drawing_identity, docpr_id)
+        pair_figure_height = max(
+            1, page_height_threshold - FIGURE_CAPTION_RESERVE_EMU
+        )
+        p_drawing = generate_drawing_xml(
+            r_id,
+            cx,
+            cy,
+            drawing_identity,
+            docpr_id,
+            max_height_emu=pair_figure_height,
+        )
 
-        # C4: page-break-before only when the RENDERED (bounding-box scaled)
-        # height exceeds the printable page-height threshold. The legacy native
-        # `cy > MAX_WIDTH` heuristic is intentionally removed; the rendered
-        # height is the only thing that determines whether the figure fits.
-        _, rendered_cy = scaled_dimensions(cx, cy)
-        if rendered_cy > page_height_threshold:
+        # C4: reserve printable height for the caption, then scale the drawing
+        # so the complete [drawing][caption] pair can fit on one page.  The
+        # keepNext/keepLines chain below makes Word move the pair together when
+        # the remaining space on the current page is insufficient.
+        _, baseline_rendered_cy = scaled_dimensions(cx, cy)
+        if baseline_rendered_cy > page_height_threshold:
             pPr = p_drawing.find('w:pPr', namespaces)
             if pPr is not None and pPr.find('w:pageBreakBefore', namespaces) is None:
                 lxml.etree.SubElement(pPr, f'{{{ns_uri}}}pageBreakBefore')
@@ -586,6 +603,30 @@ def inject_all_images(docx_path):
         if changed:
             cap_fixed += 1
     print(f"Post-COM keep-props pass: ensured keepNext/keepLines on {cap_fixed} caption paragraph(s).")
+
+    # Keep the visible Daftar Isi heading outside the TOC content control in
+    # the final package.  Word/LibreOffice can otherwise split the heading
+    # across the approval-page boundary while regenerating the SDT field.
+    for child in list(body):
+        if child.tag != f'{{{ns_uri}}}sdt':
+            continue
+        sdt_content = child.find(f'{{{ns_uri}}}sdtContent')
+        toc_heading = sdt_content.find(f'{{{ns_uri}}}p') if sdt_content is not None else None
+        if toc_heading is None:
+            continue
+        toc_text = ''.join(toc_heading.itertext()).strip().upper()
+        if not toc_text.startswith('DAFTAR ISI'):
+            continue
+        p_pr = toc_heading.find(f'{{{ns_uri}}}pPr')
+        if p_pr is None:
+            p_pr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+            toc_heading.insert(0, p_pr)
+        if p_pr.find(f'{{{ns_uri}}}pageBreakBefore') is None:
+            lxml.etree.SubElement(p_pr, f'{{{ns_uri}}}pageBreakBefore')
+        sdt_content.remove(toc_heading)
+        body.insert(body.index(child), toc_heading)
+        print('Post-COM TOC pass: moved Daftar Isi heading outside the TOC SDT.')
+        break
 
     # Write changes
     rels_tree.write(rels_path, encoding='utf-8', xml_declaration=True)

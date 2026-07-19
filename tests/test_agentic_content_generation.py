@@ -318,6 +318,42 @@ def test_object_reference_must_be_mid_sentence_existing_and_same_chapter():
     )
 
 
+def test_agentic_generation_uses_existing_semantic_object_ids():
+    draft_with_ids = DRAFT.replace(
+        "Konten manual yang harus tetap utuh.",
+        "Konten manual yang harus tetap utuh.\n\n"
+        "[FIGURE:arsitektur]\n"
+        "[FIGCAPTION:Arsitektur Implementasi]\n\n"
+        "[TABLE-ID:hasil_uji]\n"
+        "[TABLECAPTION:Hasil Pengujian]\n"
+        "[TABLE]\nA | B\n1 | 2\n[/TABLE]",
+    )
+    valid = _candidate(
+        "Alur komponen dirangkum pada [FIGREF:arsitektur], sedangkan hasil "
+        "pengujian tersedia pada [TABREF:hasil_uji]."
+    )
+    dangling = _candidate("Alur komponen dirangkum pada [FIGREF:tidak_ada].")
+    forbidden_caption = _candidate("[FIGCAPTION:Caption Baru]")
+
+    assert _run(
+        StaticProvider(valid), read=lambda _path: draft_with_ids
+    ).status is GenerationStatus.SUGGESTED
+    dangling_result = _run(
+        StaticProvider(dangling), read=lambda _path: draft_with_ids
+    )
+    assert dangling_result.status is GenerationStatus.REJECTED
+    assert any(
+        issue.code == "dangling_object_reference" for issue in dangling_result.issues
+    )
+    caption_result = _run(
+        StaticProvider(forbidden_caption), read=lambda _path: draft_with_ids
+    )
+    assert caption_result.status is GenerationStatus.REJECTED
+    assert any(
+        issue.code == "caption_insertion_forbidden" for issue in caption_result.issues
+    )
+
+
 def test_response_file_provider_accepts_agent_neutral_candidate(tmp_path):
     response = tmp_path / "candidate.json"
     response.write_text(
