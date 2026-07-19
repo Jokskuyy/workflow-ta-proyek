@@ -70,6 +70,20 @@ MAIN_LINE_SPACING_AUTO = '276'
 # Markdown and OOXML drawing metadata.
 FIGURE_MARKER_RE = re.compile(r'^\[FIGURE:([a-z0-9][a-z0-9_-]*)\]$')
 
+# Stable table identity and semantic cross-reference tokens.  ``[TABLE-ID:...]``
+# deliberately differs from the existing ``[TABLE]`` block opener so a table
+# identity can never be misparsed as table data or a rendering mode.
+TABLE_ID_MARKER_RE = re.compile(r'^\[TABLE-ID:([a-z0-9][a-z0-9_-]*)\]$')
+FIGURE_REF_RE = re.compile(r'\[FIGREF:([a-z0-9][a-z0-9_-]*)\]')
+TABLE_REF_RE = re.compile(r'\[TABREF:([a-z0-9][a-z0-9_-]*)\]')
+FIGURE_CAPTION_RE = re.compile(r'^\[FIGCAPTION:(.+)\]$')
+TABLE_CAPTION_RE = re.compile(r'^\[TABLECAPTION:(.+)\]$')
+
+# Exact block syntax.  The previous startswith('[TABLE') check also consumed
+# semantic markers such as ``[TABLE-ID:hasil_uat]`` and silently turned the
+# rest of the draft into a malformed table.
+TABLE_BLOCK_OPEN_RE = re.compile(r'^\[TABLE(?:\s+([a-zA-Z0-9_-]+))?\]$')
+
 # Shared Markdown fragments are expanded in memory before parsing.  The draft
 # itself remains the branch-owned composition file, while reusable paragraphs
 # and tables live under content/shared/.  Keeping the directive inside an HTML
@@ -283,18 +297,51 @@ def parse_markdown(md_path, workspace_root=None):
             code_lines.append(line.rstrip('\r\n'))
             continue
             
+        # Preserve a table identity as parser metadata only.  It is validated
+        # against the following caption/table and is intentionally not emitted
+        # as a visible DOCX paragraph.
+        table_id_match = TABLE_ID_MARKER_RE.fullmatch(stripped)
+        if table_id_match:
+            items.append({
+                'type': 'table_marker',
+                'id': table_id_match.group(1),
+                'text': stripped,
+            })
+            continue
+
+        # Fold the adjacent semantic id into the internal caption token.  The
+        # public Markdown remains the readable two-line form
+        # ``[TABLE-ID:id]`` + ``[TABLECAPTION:Description]``.
+        figure_caption_match = FIGURE_CAPTION_RE.fullmatch(stripped)
+        if figure_caption_match:
+            previous_id = figure_marker_id(items[-1]) if items else None
+            desc = figure_caption_match.group(1).strip()
+            text = (f"[FIGCAPTION:{previous_id}|{desc}]"
+                    if previous_id else stripped)
+            items.append({'type': 'paragraph', 'text': text})
+            continue
+
+        table_caption_match = TABLE_CAPTION_RE.fullmatch(stripped)
+        if table_caption_match:
+            previous = items[-1] if items else {}
+            previous_id = previous.get('id') if previous.get('type') == 'table_marker' else None
+            desc = table_caption_match.group(1).strip()
+            text = (f"[TABLECAPTION:{previous_id}|{desc}]"
+                    if previous_id else stripped)
+            items.append({'type': 'paragraph', 'text': text})
+            continue
+
         # Handle tables. A block opens with ``[TABLE]`` and may carry an
         # optional mode token, e.g. ``[TABLE gantt]`` to render X-marked
         # month cells as colored bars instead of the letter "X".
-        if stripped.startswith('[TABLE') and not stripped.startswith('[/'):
+        table_open_match = TABLE_BLOCK_OPEN_RE.fullmatch(stripped)
+        if table_open_match:
             in_table = True
             table_lines = []
-            inner = stripped[len('[TABLE'):]
-            inner = inner.split(']', 1)[0].strip()
-            table_mode = inner or None
+            table_mode = table_open_match.group(1) or None
             continue
             
-        if stripped.endswith('[/TABLE]'):
+        if stripped == '[/TABLE]':
             in_table = False
             items.append({
                 'type': 'table',
@@ -377,49 +424,121 @@ def figure_marker_id(item):
     return match.group(1) if match else None
 
 
+def _semantic_caption_parts(text, label):
+    """Return ``(semantic_id, description)`` for an ID-based caption token."""
+    token = 'FIGCAPTION' if label == 'Gambar' else 'TABLECAPTION'
+    match = re.fullmatch(
+        rf'\[{token}:(?:([a-z0-9][a-z0-9_-]*)\|)?(.+)\]',
+        (text or '').strip(),
+    )
+    if not match:
+        return None
+    return match.group(1), match.group(2).strip()
+
+
+def _parse_bab_number(text):
+    match = re.match(r'^BAB\s+([IVX]+|[0-9]+)\b', (text or '').strip(), re.IGNORECASE)
+    if not match:
+        return None
+    token = match.group(1).upper()
+    roman = {
+        'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5,
+        'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10,
+    }
+    return int(token) if token.isdigit() else roman.get(token)
+
+
+def _item_chapters(parsed_items):
+    """Map parsed-item index to the nearest preceding BAB number."""
+    chapters = {}
+    current = None
+    for idx, item in enumerate(parsed_items):
+        if item.get('type') == 'heading' and item.get('level') == 1:
+            parsed = _parse_bab_number(item.get('text', ''))
+            if parsed is not None:
+                current = parsed
+        chapters[idx] = current
+    return chapters
+
+
+def _reference_position_is_mid_sentence(text, start):
+    prefix = (text or '')[:start].rstrip()
+    return bool(prefix) and re.search(r'[.!?]\s*$', prefix) is None
+
+
 def validate_figure_markers(parsed_items, manifest_path):
-    """Validate an opt-in complete set of ``[FIGURE:<id>]`` markers.
+    """Validate ID-based figure/table captions and semantic references.
 
     Drafts without markers retain the legacy merge behaviour for compatibility.
-    Once one marker is used, however, every ``post_com`` manifest figure must be
-    named exactly once and immediately followed by its expected caption.  This
-    prevents a typo or a similarly named caption from selecting the wrong file.
+    Once figure markers are used, every ``post_com`` manifest figure must be
+    named exactly once. Once table markers are used, every parsed table must have
+    exactly one marker. New semantic captions require ``FIGREF``/``TABREF``
+    at least one narration in the same chapter; every semantic reference must
+    appear in the middle of a sentence. Additional cross-chapter references
+    remain valid and still resolve through the same stable bookmark.
     """
-    marker_rows = []
+    figure_rows = []
+    table_rows = []
     malformed = []
     for idx, item in enumerate(parsed_items):
-        if item.get('type') != 'paragraph':
-            continue
         text = item.get('text', '').strip()
-        marker_id = figure_marker_id(item)
-        if marker_id:
-            marker_rows.append((idx, marker_id))
-        elif text.upper().startswith('[FIGURE:'):
-            malformed.append(text)
+        if item.get('type') == 'paragraph':
+            marker_id = figure_marker_id(item)
+            if marker_id:
+                figure_rows.append((idx, marker_id))
+            elif text.upper().startswith('[FIGURE:'):
+                malformed.append(text)
+        elif item.get('type') == 'table_marker':
+            marker_id = item.get('id')
+            if marker_id:
+                table_rows.append((idx, marker_id))
+            else:
+                malformed.append(text or repr(item))
 
     if malformed:
         return [
-            "malformed figure marker; expected [FIGURE:<lowercase-id>]: " + value
+            "malformed figure marker or table marker; expected a lowercase "
+            "stable id: " + value
             for value in malformed
         ]
-    if not marker_rows:
+    # Even when no marker is present, a semantic reference/caption must not
+    # silently pass through validation.  This is especially important for a
+    # partially migrated draft: an unresolved token would otherwise be copied
+    # into the DOCX and become impossible to diagnose later.
+    has_semantic_tokens = any(
+        item.get('type') in ('paragraph', 'list_item') and (
+            FIGURE_REF_RE.search(item.get('text', ''))
+            or TABLE_REF_RE.search(item.get('text', ''))
+            or _semantic_caption_parts(item.get('text', ''), 'Gambar')
+            or _semantic_caption_parts(item.get('text', ''), 'Tabel')
+        )
+        for item in parsed_items
+    )
+    if not figure_rows and not table_rows and not has_semantic_tokens:
         return []
 
-    try:
-        with open(manifest_path, 'r', encoding='utf-8-sig') as f:
-            manifest = json.load(f)
-    except (OSError, json.JSONDecodeError) as exc:
-        return [f"cannot validate figure markers because manifest is unreadable: {exc}"]
+    post_com = {}
+    if figure_rows:
+        try:
+            with open(manifest_path, 'r', encoding='utf-8-sig') as f:
+                manifest = json.load(f)
+        except (OSError, json.JSONDecodeError) as exc:
+            return [f"cannot validate figure markers because manifest is unreadable: {exc}"]
 
-    post_com = {
-        entry['id']: entry
-        for entry in manifest.get('images', [])
-        if entry.get('inject_method') == 'post_com' and entry.get('id')
-    }
-    seen = {}
+        post_com = {
+            entry['id']: entry
+            for entry in manifest.get('images', [])
+            if entry.get('inject_method') == 'post_com' and entry.get('id')
+        }
+
+    chapters = _item_chapters(parsed_items)
+    seen_figures = {}
+    seen_tables = {}
+    semantic_figures = {}
+    semantic_tables = {}
     errors = []
-    for item_idx, marker_id in marker_rows:
-        seen.setdefault(marker_id, []).append(item_idx)
+    for item_idx, marker_id in figure_rows:
+        seen_figures.setdefault(marker_id, []).append(item_idx)
         entry = post_com.get(marker_id)
         if entry is None:
             errors.append(f"unknown figure marker [FIGURE:{marker_id}]")
@@ -430,27 +549,129 @@ def validate_figure_markers(parsed_items, manifest_path):
         next_item = parsed_items[item_idx + 1]
         caption = next_item.get('text', '').strip() if next_item.get('type') == 'paragraph' else ''
         caption_match = entry.get('caption_match', '')
-        if not re.match(r'^Gambar\s+[0-9]+\.[0-9]+\s+\S', caption, re.IGNORECASE):
+        semantic = _semantic_caption_parts(caption, 'Gambar')
+        is_legacy = re.match(r'^Gambar\s+[0-9]+\.[0-9]+\s+\S', caption, re.IGNORECASE)
+        if semantic:
+            caption_id, description = semantic
+            if caption_id and caption_id != marker_id:
+                errors.append(
+                    f"[FIGURE:{marker_id}] is followed by a caption bound to {caption_id!r}"
+                )
+            semantic_figures[marker_id] = (item_idx, chapters.get(item_idx))
+            caption_text = description
+        elif is_legacy:
+            caption_text = caption
+        else:
             errors.append(
-                f"[FIGURE:{marker_id}] must be immediately followed by a Gambar caption"
+                f"[FIGURE:{marker_id}] must be immediately followed by "
+                "[FIGCAPTION:Description] or a legacy Gambar caption"
             )
-        elif caption_match not in caption:
+            continue
+        if caption_match not in caption_text:
             errors.append(
                 f"[FIGURE:{marker_id}] caption does not contain expected text "
-                f"{caption_match!r}: {caption!r}"
+                f"{caption_match!r}: {caption_text!r}"
             )
 
-    for marker_id, positions in seen.items():
+    for marker_id, positions in seen_figures.items():
         if len(positions) != 1:
             errors.append(
                 f"figure marker [FIGURE:{marker_id}] occurs {len(positions)} times; expected once"
             )
-    missing = sorted(set(post_com) - set(seen))
+    missing = sorted(set(post_com) - set(seen_figures))
     if missing:
         errors.append(
             "missing figure marker(s): "
             + ", ".join(f"[FIGURE:{marker_id}]" for marker_id in missing)
         )
+
+    for item_idx, marker_id in table_rows:
+        seen_tables.setdefault(marker_id, []).append(item_idx)
+        if item_idx + 2 >= len(parsed_items):
+            errors.append(f"[TABLE-ID:{marker_id}] is not followed by a caption and table")
+            continue
+        caption_item = parsed_items[item_idx + 1]
+        table_item = parsed_items[item_idx + 2]
+        caption = caption_item.get('text', '').strip() if caption_item.get('type') == 'paragraph' else ''
+        semantic = _semantic_caption_parts(caption, 'Tabel')
+        is_legacy = re.match(r'^Tabel\s+[0-9]+\.[0-9]+\s+\S', caption, re.IGNORECASE)
+        if semantic:
+            caption_id, _description = semantic
+            if caption_id and caption_id != marker_id:
+                errors.append(
+                    f"[TABLE-ID:{marker_id}] is followed by a caption bound to {caption_id!r}"
+                )
+            semantic_tables[marker_id] = (item_idx, chapters.get(item_idx))
+        elif not is_legacy:
+            errors.append(
+                f"[TABLE-ID:{marker_id}] must be immediately followed by "
+                "[TABLECAPTION:Description] or a legacy Tabel caption"
+            )
+        if table_item.get('type') != 'table':
+            errors.append(f"[TABLE-ID:{marker_id}] caption is not immediately followed by a table")
+
+    for marker_id, positions in seen_tables.items():
+        if len(positions) != 1:
+            errors.append(
+                f"table marker [TABLE-ID:{marker_id}] occurs {len(positions)} times; expected once"
+            )
+    if table_rows:
+        table_count = sum(1 for item in parsed_items if item.get('type') == 'table')
+        if len(table_rows) != table_count:
+            errors.append(
+                f"ID-based table mode requires one [TABLE-ID:<id>] per table; "
+                f"found {len(table_rows)} marker(s) for {table_count} table(s)."
+            )
+
+    fig_refs = {}
+    tbl_refs = {}
+    for idx, item in enumerate(parsed_items):
+        if item.get('type') not in ('paragraph', 'list_item'):
+            continue
+        text = item.get('text', '')
+        for match in FIGURE_REF_RE.finditer(text):
+            ref_id = match.group(1)
+            fig_refs.setdefault(ref_id, []).append(idx)
+            if ref_id not in seen_figures:
+                errors.append(f"unknown figure reference [FIGREF:{ref_id}]")
+            elif ref_id not in semantic_figures:
+                errors.append(
+                    f"[FIGREF:{ref_id}] requires an adjacent [FIGCAPTION:Description]"
+                )
+            if not _reference_position_is_mid_sentence(text, match.start()):
+                errors.append(f"[FIGREF:{ref_id}] must appear in the middle of a sentence")
+        for match in TABLE_REF_RE.finditer(text):
+            ref_id = match.group(1)
+            tbl_refs.setdefault(ref_id, []).append(idx)
+            if ref_id not in seen_tables:
+                errors.append(f"unknown table reference [TABREF:{ref_id}]")
+            elif ref_id not in semantic_tables:
+                errors.append(
+                    f"[TABREF:{ref_id}] requires an adjacent [TABLECAPTION:Description]"
+                )
+            if not _reference_position_is_mid_sentence(text, match.start()):
+                errors.append(f"[TABREF:{ref_id}] must appear in the middle of a sentence")
+
+    for marker_id, (_position, caption_chapter) in semantic_figures.items():
+        same_chapter_refs = [
+            ref_idx for ref_idx in fig_refs.get(marker_id, [])
+            if chapters.get(ref_idx) == caption_chapter
+        ]
+        if not same_chapter_refs:
+            errors.append(
+                f"[FIGCAPTION:{marker_id}|...] has no [FIGREF:{marker_id}] "
+                "narration in the same BAB"
+            )
+    for marker_id, (_position, caption_chapter) in semantic_tables.items():
+        same_chapter_refs = [
+            ref_idx for ref_idx in tbl_refs.get(marker_id, [])
+            if chapters.get(ref_idx) == caption_chapter
+        ]
+        if not same_chapter_refs:
+            errors.append(
+                f"[TABLECAPTION:{marker_id}|...] has no [TABREF:{marker_id}] "
+                "narration in the same BAB"
+            )
     return errors
 
 # --------------------------------------------------------------------------- #
@@ -914,21 +1135,21 @@ def collect_bab_order_warnings(items):
 def collect_unclosed_table_warnings(lines):
     """R6.4 — warn when a ``[TABLE]`` block is opened without a ``[/TABLE]``.
 
-    Mirrors the ``parse_markdown`` open/close semantics: a line whose stripped
-    form starts with ``[TABLE]`` opens a block; a line whose stripped form ends
-    with ``[/TABLE]`` closes it. Emits exactly one warning when a block remains
-    open at end of input, and none when every block is closed. (Property 14)
+    Mirrors the ``parse_markdown`` open/close semantics using the exact
+    ``[TABLE]`` / ``[TABLE mode]`` grammar.  Semantic ``[TABLE-ID:...]``
+    markers are not block openers. Emits exactly one warning when a block
+    remains open at end of input, and none when every block is closed.
     """
     warnings = []
     in_table = False
     open_line = None
     for idx, line in enumerate(lines or []):
         stripped = line.strip()
-        if stripped.startswith('[TABLE]'):
+        if TABLE_BLOCK_OPEN_RE.fullmatch(stripped):
             in_table = True
             open_line = idx + 1
             continue
-        if stripped.endswith('[/TABLE]'):
+        if stripped == '[/TABLE]':
             in_table = False
             continue
     if in_table:
@@ -1206,6 +1427,23 @@ def add_formatted_text(p_elem, text, default_rPr=None, rel_manager=None):
     """
     emit_runs(p_elem, tokenize_inline(text), default_rPr, rel_manager)
 
+
+_HTML_BREAK_RE = re.compile(r'<br\s*/?>', re.IGNORECASE)
+
+
+def add_table_cell_formatted_text(p_elem, text, default_rPr=None):
+    """Emit table-cell text and translate Markdown ``<br>`` into Word breaks."""
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    segments = _HTML_BREAK_RE.split(text or '')
+    for index, segment in enumerate(segments):
+        if segment:
+            add_formatted_text(p_elem, segment, default_rPr)
+        if index < len(segments) - 1:
+            run = lxml.etree.SubElement(p_elem, f'{{{ns_uri}}}r')
+            if default_rPr is not None:
+                run.append(lxml.etree.fromstring(lxml.etree.tostring(default_rPr)))
+            lxml.etree.SubElement(run, f'{{{ns_uri}}}br')
+
 def build_p_element(item, rel_manager=None):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     p = lxml.etree.Element(f'{{{ns_uri}}}p')
@@ -1288,7 +1526,13 @@ def build_p_element(item, rel_manager=None):
         add_formatted_text(p, item['text'], rel_manager=rel_manager)
         
     elif item['type'] == 'paragraph':
-        is_caption = item['text'].startswith('Gambar ') or item['text'].startswith('Tabel ') or item['text'].startswith('LAMPIRAN ')
+        is_semantic_caption = (
+            FIGURE_CAPTION_RE.fullmatch(item['text'].strip()) is not None
+            or TABLE_CAPTION_RE.fullmatch(item['text'].strip()) is not None
+        )
+        is_caption = (is_semantic_caption or item['text'].startswith('Gambar ')
+                      or item['text'].startswith('Tabel ')
+                      or item['text'].startswith('LAMPIRAN '))
         
         if is_caption:
             lxml.etree.SubElement(pPr, f'{{{ns_uri}}}pStyle', {f'{{{ns_uri}}}val': 'Caption'})
@@ -1323,6 +1567,11 @@ def build_p_element(item, rel_manager=None):
                 t_pref.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
                 
                 add_formatted_text(p, suffix, rel_manager=rel_manager)
+            elif is_semantic_caption:
+                # Keep the semantic token in the intermediate XML.  The
+                # formatter consumes it after merge, once chapter-aware
+                # numbering and Word fields are available.
+                add_formatted_text(p, item['text'], rel_manager=rel_manager)
             else:
                 add_formatted_text(p, item['text'], rel_manager=rel_manager)
         else:
@@ -1587,7 +1836,7 @@ def build_table_element(item):
                 lxml.etree.SubElement(default_rPr, f'{{{ns_uri}}}b')
                 lxml.etree.SubElement(default_rPr, f'{{{ns_uri}}}bCs')
                 
-            add_formatted_text(p, cell_text, default_rPr)
+            add_table_cell_formatted_text(p, cell_text, default_rPr)
             
         if not is_first_row:
             data_row_idx += 1
@@ -1837,6 +2086,11 @@ def merge_draft_to_xml(xml_path, parsed_items):
         if item['type'] in ['heading', 'page_break', 'list_item', 'paragraph']:
             p_elem = build_p_element(item, rel_manager)
             new_elements.append(p_elem)
+        elif item['type'] == 'table_marker':
+            # Source-only identity marker.  The following semantic caption and
+            # table carry the visible content; the marker is consumed by the
+            # validator/formatter and must never become a report paragraph.
+            continue
         elif item['type'] == 'code_block':
             new_elements.extend(build_code_block_elements(item))
         elif item['type'] == 'table':
@@ -2006,7 +2260,10 @@ def main(argv=None):
         items, workspace_root / "images" / "manifest.json"
     )
     if marker_errors:
-        print("Error: invalid explicit figure references; document.xml was not modified.")
+        print(
+            "Error: invalid semantic figure/table markers or references; "
+            "document.xml was not modified."
+        )
         for error in marker_errors:
             print(f"- {error}")
         sys.exit(1)

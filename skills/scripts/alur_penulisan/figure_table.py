@@ -57,6 +57,14 @@ _OBJECT_TOKEN_RE = re.compile(
     re.IGNORECASE,
 )
 
+_SEMANTIC_MARKER_RE = re.compile(
+    r"^\s*\[(?P<kind>FIGURE|TABLE-ID):"
+    r"(?P<id>[a-z0-9][a-z0-9_-]*)\]\s*$"
+)
+_SEMANTIC_REFERENCE_RE = re.compile(
+    r"\[(?P<kind>FIGREF|TABREF):(?P<id>[a-z0-9][a-z0-9_-]*)\]"
+)
+
 # A chapter heading: "BAB <roman-or-arabic> ...".
 _BAB_RE = re.compile(r"^\s*BAB\s+(?P<num>[IVXLCDM]+|\d+)\b", re.IGNORECASE)
 
@@ -190,6 +198,7 @@ def number_objects(draft: DraftModel) -> "tuple[DraftModel, list[Finding]]":
         ObjectKind.GAMBAR.value: set(),
         ObjectKind.TABEL.value: set(),
     }
+    assigned_ids: set[tuple[str, str]] = set()
 
     new_blocks: list[DraftBlock] = []
 
@@ -199,6 +208,23 @@ def number_objects(draft: DraftModel) -> "tuple[DraftModel, list[Finding]]":
             chapter = _chapter_number(block.meta.get("text", ""))
             if chapter is not None:
                 current_chapter = chapter
+            new_blocks.append(block)
+            continue
+
+        semantic_markers = []
+        for line in block.lines:
+            semantic_match = _SEMANTIC_MARKER_RE.fullmatch(line)
+            if semantic_match:
+                kind = (
+                    ObjectKind.GAMBAR.value
+                    if semantic_match.group("kind") == "FIGURE"
+                    else ObjectKind.TABEL.value
+                )
+                assigned_ids.add((kind, semantic_match.group("id")))
+                semantic_markers.append(semantic_match.group(0))
+        if semantic_markers:
+            # ID-based objects are numbered later by the DOCX formatter through
+            # SEQ fields.  Preserve their source text byte-for-byte here.
             new_blocks.append(block)
             continue
 
@@ -244,6 +270,25 @@ def number_objects(draft: DraftModel) -> "tuple[DraftModel, list[Finding]]":
                         detail=(
                             f"Rujukan_Objek '{kind} {number}' menunjuk objek yang "
                             f"belum bernomor atau tidak ada; narasi dipertahankan."
+                        ),
+                    )
+                )
+
+        for token in _SEMANTIC_REFERENCE_RE.finditer(text):
+            kind = (
+                ObjectKind.GAMBAR.value
+                if token.group("kind") == "FIGREF"
+                else ObjectKind.TABEL.value
+            )
+            object_id = token.group("id")
+            if (kind, object_id) not in assigned_ids:
+                findings.append(
+                    Finding(
+                        kind=FindingKind.DANGLING_REFERENCE,
+                        location=f"blok#{position}",
+                        detail=(
+                            f"Rujukan_Objek '[{token.group('kind')}:{object_id}]' "
+                            "menunjuk ID objek yang tidak ada; narasi dipertahankan."
                         ),
                     )
                 )

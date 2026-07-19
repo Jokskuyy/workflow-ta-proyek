@@ -37,6 +37,7 @@ _SEPARATOR_CELL_RE = re.compile(r"^:?-+:?$")
 
 # The '# DAFTAR PUSTAKA' heading (case-insensitive).
 _DAFTAR_PUSTAKA_RE = re.compile(r"^\s*#\s+DAFTAR\s+PUSTAKA\s*$", re.IGNORECASE)
+_TABLE_BLOCK_OPEN_RE = re.compile(r"^\[TABLE(?:\s+([A-Za-z0-9_-]+))?\]$")
 
 
 class DraftBlockType(Enum):
@@ -156,9 +157,10 @@ class DraftModel:
                 continue
 
             # [TABLE] ... [/TABLE] block.
-            if stripped.startswith("[TABLE") and not stripped.startswith("[/"):
+            table_open_match = _TABLE_BLOCK_OPEN_RE.fullmatch(stripped)
+            if table_open_match:
                 start = i
-                inner = stripped[len("[TABLE"):].split("]", 1)[0].strip()
+                inner = table_open_match.group(1)
                 i += 1
                 while i < n and not lines[i].strip().endswith("[/TABLE]"):
                     i += 1
@@ -168,7 +170,7 @@ class DraftModel:
                     DraftBlock(
                         DraftBlockType.TABLE,
                         lines[start:i],
-                        meta={"mode": inner or None},
+                            meta={"mode": inner or None},
                     )
                 )
                 continue
@@ -236,7 +238,7 @@ class DraftModel:
                     break
                 if cur_stripped.startswith("```"):
                     break
-                if cur_stripped.startswith("[TABLE") and not cur_stripped.startswith("[/"):
+                if _TABLE_BLOCK_OPEN_RE.fullmatch(cur_stripped):
                     break
                 if "|" in cur_stripped and _is_pipe_table_start(lines, i):
                     break

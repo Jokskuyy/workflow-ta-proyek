@@ -66,6 +66,21 @@ _BULLET_RE = re.compile(r"^(?P<indent>[ \t]*)[-*+]\s+")
 _LIST_RE = re.compile(r"^(?P<indent>[ \t]*)(?P<marker>\d+[.)]|[A-Za-z][.)])\s+")
 _OBJECT_RE = re.compile(r"\b(?P<kind>Gambar|Tabel)\s+(?P<number>\d+(?:\.\d+)*)\b", re.IGNORECASE)
 _CAPTION_RE = re.compile(r"^\s*(?P<kind>Gambar|Tabel)\s+(?P<number>\d+(?:\.\d+)*)\b", re.IGNORECASE)
+_SEMANTIC_OBJECT_RE = re.compile(
+    r"\[(?P<kind>FIGREF|TABREF):(?P<id>[a-z0-9][a-z0-9_-]*)\]"
+)
+_SEMANTIC_SOURCE_LINE_RE = re.compile(
+    r"^\s*\[(?:FIGURE|FIGCAPTION|TABLE-ID|TABLECAPTION):[^\]]+\]\s*$"
+)
+_FIGURE_MARKER_RE = re.compile(
+    r"^\s*\[FIGURE:(?P<id>[a-z0-9][a-z0-9_-]*)\]\s*$"
+)
+_TABLE_MARKER_RE = re.compile(
+    r"^\s*\[TABLE-ID:(?P<id>[a-z0-9][a-z0-9_-]*)\]\s*$"
+)
+_BAB_HEADING_RE = re.compile(
+    r"^\s*#\s+BAB\s+(?P<number>[IVX]+|\d+)\b", re.IGNORECASE
+)
 _TBD_RE = re.compile(r"\[TBD:\s*[^\]]+\]", re.IGNORECASE)
 _MISSING_CITATION_MARKER = "[BUTUH SITASI]"
 _GENERATION_BRANCH_RE = re.compile(
@@ -404,6 +419,11 @@ def build_generation_request(
         if cleaned and cleaned not in allowed_facts:
             allowed_facts[cleaned] = emit_value(cleaned, facts)
 
+    semantic_objects = _existing_semantic_objects(draft_text)
+    semantic_id_summary = ", ".join(
+        f"{kind.upper()}:{object_id}"
+        for kind, object_id in sorted(semantic_objects)
+    ) or "(tidak ada)"
     constraints = (
         "Tulis hanya body subbab target; jangan keluarkan heading Markdown.",
         "Jangan menghapus, mengganti, atau mengulang isi manual yang sudah ada.",
@@ -412,7 +432,8 @@ def build_generation_request(
         "Deklarasikan setiap fakta proyek yang dipakai pada fact_claims dengan nilai persis yang tertulis.",
         "Jangan mengarang sitasi. Sitasi hanya boleh berasal dari bibliography_entries dan harus dideklarasikan pada citations_used.",
         "Klaim yang belum terverifikasi wajib diberi [BUTUH SITASI] dan dicatat pada unverified_claims.",
-        "Rujukan Gambar/Tabel harus berada di tengah kalimat, dalam bab yang sama, dan menunjuk objek yang sudah ada.",
+        "Rujukan objek wajib memakai [FIGREF:<id>] atau [TABREF:<id>] yang sudah ada pada draf, serta berada di tengah kalimat. Sintaks lama Gambar/Tabel X.Y hanya untuk draf legacy.",
+        f"ID objek stabil yang tersedia pada draf: {semantic_id_summary}.",
         "Jangan membuat caption atau aset Gambar/Tabel baru melalui generator teks.",
         "Gunakan canonical_terms secara konsisten.",
         "Kembalikan satu objek JSON sesuai response_schema, tanpa code fence atau teks tambahan.",
@@ -563,11 +584,37 @@ def _existing_objects(draft_text: str) -> set[tuple[str, str]]:
     return objects
 
 
+def _roman_chapter(token: str) -> int | None:
+    values = {"I": 1, "II": 2, "III": 3, "IV": 4, "V": 5,
+              "VI": 6, "VII": 7, "VIII": 8, "IX": 9, "X": 10}
+    return int(token) if token.isdigit() else values.get(token.upper())
+
+
+def _existing_semantic_objects(draft_text: str) -> dict[tuple[str, str], int | None]:
+    """Return stable object IDs and the BAB in which their marker appears."""
+    objects: dict[tuple[str, str], int | None] = {}
+    current_chapter = None
+    for line in draft_text.splitlines():
+        chapter_match = _BAB_HEADING_RE.match(line)
+        if chapter_match:
+            current_chapter = _roman_chapter(chapter_match.group("number"))
+            continue
+        figure_match = _FIGURE_MARKER_RE.match(line)
+        if figure_match:
+            objects[("figref", figure_match.group("id"))] = current_chapter
+            continue
+        table_match = _TABLE_MARKER_RE.match(line)
+        if table_match:
+            objects[("tabref", table_match.group("id"))] = current_chapter
+    return objects
+
+
 def _validate_object_references(
     markdown: str, draft_text: str, section_id: str
 ) -> list[GenerationIssue]:
     issues: list[GenerationIssue] = []
     objects = _existing_objects(draft_text)
+    semantic_objects = _existing_semantic_objects(draft_text)
     chapter = section_id.split(".", 1)[0]
     for line_no, line in enumerate(markdown.splitlines(), start=1):
         for match in _OBJECT_RE.finditer(line):
@@ -598,6 +645,29 @@ def _validate_object_references(
                         "dangling_object_reference",
                         GenerationSeverity.ERROR,
                         f"Rujukan {kind} {number} tidak memiliki caption/objek pada draf saat ini.",
+                        location,
+                    )
+                )
+        for match in _SEMANTIC_OBJECT_RE.finditer(line):
+            kind = match.group("kind")
+            object_id = match.group("id")
+            location = f"candidate:{line_no}"
+            if not is_valid_reference_position(line, match.start()):
+                issues.append(
+                    GenerationIssue(
+                        "invalid_object_reference_position",
+                        GenerationSeverity.ERROR,
+                        f"Rujukan [{kind}:{object_id}] harus berada di tengah kalimat.",
+                        location,
+                    )
+                )
+            key = (kind.casefold(), object_id)
+            if key not in semantic_objects:
+                issues.append(
+                    GenerationIssue(
+                        "dangling_object_reference",
+                        GenerationSeverity.ERROR,
+                        f"Rujukan [{kind}:{object_id}] tidak memiliki marker objek pada draf saat ini.",
                         location,
                     )
                 )
@@ -671,7 +741,7 @@ def validate_candidate(
                     f"candidate:{line_no}",
                 )
             )
-        if _CAPTION_RE.match(line):
+        if _CAPTION_RE.match(line) or _SEMANTIC_SOURCE_LINE_RE.match(line):
             issues.append(
                 GenerationIssue(
                     "caption_insertion_forbidden",

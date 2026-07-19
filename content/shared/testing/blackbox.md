@@ -1,8 +1,9 @@
 Black Box Testing merupakan metode pengujian yang mengevaluasi kesesuaian keluaran sistem terhadap masukan dan kebutuhan fungsional tanpa meninjau struktur kode internal (Maulida et al. 2025). Pengujian pada sistem integrasi denah virtual dilakukan terhadap fungsi autentikasi dan keamanan, manajemen data pada dashboard admin, dashboard publik, serta integrasi API dan navigasi Unity. Pengujian mencakup alur normal, alur gagal, dan kondisi tepi yang dapat diamati melalui antarmuka atau respons sistem.
 
-Pelaksanaan pengujian menggunakan 24 skenario utama. Skenario BB-22 terdiri atas dua kondisi tepi, yaitu perbedaan kapitalisasi `unity_object_name` dan tidak tersedianya GameObject padanan. Seluruh hasil aktual dibandingkan dengan hasil yang diharapkan, sebagaimana dirangkum pada Tabel 3.3.
+Pelaksanaan pengujian menggunakan 24 skenario utama. Skenario BB-22 terdiri atas dua kondisi tepi, yaitu perbedaan kapitalisasi `unity_object_name` dan tidak tersedianya GameObject padanan. Seluruh hasil aktual dibandingkan dengan hasil yang diharapkan, sebagaimana dirangkum pada [TABREF:hasil_black_box].
 
-Tabel 3.3 Hasil Pengujian Black Box Testing
+[TABLE-ID:hasil_black_box]
+[TABLECAPTION:Hasil Pengujian Black Box Testing]
 
 [TABLE]
 ID | Skenario | Langkah Pengujian | Hasil yang Diharapkan | Hasil Aktual dan Status
