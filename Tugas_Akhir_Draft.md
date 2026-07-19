@@ -59,22 +59,11 @@ LAMPIRAN 2. Surat Keterangan Implementasi Proyek dari Mitra
 LAMPIRAN 3. Kode Sumber Utama
 LAMPIRAN 4. Panduan Pengguna (User Manual) (Rencana/Placeholder)
 
-
 # BAB I PENDAHULUAN
 
 ## 1.1 Latar Belakang
 
-Perkembangan transformasi digital telah mendorong institusi pendidikan tinggi untuk mengadopsi teknologi informasi secara menyeluruh dalam mendukung layanan akademik, manajemen fasilitas, dan pengalaman pengguna. Perguruan tinggi tidak lagi dipandang semata sebagai ruang fisik pembelajaran, melainkan sebagai ekosistem digital yang menuntut penyajian informasi yang terintegrasi, mudah diakses, dan intuitif. Salah satu konsep yang berkembang dalam konteks ini adalah Smart Campus, yang menekankan integrasi teknologi digital untuk meningkatkan efisiensi operasional, kualitas layanan, serta pengalaman sivitas akademika dan pengunjung.
-
-Salah satu tantangan utama dalam implementasi Smart Campus adalah penyediaan informasi spasial dan profil institusi, khususnya pada kampus dengan area yang luas dan struktur bangunan yang kompleks. Media navigasi konvensional seperti papan penunjuk arah dan denah statis berbasis gambar bersifat pasif, sulit diperbarui, serta tidak mampu menyajikan informasi secara dinamis dan terintegrasi. Kondisi ini sering menyebabkan mahasiswa baru maupun pengunjung mengalami kesulitan dalam menemukan lokasi gedung atau fasilitas tertentu, serta kesenjangan informasi terkait profil akademik dan fasilitas kampus.
-
-Berdasarkan hasil pengumpulan data melalui kuesioner yang disebarkan kepada mahasiswa Universitas Pembangunan Nasional Veteran Jakarta, ditemukan bahwa 95% dari total responden pernah mengalami kesulitan dalam menemukan lokasi tertentu di lingkungan kampus. Permasalahan ini umumnya terjadi pada mahasiswa baru maupun pengunjung yang belum familiar dengan tata letak kampus. Selain itu, responden juga menunjukkan kebutuhan terhadap sistem navigasi yang lebih interaktif dan mudah diakses dibandingkan dengan media konvensional seperti papan penunjuk arah atau denah statis. Hasil survei ini memperkuat indikasi bahwa sistem informasi navigasi yang saat ini tersedia belum sepenuhnya mampu memenuhi kebutuhan pengguna secara efektif dan efisien.
-
-Kondisi tersebut relevan dengan permasalahan yang dihadapi oleh Universitas Pembangunan Nasional Veteran Jakarta (UPNVJ) Kampus Pondok Labu. Kampus ini memiliki area yang luas dengan banyak fakultas dan fasilitas, sementara media informasi dan navigasi yang tersedia saat ini masih bersifat konvensional dan terfragmentasi. Berdasarkan observasi awal, belum tersedia sistem digital terintegrasi yang mampu menggabungkan navigasi spasial berbasis visualisasi 3D dengan penyajian informasi profil kampus secara terpusat dan interaktif. Oleh karena itu, penelitian ini mengusulkan pengembangan Sistem Integrasi Denah Virtual Kampus dan Dashboard Profil UPNVJ sebagai solusi digital terpadu. Sistem ini mengombinasikan visualisasi 3D interaktif lingkungan kampus, pengelolaan aset dan data spasial, serta dashboard profil kampus berbasis web yang didukung oleh arsitektur backend dan API. Sistem dikembangkan sebagai proyek kolaboratif dengan pembagian peran yang jelas, sehingga setiap komponen saling mendukung dalam mewujudkan konsep Smart Campus yang efisien, informatif, dan mudah diakses.
-
-Upaya validasi kebutuhan sistem juga dilakukan melalui wawancara dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi (Wakil Rektor 3). Berdasarkan hasil wawancara tersebut, tidak ditemukan adanya laporan formal yang secara spesifik membahas permasalahan navigasi kampus sebagai isu strategis institusi. Meskipun demikian, pihak pimpinan universitas memberikan dukungan terhadap pengembangan solusi berbasis teknologi yang dapat meningkatkan kualitas layanan informasi dan pengalaman pengguna di lingkungan kampus. Dukungan ini menjadi landasan penting dalam pengembangan sistem, meskipun identifikasi masalah utama tetap didasarkan pada hasil observasi lapangan dan data kuesioner pengguna.
-
-Dengan demikian, urgensi pengembangan sistem tidak hanya didasarkan pada perspektif kebijakan institusi, tetapi juga pada kebutuhan nyata pengguna yang teridentifikasi melalui data empiris. Pendekatan ini memastikan bahwa solusi yang dirancang bersifat user-centered, di mana pengembangan sistem berfokus pada peningkatan pengalaman navigasi serta kemudahan akses informasi kampus secara terintegrasi. Oleh karena itu, pengembangan sistem integrasi denah virtual dan dashboard profil kampus menjadi relevan sebagai upaya menjembatani kesenjangan antara kebutuhan pengguna dan keterbatasan sistem yang saat ini tersedia.
+<!-- PIPELINE:INCLUDE content/shared/bab1/latar-belakang-umum.md -->
 
 ## 1.2 Identifikasi Masalah
 
@@ -977,21 +966,7 @@ Frontend React SPA berhasil dideploy secara statis. Antarmuka pengguna menyajika
 
 ### 3.5.1 Black Box Testing
 
-Pengujian fungsionalitas asinkron pada dashboard admin dan public dashboard dirancang untuk memvalidasi kelayakan fungsional antarmuka admin dashboard dan visualisasi 3D. Rencana pengujian fungsional dirangkum pada Tabel 3.3.
-
-Tabel 3.3 Hasil Pengujian Black Box Testing
-
-[TABLE]
-ID Test | Fitur Uji | Skenario Pengujian | Hasil yang Diharapkan | Status
-BB-01 | Login Admin | Memasukkan kredensial admin yang valid. | Administrator berhasil login dan masuk ke Admin Dashboard | [TBD]
-BB-02 | CRUD Gedung | Menambahkan data gedung baru melalui modal form admin. | Data tersimpan di Supabase dan unity_object_name terdaftar | [TBD]
-BB-03 | Keamanan RLS | Mengakses endpoint POST /api/buildings secara anonim. | API menolak request dengan status HTTP 401 Unauthorized | [TBD]
-BB-04 | Search Overlay | Mengetik kata kunci "Laboratorium" pada kotak pencarian React. | Menampilkan daftar fasilitas laboratorium dengan ikon yang sesuai | [TBD]
-BB-05 | Navigation Bridge | Memilih lokasi tujuan pada pencarian React. | React mengirimkan nama objek via SendMessage dan memicu rute 3D | [TBD]
-BB-06 | Connection Check | Membuka halaman pada kondisi jaringan internet lambat (3G). | Preload otomatis dilewati dan tombol aktivasi manual muncul | [TBD]
-[/TABLE]
-
-Hasil pengujian fungsionalitas sistem (Black Box Testing) akan dimasukkan setelah pengujian dilaksanakan secara menyeluruh pada prototipe final. [TBD: Hasil Pengujian Black Box]
+<!-- PIPELINE:INCLUDE content/shared/testing/blackbox.md -->
 
 ### 3.5.2 Lighthouse Testing
 
@@ -1011,13 +986,11 @@ Berdasarkan hasil pengujian awal di atas, skor performa (56/100) menjadi dasar d
 
 ### 3.5.3 User Acceptance Test (UAT)
 
-Pengujian UAT akan dilakukan setelah prototipe akhir dideploy secara daring. Pengujian direncanakan melibatkan responden dari kelompok mahasiswa dan staf pengelola/admin menggunakan skala Likert 5-titik untuk menilai aspek kegunaan (*usability*), kemudahan orientasi navigasi, dan performa antarmuka. [TBD: Metodologi UAT]
-
-Hasil perhitungan kuesioner UAT dan tingkat kepuasan responden akan dimasukkan setelah pengujian dilaksanakan. [TBD: Hasil Indeks Kepuasan UAT]
+<!-- PIPELINE:INCLUDE content/shared/testing/uat.md -->
 
 ### 3.5.4 Implementasi Hasil User Acceptance Test (UAT)
 
-Berdasarkan umpan balik dari responden pengujian UAT, tindakan perbaikan sistem akan didokumentasikan pada bagian ini. [TBD: Tindak Lanjut Perbaikan Sistem]
+<!-- PIPELINE:INCLUDE content/shared/testing/uat-revisions.md -->
 
 ---
 
