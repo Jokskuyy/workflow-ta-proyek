@@ -125,24 +125,25 @@ Indentasi sumber Markdown adalah tiga spasi per tingkat. Parser menerima marker 
 
 - Caption tabel berada **di atas** tabel.
 - Caption gambar berada **di bawah** gambar.
-- Caption ditulis `Tabel X.Y Deskripsi` atau `Gambar X.Y Deskripsi`, tanpa titik setelah nomor.
+- Caption final tampil sebagai `Tabel X.Y Deskripsi` atau `Gambar X.Y Deskripsi`, tanpa titik setelah nomor. Nomor dibuat otomatis oleh field Word `SEQ`.
 - Gambar dan tabel memiliki counter terpisah, mengikuti urutan baca, dan dimulai ulang pada setiap bab.
-- Penyebutan `Gambar X.Y` atau `Tabel X.Y` tidak boleh mengawali kalimat/paragraf.
-- Setiap gambar wajib memiliki paragraf narasi yang secara eksplisit menyebut nomor gambar tersebut dalam bab yang sama.
+- Markdown memakai `[FIGREF:<id>]` dan `[TABREF:<id>]`; formatter mengubahnya menjadi field Word `REF` yang terlihat sebagai `Gambar X.Y` atau `Tabel X.Y`.
+- Token rujukan tidak boleh mengawali kalimat/paragraf.
+- Setiap gambar wajib memiliki minimal satu paragraf narasi dengan `[FIGREF:<id>]` pada bab yang sama.
 
 Aturan narasi gambar bersifat **fatal**. Bentuk yang diterima:
 
 ```text
-Arsitektur sistem pada Gambar 2.1 memperlihatkan hubungan antarkomponen utama.
+Arsitektur sistem pada [FIGREF:diagram_arsitektur] memperlihatkan hubungan antarkomponen utama.
 ```
 
 Bentuk berikut ditolak:
 
 ```text
-Gambar 2.1 memperlihatkan hubungan antarkomponen utama.
+[FIGREF:diagram_arsitektur] memperlihatkan hubungan antarkomponen utama.
 ```
 
-Rujukan juga ditolak jika `Gambar X.Y` muncul tepat setelah tanda akhir kalimat `.`, `!`, atau `?`. Validator hanya mencari narasi pada paragraf biasa di bab yang sama dan mengabaikan caption, heading, daftar gambar, serta paragraf yang berisi drawing.
+Rujukan juga ditolak jika token `[FIGREF:...]`/`[TABREF:...]` muncul tepat setelah tanda akhir kalimat `.`, `!`, atau `?`. Validator final memeriksa hasil terlihat `Gambar X.Y`, mencari narasi pada paragraf biasa di bab yang sama, dan mengabaikan caption, heading, daftar gambar, serta paragraf drawing.
 
 ### Teori dan sitasi
 
@@ -409,8 +410,9 @@ Apply ditolak jika kandidat:
 - memakai fakta yang tidak tersedia tanpa `[TBD: ...]`;
 - memakai sitasi yang tidak ada pada Daftar Pustaka atau metadata sitasinya
   tidak sama dengan body;
-- membuat caption/aset Gambar/Tabel baru, rujukan di awal kalimat, rujukan
-  lintas bab, atau rujukan ke objek yang belum ada;
+- membuat caption/aset Gambar/Tabel baru, memakai token selain
+  `[FIGREF:<id>]`/`[TABREF:<id>]`, menaruh rujukan di awal kalimat, atau merujuk
+  ID objek yang belum ada;
 - memperkenalkan inkonsistensi istilah baru; atau
 - mendapati draf berubah setelah request dibuat.
 
@@ -516,10 +518,11 @@ Seluruh `sectPr` yang tersisa dipaksa kembali ke A4 dan margin yang sama, sehing
 - counter restart per bab;
 - nomor dibuat sebagai field `SEQ` Word;
 - item pertama dalam bab memakai switch restart `\r 1`;
-- referensi nomor lama dipetakan ke nomor baru jika tidak ambigu;
-- mapping ambigu atau tidak ditemukan dipertahankan dan dilaporkan sebagai warning.
+- caption ID-based diberi bookmark stabil `fig_*`/`tbl_*` yang mencakup label dan nomor;
+- `[FIGREF:id]`/`[TABREF:id]` diubah menjadi field `REF` dengan nilai terlihat yang dicache untuk renderer headless;
+- referensi nomor lama tetap dipetakan ke nomor baru jika tidak ambigu sebagai kompatibilitas legacy.
 
-Deskripsi caption diambil dari draf dan tidak bergantung pada daftar caption hard-coded.
+Deskripsi caption diambil dari `[FIGCAPTION:Deskripsi]` atau `[TABLECAPTION:Deskripsi]`; Daftar Gambar/Tabel dan nomor tidak ditulis hard-coded di draf.
 
 ### Tabel
 
@@ -533,14 +536,31 @@ Formatter tabel bekerja berdasarkan struktur, bukan isi spesifik:
 - isi sel tidak boleh mewarisi first-line indent body;
 - tabel Gantt dikenali melalui mode/struktur yang didukung parser.
 
+Sumber tabel baru menggunakan ID stabil, bukan nomor statis:
+
+```markdown
+Rincian hasil disajikan pada [TABREF:hasil_pengujian].
+
+[TABLE-ID:hasil_pengujian]
+[TABLECAPTION:Hasil Pengujian]
+[TABLE]
+Kolom A | Kolom B
+Nilai A | Nilai B
+[/TABLE]
+```
+
+`TABLE-ID` hanya metadata sumber dan tidak dirender. Formatter membuat caption
+`Tabel X.Y`, bookmark stabil, serta field `REF` pada narasi secara otomatis.
+
 ### Gambar
 
 - Gambar ditengahkan dan tidak di-upscale.
 - Rasio aspek asli dipertahankan; gambar tidak dicrop atau didistorsi.
 - Batas body bersama adalah sekitar 15 cm × 16 cm.
 - Paragraf drawing dan caption diberi `keepNext` serta `keepLines`.
+- Drawing dan caption wajib berada pada halaman yang sama. Injector menyisakan cadangan tinggi 3 cm untuk caption dan Word memindahkan pasangan tersebut bersama ke halaman berikutnya bila ruang tersisa tidak cukup.
 - Susunan final yang dijaga adalah drawing lalu caption. Jika pola awalnya `[drawing][narasi][caption]`, formatter memindahkan caption menjadi `[drawing][caption][narasi]` agar drawing dan caption tetap berdekatan; narasi tetap valid selama berada pada bab yang sama.
-- `pageBreakBefore` hanya diterapkan ketika tinggi render melampaui tinggi area cetak.
+- Validator C4 menolak pasangan yang tidak bersebelahan, kehilangan `keepNext`/`keepLines`, atau tinggi drawing ditambah cadangan caption tidak muat dalam area cetak.
 
 ## Manifest dan injeksi gambar
 
@@ -559,18 +579,18 @@ Prosedur menambah gambar:
 
 1. Simpan file di `images/`.
 2. Tambahkan entry manifest dengan `id` unik, path `file`, dan `caption_match`.
-3. Tepat sebelum caption pada draf, tulis marker ID eksplisit pada baris sendiri:
+3. Tepat sebelum caption pada draf, tulis marker dan caption semantik pada baris sendiri:
 
    ```markdown
    [FIGURE:diagram_arsitektur]
-   Gambar 2.9 Diagram Arsitektur Sistem
+   [FIGCAPTION:Diagram Arsitektur Sistem]
    ```
 
-4. Tambahkan narasi pada bab yang sama, misalnya `Alur tersebut ditunjukkan pada Gambar X.Y ...`.
-5. Jalankan build. Marker diganti oleh drawing dan ID disimpan pada metadata OOXML sebagai `FIGURE:<id>`.
+4. Tambahkan narasi pada bab yang sama, misalnya `Alur tersebut ditunjukkan pada [FIGREF:diagram_arsitektur] ...`.
+5. Jalankan build. Marker diganti drawing, caption memperoleh `SEQ` + bookmark, dan token narasi memperoleh field `REF` ke bookmark yang sama.
 6. Periksa hasil visual dan validator.
 
-Begitu satu marker dipakai, merge mewajibkan semua entry `post_com` milik manifest branch tersebut hadir tepat satu kali, menolak ID asing/duplikat, dan menolak caption yang tidak bersebelahan sebelum `document.xml` ditulis. Jalur pencocokan drawing template lama dinonaktifkan agar gambar tidak terduplikasi. Draf branch lama tanpa marker masih dapat memakai fallback caption untuk kompatibilitas sampai dimigrasikan.
+Begitu satu marker dipakai, merge mewajibkan semua entry `post_com` milik manifest branch tersebut hadir tepat satu kali, menolak ID asing/duplikat, caption yang tidak bersebelahan, rujukan ID yang tidak ada, serta gambar tanpa narasi satu bab sebelum `document.xml` ditulis. Jalur pencocokan drawing template lama dinonaktifkan agar gambar tidak terduplikasi. Draf branch lama tanpa marker masih dapat memakai fallback caption untuk kompatibilitas sampai dimigrasikan.
 
 `images/manifest_reconcile.json` hanya digunakan untuk exception yang sah dan dapat dijelaskan. Karena daftar exception mengikuti aset dan isi laporan masing-masing anggota, file manifest dan reconcile bukan bagian dari sinkronisasi pipeline umum antarbranch.
 
@@ -581,7 +601,7 @@ Begitu satu marker dipakai, merge mewajibkan semua entry `post_com` milik manife
 | C1 | Konten gambar duplikat berdasarkan MD5 harus ditolak kecuali di-allow-list |
 | C2 | Setiap entry `post_com` memiliki tepat satu ID drawing, satu caption target, dan adjacency `[drawing][caption]` |
 | C3 | Byte media di DOCX harus cocok dengan file sumber di `images/` berdasarkan MD5 |
-| C4 | Drawing/caption tidak boleh terpisah oleh page split yang tidak sah |
+| C4 | Setiap pasangan `[drawing][caption]` wajib satu halaman; adjacency, `keepNext`/`keepLines`, dan kemampuan pasangan untuk muat dalam printable height bersifat fatal |
 
 Injector mencari `[FIGURE:<id>]` secara exact, menggantinya dengan drawing, lalu memberi drawing nama metadata `FIGURE:<id>`. `caption_match` diperiksa sebagai assertion sehingga nama caption yang mirip tidak dapat memilih file lain. Jika sebuah caption sudah memiliki drawing tepat sebelumnya, injector mengganti relationship/media drawing tersebut, bukan menambahkan salinan baru.
 
@@ -605,13 +625,14 @@ Build gagal jika ditemukan salah satu kondisi berikut:
 - field Word berisi error;
 - salah satu section bukan A4 portrait atau marginnya bukan 4-3-3-3 cm;
 - caption tidak memiliki field `SEQ` yang benar atau counter bab tidak direstart;
+- token sumber ID-based tersisa, bookmark caption duplikat/hilang, atau field `REF` menunjuk bookmark yang tidak ada;
 - Daftar Lampiran tidak menargetkan level 9–9;
 - caption gambar berturut-turut tanpa struktur drawing yang sah;
 - drawing atau caption kehilangan `keepNext`/`keepLines`;
 - drawing tidak berdekatan secara benar dengan caption;
 - teks kode keluar dari style kode;
 - integritas gambar C1–C4 gagal;
-- gambar tidak memiliki narasi eksplisit `Gambar X.Y` dalam bab yang sama;
+- gambar tidak memiliki narasi `[FIGREF:<id>]` yang terlihat sebagai `Gambar X.Y` dalam bab yang sama;
 - rujukan gambar mengawali paragraf atau kalimat.
 
 ### Warning nonfatal
@@ -739,8 +760,8 @@ C:\Python312\python.exe skills/scripts/update_fields_com.py Tugas_Akhir_Formatte
 
 ### Narasi gambar gagal
 
-- Cocokkan nomor persis dengan caption final, misalnya `Gambar 3.4`.
-- Pastikan rujukan berada pada bab yang sama.
+- Cocokkan ID persis dengan `[FIGURE:<id>]`, lalu gunakan `[FIGREF:<id>]`.
+- Pastikan minimal satu rujukan berada pada bab yang sama dengan caption.
 - Letakkan rujukan di tengah kalimat, bukan setelah tanda akhir kalimat.
 - Jangan mengandalkan teks caption atau Daftar Gambar sebagai narasi.
 

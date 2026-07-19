@@ -101,14 +101,16 @@ Jika implementasi menyimpang dari sumber dengan prioritas lebih tinggi, laporkan
 ### 5.2 Gambar dan narasi
 
 - Caption gambar berada di bawah gambar dan menggunakan style `Caption`.
-- Format caption: `Gambar X.Y Deskripsi`, tanpa titik setelah nomor.
-- Untuk draf yang sudah memakai referensi eksplisit, setiap gambar `post_com` ditulis sebagai marker `[FIGURE:<id-manifest>]` pada satu baris tepat sebelum caption. ID adalah pencarian utama; `caption_match` hanya menjadi assertion bahwa caption yang bersebelahan benar. Draf branch lama tanpa marker masih didukung melalui fallback caption sampai dimigrasikan.
+- Format final caption: `Gambar X.Y Deskripsi`, tanpa titik setelah nomor. Nomor `X.Y` dibuat oleh field Word `SEQ`, bukan ditulis di Markdown.
+- Sumber gambar ID-based wajib memakai dua baris bersebelahan: `[FIGURE:<id-manifest>]` lalu `[FIGCAPTION:Deskripsi]`. ID adalah pencarian aset dan bookmark utama; `caption_match` hanya menjadi assertion deskripsi. Draf branch lama dengan caption bernomor masih didukung sementara.
 - Counter gambar restart per bab dan mengikuti urutan baca.
-- Setiap caption gambar wajib memiliki paragraf narasi biasa yang menyebut `Gambar X.Y` dalam bab yang sama.
+- Narasi sumber merujuk gambar dengan `[FIGREF:<id-manifest>]`; formatter mengubah token itu menjadi field Word `REF` yang terlihat sebagai `Gambar X.Y`.
+- Setiap caption gambar wajib memiliki minimal satu paragraf narasi biasa dengan `[FIGREF:<id>]` dalam bab yang sama. Rujukan tambahan dari bab lain diperbolehkan.
 - Rujukan harus berada di tengah kalimat. Rujukan pada awal paragraf atau tepat setelah `.`, `!`, atau `?` adalah pelanggaran fatal.
 - Caption, heading, Daftar Gambar, atau paragraf drawing tidak dihitung sebagai narasi.
 - Struktur final harus menjaga drawing tepat sebelum caption. Pola `[drawing][narasi][caption]` diubah menjadi `[drawing][caption][narasi]`.
 - Drawing dan caption harus memiliki `keepNext` serta `keepLines`.
+- Drawing dan caption wajib berada pada halaman yang sama. Ukuran drawing harus menyisakan ruang caption; bila ruang halaman tersisa tidak cukup, Word harus memindahkan pasangan tersebut bersama ke halaman berikutnya.
 - Gambar mempertahankan rasio aspek, tidak di-upscale, tidak dicrop, dan dibatasi sekitar 15 × 16 cm.
 
 ### 5.3 Integritas gambar C1–C4
@@ -116,14 +118,15 @@ Jika implementasi menyimpang dari sumber dengan prioritas lebih tinggi, laporkan
 - C1: byte gambar duplikat berdasarkan MD5 ditolak kecuali direkonsiliasi secara sah.
 - C2: entry manifest `post_com` harus menghasilkan tepat satu drawing bernama `FIGURE:<id>`, tepat satu caption target, dan keduanya harus bersebelahan. Jika sebuah draf memakai marker, draf tersebut wajib memuat seluruh ID manifest branch itu tepat satu kali.
 - C3: byte media di DOCX harus sama dengan file `images/<file>`.
-- C4: drawing/caption tidak boleh terpisah oleh page split yang tidak sah.
+- C4: setiap pasangan `[drawing][caption]` wajib berada pada satu halaman. Validator memeriksa adjacency, `keepNext`/`keepLines`, dan bahwa tinggi drawing ditambah cadangan caption masih muat dalam printable height.
 - `source` pada manifest adalah provenance; perbedaan path source saja bukan kegagalan jika byte final benar.
 - Jangan menambah allow-list hanya agar test lulus. Gunakan hanya untuk exception yang dapat dijelaskan.
 
 ### 5.4 Tabel dan caption
 
 - Caption tabel berada di atas tabel.
-- Format caption: `Tabel X.Y Deskripsi`.
+- Format final caption: `Tabel X.Y Deskripsi`; nomor dibuat oleh field Word `SEQ`.
+- Sumber tabel ID-based memakai `[TABLE-ID:<id>]`, `[TABLECAPTION:Deskripsi]`, lalu blok `[TABLE]...[/TABLE]`. Narasi memakai `[TABREF:<id>]`, yang menjadi field Word `REF` terlihat sebagai `Tabel X.Y`.
 - Counter tabel terpisah dari gambar dan restart per bab.
 - Tabel harus muat dalam printable width.
 - Header row diulang pada halaman lanjutan.
@@ -185,6 +188,7 @@ Parser mendukung:
 - fenced code block;
 - inline bold, italic, bold+italic, inline code, escape `\*`, dan hyperlink;
 - `[TABLE]...[/TABLE]`, termasuk mode seperti `[TABLE gantt]`;
+- marker/caption/ref ID-based: `[FIGURE:id]`, `[FIGCAPTION:...]`, `[FIGREF:id]`, `[TABLE-ID:id]`, `[TABLECAPTION:...]`, dan `[TABREF:id]`;
 - pipe table dengan alignment Markdown;
 - `---` sebagai page break;
 - `# DAFTAR PUSTAKA` sebagai bibliografi dinamis.
@@ -266,7 +270,7 @@ Agent harus mengingat batas berikut:
 - branch selain `laporan/iman|dwikhi|faiz` menghasilkan `HELD` sebelum I/O/provider;
 - `--fact` bersifat opt-in; jangan mengirim seluruh `project_facts.json` ke provider eksternal;
 - response wajib JSON terstruktur dengan provenance fakta/sitasi/klaim belum terverifikasi;
-- jangan membuat sitasi atau caption/aset gambar baru dari generator;
+- jangan membuat sitasi atau caption/aset gambar baru dari generator; rujukan kandidat hanya boleh memakai `[FIGREF:<id>]`/`[TABREF:<id>]` yang sudah ada;
 - jangan pernah menambahkan `--apply` tanpa meninjau issues dan diff;
 - request/result pada `scratch/` adalah artefak lokal dan tidak boleh dianggap source of truth.
 

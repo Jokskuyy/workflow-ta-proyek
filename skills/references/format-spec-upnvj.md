@@ -22,4 +22,4 @@
 | **Page Splits** | Daftar Isi, Daftar Gambar, Daftar Tabel di halaman terpisah |
 | **Cover Page** | Cover di halaman sendiri, terpisah dari isi |
 | **Table of Appendices** | Daftar Lampiran di halaman sendiri setelah Daftar Tabel. LAMPIRAN 1–4 dikecualikan dari Daftar Isi (gaya paragraf kustom tanpa outline level). |
-| **Images & Figures** | Pertahankan rasio aspek asli (tidak distorsi); ukuran menyesuaikan dimensi gambar secara dinamis. |
+| **Images & Figures** | Pertahankan rasio aspek asli (tidak distorsi); ukuran menyesuaikan dimensi gambar secara dinamis. Drawing wajib tepat sebelum caption dan keduanya harus berada pada halaman yang sama. Jika ruang halaman tersisa tidak cukup, pasangan gambar-caption dipindahkan bersama ke halaman berikutnya. |

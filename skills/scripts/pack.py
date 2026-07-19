@@ -208,6 +208,7 @@ def cleanup_post_com_update(docx_path):
             
         children = list(body)
         paragraphs_to_remove = []
+        changed = False
         
         for idx in range(1, len(children)):
             child = children[idx]
@@ -228,13 +229,51 @@ def cleanup_post_com_update(docx_path):
                                     child.remove(run)
                                     prev_p.append(run)
                                 paragraphs_to_remove.append(child)
+                                changed = True
                             else:
                                 print(f"Cleanup: Preceding sibling is not a paragraph at index {idx}, skipping move.")
                         else:
                             paragraphs_to_remove.append(child)
                             print(f"Cleanup: Removing empty TableofFigures paragraph at index {idx}.")
+                            changed = True
+
+        # Word COM may regenerate the TOC SDT and discard pageBreakBefore from
+        # its heading. Reapply it after COM so the heading cannot split across
+        # the approval page in Word or LibreOffice renders.
+        for child in list(body):
+            if not child.tag.endswith('sdt'):
+                continue
+            sdt_content = child.find('w:sdtContent', namespaces)
+            toc_heading = (
+                sdt_content.find('w:p', namespaces)
+                if sdt_content is not None else None
+            )
+            if toc_heading is None:
+                continue
+            toc_text = ''.join(toc_heading.itertext()).strip().upper()
+            if not toc_text.startswith('DAFTAR ISI'):
+                continue
+            p_pr = toc_heading.find('w:pPr', namespaces)
+            if p_pr is None:
+                p_pr = ET.Element('{%s}pPr' % namespaces['w'])
+                toc_heading.insert(0, p_pr)
+            if p_pr.find('w:pageBreakBefore', namespaces) is None:
+                ET.SubElement(p_pr, '{%s}pageBreakBefore' % namespaces['w'])
+                changed = True
+                print('Cleanup: Reapplied pageBreakBefore to the Daftar Isi SDT heading.')
+
+            # LibreOffice (and some Word field-update paths) can still split the
+            # first paragraph of a TOC content control even when pageBreakBefore
+            # is present.  Keep the visible heading outside the SDT while the
+            # TOC field/list remains inside it; this gives both renderers a
+            # normal paragraph boundary on which to apply the page break.
+            content.remove(toc_heading)
+            insert_at = body.index(child)
+            body.insert(insert_at, toc_heading)
+            changed = True
+            print('Cleanup: Moved Daftar Isi heading outside the TOC SDT.')
                             
-        if paragraphs_to_remove:
+        if changed:
             for p in paragraphs_to_remove:
                 body.remove(p)
             
