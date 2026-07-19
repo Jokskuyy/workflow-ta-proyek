@@ -1,8 +1,9 @@
 Masukan UAT dikelola sebagai kebutuhan produk bersama karena seluruh responden mengevaluasi sistem yang sama. Setiap laporan menggunakan daftar temuan dan status produk yang identik, sedangkan penjelasan kontribusi teknis ditulis sesuai peran masing-masing. Solusi aktual tidak harus sama secara literal dengan redaksi saran apabila terdapat bukti bahwa solusi tersebut menyelesaikan masalah pengguna yang sama.
 
-Matriks pada Tabel 3.7 menjadi sumber bersama untuk menelusuri masalah pengguna, target hasil, komponen terkait, dan status verifikasi. Status hanya boleh diubah menjadi `Diterapkan` setelah terdapat bukti implementasi dan pengujian ulang pada build produk yang sama.
+Matriks pada [TABREF:tindak_lanjut_uat] menjadi sumber bersama untuk menelusuri masalah pengguna, target hasil, komponen terkait, dan status verifikasi. Status hanya boleh diubah menjadi `Diterapkan` setelah terdapat bukti implementasi dan pengujian ulang pada build produk yang sama.
 
-Tabel 3.7 Matriks Tindak Lanjut Hasil UAT
+[TABLE-ID:tindak_lanjut_uat]
+[TABLECAPTION:Matriks Tindak Lanjut Hasil UAT]
 
 [TABLE]
 ID | Masalah atau Kebutuhan Pengguna | Target Hasil | Komponen Terkait | Status Verifikasi

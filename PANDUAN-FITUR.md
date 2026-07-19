@@ -39,7 +39,7 @@ Sumber kebenaran tunggal tiap branch adalah **`Tugas_Akhir_Draft.md`** di root. 
 ### Aturan penulisan wajib (dari `write-ta-proyek`)
 1. **Tanpa bullet** (`-`, `*`, `+`). Gunakan hierarki: `1.` → `a.` → `1)` → `a)`.
 2. **Setiap sub-bab teori diawali definisi + minimal satu sitasi.**
-3. **Jangan menyebut gambar/tabel di awal kalimat** ("Gambar 2.1 menunjukkan..." ❌). Sebut di tengah kalimat ("...seperti pada Gambar 2.1.").
+3. **Jangan menaruh rujukan gambar/tabel di awal kalimat.** Gunakan ID di tengah kalimat, misalnya `...seperti pada [FIGREF:diagram_arsitektur].` atau `...dirinci pada [TABREF:hasil_uji].`.
 4. **Konsistensi istilah** (mis. pakai "database" terus, jangan ganti "basis data").
 5. **Jangan mengarang fakta/angka.** Verifikasi ke `project_facts.json`. Bila `completed: false`/`null`, tulis placeholder `[TBD: ...]`.
 6. **Lampiran**: format `LAMPIRAN 1.`, tiap lampiran pisah halaman (`---`), tidak muncul di Daftar Isi.
@@ -102,7 +102,7 @@ Karena pergeseran halaman, buka `.docx` di Word → klik kanan tabel **DAFTAR IS
 | Caption Gambar | **di bawah** gambar, center, "Gambar 2.3 ..." |
 | Nomor halaman | Romawi di kanan bawah untuk front matter; Arab restart dari 1 pada BAB I; pembuka BAB di tengah bawah dan halaman lanjutan di kanan atas |
 | Page split | Daftar Isi/Gambar/Tabel/Lampiran di halaman terpisah; cover sendiri |
-| Gambar | Pertahankan rasio aspek (tidak distorsi) |
+| Gambar | Pertahankan rasio aspek (tidak distorsi); gambar dan caption wajib satu halaman |
 
 ---
 
@@ -122,16 +122,33 @@ Alternatif tanpa instalasi: tempel isi `.puml` ke https://www.plantuml.com/plant
 
 ## 7. Gambar & Manifest
 
-- `images/manifest.json` memetakan ID stabil ke berkas gambar milik branch. Untuk draf baru atau yang sudah dimigrasikan, Markdown menyebut gambar secara exact dengan marker `[FIGURE:<id>]` tepat sebelum caption; draf lama tetap memiliki fallback caption.
+- `images/manifest.json` memetakan ID stabil ke berkas gambar milik branch. Draf baru memakai marker `[FIGURE:<id>]`, caption `[FIGCAPTION:Deskripsi]`, dan narasi `[FIGREF:<id>]`; draf lama tetap memiliki fallback caption bernomor.
 - Screenshot antarmuka & dokumentasi ada di `dokumentasi/`.
 - Saat menambah gambar baru: simpan aset, daftarkan ID di manifest, lalu tulis dua baris berikut dan rebuild:
 
   ```markdown
+  Arsitektur sistem dijelaskan pada [FIGREF:diagram_arsitektur].
+
   [FIGURE:diagram_arsitektur]
-  Gambar 2.9 Diagram Arsitektur Sistem
+  [FIGCAPTION:Diagram Arsitektur Sistem]
   ```
 
-  `caption_match` memverifikasi caption, sedangkan pencarian aset memakai ID exact. Setiap gambar tetap wajib disebut di tengah kalimat narasi pada bab yang sama. Jangan menyalin manifest, aset, atau marker laporan anggota lain saat hanya menyinkronkan pipeline.
+  `caption_match` memverifikasi deskripsi, sedangkan pencarian aset memakai ID exact. Pipeline membuat `Gambar X.Y` dan field rujukannya otomatis. Setiap gambar tetap wajib disebut di tengah kalimat narasi pada bab yang sama. Jangan menyalin manifest, aset, atau marker laporan anggota lain saat hanya menyinkronkan pipeline.
+
+  Drawing ditempatkan tepat sebelum caption dan keduanya wajib berada pada halaman yang sama. Pipeline memakai `keepNext`/`keepLines` serta batas tinggi page-aware agar pasangan dipindahkan bersama ke halaman berikutnya jika ruang tersisa tidak cukup.
+
+- Tabel baru memakai bentuk berikut agar nomor dan seluruh rujukan ikut berubah otomatis:
+
+  ```markdown
+  Hasil pengujian dirinci pada [TABREF:hasil_uji].
+
+  [TABLE-ID:hasil_uji]
+  [TABLECAPTION:Hasil Pengujian]
+  [TABLE]
+  Kolom | Nilai
+  A | B
+  [/TABLE]
+  ```
 
 ---
 
