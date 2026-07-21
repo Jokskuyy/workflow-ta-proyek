@@ -3,50 +3,36 @@
     {
       "id": "diagram_arsitektur",
       "file": "diagram_arsitektur.png",
-      "caption_match": "Diagram Arsitektur Sistem",
-      "source": "unpacked_ta/word/media/image22.png",
+      "caption_match": "Arsitektur Integrasi Aset 3D dan Data",
+            "source": "diagrams/gambar-2-09-arsitektur-integrasi-aset-data.svg",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_tahap_pengembangan",
-      "file": "diagram_tahap_pengembangan.jpg",
-      "caption_match": "Tahap Pengembangan",
-      "source": "unpacked_ta/word/media/image23.png",
+      "file": "diagram_tahap_pengembangan.png",
+      "caption_match": "Alur Perancangan Aset 3D dan Data",
+            "source": "diagrams/gambar-2-10-alur-perancangan-aset-data.svg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "diagram_hierarki_prefab",
+      "file": "diagram_hierarki_prefab.png",
+      "caption_match": "Rancangan Hierarki Prefab dan Target Navigasi",
+            "source": "diagrams/gambar-2-11-hierarki-prefab.svg",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_erd",
-      "file": "ERD_data_akademik_dan_fasilitas.png",
-      "caption_match": "ERD Ringkas Data Akademik dan Fasilitas",
-      "source": "images/ERD_data_akademik_dan_fasilitas.svg",
+      "file": "diagram_erd.png",
+      "caption_match": "ERD Inti Data Gedung, Fasilitas, Fakultas, dan Program Studi",
+            "source": "diagrams/gambar-2-17-erd-inti-data-kampus.svg",
       "inject_method": "post_com"
     },
     {
-      "id": "diagram_use_case_legenda",
-      "file": "diagram_use_case_legenda.png",
-      "caption_match": "Legenda Use Case Diagram",
-      "source": "unpacked_ta/word/media/image25.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "diagram_use_case",
-      "file": "diagram_use_case.jpg",
-      "caption_match": "Use Case Diagram",
-      "source": "unpacked_ta/word/media/image26.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "diagram_activity_kelola_data",
-      "file": "diagram_activity_kelola_data.png",
-      "caption_match": "Activity Diagram: Pengelolaan Data oleh Admin",
-      "source": "unpacked_ta/word/media/image27.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "diagram_activity_integrasi",
-      "file": "diagram_activity_integrasi.png",
-      "caption_match": "Activity Diagram: Integrasi Data Denah",
-      "source": "unpacked_ta/word/media/image28.png",
+      "id": "diagram_sequence_validasi",
+      "file": "diagram_sequence_validasi.png",
+      "caption_match": "Sequence Diagram Validasi Identifier Aset dan Data",
+            "source": "diagrams/gambar-2-16-sequence-validasi-aset-data.svg",
       "inject_method": "post_com"
     },
     {

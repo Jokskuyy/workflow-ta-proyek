@@ -1,68 +1,53 @@
-@startuml gambar-2-09-arsitektur-sistem
-' Gambar 2.9 - Diagram Arsitektur Sistem (versi terkini, mengacu PRD)
-' Menggantikan arsitektur lama (BuildingDataReceiver/BuildingClickHandler - deprecated)
+@startuml gambar-2-09-arsitektur-integrasi-aset-data
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
+skinparam defaultFontName "Times New Roman"
 skinparam defaultFontSize 12
-skinparam ArrowColor #444444
+skinparam ArrowColor #3F3F3F
 skinparam componentStyle rectangle
 skinparam rectangle {
-  BackgroundColor #F2F2F2
+  BackgroundColor #F7F7F7
   BorderColor #555555
 }
 skinparam component {
   BackgroundColor #F7F7F7
-  BorderColor #666666
+  BorderColor #555555
 }
 skinparam database {
-  BackgroundColor #ECECEC
-  BorderColor #555555
-}
-skinparam actor {
-  BackgroundColor #ECECEC
-  BorderColor #555555
+  BackgroundColor #EDF3F8
+  BorderColor #4A667A
 }
 
-title Gambar 2.9 — Diagram Arsitektur Sistem
-
-actor "Pengguna Publik" as User
-actor "Administrator" as Admin
-
-rectangle "Browser (Klien)" as Browser {
-  component "React SPA\n(Vite)\n- Dashboard Publik\n- Admin Panel\n- Panel Pencarian\n- Multi-bahasa" as React
-  component "Unity WebGL Canvas\n- Scene 3D Kampus\n- NavMesh Pathfinding\n- First-person Control" as UnityCanvas
-  React -right-> UnityCanvas : SendMessage\n(\"NavigationReceiver\",\n\"NavigateTo\") — satu arah
+rectangle "Browser" {
+  component "React SPA\nDashboard publik dan admin\n(Iman)" as React
+  component "Unity WebGL\nRuntime navigasi\n(Faiz)" as Unity
 }
 
-rectangle "Vercel" as Vercel {
-  component "Static Hosting\n(dist/, unity-builds/)" as Static
-  component "Serverless Functions\n/api/unity/data\n/api/unity/names\n/api/buildings, /api/rooms\n/api/health" as Serverless
+database "Supabase PostgreSQL\nData gedung, fasilitas,\nfakultas, dan program studi\n(Rancangan inti: Dwikhi)" as DB
+
+component "Vercel Serverless Functions\n/api/unity/data\n/api/unity/names\n(Iman)" as API
+
+rectangle "Unity Editor" {
+  component "Aset 3D, prefab, Pointer,\ndan GameObject tujuan\n(Dwikhi)" as Assets #EAF5EA
+  component "DatabaseSyncChecker\n(Faiz; digunakan Dwikhi)" as Checker
 }
 
-rectangle "Server Kampus" as Kampus {
-  component "Express.js (:3001)\n- Proxy Umami\n- Rate limiter" as Express
-  component "Umami Analytics\n(Docker :3000)" as Umami
-  Express -right-> Umami : proxy
-}
+React --> DB : Supabase Auth dan CRUD langsung
+API --> DB : Query data dan identifier
+Unity --> API : GET /api/unity/data
+Checker --> API : GET /api/unity/names
+Checker --> Assets : Bandingkan nama GameObject
 
-database "Supabase Cloud\n- PostgreSQL\n- Auth (JWT)\n- Row Level Security" as Supabase
+React --> Unity : SendMessage\nNavigateTo(unity_object_name)
+Unity --> React : OnNavigationCompleted\nJSON unity_object_name
 
-' Alur pengguna
-User --> React : Akses dashboard & denah
-Admin --> React : Login & CRUD data
+DB ..> Assets : Kontrak pemetaan\nunity_object_name
 
-' Frontend ke layanan
-React --> Static : Muat aset (SPA + WebGL)
-React --> Serverless : REST API (data gedung/fasilitas)
-React --> Supabase : Auth & query (RLS)
-React --> Express : Statistik analitik
-
-' Unity menarik data sendiri (runtime)
-UnityCanvas --> Serverless : HTTP GET /api/unity/data
-
-' Serverless ke database
-Serverless --> Supabase : Query data
+note bottom of DB
+  SQL diintegrasikan ke repositori web oleh Iman.
+  RLS, autentikasi, layanan audit, dan deployment
+  berada di luar kontribusi Dwikhi.
+end note
 
 @enduml

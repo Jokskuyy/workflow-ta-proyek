@@ -1,51 +1,41 @@
-# Kerangka Laporan TA — Dwikhi (3D Asset Designer dan Database Schema Designer)
+# Kerangka Laporan TA Dwikhi
 
-> Format TA prototipe (4 bab). BAB I dan observasi (2.1) sebagian besar **sama** untuk semua anggota; penekanan berbeda mulai dari usulan solusi & implementasi.
+## BAB I Pendahuluan
 
-## BAB I PENDAHULUAN
-- 1.1 Latar Belakang *(bersama)*
-- 1.2 Identifikasi Masalah *(tekankan: belum ada aset 3D kampus & struktur data terpadu/aman)*
-- 1.3 Batasan Masalah *(fokus: seluruh aset 3D gedung dan fasilitas yang memiliki GameObject di Unity Editor + prefab/Pointer + skema/ERD + pengelolaan data dan `unity_object_name`; RLS/audit hanya konteks sistem)*
-- 1.4 Tujuan dan Manfaat (1.4.1 Tujuan, 1.4.2 Manfaat)
-- 1.5 Jadwal Kegiatan
-- 1.6 Sistematika Penulisan
+BAB I memakai konteks proyek bersama, lalu memfokuskan rumusan masalah, batasan, tujuan, dan manfaat pada aset 3D, rancangan data inti, seed, serta pemetaan `unity_object_name`.
 
-## BAB II RANCANGAN PROYEK
-- 2.1 Observasi *(bersama)* — 2.1.1 Observasi Lapangan; 2.1.2 Analisis Sistem Berjalan; 2.1.3 Wawancara Stakeholder
-- 2.2 Usulan Solusi
-  - 2.2.1 Kebutuhan Fungsional *(data gedung/fasilitas, akurasi aset, audit)*
-  - 2.2.2 Kebutuhan Teknis *(Unity Editor, PostgreSQL/Supabase, pemetaan data; RLS dan trigger sebagai konteks sistem)*
-  - 2.2.3 Kebutuhan Non-Fungsional *(integritas data, keamanan, keterpeliharaan aset)*
-- 2.3 Rancangan Proyek
-  - 2.3.1 Rencana Pengembangan *(prototyping)*
-  - 2.3.2 Perancangan Aset & Konvensi Scene 3D *(aset gedung dan fasilitas, prefab, child Pointer, penamaan)*
-  - 2.3.3 Perancangan Database & Pengelolaan Data *(ERD, relasi, record gedung/fasilitas; RLS dan trigger audit sebagai konteks)*
-  - 2.3.4 Perancangan unity_object_name sebagai Jembatan Data
-- 2.4 Rencana Pengujian Proyek *(integritas data dan konsistensi aset–DB; RLS/audit mengacu pada pengujian bersama)*
+## BAB II Rancangan Proyek
 
-## BAB III IMPLEMENTASI PROYEK
-- 3.1 Profil Mitra *(bersama)*
-- 3.2 Metode Implementasi
-  - 3.2.1 Pembuatan & Penataan Aset 3D Gedung dan Fasilitas di Unity Editor
-  - 3.2.2 Hierarki Prefab, Child Pointer & Penamaan unity_object_name
-  - 3.2.3 Skema Database, ERD & Pengelolaan Data di Supabase
-  - 3.2.4 Konteks Row Level Security & Trigger Audit Logs
-- 3.3 Konfigurasi & Metadata (3.3.1 Struktur Basis Data & Relasi; 3.3.2 Aset & Konvensi Penamaan)
-- 3.4 Laporan Implementasi (3.4.1 Logbook; 3.4.2 Hasil & Bukti Aset 3D Gedung dan Fasilitas; 3.4.3 Hasil & Bukti Skema serta Pengelolaan Data)
-- 3.5 Hasil Pengujian (3.5.1 Integritas & Relasi; pengujian RLS/audit sebagai konteks bersama; konsistensi aset–DB menggunakan Database Sync Checker buatan Faiz)
+### 2.1 Observasi
 
-## BAB IV PENUTUP
-- 4.1 Kesimpulan
-- 4.2 Saran
+Gunakan observasi bersama tanpa mengubah batas interpretasi kuesioner dan wawancara.
 
----
+### 2.2 Usulan Solusi
 
-### Gambar Direkomendasikan
-- Arsitektur Sistem (`../../diagrams/gambar-2.09-*`)
-- ERD (`../../diagrams/gambar-2.17-erd`)
-- Hierarki Prefab Gedung (`../../diagrams/gambar-3.1-hierarki-prefab-unity`)
-- Sequence Sinkronisasi (`../../diagrams/gambar-2.16-*`)
-- (buat sendiri) Screenshot pembuatan aset gedung dan fasilitas di Unity, workflow aset→prefab/Pointer, ERD, bukti pengelolaan data, perubahan `unity_object_name`, dan hasil validasi/retest
+1. Kebutuhan fungsional aset, prefab, data inti, seed, pemetaan identifier, dan pemeriksaan konsistensi.
+2. Kebutuhan teknis Unity Editor, ProBuilder, PostgreSQL atau Supabase, prefab, material, seed, `/api/unity/names`, dan `DatabaseSyncChecker`.
+3. Kebutuhan nonfungsional integritas data, konsistensi identifier, keterpeliharaan, keterlacakan, dan keterbacaan visual.
 
-### Acuan
-- PRD bagian "Skema Database" & "Konvensi Struktur Scene Unity": `../../PRD_Konsolidasi_TA.md`
+### 2.3 Rancangan Proyek
+
+1. Alur Perancangan Aset dan Data.
+2. Perancangan Aset 3D Gedung dan Fasilitas.
+3. Perancangan Hierarki Prefab dan Konvensi Penamaan.
+4. Perancangan ERD dan Struktur Data Inti.
+5. Perancangan Pengelolaan Seed dan Kualitas Data.
+6. Perancangan Pemetaan dan Validasi `unity_object_name`.
+
+### 2.4 Rencana Pengujian
+
+1. Pemeriksaan Visual dan Struktur Aset.
+2. Verifikasi Struktural Skema dan Seed.
+3. Pemeriksaan Konsistensi Aset–Data.
+4. Black Box dan UAT produk bersama sebagai konteks.
+
+## BAB III Implementasi Proyek
+
+BAB III memuat bukti proses Unity Editor, hierarki prefab, empat tabel inti, pengelolaan seed, pemetaan identifier, inventaris material atau tekstur, serta penggunaan alat pemeriksa buatan Faiz. Konfigurasi akses dan audit aplikasi dijelaskan sebagai batas integrasi, bukan implementasi Dwikhi.
+
+## BAB IV Penutup
+
+Kesimpulan hanya merangkum bukti aset, struktur data inti, seed, serta snapshot validasi yang tersedia. Saran tidak mengubah kekurangan bukti menjadi klaim performa atau optimasi aset.

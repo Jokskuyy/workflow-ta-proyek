@@ -114,7 +114,7 @@
             "focus": [
                 "Creation and layout of all building and facility 3D GameObjects in Unity Editor without Blender",
                 "Prefab hierarchy and child Pointer target GameObjects",
-                "PostgreSQL database schema and ERD design in Supabase Cloud",
+                "Core PostgreSQL schema and ERD design for gedung, fasilitas, fakultas, and program_studi",
                 "Management of gedung and fasilitas records",
                 "unity_object_name mapping and integrity",
                 "Use of DatabaseSyncChecker developed by the 3D Simulator & Engine Developer"
@@ -139,7 +139,7 @@
             {"activity": "Pemetaan aset dengan unity_object_name", "months": [3, 4, 5]},
             {"activity": "Pemeriksaan integritas database", "months": [4, 5]},
             {"activity": "Validasi menggunakan DatabaseSyncChecker", "months": [4, 5]},
-            {"activity": "Pemeriksaan visual dan teknis aset", "months": [4, 5, 6]},
+            {"activity": "Pemeriksaan visual dan struktur aset", "months": [4, 5, 6]},
             {"activity": "Koreksi ketidaksesuaian aset dan data", "months": [5, 6]},
             {"activity": "Penyusunan dokumentasi dan laporan", "months": [1, 2, 3, 4, 5, 6]},
             {"activity": "Pengujian akhir dan finalisasi", "months": [5, 6]}
@@ -198,6 +198,28 @@
             "ui_screenshot": "dokumentasi/contoh_sync_db.png"
         }
     },
+    "dwikhi_evidence_inventory": {
+        "unity_editor_version": "6000.4.1f1",
+        "active_scene": "Assets/Scene/SceneUtama.unity",
+        "reference_visual_files": 21,
+        "representative_render_hierarchy_pairs": 11,
+        "material_texture_files": 37,
+        "material_texture_source_match": "Seluruh 37 berkas material dan tekstur pada bukti laporan memiliki byte yang sama dengan berkas bernama sama pada proyek Unity sumber.",
+        "performance_scope": "Data GameObject, mesh, vertex, dan ukuran prefab digunakan sebagai inventaris keadaan aset, bukan hasil optimasi atau pengujian performa.",
+        "provenance_limit": "Identitas pengambil, tanggal dan lokasi sebagian foto, serta sumber atau lisensi beberapa material dan tekstur belum tercatat lengkap."
+    },
+    "live_data_snapshot": {
+        "status": "historical_and_not_latest_seed",
+        "building_records": 19,
+        "facility_records": 331,
+        "unity_name_records": 323,
+        "sync_checker_result": {
+            "found_in_scene": 320,
+            "database_only": 3,
+            "scene_only": 14
+        },
+        "interpretation": "Data endpoint dan hasil DatabaseSyncChecker merupakan snapshot lama. Seed final berisi 19 gedung dan 311 fasilitas serta belum diterapkan ulang pada Supabase aktif."
+    },
     "facility_seed_inventory": {
         "source_status": "Seed terbaru yang diberikan pada lampiran SQL menjadi sumber data fasilitas yang didokumentasikan. Supabase belum menggunakan seed terbaru; jumlah GameObject Unity tidak disamakan otomatis dengan jumlah record database.",
         "building_records": 19,
@@ -225,8 +247,24 @@
     "database_schema": {
         "table_count": 11,
         "status": "active",
+        "dwikhi_core_design_tables": [
+            "gedung",
+            "fasilitas",
+            "fakultas",
+            "program_studi"
+        ],
+        "system_extension_tables": [
+            "admin_users",
+            "audit_logs",
+            "campus_maps",
+            "campus_map_nodes",
+            "campus_map_edges",
+            "campus_map_building_points",
+            "web_analytics_log"
+        ],
+        "integration_ownership": "Dwikhi merancang empat tabel inti dan ERD; Iman mengintegrasikan SQL ke repositori web. Tabel ekstensi, Supabase Auth, RLS, dan layanan audit diperlakukan sebagai konteks sistem.",
         "documentation_source": "Berkas SQL setup dan seed terbaru yang diberikan pengguna; SQL setup hanya dibaca sebagai dokumentasi dan tidak dijalankan karena memuat operasi DROP TABLE.",
-        "audit_trigger_evidence": "Definisi trigger audit tidak ditemukan pada berkas SQL setup yang diberikan; keberadaannya tidak boleh disimpulkan dari berkas tersebut.",
+        "audit_trigger_evidence": "Definisi trigger audit tidak ditemukan pada berkas SQL setup. Pencatatan audit dilakukan oleh layanan aplikasi dan bukan kontribusi Dwikhi.",
         "tables": [
             {
                 "name": "gedung",

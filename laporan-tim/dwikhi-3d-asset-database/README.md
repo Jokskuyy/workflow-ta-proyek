@@ -1,31 +1,38 @@
-# Laporan TA — Dwikhi Deandra Purnianto (3D Asset Designer dan Database Schema Designer)
+# Laporan TA Dwikhi Deandra Purnianto
 
-**Branch:** `laporan/dwikhi` — tulis laporan di `Tugas_Akhir_Draft.md` (root repo) saat berada di branch ini.
+Branch `laporan/dwikhi` mendokumentasikan peran 3D Asset Designer dan Database Schema Designer.
 
-## Fokus / Lingkup Laporan
-Berdasarkan pembagian peran (BAB II — Wawancara Stakeholder), kontribusi:
-1. **Pembuatan & Penataan Seluruh Aset 3D Gedung dan Fasilitas yang Memiliki GameObject di Unity** langsung di **Unity Editor** (tanpa Blender), termasuk geometri, material atau tekstur, prefab, dan hierarki.
-2. **Konvensi Hierarki Prefab** — menyusun child `Pointer` dan GameObject tujuan dengan nama yang sesuai dengan `unity_object_name`.
-3. **Perancangan Skema Database dan ERD** Supabase PostgreSQL — `gedung`, `fasilitas`, `fakultas`, `program_studi`, `admin_users`, dan `audit_logs` beserta relasinya.
-4. **Pengelolaan Data Gedung dan Fasilitas** — menjaga kelengkapan record serta pemetaan `unity_object_name` pada aset dan data.
-5. **Validasi Konsistensi Aset–Data** — menggunakan `DatabaseSyncChecker` yang dikembangkan oleh 3D Simulator & Engine Developer untuk menemukan dan memperbaiki ketidaksesuaian.
+## Fokus Laporan
 
-> Ruang lingkup: persimpangan aset 3D dan pengelolaan data. Logika navigasi, *engine*, dan kode `DatabaseSyncChecker` merupakan kontribusi Faiz; API, dashboard, autentikasi, integrasi web, deployment, dan operasional layanan web merupakan kontribusi Iman. RLS serta trigger audit log hanya dibahas sebagai konteks sistem dan bukan kontribusi Dwikhi.
+1. Pembuatan dan penataan aset 3D gedung serta fasilitas yang memiliki GameObject pada scene Unity menggunakan Unity Editor.
+2. Penyusunan prefab, child `Pointer`, dan GameObject tujuan.
+3. Perancangan ERD dan struktur empat tabel inti: `gedung`, `fasilitas`, `fakultas`, dan `program_studi`.
+4. Pengelolaan seed gedung dan fasilitas.
+5. Pemetaan `unity_object_name` antara record dan GameObject tujuan.
+6. Penggunaan `DatabaseSyncChecker` buatan Faiz untuk memeriksa konsistensi aset dan data.
 
-## Diagram Relevan
-- **2.17 Entity-Relationship Diagram** — inti perancangan database.
-- **3.1 Hierarki Prefab Gedung dengan Child Pointer** — inti penataan aset.
-- **2.9 Arsitektur**, **2.12 Use Case**, **2.13 Activity Pengelolaan Data**, **2.16 Sequence Sinkronisasi** — konteks bersama.
-- Sumber diagram: `../../diagrams/`.
+Tabel Denah 2D, Supabase Auth, RLS, layanan audit, frontend, API, runtime Unity, dan deployment hanya dijelaskan sebagai konteks integrasi. Iman menangani integrasi SQL ke repositori web. Faiz menangani kode pemeriksa, runtime Unity, navigasi, optimasi, dan build WebGL.
 
-## Yang Perlu Ditambahkan Sendiri
-- Tangkapan layar proses pemodelan aset di Unity Editor.
-- Workflow aset → prefab → penamaan `unity_object_name`.
-- ERD atau dokumentasi skema yang dirancang.
-- Bukti pengelolaan record gedung/fasilitas, perubahan `unity_object_name`, hasil pemeriksaan, koreksi, dan retest.
+## Diagram Aktif
+
+1. Arsitektur Integrasi Aset 3D dan Data.
+2. Alur Perancangan Aset 3D dan Data.
+3. Rancangan Hierarki Prefab dan Target Navigasi.
+4. ERD Inti Data Gedung, Fasilitas, Fakultas, dan Program Studi.
+5. Sequence Diagram Validasi Identifier Aset dan Data.
+
+Sumber diagram berada di folder `diagrams/` dan menggunakan PlantUML sebagai sumber kanonik.
+
+## Batas Klaim
+
+1. Tidak ada klaim optimasi performa aset karena optimasi dilakukan pada runtime Unity melalui pekerjaan Faiz.
+2. Seed final 19 gedung dan 311 fasilitas dibedakan dari snapshot Supabase aktif 19 gedung dan 331 fasilitas.
+3. Hasil sinkronisasi 320 cocok, 3 hanya pada basis data, dan 14 hanya pada scene diperlakukan sebagai snapshot lama.
+4. Provenance foto atau tekstur yang tidak tersedia dinyatakan sebagai keterbatasan.
+5. RLS, Auth, dan layanan audit bukan kontribusi Dwikhi.
 
 ## Acuan
-- Kontrak konten bersama dan include: `../../content/README.md`
-- PRD (bagian "Skema Database" & "Konvensi Struktur Scene Unity"): `../../PRD_Konsolidasi_TA.md`
-- Kerangka laporan: `outline-laporan.md`
-- Kode Unity & skema DB: repo eksternal (lihat `../../PANDUAN-TIM.md`).
+
+- Kontrak shared content: `content/README.md`.
+- Kerangka laporan: `outline-laporan.md`.
+- Fakta terstruktur: `project_facts.json`.

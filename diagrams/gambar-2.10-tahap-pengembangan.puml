@@ -1,58 +1,38 @@
-@startuml gambar-2-10-tahap-pengembangan
-' Gambar 2.10 - Tahap Pengembangan (Model Prototyping, iteratif)
-' Sumber: BAB II - 2.3.1 Rencana Pengembangan
+@startuml gambar-2-10-alur-perancangan-aset-data
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
-skinparam defaultFontSize 13
-skinparam ArrowColor #444444
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
+skinparam ArrowColor #3F3F3F
 skinparam ActivityBorderColor #555555
-skinparam ActivityBackgroundColor #F2F2F2
-skinparam ActivityDiamondBackgroundColor #ECECEC
+skinparam ActivityBackgroundColor #F5F5F5
+skinparam ActivityDiamondBackgroundColor #EDF3F8
 skinparam ActivityDiamondBorderColor #555555
-skinparam NoteBackgroundColor #FAFAFA
-skinparam NoteBorderColor #BBBBBB
-
-title Gambar 2.10 — Tahap Pengembangan (Model Prototyping)
 
 start
+:Mengumpulkan referensi visual\ndan kebutuhan data;
 
-:1. Pengumpulan Kebutuhan\n(Requirement Gathering);
-note right
-  Wawancara stakeholder & survei awal
-  untuk memetakan fungsionalitas
-  Full Stack API dan dashboard.
-end note
+fork
+  :Mengamati bentuk, lantai,\nbukaan, warna, dan material;
+  :Membuat serta menata aset\ndi Unity Editor;
+  :Menyusun prefab, Pointer,\ndan GameObject tujuan;
+fork again
+  :Menginventarisasi gedung,\nfasilitas, fakultas, dan program studi;
+  :Merancang entitas, atribut,\nrelasi, dan constraint;
+  :Menyusun serta memeriksa seed;
+end fork
 
-repeat
-  :2. Membangun Prototyping Awal\n(Quick Design);
-  note right
-    Desain skema database (ERD)
-    dan mockup antarmuka
-    dashboard admin & publik.
-  end note
+:Menetapkan unity_object_name\npada data dan GameObject;
+:Menjalankan pemeriksaan\nkonsistensi aset dan data;
 
-  :3. Evaluasi Prototipe\n(Evaluation & Testing);
-  note right
-    Pengujian backend API & dashboard
-    via Black Box Testing dan
-    validasi internal.
-  end note
+while (Masih terdapat ketidaksesuaian?) is (Ya)
+  :Menentukan sumber masalah\npada data atau scene;
+  :Memperbaiki identifier, data,\natau nama GameObject;
+  :Mengulangi pemeriksaan;
+endwhile (Tidak)
 
-  if (Prototipe diterima?) then (Belum)
-    :4. Iterasi Perbaikan\n(Iteration);
-    note right
-      Perbaikan bug fungsionalitas
-      CRUD, RLS database, atau
-      koneksi API.
-    end note
-  endif
-repeat while (Perlu perbaikan?) is (Ya) not (Tidak)
-->Prototipe disetujui;
-
-:Sistem siap rilis;
-
+:Mendokumentasikan aset, data,\ndan hasil pemeriksaan;
 stop
 
 @enduml

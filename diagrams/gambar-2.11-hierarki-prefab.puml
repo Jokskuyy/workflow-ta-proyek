@@ -1,4 +1,4 @@
-@startwbs gambar-3-1-hierarki-prefab-unity
+@startwbs gambar-2-11-hierarki-prefab
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -15,8 +15,10 @@ skinparam wbsDiagram {
 *** Lantai 1
 *** Lantai 2
 *** Lantai berikutnya
+** Material dan Tekstur
 ** Pointer
 *** unity_object_name gedung
-*** unity_object_name fasilitas
+*** unity_object_name fasilitas 1
+*** unity_object_name fasilitas berikutnya
 
 @endwbs

@@ -1,91 +1,63 @@
-@startuml gambar-2-17-erd
-' Gambar 2.17 - Entity-Relationship Diagram
-' Sumber: PRD - Skema Database (Supabase Cloud / PostgreSQL)
+@startuml gambar-2-17-erd-inti-data-kampus
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
-skinparam defaultFontSize 12
-skinparam ArrowColor #444444
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 11
+skinparam ArrowColor #3F3F3F
 skinparam entity {
-  BackgroundColor #F2F2F2
+  BackgroundColor #F5F5F5
   BorderColor #555555
 }
 hide circle
 skinparam linetype ortho
 
-title Gambar 2.17 — Entity-Relationship Diagram
-
 entity "gedung" as gedung {
-  * id : PK
+  * id : SERIAL <<PK>>
   --
-  nama_gedung
-  deskripsi_gedung
-  lokasi
-  jumlah_lantai
-  foto_url
-  unity_object_name
+  nama_gedung : VARCHAR <<UQ, NOT NULL>>
+  deskripsi_gedung : TEXT
+  lokasi : TEXT
+  jumlah_lantai : INT
+  foto_url : VARCHAR
+  unity_object_name : TEXT <<UQ>>
 }
 
 entity "fasilitas" as fasilitas {
-  * id : PK
+  * id : SERIAL <<PK>>
   --
-  nama_fasilitas
-  deskripsi_fasilitas
-  tipe_fasilitas
-  color
-  lantai
-  # id_gedung : FK
-  foto_url
-  unity_object_name
+  nama_fasilitas : VARCHAR <<NOT NULL>>
+  deskripsi_fasilitas : TEXT
+  tipe_fasilitas : VARCHAR
+  color : VARCHAR
+  lantai : INT
+  foto_url : TEXT
+  id_gedung : INT <<FK, NULLABLE>>
+  unity_object_name : TEXT <<UQ>>
 }
 
 entity "fakultas" as fakultas {
-  * id : PK
+  * id : SERIAL <<PK>>
   --
-  nama_fakultas
-  deskripsi_fakultas
-  email
-  website
-  # id_gedung_utama : FK
+  nama_fakultas : VARCHAR <<UQ, NOT NULL>>
+  deskripsi_fakultas : TEXT
+  email : VARCHAR
+  website : VARCHAR
+  id_gedung_utama : INT <<FK, NULLABLE>>
 }
 
 entity "program_studi" as prodi {
-  * id : PK
+  * id : SERIAL <<PK>>
   --
-  nama_prodi
-  jenjang : D3/S1/S2/S3
-  # id_fakultas : FK
-  akreditasi
+  nama_prodi : VARCHAR <<NOT NULL>>
+  jenjang : VARCHAR <<NOT NULL>>
+  id_fakultas : INT <<FK, NOT NULL>>
+  akreditasi : VARCHAR
+  (nama_prodi, jenjang, id_fakultas) <<UQ>>
 }
 
-entity "admin_users" as admin {
-  * id : PK
-  --
-  username
-  password_hash
-  nama_lengkap
-  role
-  created_at
-}
-
-entity "audit_logs" as audit {
-  * id : PK
-  --
-  # actor_id : FK
-  actor_email
-  action : INSERT/UPDATE/DELETE
-  table_name
-  record_id
-  old_data
-  new_data
-  created_at
-}
-
-' Relasi
-gedung ||--o{ fasilitas : memiliki
-gedung ||--o{ fakultas : "gedung utama"
-fakultas ||--o{ prodi : menaungi
-admin ||--o{ audit : mencatat
+gedung ||--o{ fasilitas : id_gedung / SET NULL
+gedung ||--o{ fakultas : id_gedung_utama / SET NULL
+fakultas ||--o{ prodi : id_fakultas / CASCADE
 
 @enduml

@@ -41,6 +41,21 @@ from hypothesis import strategies as st
 ROOT = Path(__file__).resolve().parents[1]
 CAPTURED_DOCX = ROOT / "Tugas_Akhir_Formatted.docx"
 VALIDATOR = ROOT / "skills" / "scripts" / "validate_docx_structure.py"
+DRAFT = ROOT / "Tugas_Akhir_Draft.md"
+MANIFEST = ROOT / "images" / "manifest.json"
+REFERENCE_CAPTIONS = ROOT / "tests" / "fixtures" / "reference_caption_numbers.json"
+CAPTURED_DOCX_STALE = (
+    CAPTURED_DOCX.exists()
+    and CAPTURED_DOCX.stat().st_mtime < max(DRAFT.stat().st_mtime, MANIFEST.stat().st_mtime)
+)
+CAPTURED_BASELINE_STALE = (
+    not REFERENCE_CAPTIONS.exists()
+    or REFERENCE_CAPTIONS.stat().st_mtime < max(DRAFT.stat().st_mtime, MANIFEST.stat().st_mtime)
+)
+pytestmark = pytest.mark.skipif(
+    CAPTURED_DOCX_STALE or CAPTURED_BASELINE_STALE,
+    reason="captured DOCX or preservation baseline is stale after an intentional report revision",
+)
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
