@@ -32,7 +32,7 @@ Platform Web UPNVJ menyatukan empat komponen:
 ## Struktur Tim & Branch
 Repo dipakai 3 anggota; tiap anggota menulis di branch sendiri (lihat `PANDUAN-TIM.md`):
 - `laporan/iman` — Full Stack & System Integrator
-- `laporan/dwikhi` — 3D Asset & Database Schema (RLS, audit, ERD)
+- `laporan/dwikhi` — 3D Asset & Database/Asset Manager (11 aset gedung, prefab dan `Pointer`, ERD, pengelolaan data, serta pemetaan `unity_object_name`; RLS dan audit hanya konteks sistem)
 - `laporan/faiz` — Simulator & Engine (NavMesh, Catmull-Rom, Building Culling, WebGL Optimizer, Database Sync Checker)
 
 Saat membantu, **cek peran branch aktif** di `laporan-tim/<peran>/` dan fokuskan pembahasan pada lingkup peran itu.

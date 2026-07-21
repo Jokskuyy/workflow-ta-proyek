@@ -1,16 +1,16 @@
-# Laporan TA — Muhammad Dwikhi Deandra Purnianto (3D Asset Designer & Database Schema Designer)
+# Laporan TA — Muhammad Dwikhi Deandra Purnianto (3D Asset Designer & Database/Asset Manager)
 
 **Branch:** `laporan/dwikhi` — tulis laporan di `Tugas_Akhir_Draft.md` (root repo) saat berada di branch ini.
 
 ## Fokus / Lingkup Laporan
 Berdasarkan pembagian peran (BAB II — Wawancara Stakeholder), kontribusi:
-1. **Pemodelan & Penataan Aset 3D Gedung** langsung di **Unity Editor** (tanpa Blender).
-2. **Konvensi Hierarki Prefab** — prefab gedung dengan child `Pointer` berisi GameObject `unity_object_name`.
-3. **Perancangan Skema Database** Supabase PostgreSQL — `gedung`, `fasilitas`, `fakultas`, `program_studi`, `admin_users`, `audit_logs` beserta relasinya (ERD).
-4. **Row Level Security (RLS)** — kebijakan akses (`anon` = SELECT, `authenticated` = CRUD).
-5. **Trigger Audit Logs** — pencatatan otomatis setiap mutasi data.
+1. **Pembuatan & Penataan Sebelas Aset 3D Gedung** langsung di **Unity Editor** (tanpa Blender), termasuk geometri, material atau tekstur, prefab, dan hierarki.
+2. **Konvensi Hierarki Prefab** — menyusun child `Pointer` dan GameObject tujuan dengan nama yang sesuai dengan `unity_object_name`.
+3. **Perancangan Skema Database dan ERD** Supabase PostgreSQL — `gedung`, `fasilitas`, `fakultas`, `program_studi`, `admin_users`, dan `audit_logs` beserta relasinya.
+4. **Pengelolaan Data Gedung dan Fasilitas** — menjaga kelengkapan record serta pemetaan `unity_object_name` pada aset dan data.
+5. **Validasi Konsistensi Aset–Data** — menggunakan `DatabaseSyncChecker` yang dikembangkan oleh 3D Simulator & Engine Developer untuk menemukan dan memperbaiki ketidaksesuaian.
 
-> Ruang lingkup: persimpangan aset 3D dan struktur data. Logika navigasi/engine = Faiz; API/integrasi web = Iman.
+> Ruang lingkup: persimpangan aset 3D dan pengelolaan data. Logika navigasi, engine, dan kode `DatabaseSyncChecker` = Faiz; API, dashboard, autentikasi, dan integrasi web = Iman. RLS serta trigger audit log hanya dibahas sebagai konteks sistem dan bukan kontribusi Dwikhi.
 
 ## Diagram Relevan
 - **2.17 Entity-Relationship Diagram** — inti perancangan database.
@@ -21,7 +21,8 @@ Berdasarkan pembagian peran (BAB II — Wawancara Stakeholder), kontribusi:
 ## Yang Perlu Ditambahkan Sendiri
 - Tangkapan layar proses pemodelan aset di Unity Editor.
 - Workflow aset → prefab → penamaan `unity_object_name`.
-- SQL DDL skema, contoh policy RLS, dan kode trigger audit log.
+- ERD atau dokumentasi skema yang dirancang.
+- Bukti pengelolaan record gedung/fasilitas, perubahan `unity_object_name`, hasil pemeriksaan, koreksi, dan retest.
 
 ## Acuan
 - Kontrak konten bersama dan include: `../../content/README.md`

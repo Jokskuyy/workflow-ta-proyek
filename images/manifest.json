@@ -16,9 +16,9 @@
     },
     {
       "id": "diagram_erd",
-      "file": "diagram_erd.png",
-      "caption_match": "Entity-Relationship Diagram",
-      "source": "dokumentasi/erd_schema.png",
+      "file": "ERD_data_akademik_dan_fasilitas.png",
+      "caption_match": "ERD Ringkas Data Akademik dan Fasilitas",
+      "source": "images/ERD_data_akademik_dan_fasilitas.svg",
       "inject_method": "post_com"
     },
     {
@@ -170,51 +170,240 @@
     },
     {
       "id": "survey_01_profil",
-      "file": "survey_01_profil.png",
+      "file": "surveys/survey_01_profil.png",
       "caption_match": "Hasil Kuesioner: Profil Status Akademik",
       "source": "unpacked_ta/word/media/image4.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_02_efektivitas",
-      "file": "survey_02_efektivitas.png",
+      "file": "surveys/survey_02_efektivitas.png",
       "caption_match": "Hasil Kuesioner: Efektivitas Informasi",
       "source": "unpacked_ta/word/media/image5.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_03_frekuensi",
-      "file": "survey_03_frekuensi.png",
+      "file": "surveys/survey_03_frekuensi.png",
       "caption_match": "Hasil Kuesioner: Frekuensi Akses Denah",
       "source": "unpacked_ta/word/media/image6.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_04_perilaku",
-      "file": "survey_04_perilaku.png",
+      "file": "surveys/survey_04_perilaku.png",
       "caption_match": "Hasil Kuesioner: Perilaku Pencarian Lokasi",
       "source": "unpacked_ta/word/media/image7.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_05_urgensi",
-      "file": "survey_05_urgensi.png",
+      "file": "surveys/survey_05_urgensi.png",
       "caption_match": "Hasil Kuesioner: Urgensi Kebutuhan Denah",
       "source": "unpacked_ta/word/media/image8.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_06_adopsi",
-      "file": "survey_06_adopsi.png",
+      "file": "surveys/survey_06_adopsi.png",
       "caption_match": "Hasil Kuesioner: Tingkat Adopsi Potensial",
       "source": "unpacked_ta/word/media/image9.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_07_prioritas",
-      "file": "survey_07_prioritas.png",
+      "file": "surveys/survey_07_prioritas.png",
       "caption_match": "Hasil Kuesioner: Prioritas Fitur",
       "source": "unpacked_ta/word/media/image10.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_photo_cipto",
+      "file": "list_foto/Foto_gedung_Cipto.jpg",
+      "caption_match": "Referensi Aktual Gedung Cipto Mangunkusumo",
+      "source": "images/list_foto/Foto_gedung_Cipto.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_photo_myamin",
+      "file": "list_foto/Foto_gedung_M.Yamin.jpg",
+      "caption_match": "Referensi Aktual Gedung M. Yamin",
+      "source": "images/list_foto/Foto_gedung_M.Yamin.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_photo_wahidin",
+      "file": "list_foto/Foto_gedung_wahidin.jpg",
+      "caption_match": "Referensi Aktual Gedung Wahidin Sudiro Husodo",
+      "source": "images/list_foto/Foto_gedung_wahidin.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_process_asset",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/Proses_penegerjaan_asset_gedung.png",
+      "caption_match": "Proses Pengerjaan Aset Gedung di Unity Editor",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/Proses_penegerjaan_asset_gedung.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_material_wall_fik",
+      "file": "list_material/diding_tu_fik.png",
+      "caption_match": "Contoh Tekstur Dinding FIK",
+      "source": "images/list_material/diding_tu_fik.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_material_roof",
+      "file": "list_material/atap.jpeg",
+      "caption_match": "Contoh Tekstur Atap",
+      "source": "images/list_material/atap.jpeg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_material_grass",
+      "file": "list_material/rumput.png",
+      "caption_match": "Contoh Tekstur Rumput",
+      "source": "images/list_material/rumput.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_material_window",
+      "file": "list_material/jendela.png",
+      "caption_match": "Contoh Tekstur Jendela",
+      "source": "images/list_material/jendela.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_cipto",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Cipto_Mangunkusumo.png",
+      "caption_match": "Aset 3D Gedung Cipto Mangunkusumo",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Cipto_Mangunkusumo.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_cipto",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset gedung_Cipto Mangunkusumo.png",
+      "caption_match": "Hierarki Aset Gedung Cipto Mangunkusumo",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset gedung_Cipto Mangunkusumo.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_myamin",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_M.Yamin.png",
+      "caption_match": "Aset 3D Gedung M. Yamin",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_M.Yamin.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_myamin",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_M.Yamin.png",
+      "caption_match": "Hierarki Aset Gedung M. Yamin",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_M.Yamin.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_wahidin",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_wahidin_Sudiro_Husodo.png",
+      "caption_match": "Aset 3D Gedung Wahidin Sudiro Husodo",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_wahidin_Sudiro_Husodo.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_wahidin",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Wahidin_Sudiro_Husodo.png",
+      "caption_match": "Hierarki Aset Gedung Wahidin Sudiro Husodo",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Wahidin_Sudiro_Husodo.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_dewi",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Dewi_Sartika.png",
+      "caption_match": "Aset 3D Gedung Dewi Sartika",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Dewi_Sartika.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_dewi",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Dewi_Sartika.png",
+      "caption_match": "Hierarki Aset Gedung Dewi Sartika",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Dewi_Sartika.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_work_history",
+      "file": "riwayat_pengerjaan.png",
+      "caption_match": "Riwayat Perubahan Aset dan Material pada Repository",
+      "source": "images/riwayat_pengerjaan.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_unity_version",
+      "file": "versi_unity.jpeg",
+      "caption_match": "Versi Unity yang Digunakan pada Pengukuran Aset",
+      "source": "images/versi_unity.jpeg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_prefab_sizes",
+      "file": "data/Ukuran__file_prefab.png",
+      "caption_match": "Ukuran Berkas Prefab Gedung pada Inventaris Aset",
+      "source": "images/data/Ukuran__file_prefab.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_ki_hadjar",
+      "file": "pengujian_vertex_dan_mesh_gedung.png",
+      "caption_match": "Hasil Pengukuran GameObject, Mesh, dan Vertex Ki Hajar Dewantara",
+      "source": "images/pengujian_vertex_dan_mesh_gedung.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_dewi",
+      "file": "pengujian_vertex_dan_mesh_gedung_2.png",
+      "caption_match": "Hasil Pengukuran GameObject, Mesh, dan Vertex Dewi Sartika",
+      "source": "images/pengujian_vertex_dan_mesh_gedung_2.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_jenderal",
+      "file": "pengujian_vertex_dan_mesh_gedung_3.png",
+      "caption_match": "Hasil Pengukuran GameObject, Mesh, dan Vertex Jenderal Soedirman",
+      "source": "images/pengujian_vertex_dan_mesh_gedung_3.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_constraint_inventory",
+      "file": "Memeriksa_constraint_database.png",
+      "caption_match": "Inventaris Constraint Tabel Utama pada Supabase",
+      "source": "images/Memeriksa_constraint_database.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_unity_names_gedung",
+      "file": "data/nama_objek_unity_gedung.png",
+      "caption_match": "Contoh Nilai unity_object_name pada Tabel Gedung",
+      "source": "images/data/nama_objek_unity_gedung.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_unity_names_fasilitas",
+      "file": "data/nama_objek_unity_fasilitas.png",
+      "caption_match": "Contoh Nilai unity_object_name pada Tabel Fasilitas",
+      "source": "images/data/nama_objek_unity_fasilitas.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_sync_checker_lanjutan",
+      "file": "hasil_databasesynchacker.png",
+      "caption_match": "Hasil Pemeriksaan Lanjutan Konsistensi Nama Aset dan Basis Data",
+      "source": "images/hasil_databasesynchacker.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_test_device",
+      "file": "Perangkat_uji.png",
+      "caption_match": "Spesifikasi Perangkat Pengujian Aset",
+      "source": "images/Perangkat_uji.png",
       "inject_method": "post_com"
     }
   ]

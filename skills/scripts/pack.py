@@ -262,12 +262,64 @@ def cleanup_post_com_update(docx_path):
                 changed = True
                 print('Cleanup: Reapplied pageBreakBefore to the Daftar Isi SDT heading.')
 
+            # Word can retain the TOC hyperlink to the heading while dropping
+            # its bookmark start during field refresh. Restore the start from
+            # the first cached TOC entry before moving the heading outside the
+            # content control, otherwise Word displays an error on the first
+            # Daftar Isi line.
+            toc_hyperlinks = sdt_content.findall('.//w:hyperlink', namespaces)
+            toc_anchor = (
+                toc_hyperlinks[0].get('{%s}anchor' % namespaces['w'])
+                if toc_hyperlinks else None
+            )
+            if toc_anchor:
+                existing_names = {
+                    node.get('{%s}name' % namespaces['w'])
+                    for node in root.iter('{%s}bookmarkStart' % namespaces['w'])
+                }
+                if toc_anchor not in existing_names:
+                    bookmark_end = toc_heading.find('w:bookmarkEnd', namespaces)
+                    bookmark_id = (
+                        bookmark_end.get('{%s}id' % namespaces['w'])
+                        if bookmark_end is not None else None
+                    )
+                    if bookmark_id is None:
+                        ids = [
+                            int(node.get('{%s}id' % namespaces['w']))
+                            for node in root.iter('{%s}bookmarkStart' % namespaces['w'])
+                            if (node.get('{%s}id' % namespaces['w']) or '').isdigit()
+                        ]
+                        ids.extend(
+                            int(node.get('{%s}id' % namespaces['w']))
+                            for node in root.iter('{%s}bookmarkEnd' % namespaces['w'])
+                            if (node.get('{%s}id' % namespaces['w']) or '').isdigit()
+                        )
+                        bookmark_id = str(max(ids, default=-1) + 1)
+                    bookmark_start = ET.Element(
+                        '{%s}bookmarkStart' % namespaces['w'],
+                        {
+                            '{%s}id' % namespaces['w']: bookmark_id,
+                            '{%s}name' % namespaces['w']: toc_anchor,
+                        },
+                    )
+                    first_run = toc_heading.find('w:r', namespaces)
+                    insert_at = (
+                        list(toc_heading).index(first_run)
+                        if first_run is not None else len(toc_heading)
+                    )
+                    toc_heading.insert(insert_at, bookmark_start)
+                    changed = True
+                    print(
+                        f'Cleanup: Restored bookmark {toc_anchor} '
+                        'for the Daftar Isi heading.'
+                    )
+
             # LibreOffice (and some Word field-update paths) can still split the
             # first paragraph of a TOC content control even when pageBreakBefore
             # is present.  Keep the visible heading outside the SDT while the
             # TOC field/list remains inside it; this gives both renderers a
             # normal paragraph boundary on which to apply the page break.
-            content.remove(toc_heading)
+            sdt_content.remove(toc_heading)
             insert_at = body.index(child)
             body.insert(insert_at, toc_heading)
             changed = True

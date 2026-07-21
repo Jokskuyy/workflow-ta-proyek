@@ -259,7 +259,7 @@ Package `skills/scripts/alur_penulisan/` adalah library Python untuk memproses M
 | Branch | Peran |
 |---|---|
 | `laporan/iman` | Full Stack & System Integrator |
-| `laporan/dwikhi` | 3D Asset & Database Schema |
+| `laporan/dwikhi` | 3D Asset Designer & Database/Asset Manager |
 | `laporan/faiz` | Simulator & Engine |
 
 Branch lain menghasilkan status `HELD`; tidak ada berkas yang dibaca atau ditulis sampai lingkup peran dapat ditentukan.

@@ -136,7 +136,7 @@ The writing process uses the following files in the workspace parent directory (
   - **Focus Areas**: Unity WebGL Engine, NavMesh pathfinding, Catmull-Rom Centripetal curve, Building Culling, Pointer Lock, Virtual mobile joystick, Editor tools (WebGL Settings Optimizer, Database Sync Checker).
 - **Muhammad Dwikhi Deandra Purnianto**
   - **Role**: *Peran 3: 3D Asset Designer & Database/Asset Manager*
-  - **Focus Areas**: 3D modeling and layout directly in Unity Editor (no Blender), PostgreSQL database schema design in Supabase Cloud, RLS policies, audit logs triggers, data mapping/integrity (`unity_object_name` bridge).
+  - **Focus Areas**: creation and layout of 11 building assets directly in Unity Editor (no Blender), prefab hierarchy and child `Pointer` targets, PostgreSQL schema and ERD design, management of building/facility records, and validation of the `unity_object_name` bridge using the Database Sync Checker developed by the 3D Simulator & Engine Developer. RLS and audit triggers are system context, not this role's contribution.
 
 ### Technical & Environment Constraints
 - **3D Modeling & Layout**: Executed directly in **Unity Editor** instead of external software like Blender.

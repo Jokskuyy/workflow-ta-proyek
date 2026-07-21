@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import copy
 import lxml.etree
 
 # Register all namespaces
@@ -46,6 +47,70 @@ for prefix, uri in {
 import sys
 sys.path.append('scratch')
 from merge_draft_to_docx import build_p_element
+
+
+def load_draft_front_matter():
+    """Read identity/title metadata from the active draft for template front matter.
+
+    The archive DOCX is a reusable layout template and may contain another
+    author's cover page.  The draft is the source of truth for branch-specific
+    identity metadata, so the patcher updates the cover without hard-coding a
+    particular branch or NIM.
+    """
+    draft_path = os.environ.get('TA_DRAFT_PATH', 'Tugas_Akhir_Draft.md')
+    if not os.path.isfile(draft_path):
+        return {}
+
+    with open(draft_path, 'r', encoding='utf-8') as handle:
+        lines = handle.read().splitlines()
+
+    headings = []
+    second_heading_index = None
+    heading_end = 0
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith('# BAB '):
+            heading_end = index
+            break
+        if stripped.startswith('# '):
+            headings.append(stripped[2:].strip())
+            if len(headings) == 2:
+                second_heading_index = index
+    if len(headings) < 2:
+        return {}
+
+    # The draft contract places name and NIM immediately after the two title
+    # lines. Keep TBD markers intact when the student has not supplied a NIM.
+    metadata_lines = [
+        line.strip()
+        for line in lines[second_heading_index + 1:heading_end]
+        if line.strip()
+    ]
+    if len(metadata_lines) < 2:
+        return {}
+
+    return {
+        'title': headings[0],
+        'subtitle': headings[1],
+        'name': metadata_lines[0],
+        'nim': metadata_lines[1],
+    }
+
+
+def replace_paragraph_text(paragraph, text, ns_uri):
+    """Replace a paragraph's visible text while retaining its paragraph/run style."""
+    ppr = paragraph.find(f'{{{ns_uri}}}pPr')
+    source_run = paragraph.find(f'{{{ns_uri}}}r')
+    source_rpr = source_run.find(f'{{{ns_uri}}}rPr') if source_run is not None else None
+    for child in list(paragraph):
+        if child is not ppr:
+            paragraph.remove(child)
+    run = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}r')
+    if source_rpr is not None:
+        run.append(copy.deepcopy(source_rpr))
+    text_node = lxml.etree.SubElement(run, f'{{{ns_uri}}}t')
+    text_node.text = text
+    text_node.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
 
 new_erd_markdown = """Penjelasan mengenai struktur tabel, kolom, tipe data, serta aturan relasi antartabel dijabarkan sebagai berikut:
 
@@ -188,13 +253,48 @@ def main():
     body = root.find('w:body', namespaces)
     
     # 1. Search and replace simple strings in w:t nodes
+    front_matter = load_draft_front_matter()
+    front_matter_replacements = {}
+    if front_matter:
+        front_matter_replacements = {
+            'Integrasi Denah Virtual Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu': front_matter['title'],
+            '(Dashboard Profil)': front_matter['subtitle'],
+            'Muhammad Iman Nugraha': front_matter['name'],
+            '2210511129': front_matter['nim'],
+        }
+        print(
+            'Loaded front matter from %s: %s / %s / %s / %s'
+            % (
+                os.environ.get('TA_DRAFT_PATH', 'Tugas_Akhir_Draft.md'),
+                front_matter['title'],
+                front_matter['subtitle'],
+                front_matter['name'],
+                front_matter['nim'],
+            )
+        )
+
+        paragraph_replacements = {
+            'Integrasi Denah Virtual Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu': front_matter['title'],
+            '(Dashboard Profil)': front_matter['subtitle'],
+        }
+        replaced_front_paragraphs = 0
+        for paragraph in body.findall('w:p', namespaces):
+            paragraph_text = ''.join(
+                node.text for node in paragraph.iter(f'{{{ns_uri}}}t') if node.text
+            )
+            replacement = paragraph_replacements.get(paragraph_text)
+            if replacement is not None:
+                replace_paragraph_text(paragraph, replacement, ns_uri)
+                replaced_front_paragraphs += 1
+        print(f'Replaced {replaced_front_paragraphs} split front-matter paragraph(s).')
+
     wt_replaced = 0
     for wt in root.xpath('//w:t', namespaces=namespaces):
         text = wt.text
         if not text:
             continue
             
-        new_text = text
+        new_text = front_matter_replacements.get(text, text)
         # Replace outdated figure titles
         if "Modal Tambah Dosen" in new_text:
             new_text = new_text.replace("Modal Tambah Dosen", "Modal Tambah Data Gedung")

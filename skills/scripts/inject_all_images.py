@@ -623,10 +623,213 @@ def inject_all_images(docx_path):
             toc_heading.insert(0, p_pr)
         if p_pr.find(f'{{{ns_uri}}}pageBreakBefore') is None:
             lxml.etree.SubElement(p_pr, f'{{{ns_uri}}}pageBreakBefore')
+
+        # The archive template stores the TOC heading's bookmark end, but
+        # Word's field refresh can drop the corresponding bookmark start when
+        # the heading is regenerated inside the content control.  The first
+        # TOC hyperlink points at that heading; restore the missing start so
+        # the cached TOC does not render ``Error! Bookmark not defined.``.
+        toc_hyperlinks = sdt_content.xpath('.//w:hyperlink', namespaces=namespaces)
+        toc_anchor = (
+            toc_hyperlinks[0].get(f'{{{ns_uri}}}anchor')
+            if toc_hyperlinks else None
+        )
+        if toc_anchor:
+            existing_names = {
+                node.get(f'{{{ns_uri}}}name')
+                for node in doc_root.iter(f'{{{ns_uri}}}bookmarkStart')
+            }
+            if toc_anchor not in existing_names:
+                bookmark_end = toc_heading.find(f'{{{ns_uri}}}bookmarkEnd')
+                bookmark_id = (
+                    bookmark_end.get(f'{{{ns_uri}}}id')
+                    if bookmark_end is not None else None
+                )
+                if bookmark_id is None:
+                    ids = [
+                        int(node.get(f'{{{ns_uri}}}id'))
+                        for node in doc_root.iter(f'{{{ns_uri}}}bookmarkStart')
+                        if (node.get(f'{{{ns_uri}}}id') or '').isdigit()
+                    ]
+                    ids.extend(
+                        int(node.get(f'{{{ns_uri}}}id'))
+                        for node in doc_root.iter(f'{{{ns_uri}}}bookmarkEnd')
+                        if (node.get(f'{{{ns_uri}}}id') or '').isdigit()
+                    )
+                    bookmark_id = str(max(ids, default=-1) + 1)
+                bookmark_start = lxml.etree.Element(
+                    f'{{{ns_uri}}}bookmarkStart',
+                    {
+                        f'{{{ns_uri}}}id': bookmark_id,
+                        f'{{{ns_uri}}}name': toc_anchor,
+                    },
+                )
+                first_run = toc_heading.find(f'{{{ns_uri}}}r')
+                insert_at = (
+                    list(toc_heading).index(first_run)
+                    if first_run is not None else len(toc_heading)
+                )
+                toc_heading.insert(insert_at, bookmark_start)
+                print(
+                    f'Post-COM TOC pass: restored bookmark {toc_anchor} '
+                    'for the Daftar Isi heading.'
+                )
         sdt_content.remove(toc_heading)
         body.insert(body.index(child), toc_heading)
         print('Post-COM TOC pass: moved Daftar Isi heading outside the TOC SDT.')
-        break
+
+    # ``pack.py`` may already have moved the heading before this script runs.
+    # In that case, repeat the bookmark repair against the visible paragraph
+    # and the cached TOC hyperlinks that remain inside the SDT.
+    else:
+        direct_toc_heading = None
+        for child in list(body):
+            if child.tag != f'{{{ns_uri}}}p':
+                continue
+            if ''.join(child.itertext()).strip().upper().startswith('DAFTAR ISI'):
+                direct_toc_heading = child
+                break
+        toc_hyperlinks = []
+        for candidate in body.findall(f'{{{ns_uri}}}p'):
+            candidate_text = ''.join(candidate.itertext()).strip().upper()
+            if candidate is direct_toc_heading or not candidate_text.startswith('DAFTAR ISI'):
+                continue
+            toc_hyperlinks = candidate.xpath('./w:hyperlink', namespaces=namespaces)
+            if toc_hyperlinks:
+                break
+        if not toc_hyperlinks:
+            toc_hyperlinks = doc_root.xpath(
+                '//w:sdtContent//w:hyperlink', namespaces=namespaces
+            )
+        if direct_toc_heading is not None and toc_hyperlinks:
+            toc_anchor = toc_hyperlinks[0].get(f'{{{ns_uri}}}anchor')
+            existing_names = {
+                node.get(f'{{{ns_uri}}}name')
+                for node in doc_root.iter(f'{{{ns_uri}}}bookmarkStart')
+            }
+            if toc_anchor and toc_anchor not in existing_names:
+                bookmark_end = direct_toc_heading.find(f'{{{ns_uri}}}bookmarkEnd')
+                bookmark_id = (
+                    bookmark_end.get(f'{{{ns_uri}}}id')
+                    if bookmark_end is not None else None
+                )
+                if bookmark_id is None:
+                    ids = [
+                        int(node.get(f'{{{ns_uri}}}id'))
+                        for node in doc_root.iter(f'{{{ns_uri}}}bookmarkStart')
+                        if (node.get(f'{{{ns_uri}}}id') or '').isdigit()
+                    ]
+                    ids.extend(
+                        int(node.get(f'{{{ns_uri}}}id'))
+                        for node in doc_root.iter(f'{{{ns_uri}}}bookmarkEnd')
+                        if (node.get(f'{{{ns_uri}}}id') or '').isdigit()
+                    )
+                    bookmark_id = str(max(ids, default=-1) + 1)
+                bookmark_start = lxml.etree.Element(
+                    f'{{{ns_uri}}}bookmarkStart',
+                    {
+                        f'{{{ns_uri}}}id': bookmark_id,
+                        f'{{{ns_uri}}}name': toc_anchor,
+                    },
+                )
+                first_run = direct_toc_heading.find(f'{{{ns_uri}}}r')
+                insert_at = (
+                    list(direct_toc_heading).index(first_run)
+                    if first_run is not None else len(direct_toc_heading)
+                )
+                direct_toc_heading.insert(insert_at, bookmark_start)
+                print(
+                    f'Post-COM TOC pass: restored bookmark {toc_anchor} '
+                    'for the existing Daftar Isi heading.'
+                )
+
+    # Final defensive pass: depending on Word's field-update order, the first
+    # TOC result paragraph can live either directly in the body or inside a
+    # different SDT. Locate it structurally rather than assuming one layout.
+    visible_heading = next(
+        (
+            child for child in body.findall(f'{{{ns_uri}}}p')
+            if ''.join(child.xpath('.//w:t/text()', namespaces=namespaces)).strip().upper()
+            == 'DAFTAR ISI'
+        ),
+        None,
+    )
+    if visible_heading is not None and not visible_heading.xpath(
+        './w:bookmarkStart', namespaces=namespaces
+    ):
+        toc_entry = next(
+            (
+                paragraph for paragraph in doc_root.xpath(
+                    '//w:p[.//w:hyperlink]', namespaces=namespaces
+                )
+                if paragraph is not visible_heading
+                and ''.join(
+                    paragraph.xpath('.//w:t/text()', namespaces=namespaces)
+                ).strip().upper().startswith('DAFTAR ISI')
+            ),
+            None,
+        )
+        if toc_entry is not None:
+            toc_entry_ppr = toc_entry.find(f'{{{ns_uri}}}pPr')
+            if toc_entry_ppr is not None:
+                toc_entry_break = toc_entry_ppr.find(f'{{{ns_uri}}}pageBreakBefore')
+                if toc_entry_break is not None:
+                    toc_entry_ppr.remove(toc_entry_break)
+        toc_hyperlink = (
+            toc_entry.find('w:hyperlink', namespaces)
+            if toc_entry is not None else None
+        )
+        toc_anchor = (
+            toc_hyperlink.get(f'{{{ns_uri}}}anchor')
+            if toc_hyperlink is not None else None
+        )
+        if toc_anchor:
+            existing_start = next(
+                (
+                    node for node in doc_root.iter(f'{{{ns_uri}}}bookmarkStart')
+                    if node.get(f'{{{ns_uri}}}name') == toc_anchor
+                ),
+                None,
+            )
+            bookmark_end = visible_heading.find(f'{{{ns_uri}}}bookmarkEnd')
+            bookmark_id = (
+                existing_start.get(f'{{{ns_uri}}}id')
+                if existing_start is not None else (
+                    bookmark_end.get(f'{{{ns_uri}}}id')
+                    if bookmark_end is not None else None
+                )
+            )
+            if existing_start is not None:
+                existing_start.getparent().remove(existing_start)
+            if bookmark_id is None:
+                ids = [
+                    int(node.get(f'{{{ns_uri}}}id'))
+                    for node in doc_root.iter(f'{{{ns_uri}}}bookmarkStart')
+                    if (node.get(f'{{{ns_uri}}}id') or '').isdigit()
+                ]
+                ids.extend(
+                    int(node.get(f'{{{ns_uri}}}id'))
+                    for node in doc_root.iter(f'{{{ns_uri}}}bookmarkEnd')
+                    if (node.get(f'{{{ns_uri}}}id') or '').isdigit()
+                )
+                bookmark_id = str(max(ids, default=-1) + 1)
+            bookmark_start = lxml.etree.Element(
+                f'{{{ns_uri}}}bookmarkStart',
+                {
+                    f'{{{ns_uri}}}id': bookmark_id,
+                    f'{{{ns_uri}}}name': toc_anchor,
+                },
+            )
+            first_run = visible_heading.find(f'{{{ns_uri}}}r')
+            insert_at = (
+                list(visible_heading).index(first_run)
+                if first_run is not None else len(visible_heading)
+            )
+            visible_heading.insert(insert_at, bookmark_start)
+            print(
+                f'Post-COM TOC pass: restored bookmark {toc_anchor} '
+                'in the final defensive pass.'
+            )
 
     # Write changes
     rels_tree.write(rels_path, encoding='utf-8', xml_declaration=True)

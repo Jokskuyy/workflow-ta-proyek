@@ -101,14 +101,15 @@
         },
         {
             "name": "Muhammad Dwikhi Deandra Purnianto",
-            "nim": "TBD",
+            "nim": "2210511131",
             "role": "Peran 3: 3D Asset Designer & Database/Asset Manager",
             "focus": [
-                "3D modeling and layout directly in Unity Editor",
-                "PostgreSQL database schema design in Supabase Cloud",
-                "RLS policies",
-                "audit logs triggers",
-                "data mapping/integrity"
+                "Creation and layout of 11 building assets directly in Unity Editor without Blender",
+                "Prefab hierarchy and child Pointer target GameObjects",
+                "PostgreSQL database schema and ERD design in Supabase Cloud",
+                "Management of gedung and fasilitas records",
+                "unity_object_name mapping and integrity",
+                "Use of DatabaseSyncChecker developed by the 3D Simulator & Engine Developer"
             ]
         }
     ],
@@ -153,12 +154,12 @@
     },
     "integration_pointer_and_sync": {
         "pointer_mechanism": {
-            "description": "Sebagai integrator, Muhammad Iman Nugraha membuat unity object name di dalam Unity (seperti prefab dewi sartika) yang memiliki child empty object pointer dengan nama yang sesuai dengan unity_object_name di database Supabase.",
+            "description": "Sebagai 3D Asset Designer dan Database/Asset Manager, Muhammad Dwikhi Deandra Purnianto menyusun child Pointer dan GameObject tujuan pada prefab gedung serta menetapkan nama yang sesuai dengan unity_object_name di database Supabase.",
             "hierarchy_screenshot": "dokumentasi/contoh_pointer.png"
         },
         "database_sync_checker": {
             "script_path": "src/unity-scripts/Editor/DatabaseSyncChecker.cs",
-            "description": "Script editor Unity untuk memeriksa sinkronisasi antara objek-objek di Unity Hierarchy dengan data di database Supabase melalui API /api/unity/names.",
+            "description": "Script editor Unity yang dikembangkan oleh Muammar Faiz Khairul Anam untuk memeriksa sinkronisasi antara objek di Unity Hierarchy dan data Supabase melalui API /api/unity/names; Muhammad Dwikhi Deandra Purnianto menggunakannya untuk menemukan dan memperbaiki ketidaksesuaian pada aset atau data.",
             "ui_screenshot": "dokumentasi/contoh_sync_db.png"
         }
     },
