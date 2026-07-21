@@ -298,10 +298,10 @@ def test_c2_natural_zero_match_entries_are_detected(base_entries, tmp_path):
     assert the validator REJECTS it (exit != 0) and names the C2 defect.
 
     Uses a DISTINCT entry (``diagram_arsitektur``) from the sibling
-    ``test_c2_synthetic_zero_match_is_detected`` (``diagram_erd``)."""
+    ``test_c2_synthetic_zero_match_is_detected`` (``diagram_use_case``)."""
     entries = dict(base_entries)
     doc = parse_doc(entries)
-    target = "Diagram Arsitektur Sistem"  # manifest entry: diagram_arsitektur
+    target = "Arsitektur Integrasi Sistem dan Unity WebGL"
     assert caption_match_count(doc, target) == 1, (
         "precondition: entry diagram_arsitektur must resolve to exactly 1 caption "
         "in the captured baseline document"
@@ -334,14 +334,14 @@ def test_c2_synthetic_zero_match_is_detected(base_entries, tmp_path):
     entry resolves to 0; the validator must reject the document."""
     entries = dict(base_entries)
     doc = parse_doc(entries)
-    target = "Entity-Relationship Diagram"  # manifest entry: diagram_erd
+    target = "Use Case Modul Unity WebGL"
     assert caption_match_count(doc, target) == 1
     _edit_caption_descriptor(doc, target, "Bagan Yang Sudah Tidak Cocok")
     assert caption_match_count(doc, target) == 0
     entries[DOC] = serialize_doc(doc)
     out = tmp_path / "c2_zero.docx"
     write_all(entries, out)
-    detail = f"entry diagram_erd caption_match '{target}' now resolves to 0 captions"
+    detail = f"entry diagram_use_case caption_match '{target}' now resolves to 0 captions"
     assert_rejected(run_validator(out), C2_KEYWORDS, "C2 (synthetic zero-match)", detail)
 
 
@@ -350,7 +350,7 @@ def test_c2_synthetic_multi_match_is_detected(base_entries, tmp_path):
     caption_match so it resolves to 2; the validator must reject the document."""
     entries = dict(base_entries)
     doc = parse_doc(entries)
-    target = "Entity-Relationship Diagram"  # manifest entry: diagram_erd
+    target = "Use Case Modul Unity WebGL"
     assert caption_match_count(doc, target) == 1
     # Repurpose a different existing Gambar caption to also read as the target.
     _edit_caption_descriptor(doc, "Tampilan UI Database Sync Checker di Unity Editor", target)
@@ -358,7 +358,7 @@ def test_c2_synthetic_multi_match_is_detected(base_entries, tmp_path):
     entries[DOC] = serialize_doc(doc)
     out = tmp_path / "c2_multi.docx"
     write_all(entries, out)
-    detail = f"entry diagram_erd caption_match '{target}' now resolves to 2 captions"
+    detail = f"entry diagram_use_case caption_match '{target}' now resolves to 2 captions"
     assert_rejected(run_validator(out), C2_KEYWORDS, "C2 (synthetic multi-match)", detail)
 
 

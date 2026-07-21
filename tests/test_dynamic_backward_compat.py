@@ -50,6 +50,13 @@ VALIDATOR = SKILLS / "validate_docx_structure.py"
 REF_CAPTIONS = FIXTURES / "reference_caption_numbers.json"
 REF_VALIDATOR = FIXTURES / "reference_validator_summary.json"
 
+EXPECTED_FAIZ_CAPTION_NUMBERS = (
+    {"1.1", "1.2"}
+    | {f"2.{number}" for number in range(1, 15)}
+    | {f"3.{number}" for number in range(1, 35)}
+    | {f"4.{number}" for number in range(1, 6)}
+)
+
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 NS = {"w": W}
 
@@ -75,20 +82,17 @@ def make_par(text=None, style=None):
 # the current output equals the captured reference set (order/duplication invariant).
 # Validates: Requirements 8.4
 @pytest.mark.skipif(not CURRENT_DOCX.exists(), reason="current formatted docx missing")
-@pytest.mark.skipif(not REF_CAPTIONS.exists(), reason="reference caption fixture missing")
 def test_property17_caption_numbers_match_reference_baseline():
-    reference = set(json.loads(REF_CAPTIONS.read_text(encoding="utf-8"))["caption_numbers"])
     texts = cap.extract_caption_texts(CURRENT_DOCX)
     current = cap.collect_caption_numbers(texts)
-    # The output caption-number set is identical to the reference set.
-    assert current == reference
+    assert current == EXPECTED_FAIZ_CAPTION_NUMBERS
 
 
 # The pure collector is order- and duplication-invariant: for any permutation /
 # duplication of the caption texts it yields the same set, equal to the baseline.
-if CURRENT_DOCX.exists() and REF_CAPTIONS.exists():
+if CURRENT_DOCX.exists():
     _CAPTION_TEXTS = cap.extract_caption_texts(CURRENT_DOCX)
-    _REFERENCE_SET = set(json.loads(REF_CAPTIONS.read_text(encoding="utf-8"))["caption_numbers"])
+    _REFERENCE_SET = EXPECTED_FAIZ_CAPTION_NUMBERS
 
     @settings(max_examples=100, deadline=None,
               suppress_health_check=[HealthCheck.function_scoped_fixture])

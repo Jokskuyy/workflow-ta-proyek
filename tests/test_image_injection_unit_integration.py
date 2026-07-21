@@ -400,7 +400,7 @@ def test_unit_resolve_caption_indices_zero_one_multiple():
     """inj.resolve_caption_indices returns ALL matching body indices: 0, 1, or
     many, per the pStyle=='Caption' + contains + remainder rule."""
     ns = {"w": W}
-    match = "Diagram Arsitektur Sistem"
+    match = "Arsitektur Integrasi Sistem dan Unity WebGL"
 
     # Zero matches: no caption mentions the target descriptor.
     body0 = _body_from_captions(["Gambar 2.1 Sesuatu Yang Lain",
@@ -675,7 +675,7 @@ def test_validator_c2_wrong_resolution_count_rejected(reconciled_project):
     """C2: an entry that no longer resolves to exactly one caption is rejected."""
     entries = read_all(reconciled_project / "captured.docx")
     doc = parse_doc(entries)
-    target = "Entity-Relationship Diagram"  # manifest entry diagram_erd
+    target = "Use Case Modul Unity WebGL"
     assert caption_match_count(doc, target) == 1
     _edit_caption_descriptor(doc, target, "Bagan Yang Sudah Tidak Cocok")
     assert caption_match_count(doc, target) == 0
@@ -692,8 +692,8 @@ def test_validator_c3_content_mismatch_rejected(reconciled_project):
     """C3: a packed media whose bytes no longer match its injected images/<file>
     (simulated recompression) is rejected."""
     entries = read_all(reconciled_project / "captured.docx")
-    victim = _media_before_caption(entries, "Entity-Relationship Diagram")
-    assert victim is not None, "expected a packed media preceding the ERD caption"
+    victim = _media_before_caption(entries, "Use Case Modul Unity WebGL")
+    assert victim is not None, "expected packed media preceding the use case caption"
     original = _md5_bytes(entries[victim])
     entries[victim] = entries[victim] + b"\x00recompressed-drift"
     assert _md5_bytes(entries[victim]) != original
@@ -711,8 +711,8 @@ def test_validator_c4_oversized_without_pagebreak_rejected(reconciled_project):
     entries = read_all(reconciled_project / "captured.docx")
     doc = parse_doc(entries)
     threshold = _printable_height(doc)
-    p = _drawing_p_before_caption(doc, "Sequence Diagram: Autentikasi Administrator")
-    assert p is not None, "expected a drawing before the autentikasi sequence caption"
+    p = _drawing_p_before_caption(doc, "Sequence Diagram Integrasi Data dan Penyelesaian Navigasi")
+    assert p is not None, "expected a drawing before the integration sequence caption"
     _make_tall_strip_pbb(p, threshold + 2_000_000)
     entries[DOC] = serialize_doc(doc)
     out_docx = reconciled_project / "c4.docx"
@@ -756,16 +756,16 @@ def test_integration_negative_all_four_defects(reconciled_project):
 
     # Document-level defects: C2 (zero match) + C4 (tall, no pageBreakBefore).
     doc = parse_doc(entries)
-    _edit_caption_descriptor(doc, "Entity-Relationship Diagram", "Bagan Rusak Tak Cocok")
+    _edit_caption_descriptor(doc, "Use Case Modul Unity WebGL", "Bagan Rusak Tak Cocok")
     threshold = _printable_height(doc)
-    tall_p = _drawing_p_before_caption(doc, "Sequence Diagram: Autentikasi Administrator")
+    tall_p = _drawing_p_before_caption(doc, "Sequence Diagram Integrasi Data dan Penyelesaian Navigasi")
     assert tall_p is not None
     _make_tall_strip_pbb(tall_p, threshold + 2_500_000)
     entries[DOC] = serialize_doc(doc)
 
     # Media-level defects: C1 (duplicate) + C3 (content drift on a third figure).
     entries, (src, dst) = _make_duplicate_media(entries, 5, 12)
-    victim = _media_before_caption(entries, "Sequence Diagram: Sinkronisasi Data Gedung dan Unity")
+    victim = _media_before_caption(entries, "Activity Diagram Navigasi NavMesh dan Rendering Rute")
     assert victim is not None and victim not in (src, dst)
     entries[victim] = entries[victim] + b"\x00drift-bytes"
 

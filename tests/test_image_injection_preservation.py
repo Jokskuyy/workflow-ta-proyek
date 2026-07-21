@@ -155,10 +155,28 @@ PRESERVE_PBT = settings(
 NON_MANIFEST_CAPTIONS = [
     ("Tabel 1.1 Peran dan Tanggung Jawab", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "Heading2", False),
     ("Tabel 1.2 Jadwal Kegiatan", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 3.1 Hubungan Mitra dengan Proyek", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "Heading2", False),
-    ("Tabel 3.2 Logbook Implementasi Proyek", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
-    ("Tabel 3.3 Hasil Pengujian Black Box Testing", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 3.4 Perbandingan Metrik Performa Lighthouse", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 2.1 Analisis Sistem yang Berjalan dan Implikasi Kebutuhan", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "", False),
+    ("Tabel 2.2 Pemetaan Komponen Arsitektur terhadap Peran Engine", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
+    ("Tabel 2.3 Pemetaan Diagram Rancangan terhadap Kebutuhan Laporan Faiz", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
+    ("Tabel 2.4 Alur Algoritme Penerimaan Tujuan dan Navigasi", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
+    ("Tabel 2.5 Alur Pemrosesan Titik Rute sebelum Rendering", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
+    ("Tabel 2.6 Rancangan State Occlusion dan Fog pada Overview–Gameplay", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 2.7 Rencana Pengujian Modul Simulator dan Engine", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 3.1 Hubungan Pemangku Kepentingan dengan Proyek", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "Heading2", False),
+    ("Tabel 3.2 Logbook Implementasi Modul Simulator dan Engine", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
+    ("Tabel 3.3 Alur Rendering Rute pada NavigationGuide", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 3.4 Batas Kontribusi Penulis dalam Sistem Terintegrasi", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading2", False),
+    ("Tabel 3.5 Hasil Pengujian Black Box Testing", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 3.6 Hasil Pengujian Khusus Modul Unity", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading4", False),
+    ("Tabel 3.7 Rekapitulasi UAT Dashboard Publik", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 3.8 Rekapitulasi UAT Dashboard Admin", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 3.9 Matriks Tindak Lanjut Hasil UAT", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 3.10 Pemetaan Kontribusi Engine terhadap Tindak Lanjut UAT", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 4.1 Panduan Pengambilan dan Penempatan Bukti Unity", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "", False),
+    ("Tabel 4.2 Status Bukti Unity yang Sudah Diterima", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 4.3 Instrumen Evaluasi UAT Dashboard Publik", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 4.4 Instrumen UAT Dashboard Admin", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 4.5 Rekap Anonim Respons UAT", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
 ]
 
 # --- Property 6: every SEQ caption and its field --------------------------- #
@@ -167,22 +185,29 @@ RESTART_CAPTIONS = {
     "Gambar 2.1 Hasil Kuesioner: Profil Status Akademik Responden",
     "Gambar 3.1 Hierarki Prefab Gedung dengan Child Pointer di Unity",
     "Tabel 1.1 Peran dan Tanggung Jawab",
-    "Tabel 3.1 Hubungan Mitra dengan Proyek",
+    "Tabel 2.1 Analisis Sistem yang Berjalan dan Implikasi Kebutuhan",
+    "Tabel 3.1 Hubungan Pemangku Kepentingan dengan Proyek",
+    "Tabel 4.1 Panduan Pengambilan dan Penempatan Bukti Unity",
 }
-EXPECTED_SEQ_GAMBAR_COUNT = 31
-EXPECTED_SEQ_TABEL_COUNT = 6
+EXPECTED_SEQ_GAMBAR_COUNT = 48
+EXPECTED_SEQ_TABEL_COUNT = 24
 
 # --- Property 7: scaled extents of every injected figure (noChangeAspect) -- #
 # Recorded (cx, cy) EMU extents; all within width and aspect-locked on unfixed code.
 FIGURE_EXTENTS = [
-    (5400000, 2334146), (5400000, 2529798), (5400000, 2580598), (5400000, 2298033),
-    (5400000, 2766042), (5400000, 2342074), (5400000, 2729916), (5400000, 3037499),
-    (5400000, 1945088), (4219575, 4695825), (4038600, 5343525), (5246820, 5760000),
-    (5303461, 5760000), (5400000, 4860823), (3829050, 2466975), (5400000, 2862541),
-    (5400000, 5400000), (3954550, 5759999), (5400000, 5373996), (4609756, 5760000),
-    (4622006, 5760000), (4333875, 3009900), (5400000, 5189678), (5400000, 2443764),
-    (5400000, 4072771), (5400000, 2392239), (4231729, 5759999), (5400000, 4056750),
-    (5400000, 2755891), (3953357, 5760000), (4229083, 5760000),
+    (1512000, 1513892), (5040000, 7129161), (5400000, 2334146), (5400000, 2529799),
+    (5400000, 2580599), (5400000, 2298033), (5400000, 2766043), (5400000, 2342074),
+    (5400000, 2729916), (5400000, 3037499), (2151325, 5760000), (5400000, 2570171),
+    (5399999, 2589179), (4529339, 5760000), (5400000, 4198050), (5250265, 5760000),
+    (3953357, 5760000), (4229083, 5760000), (5400000, 5406250), (5400000, 4519780),
+    (5334973, 5760000), (5400000, 3223125), (5400000, 3223125), (5400000, 3223125),
+    (5400000, 3223125), (2016180, 5760000), (5400000, 3223125), (5400000, 3223125),
+    (5400000, 3148768), (5400000, 3223125), (5400000, 3223125), (5400000, 3223125),
+    (5400000, 3223125), (5400000, 2194211), (5400000, 3223125), (5400000, 3223125),
+    (4645859, 5760000), (5400000, 712973), (5400000, 5752365), (5400000, 3223125),
+    (5400000, 3376318), (5400000, 3233242), (5400000, 3375000), (5400000, 2492307),
+    (4229452, 5760000), (5400000, 3223125), (5400000, 3223125), (5400000, 3223125),
+    (5400000, 3214235), (5400000, 2492307),
 ]
 
 # --- Property 8: structural invariants ------------------------------------- #
