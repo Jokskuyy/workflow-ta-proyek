@@ -43,14 +43,19 @@ C:\Python312\python.exe skills/scripts/merge_draft_to_docx.py --check-includes
 
 Perintah tersebut hanya memperluas include, mem-parse Markdown, dan memeriksa marker gambar. Perintah tidak mengubah `document.xml` atau menghasilkan DOCX.
 
-## Sumber pengujian bersama aktif
+## Sumber konten bersama aktif
 
 | Bagian laporan | Fragment kanonik |
 |---|---|
 | 1.1 konteks umum Latar Belakang | `content/shared/bab1/latar-belakang-umum.md` |
+| 2.1 Observasi dan Analisis Kebutuhan Awal | `content/shared/bab2/observasi-dan-analisis-kebutuhan.md` |
+| 2.1.1 Sumber Data dan Batas Observasi | `content/shared/bab2/sumber-data-dan-batas-observasi.md` |
+| 2.1.2 Analisis Kebutuhan Pengguna dan Sistem yang Berjalan | `content/shared/bab2/analisis-kebutuhan-dan-sistem-berjalan.md` |
+| 2.1.3 Hasil Wawancara dan Implikasi Kebutuhan | `content/shared/bab2/wawancara-dan-implikasi-kebutuhan.md` |
 | 3.5.1 Black Box Testing | `content/shared/testing/blackbox.md` |
 | 3.5.3 User Acceptance Test | `content/shared/testing/uat.md` |
 | 3.5.4 Implementasi Hasil UAT | `content/shared/testing/uat-revisions.md` |
+| Lampiran instrumen UAT tertutup | `content/shared/testing/appendix-instruments.md` |
 
 Angka dan status terstruktur yang mendasari fragment pengujian berada di `content/shared/testing/results.json`. `project_facts.json` pada setiap branch boleh memuat salinan yang diperlukan generator per-role, tetapi tidak boleh bertentangan dengan hasil bersama tersebut.
 

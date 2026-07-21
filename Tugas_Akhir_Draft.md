@@ -52,7 +52,7 @@ Berdasarkan latar belakang dan kebutuhan proyek, masalah yang menjadi fokus lapo
 
 ## 1.3 Batasan Masalah
 
-Ruang lingkup laporan ini dibatasi agar pembahasan tetap sesuai dengan kontribusi 3D Asset Designer & Database/Asset Manager, yaitu sebagai berikut:
+Ruang lingkup laporan ini dibatasi agar pembahasan tetap sesuai dengan kontribusi 3D Asset Designer dan Database Schema Designer, yaitu sebagai berikut:
 
 1. Objek yang direpresentasikan dibatasi pada aset 3D gedung dan fasilitas yang benar-benar memiliki GameObject pada scene Unity dan dikerjakan dalam lingkup kontribusi penulis.
 2. Pembuatan dan penataan aset dilakukan langsung di Unity Editor tanpa membahas pemodelan menggunakan Blender.
@@ -67,13 +67,13 @@ Ruang lingkup laporan ini dibatasi agar pembahasan tetap sesuai dengan kontribus
 Pembagian tanggung jawab tim dirangkum pada [TABREF:peran_tanggung_jawab].
 
 [TABLE-ID:peran_tanggung_jawab]
-[TABLECAPTION:Peran dan Tanggung Jawab Tim]
+[TABLECAPTION:Peran dan Tanggung Jawab]
 
 [TABLE]
 Peran | Tanggung Jawab Utama
-3D Asset Designer & Database/Asset Manager | Membuat dan menata aset 3D gedung dan fasilitas di Unity Editor; menyusun prefab, child `Pointer`, dan GameObject tujuan; merancang skema serta ERD; mengelola data gedung atau fasilitas; dan menjaga `unity_object_name`.
-3D Simulator dan Engine Developer | Mengembangkan logika navigasi Unity WebGL, NavMesh pathfinding, kontrol pemain, optimasi engine, serta alat editor termasuk `DatabaseSyncChecker`.
-Full Stack Web Developer dan System Integrator | Mengembangkan React SPA, Vercel Serverless Functions, Supabase Auth, API, dashboard, komunikasi React ke Unity, dan integrasi antarkomponen.
+3D Asset Designer dan Database Schema Designer | Merancang aset visual 3D dan hierarki prefab beserta `Pointer`, merancang skema basis data Supabase PostgreSQL dan ERD, mengelola data serta pemetaan aset, dan menjaga konsistensi `unity_object_name`.
+3D Simulator dan Engine Developer | Mengembangkan *runtime* Unity WebGL, termasuk `BuildingDatabase`, `NavigationReceiver`, `DatabaseSyncChecker`, navigasi NavMesh, interaksi pengguna, optimasi performa, dan proses *build* WebGL.
+Full Stack Web Developer, System Integrator, dan DevOps Engineer | Mengembangkan Public Dashboard dan Admin Panel React, REST API pada Vercel Serverless Functions, integrasi Supabase Auth dan CRUD, *bridge* sisi React, pencatatan analitik aplikasi, pengujian web, serta deployment dan operasional layanan web; Express dan Umami dikelola sebagai jalur opsional.
 [/TABLE]
 
 ## 1.4 Tujuan dan Manfaat
@@ -100,14 +100,14 @@ Manfaat yang diharapkan dari kontribusi tersebut adalah sebagai berikut:
 
 ## 1.5 Jadwal Kegiatan
 
-Kegiatan aktual penulis berlangsung selama enam bulan dan dirangkum pada [TABREF:jadwal_kegiatan]. Pembagian aktivitas per bulan disajikan berdasarkan rekap dokumentasi pelaksanaan pada Subbab 3.4.1.
+Kegiatan aktual penulis berlangsung selama enam bulan dan dirangkum pada [TABREF:jadwal_kegiatan]. Struktur tabel menggunakan periode enam bulan yang sama dengan jadwal proyek tim, sedangkan aktivitasnya dibatasi pada pekerjaan aset 3D, skema basis data, pengelolaan data, pemetaan identifier, validasi, dan dokumentasi Dwikhi.
 
 [TABLE-ID:jadwal_kegiatan]
 [TABLECAPTION:Jadwal Kegiatan Perancangan Aset 3D dan Basis Data]
 
 [TABLE gantt]
 Aktivitas | Bulan 1 | Bulan 2 | Bulan 3 | Bulan 4 | Bulan 5 | Bulan 6
-Observasi stakeholder dan identifikasi kebutuhan aset serta data | X | | | | | |
+Observasi lapangan dan identifikasi kebutuhan aset serta data | X | | | | | |
 Pengambilan foto dan inventarisasi gedung serta fasilitas | X | X | | | | |
 Perancangan skema database dan ERD | X | X | | | | |
 Penetapan konvensi nama aset dan `unity_object_name` | X | X | X | | | |
@@ -136,82 +136,21 @@ Laporan Tugas Akhir Proyek ini disusun dalam empat bab dengan sistematika sebaga
 ---
 
 # BAB II RANCANGAN PROYEK
+## 2.1 Observasi dan Analisis Kebutuhan Awal
 
-## 2.1 Observasi
+<!-- PIPELINE:INCLUDE content/shared/bab2/observasi-dan-analisis-kebutuhan.md -->
 
-Observasi dilakukan untuk memahami kondisi navigasi kampus, kebutuhan informasi gedung dan fasilitas, serta hubungan antara representasi fisik kampus dengan data yang perlu dikelola. Proses ini memanfaatkan observasi lapangan, kuesioner mahasiswa, wawancara pemangku kepentingan, dan koordinasi teknis tim. Penggunaan representasi digital lingkungan kampus sebagai media informasi sejalan dengan penelitian mengenai visualisasi gedung dan *smart campus* yang menekankan pentingnya keterhubungan antara model visual, data, dan kebutuhan pengguna (Jamaludin et al. 2024; Taurusta et al. 2024).
+### 2.1.1 Sumber Data dan Batas Observasi
 
-### 2.1.1 Observasi Lapangan Kegiatan
+<!-- PIPELINE:INCLUDE content/shared/bab2/sumber-data-dan-batas-observasi.md -->
 
-Observasi lapangan diarahkan pada dua kelompok objek. Kelompok pertama adalah unsur fisik yang perlu direpresentasikan dalam denah virtual, seperti gedung, lantai, ruangan, fasilitas, jalur penghubung, dan elemen lingkungan. Kelompok kedua adalah data deskriptif yang diperlukan untuk mengidentifikasi objek tersebut pada sistem, terutama nama tampilan, lokasi, relasi gedung, lantai, foto, dan `unity_object_name`.
+### 2.1.2 Analisis Kebutuhan Pengguna dan Sistem yang Berjalan
 
-Hasil observasi awal menunjukkan beberapa kebutuhan berikut:
+<!-- PIPELINE:INCLUDE content/shared/bab2/analisis-kebutuhan-dan-sistem-berjalan.md -->
 
-1. Setiap aset gedung perlu memiliki struktur yang dapat dikenali dan dipelihara secara konsisten pada Unity Editor.
-2. Titik tujuan navigasi perlu ditempatkan pada posisi yang mewakili gedung atau fasilitas terkait.
-3. Nama internal objek perlu dipisahkan dari nama yang ditampilkan kepada pengguna.
-4. Data fasilitas perlu memiliki relasi yang jelas terhadap gedung agar konteks lokasi tidak hilang.
-5. Perubahan data perlu dapat dilakukan tanpa mengubah model 3D selama identitas integrasi tetap konsisten.
-6. Nama serta fungsi ruangan perlu memiliki status dan waktu verifikasi karena informasi di lapangan dapat berubah atau tidak tersedia secara lengkap.
+### 2.1.3 Hasil Wawancara Pemangku Kepentingan dan Implikasi Kebutuhan
 
-Pengumpulan referensi dilakukan penulis secara mandiri dengan mendatangi gedung satu per satu, melakukan observasi visual, dan mengambil dokumentasi fotografis terhadap bentuk bangunan atau informasi ruangan yang dapat diakses. Penulis tidak menggunakan alat ukur untuk memperoleh dimensi fisik. Oleh karena itu, metode yang digunakan adalah pemodelan berbasis referensi visual, yaitu menyesuaikan massa bangunan, jumlah lantai, pola bukaan, warna, material, dan hubungan proporsional antarelemen berdasarkan objek yang terlihat pada foto serta pengamatan lapangan. Aset yang dihasilkan berfungsi sebagai representasi visual untuk denah virtual dan tidak diklaim sebagai model *as-built* dengan ukuran presisi.
-
-Kendala utama observasi adalah pengumpulan data dilakukan secara pribadi dari gedung ke gedung dengan akses dan informasi yang terbatas. Sebagian nama atau fungsi ruangan yang tersedia tidak dapat dipastikan telah mengikuti kondisi terbaru, sedangkan beberapa ruangan tidak memiliki informasi yang cukup untuk memperbarui record. Data yang belum dapat diverifikasi tidak dinyatakan sebagai kondisi final. Temuan ini menjadi alasan kebutuhan basis data yang mudah diperbarui serta pencatatan sumber dan waktu verifikasi setiap perubahan nama ruangan.
-
-### 2.1.2 Analisis Sistem yang Sedang Berjalan
-
-Kuesioner proyek diisi oleh 21 responden. Sebanyak 20 responden (95,2%) merupakan sivitas akademika UPNVJ dan satu responden merupakan pengunjung eksternal. Komposisi tersebut disajikan pada [FIGREF:survey_01_profil] dan menunjukkan bahwa temuan terutama menggambarkan pengalaman pengguna internal pada sampel yang diteliti.
-
-[FIGURE:survey_01_profil]
-[FIGCAPTION:Hasil Kuesioner: Profil Status Akademik Responden]
-
-Penilaian terhadap papan penunjuk arah dan peta statis tidak menunjukkan penolakan yang dominan. Sebanyak 33,3% responden memberi nilai 1 atau 2, 23,8% memberi nilai 3, dan 42,9% memberi nilai 4 atau 5. Nilai rata-rata sekitar 3,05 dari 5 pada [FIGREF:survey_02_efektivitas] menunjukkan persepsi yang terbagi, sehingga kebutuhan sistem baru tidak didasarkan pada klaim bahwa seluruh media yang tersedia tidak informatif.
-
-[FIGURE:survey_02_efektivitas]
-[FIGCAPTION:Hasil Kuesioner: Efektivitas Media Navigasi Kampus Saat Ini]
-
-Dalam satu semester terakhir, 57,1% responden mengalami kesulitan mencari lokasi sebanyak 1–3 kali, 9,5% mengalaminya lebih dari tiga kali, dan 33,3% tidak pernah mengalaminya. Dengan demikian, 14 dari 21 responden (66,7%) pernah mengalami kesulitan setidaknya satu kali, sebagaimana disajikan pada [FIGREF:survey_03_frekuensi].
-
-[FIGURE:survey_03_frekuensi]
-[FIGCAPTION:Hasil Kuesioner: Frekuensi Kesulitan Menemukan Lokasi]
-
-Ketika mencari lokasi, 90,5% responden paling sering bertanya kepada orang di sekitar, petugas keamanan, atau layanan mahasiswa. Pola pada [FIGREF:survey_04_perilaku] menunjukkan bahwa bantuan interpersonal masih menjadi jalur utama pada sampel, sedangkan papan penunjuk dan situs kampus digunakan oleh sebagian kecil responden.
-
-[FIGURE:survey_04_perilaku]
-[FIGCAPTION:Hasil Kuesioner: Perilaku Pengguna Saat Mencari Lokasi]
-
-Sebanyak 76,2% responden memberi nilai 4 atau 5 terhadap pentingnya peta virtual 3D yang terintegrasi dengan informasi fasilitas. Penilaian pada [FIGREF:survey_05_urgensi] mendukung kebutuhan akan alternatif digital, tetapi tetap diperlakukan sebagai kebutuhan pengguna pada sampel, bukan bukti keberhasilan solusi yang belum diuji pada tahap observasi.
-
-[FIGURE:survey_05_urgensi]
-[FIGCAPTION:Hasil Kuesioner: Urgensi Kebutuhan Peta Virtual 3D]
-
-Dalam rencana penggunaan, 9,5% responden menyatakan akan menggunakan denah setiap kali berada di kampus, 61,9% ketika mencari lokasi tertentu, 23,8% hanya sesekali, dan 4,8% tidak akan menggunakannya. Distribusi pada [FIGREF:survey_06_adopsi] menunjukkan bahwa fungsi pencarian lokasi merupakan konteks penggunaan yang paling relevan.
-
-[FIGURE:survey_06_adopsi]
-[FIGCAPTION:Hasil Kuesioner: Potensi Adopsi Denah Virtual 3D]
-
-Informasi yang paling banyak dipilih untuk ditampilkan adalah nama gedung sebesar 95,2%, fasilitas dalam ruangan sebesar 52,4%, dan kapasitas ruangan sebesar 38,1%. Prioritas pada [FIGREF:survey_07_prioritas] menjadi dasar pemilihan atribut gedung dan fasilitas yang dikelola pada laporan ini.
-
-[FIGURE:survey_07_prioritas]
-[FIGCAPTION:Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus]
-
-Rangkaian hasil tersebut menunjukkan bahwa aset 3D tidak dapat diperlakukan hanya sebagai elemen visual. Setiap objek perlu memiliki padanan data yang dapat ditelusuri, sedangkan informasi gedung dan fasilitas perlu disimpan dengan struktur yang mendukung pencarian serta integrasi. Temuan kuesioner ini digunakan sebagai konteks kebutuhan, bukan sebagai hasil pengujian keberhasilan produk.
-
-### 2.1.3 Wawancara dengan Stakeholder
-
-Wawancara dengan Kepala UPA TIK UPNVJ membahas pembagian peran tim dan kebutuhan sistem. Berdasarkan pembagian kerja yang telah dikonfirmasi, penulis berperan sebagai 3D Asset Designer & Database/Asset Manager yang membuat serta menata aset 3D gedung dan fasilitas di Unity Editor, menyusun prefab dan child `Pointer`, merancang skema serta ERD, mengelola data, dan menjaga `unity_object_name`. Anggota lain menangani logika *engine*, alat editor, pengembangan web, autentikasi, API, dan integrasi sistem.
-
-Pada 25 Februari 2026, penulis mengikuti wawancara dengan Dr. dr. Ria Maria Theresa, SpKJ., MH. selaku Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi UPNVJ. Wawancara bertujuan memvalidasi kesulitan mahasiswa dan pengunjung dalam mencari ruangan serta memperoleh masukan terhadap solusi berupa dashboard dan denah 3D dengan fasilitas pencarian lokasi di Kampus Pondok Labu.
-
-Narasumber menekankan bahwa data ruangan bersifat dinamis karena renovasi dan perubahan fungsi. Penulis menjelaskan bahwa data gedung dan fasilitas dikelola melalui basis data sehingga perubahan informasi dapat dilakukan tanpa mengubah struktur dasar sistem. Temuan tersebut memperkuat kebutuhan skema data yang dapat dipelihara, relasi yang konsisten, serta pemisahan nama tampilan dari identifier `unity_object_name`.
-
-Pembahasan integrasi mencakup rencana penggunaan subdomain resmi UPNVJ, penyematan sistem pada website universitas, dan kolaborasi dengan UPA TIK untuk data pendukung dashboard. Narasumber mengarahkan koordinasi dengan Pak Taufik pada bagian PKU/Tata Usaha guna memperoleh denah fisik terbaru dan menjelaskan perlunya surat permohonan data yang dapat didisposisikan kepada bagian terkait. Stabilitas Wi-Fi di lingkungan kampus juga disampaikan sebagai perhatian tambahan dalam ekosistem digital kampus, tetapi tidak menjadi ruang lingkup implementasi aset dan basis data penulis.
-
-Wawancara menghasilkan respons positif terhadap proyek sebagai bagian dari digitalisasi sarana dan prasarana kampus. Bagi lingkup pekerjaan penulis, kesimpulan terpenting adalah perlunya memvalidasi model serta record terhadap kondisi fisik terbaru karena perubahan bangunan dapat memengaruhi representasi aset dan data. Dokumentasi kegiatan wawancara ditunjukkan pada [FIGREF:foto_wawancara_warek].
-
-[FIGURE:foto_wawancara_warek]
-[FIGCAPTION:Dokumentasi Wawancara Pemangku Kepentingan]
-
+<!-- PIPELINE:INCLUDE content/shared/bab2/wawancara-dan-implikasi-kebutuhan.md -->
 ## 2.2 Usulan Solusi
 
 Solusi yang diusulkan adalah platform terintegrasi yang menggabungkan dashboard publik berbasis React, denah virtual Unity WebGL, Vercel Serverless Functions berbasis Node.js, basis data Supabase PostgreSQL, autentikasi, RLS, *audit log*, dan analitik Umami. Arsitektur tingkat tinggi sistem ditunjukkan pada [FIGREF:diagram_arsitektur].
@@ -405,39 +344,35 @@ Pengujian konsistensi direncanakan dengan membandingkan seluruh `unity_object_na
 
 ### 2.4.5 Rencana Pengujian Fungsional dan UAT Bersama
 
-Pengujian Black Box memeriksa fungsi sistem melalui masukan dan keluaran tanpa bergantung pada rincian kode internal (Maulida et al. 2025). Skenario bersama digunakan sebagai pengujian regresi untuk memastikan perubahan skema atau aset tidak merusak fungsi dashboard, API, dan navigasi. UAT digunakan untuk mengevaluasi penerimaan pengguna terhadap sistem berdasarkan kebutuhan yang telah ditentukan (Aliyah et al. 2024).
+Pengujian Black Box memeriksa fungsi sistem melalui masukan dan keluaran tanpa bergantung pada rincian kode internal (Maulida et al. 2025). Skenario bersama digunakan sebagai pengujian regresi untuk memastikan perubahan skema atau aset tidak merusak fungsi dashboard, API, dan navigasi. UAT digunakan untuk mengevaluasi penerimaan pengguna terhadap sistem berdasarkan kebutuhan yang telah ditentukan (Aliyah et al. 2025).
 
 ---
 
 # BAB III IMPLEMENTASI PROYEK
-
-## 3.1 Profil Mitra
+## 3.1 Profil Mitra dan Pemangku Kepentingan
 
 ### 3.1.1 Nama Organisasi atau Lembaga Mitra
 
-Mitra proyek adalah Unit Penunjang Akademik Teknologi Informasi dan Komunikasi Universitas Pembangunan Nasional Veteran Jakarta (UPA TIK UPNVJ) dengan lingkungan implementasi di Kampus Pondok Labu.
+Humas Universitas Pembangunan Nasional “Veteran” Jakarta atau Humas UPNVJ.
 
 ### 3.1.2 Deskripsi Mitra
 
-UPA TIK UPNVJ merupakan unit yang terkait dengan pengelolaan dan pengembangan layanan teknologi informasi di lingkungan universitas. Dalam proyek ini, unit tersebut menjadi mitra koordinasi untuk memetakan kebutuhan sistem, pembagian tanggung jawab tim, dan arah integrasi denah virtual dengan layanan informasi kampus.
+Humas UPNVJ menjadi mitra pengguna dalam proyek ini karena layanan navigasi ditujukan untuk membantu penyampaian informasi lokasi kepada mahasiswa baru, orang tua atau wali, sivitas akademika, dan pengunjung eksternal. Halaman resmi UPNVJ menjelaskan bahwa Humas UPNVJ mengoordinasikan strategi komunikasi digital bersama humas fakultas (UPNVJ 2026). Keterangan tersebut digunakan untuk menjelaskan hubungan Humas dengan penyampaian informasi kepada publik, bukan sebagai bukti bahwa sistem telah diterima sebagai layanan resmi institusi.
 
-[TBD: tambahkan deskripsi resmi mitra hanya setelah diverifikasi terhadap sumber institusi atau dokumen mitra]
+### 3.1.3 Hubungan Pemangku Kepentingan dengan Proyek
 
-### 3.1.3 Hubungan Mitra dengan Proyek
-
-Hubungan mitra dengan proyek dirangkum pada [TABREF:hubungan_mitra_proyek].
+Humas UPNVJ berperan sebagai mitra pengguna dan satu perwakilannya mengikuti UAT untuk memberikan perspektif evaluasi terhadap informasi serta navigasi. Keikutsertaan tersebut tidak digunakan untuk mengklaim persetujuan formal, serah terima sistem, atau representasi seluruh pengguna UPNVJ. UPA TIK dicatat secara terpisah sebagai pihak koordinasi teknis, kebijakan data, kemungkinan integrasi institusional, dan penyerahan pakta integritas. Hubungan setiap pihak dirangkum pada [TABREF:hubungan_mitra_proyek].
 
 [TABLE-ID:hubungan_mitra_proyek]
-[TABLECAPTION:Hubungan Mitra dengan Proyek]
+[TABLECAPTION:Hubungan Pemangku Kepentingan dengan Proyek]
 
 [TABLE]
-Entitas | Peran dalam Proyek | Manfaat yang Diharapkan
-UPA TIK UPNVJ | Memberikan konteks kebutuhan, koordinasi teknis, dan validasi arah pengembangan | Memperoleh prototipe layanan informasi kampus yang mengintegrasikan data dan denah virtual
-UPNVJ Kampus Pondok Labu | Menjadi ruang lingkup objek fisik, data gedung, fasilitas, serta observasi | Memiliki dasar representasi digital lingkungan dan data aset kampus
-Sivitas akademika dan pengunjung | Menjadi pengguna publik dan sumber kebutuhan melalui observasi atau kuesioner | Memperoleh akses informasi lokasi dan fasilitas yang lebih terintegrasi
-Administrator | Mengelola data gedung, fasilitas, fakultas, dan program studi | Memperoleh pengelolaan data dengan pembatasan akses dan jejak perubahan
+Pemangku Kepentingan | Hubungan dengan Proyek | Batas Interpretasi
+Humas UPNVJ | Menjadi mitra pengguna; satu perwakilan mengikuti UAT dan memberikan perspektif evaluasi informasi serta navigasi | Masukan dibatasi pada peserta UAT dan tidak dianggap sebagai persetujuan institusional
+Pengguna layanan | Mahasiswa baru, orang tua atau wali, sivitas akademika, dan pengunjung eksternal menjadi kelompok penerima manfaat navigasi | Tidak seluruh kelompok tersebut menjadi peserta UAT
+UPA TIK UPNVJ | Memberikan konteks koordinasi teknis, kebijakan data, kemungkinan integrasi, wawancara, dan penyerahan pakta integritas | Bukan mitra pengguna dan tidak dinyatakan telah menerima implementasi sistem
+Tim pengembang | Mengembangkan komponen sesuai pembagian peran aset/data, *runtime* Unity, dan aplikasi web | Setiap laporan hanya mengklaim implementasi yang berada dalam ownership penulisnya
 [/TABLE]
-
 ## 3.2 Metode Implementasi
 
 Implementasi menggunakan pendekatan iteratif sesuai rancangan *prototyping*. Lingkup penulis mencakup pembuatan dan penataan seluruh aset 3D gedung dan fasilitas yang memiliki GameObject pada scene Unity, hierarki prefab dan child `Pointer`, perancangan skema serta ERD, pengelolaan record gedung atau fasilitas, dan pemetaan `unity_object_name`. Uraian berikut membedakan kontribusi tersebut dari komponen integrasi milik anggota lain.
@@ -1055,7 +990,7 @@ Unity Technologies (2026c). _Unity 6 Manual: Memory Profiler module reference_. 
 
 Afiifah, K., Azzahra, Z. F., dan Anggoro, A. D. (2022). Analisis teknik Entity-Relationship Diagram dalam perancangan database: Sebuah literature review. _INTECH (Informatika dan Teknologi)_, 3(1), 8–11. https://doi.org/10.54895/intech.v3i1.1261
 
-Aliyah, A., Hartono, N., dan Muin, A. A. (2024). Penggunaan User Acceptance Testing (UAT) pada pengujian sistem informasi pengelolaan keuangan dan inventaris barang. _Switch: Jurnal Sains dan Teknologi Informasi_, 3(1), 84–100. https://doi.org/10.62951/switch.v3i1.330
+Aliyah, A., Hartono, N., dan Muin, A. A. (2025). Penggunaan User Acceptance Testing (UAT) pada pengujian sistem informasi pengelolaan keuangan dan inventaris barang. _Switch: Jurnal Sains dan Teknologi Informasi_, 3(2), 42–58. https://doi.org/10.62951/switch.v3i1.330
 
 Jamaludin, J., dan Saepuloh, L. (2024). Tren riset twin digital smart campus. _Sang Pencerah: Jurnal Ilmiah Universitas Muhammadiyah Buton_, 10(2), 408–425. https://doi.org/10.35326/pencerah.v10i2.5317
 
@@ -1065,9 +1000,15 @@ Muharam, Y., Anggara, M. B., dan Hanafi, T. J. (2023). Implementasi peta 3 dimen
 
 Pricillia, T., dan Zulfachmi (2021). Perbandingan metode pengembangan perangkat lunak (Waterfall, Prototype, RAD). _Jurnal Bangkit Indonesia_, 10(1), 6–12. https://doi.org/10.52771/bangkitindonesia.v10i1.153
 
-Putra, I. G. W. W., Dharma, E. M., dan Permana, P. T. H. (2026). Implementasi relational database dengan Row-Level Security (RLS) pada sistem inventory menggunakan Supabase dan React Native Expo (Studi kasus Bengkel Sari Merta). _JATI (Jurnal Mahasiswa Teknik Informatika)_, 10(2), 2443–2448. https://ejournal.itn.ac.id/index.php/jati/article/view/8282
+Putra, I. G. W. W., Dharma, E. M., dan Permana, P. T. H. (2026). Implementasi relational database dengan Row-Level Security (RLS) pada sistem inventory menggunakan Supabase dan React Native Expo (Studi kasus Bengkel Sari Merta). _JATI (Jurnal Mahasiswa Teknik Informatika)_, 10(2), 2443–2448. https://doi.org/10.36040/jati.v10i2.17551
 
 Taurusta, C., Asiddiq, A. M., Suprianto, S., dan Setiawan, H. (2024). Visualisasi gedung kampus 1 Universitas Muhammadiyah Sidoarjo menggunakan augmented reality sebagai media informasi. _Journal of Technology and System Information_, 1(1), 55–70. https://doi.org/10.47134/jtsi.v1i1.2146
+
+UPNVJ. (2022). Lokasi Kampus UPN Veteran Jakarta. https://www.upnvj.ac.id/id/tentang-upn/lokasi-kampus.html
+
+UPNVJ. (2025a). Kantin. https://www.upnvj.ac.id/id/fasilitas/kantin.html
+
+UPNVJ. (2026). Rapat koordinasi Humas UPNVJ 2026: Fokus strategi komunikasi digital dan media sosial perguruan tinggi. https://www.upnvj.ac.id/id/berita/2026/02/rapat-koordinasi-humas-upnvj-2026-fokus-strategi-komunikasi-digital-dan-media-sosial-perguruan-tinggi.html
 
 ---
 
@@ -1079,7 +1020,7 @@ Taurusta, C., Asiddiq, A. M., Suprianto, S., dan Setiawan, H. (2024). Visualisas
 
 # LAMPIRAN 2. Dokumentasi Penyerahan Pakta Integritas kepada UPA TIK
 
-Dokumentasi berikut memperlihatkan penyerahan atau penyampaian Pakta Integritas kepada UPA TIK dalam rangka pelaksanaan riset proyek. Foto digunakan sebagai bukti dokumentasi kegiatan dan salinan PDF Pakta Integritas disimpan pada `pakta_integritas/PAKTA INTEGRITAS RISET MAHASISWA.pdf`. Identitas staf, tanggal pengesahan, status persetujuan institusi, dan kesetaraan foto dengan salinan resmi bertanda tangan tidak disimpulkan dari gambar ini.
+Salinan pakta integritas yang telah diserahkan tidak berada dalam arsip penulis. Bukti yang tersedia berupa foto dokumentasi penyerahan dokumen kepada staf UPA TIK; lampiran ini tidak dimaksudkan sebagai pengganti salinan dokumen bertanda tangan atau surat keterangan resmi dari institusi. Identitas staf, nomor surat, tanggal pengesahan, dan status persetujuan tidak disimpulkan dari foto.
 
 Foto kegiatan tersebut dirujuk pada [FIGREF:foto_penyerahan_pakta_upa_tik].
 
@@ -1116,6 +1057,10 @@ Bukti yang sudah tersedia adalah diagram empat tabel inti data akademik dan fasi
 # LAMPIRAN 5. Logbook dan Bukti Pengujian
 
 Subbab 3.4.1 memuat rekap logbook bulanan yang disusun berdasarkan dokumentasi aktual, bukan logbook harian. Matriks pengujian integritas, visual aset, dan konsistensi nama telah disiapkan pada Subbab 3.5, sedangkan RLS serta audit log hanya diringkas dari pengujian sistem bersama. Bukti yang tersedia meliputi hasil Black Box dan UAT bersama pada `Hasil UAT/`, survei 21 responden, inventaris constraint, dua tangkapan `DatabaseSyncChecker` dengan cakupan berbeda, serta metrik parsial tiga aset. Lampiran ini masih memerlukan `[TBD: query serta pesan galat uji foreign key, unique constraint, NOT NULL, dan ON DELETE]`, `[TBD: checklist visual seluruh aset dalam scope]`, `[TBD: daftar koreksi mismatch]`, dan `[TBD: retest pada scene, endpoint, dan basis data dengan versi pengujian yang dicatat]`.
+
+Instrumen UAT tertutup dan indeks bukti pengujian bersama disajikan setelah uraian ini. Instrumen tersebut merupakan bukti produk bersama dan tidak digunakan sebagai hasil pengujian teknis khusus aset atau basis data Dwikhi.
+
+<!-- PIPELINE:INCLUDE content/shared/testing/appendix-instruments.md -->
 
 ---
 

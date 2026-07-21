@@ -1,4 +1,4 @@
-# Kerangka Laporan TA — Dwikhi (3D Asset Designer & Database/Asset Manager)
+# Kerangka Laporan TA — Dwikhi (3D Asset Designer dan Database Schema Designer)
 
 > Format TA prototipe (4 bab). BAB I dan observasi (2.1) sebagian besar **sama** untuk semua anggota; penekanan berbeda mulai dari usulan solusi & implementasi.
 

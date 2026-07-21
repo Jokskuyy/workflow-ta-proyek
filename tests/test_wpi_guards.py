@@ -305,5 +305,54 @@ def test_unit_citation_fatal_flag_sets_has_fatal():
     assert has_fatal is True
 
 
+def test_unit_citation_accepts_indonesian_two_author_form():
+    entries = mrg.parse_bibliography_entries(
+        "# DAFTAR PUSTAKA\n\n"
+        "Syarif, S., dan Risdiansyah, D. (2024). Judul artikel.\n"
+    )
+    warnings, has_fatal = mrg.collect_citation_crosscheck_warnings(
+        "Metode ini dibahas oleh penelitian terdahulu "
+        "(Syarif dan Risdiansyah 2024).",
+        entries,
+    )
+
+    assert entries[0].authors == ("Syarif", "Risdiansyah")
+    assert warnings == []
+    assert has_fatal is False
+
+
+def test_unit_citation_preserves_year_suffix_and_organization_key():
+    entries = mrg.parse_bibliography_entries(
+        "# DAFTAR PUSTAKA\n\n"
+        "UPNVJ. (2025a). Halaman fasilitas.\n\n"
+        "UPNVJ. (2025b). Halaman sejarah.\n"
+    )
+    warnings, _ = mrg.collect_citation_crosscheck_warnings(
+        "Informasi tersedia pada laman resmi (UPNVJ 2025a; UPNVJ 2025b).",
+        entries,
+    )
+
+    assert [mrg.reference_key(entry) for entry in entries] == [
+        ("upnvj", "2025a"),
+        ("upnvj", "2025b"),
+    ]
+    assert warnings == []
+
+
+def test_current_expanded_draft_has_zero_citation_mismatches():
+    draft_path = ROOT / "Tugas_Akhir_Draft.md"
+    draft_text = mrg._load_draft_text(str(draft_path))
+    bibliography = mrg.parse_bibliography_entries(draft_text)
+    body_text = draft_text.split("# DAFTAR PUSTAKA", 1)[0]
+
+    warnings, has_fatal = mrg.collect_citation_crosscheck_warnings(
+        body_text,
+        bibliography,
+    )
+
+    assert warnings == []
+    assert has_fatal is False
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-q"]))

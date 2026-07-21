@@ -249,5 +249,15 @@ def test_unit_reference_key_surname_and_year():
     assert ('putra', '2026') in keys
 
 
+def test_unit_reference_key_keeps_year_suffix_and_strips_org_period():
+    result = mrg.parse_bibliography_entries(
+        "# DAFTAR PUSTAKA\n\nUPNVJ. (2025a). Halaman fasilitas.\n"
+    )
+
+    assert result[0].year == "2025a"
+    assert result[0].authors == ("UPNVJ.",)
+    assert mrg.reference_key(result[0]) == ("upnvj", "2025a")
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-q"]))

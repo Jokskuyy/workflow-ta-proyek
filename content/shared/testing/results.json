@@ -2,7 +2,7 @@
   "schema_version": 1,
   "black_box_testing": {
     "total_scenarios": 24,
-    "initial_result": {
+    "execution_result": {
       "passed_scenarios": 23,
       "failed_scenarios": [
         "BB-20"
@@ -21,11 +21,10 @@
       ],
       "verification": "Dua tangkapan layar berurutan menunjukkan label tujuan yang mudah dibaca dan garis rute sebelum pengguna tiba. Setelah pengguna tiba, garis rute hilang dan notifikasi kedatangan tampil."
     },
-    "final_result": {
+    "final_verification": {
       "passed_scenarios": 24,
       "failed_scenarios": [],
-      "success_rate": "100.00%",
-      "retested_scenario": "BB-20"
+      "success_rate": "100.00%"
     },
     "evidence_status": "Hasil awal 23 dari 24 tersedia pada Hasil UAT/Hasil_BlackBox.docx; pengujian ulang BB-20 dibuktikan melalui BB20_1.png dan BB20_2.png sehingga status akhir menjadi 24 dari 24 terverifikasi lulus."
   },
@@ -71,8 +70,7 @@
       "UAT-R07": "implemented",
       "UAT-R08": "implemented",
       "UAT-R09": "implemented",
-      "UAT-R10": "implemented",
-      "UAT-R11": "implemented_per_branch"
+      "UAT-R10": "implemented"
     },
     "revision_verification": {
       "UAT-R01": {
@@ -114,10 +112,6 @@
       "UAT-R10": {
         "basis": ["visual", "automated_test", "source_audit", "user_confirmed_deployment"],
         "limitations": ["Tangkapan layar memverifikasi notifikasi pada kondisi kedatangan normal. Pemberitahuan yang kosong, tidak valid, berbeda, dan diterima setelah pembatalan diperiksa melalui 11 pengujian React."]
-      },
-      "UAT-R11": {
-        "basis": ["per_branch_metadata_review"],
-        "limitations": ["Verifikasi judul dilakukan pada metadata masing-masing laporan dan tidak mengubah hasil UAT produk."]
       }
     }
   }

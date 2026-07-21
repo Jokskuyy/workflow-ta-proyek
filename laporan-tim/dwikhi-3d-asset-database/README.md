@@ -1,4 +1,4 @@
-# Laporan TA — Dwikhi Deandra Purnianto (3D Asset Designer & Database/Asset Manager)
+# Laporan TA — Dwikhi Deandra Purnianto (3D Asset Designer dan Database Schema Designer)
 
 **Branch:** `laporan/dwikhi` — tulis laporan di `Tugas_Akhir_Draft.md` (root repo) saat berada di branch ini.
 
@@ -10,7 +10,7 @@ Berdasarkan pembagian peran (BAB II — Wawancara Stakeholder), kontribusi:
 4. **Pengelolaan Data Gedung dan Fasilitas** — menjaga kelengkapan record serta pemetaan `unity_object_name` pada aset dan data.
 5. **Validasi Konsistensi Aset–Data** — menggunakan `DatabaseSyncChecker` yang dikembangkan oleh 3D Simulator & Engine Developer untuk menemukan dan memperbaiki ketidaksesuaian.
 
-> Ruang lingkup: persimpangan aset 3D dan pengelolaan data. Logika navigasi, engine, dan kode `DatabaseSyncChecker` = Faiz; API, dashboard, autentikasi, dan integrasi web = Iman. RLS serta trigger audit log hanya dibahas sebagai konteks sistem dan bukan kontribusi Dwikhi.
+> Ruang lingkup: persimpangan aset 3D dan pengelolaan data. Logika navigasi, *engine*, dan kode `DatabaseSyncChecker` merupakan kontribusi Faiz; API, dashboard, autentikasi, integrasi web, deployment, dan operasional layanan web merupakan kontribusi Iman. RLS serta trigger audit log hanya dibahas sebagai konteks sistem dan bukan kontribusi Dwikhi.
 
 ## Diagram Relevan
 - **2.17 Entity-Relationship Diagram** — inti perancangan database.

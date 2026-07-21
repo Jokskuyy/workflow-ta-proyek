@@ -915,7 +915,8 @@ class BibliographyResult(list):
 
 
 _DAFTAR_PUSTAKA_RE = re.compile(r'^\s*#\s+DAFTAR\s+PUSTAKA\s*$', re.IGNORECASE)
-_YEAR_RE = re.compile(r'\((\d{4})[a-z]?\)')
+_YEAR_RE = re.compile(r'\((\d{4}[a-z]?)\)', re.IGNORECASE)
+_AUTHOR_JOIN_RE = re.compile(r'\s+(?:&|dan)\s+', re.IGNORECASE)
 
 
 def _load_draft_text(draft_path_or_text):
@@ -967,9 +968,9 @@ def parse_italic_spans(raw):
 def _parse_authors(raw):
     """Best-effort extraction of author surname(s) from an APA entry.
 
-    The author block is the text before the first '(YYYY)'. The first surname
-    (text up to the first comma) is always returned; a second surname after an
-    '&' is included when easily separable.
+    The author block is the text before the first '(YYYY[a-z])'. The first
+    surname (text up to the first comma) is always returned; a second surname
+    after '&' or the Indonesian conjunction 'dan' is included when separable.
     """
     m = _YEAR_RE.search(raw)
     head = (raw[:m.start()] if m else raw).strip()
@@ -977,8 +978,9 @@ def _parse_authors(raw):
         return ()
     first = head.split(',', 1)[0].strip()
     surnames = [first] if first else []
-    if '&' in head:
-        tail = head.rsplit('&', 1)[1].strip()
+    joined = _AUTHOR_JOIN_RE.split(head, maxsplit=1)
+    if len(joined) == 2:
+        tail = joined[1].strip()
         tail_surname = tail.split(',', 1)[0].strip().rstrip('.').strip()
         if tail_surname and tail_surname not in surnames:
             surnames.append(tail_surname)
@@ -993,7 +995,8 @@ def reference_key(entry):
     """
     surname = entry.authors[0].lower() if entry.authors else ""
     surname = surname.lstrip("'\"`’‘").strip()
-    return (surname, entry.year or "")
+    surname = surname.rstrip('.,;:').strip()
+    return (surname, (entry.year or "").lower())
 
 
 def parse_bibliography_entries(draft_path_or_text):
@@ -1026,7 +1029,7 @@ def parse_bibliography_entries(draft_path_or_text):
             raw=stripped,
             spans=tuple(parse_italic_spans(stripped)),
             authors=_parse_authors(stripped),
-            year=(ym.group(1) if ym else None),
+            year=(ym.group(1).lower() if ym else None),
         ))
     return BibliographyResult(entries, section_found=True)
 
@@ -1044,7 +1047,7 @@ _BAB_RE = re.compile(r'^BAB\s+([IVXLCDM]+|\d+)\b', re.IGNORECASE)
 _ROMAN_MAP = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
 # In-text citation: a parenthesised group that contains at least one 4-digit year.
 _CITATION_PAREN_RE = re.compile(r'\(([^)]*\d{4}[a-z]?[^)]*)\)')
-_INNER_YEAR_RE = re.compile(r'(\d{4})[a-z]?')
+_INNER_YEAR_RE = re.compile(r'(\d{4}[a-z]?)', re.IGNORECASE)
 _ET_AL_RE = re.compile(r'\bet\s+al\.?', re.IGNORECASE)
 
 
@@ -1235,8 +1238,9 @@ def _extract_citation_keys(body_text):
     """Extract in-text APA citation keys from ``body_text``.
 
     Returns a list of ``(surname_lower, year, display_name)`` tuples. Handles
-    ``(Nama Tahun)``, ``(Nama et al. Tahun)``, ``(Nama & Lain Tahun)`` and
-    multiple sources in one parenthesis separated by ';'.
+    ``(Nama Tahun)``, ``(Nama et al. Tahun)``, ``(Nama & Lain Tahun)``,
+    ``(Nama dan Lain Tahun)``, suffixed years such as ``2025a``, and multiple
+    sources in one parenthesis separated by ';'.
     """
     keys = []
     for m in _CITATION_PAREN_RE.finditer(body_text or ""):
@@ -1246,17 +1250,18 @@ def _extract_citation_keys(body_text):
             ym = _INNER_YEAR_RE.search(part)
             if not ym:
                 continue
-            year = ym.group(1)
+            year = ym.group(1).lower()
             # Only a plausible publication year (1900-2099) is a citation year;
             # this rejects code-block noise such as port numbers (3000/3001).
-            if not (year.isdigit() and 1900 <= int(year) <= 2099):
+            if not (1900 <= int(year[:4]) <= 2099):
                 continue
             name_part = part[:ym.start()].strip().rstrip(',').strip()
             name_part = _ET_AL_RE.sub('', name_part).strip()
-            name_part = name_part.split('&', 1)[0].strip()
+            name_part = _AUTHOR_JOIN_RE.split(name_part, maxsplit=1)[0].strip()
             # Strip leading transliteration quotes so the citation key matches
             # the normalized reference key (see reference_key()).
             name_part = name_part.lstrip("'\"`’‘").strip()
+            name_part = name_part.rstrip('.,;:').strip()
             if not name_part:
                 continue
             keys.append((name_part.lower(), year, name_part))

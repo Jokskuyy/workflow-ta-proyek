@@ -47,12 +47,13 @@ def test_blackbox_fragment_matches_structured_facts():
     result = _shared_results()["black_box_testing"]
     text = (SHARED / "testing" / "blackbox.md").read_text(encoding="utf-8")
 
-    assert result["final_result"]["passed_scenarios"] == result["total_scenarios"] == 24
-    assert result["final_result"]["failed_scenarios"] == []
-    assert result["final_result"]["retested_scenario"] == "BB-20"
+    assert result["final_verification"]["passed_scenarios"] == result["total_scenarios"] == 24
+    assert result["final_verification"]["failed_scenarios"] == []
+    assert result["retest"]["scenario"] == "BB-20"
+    assert result["retest"]["result"] == "passed"
     assert "24 dari 24" in text
-    assert "script testing Unity" in text
-    assert "Lulus pada pengujian ulang" in text
+    assert "skrip pengujian Unity" in text
+    assert "dinyatakan lulus pada pengujian ulang" in text
 
 
 def test_uat_fragment_matches_structured_scores():
@@ -71,10 +72,12 @@ def test_uat_revision_ids_are_complete_and_unique():
     text = (SHARED / "testing" / "uat-revisions.md").read_text(encoding="utf-8")
     status = _shared_results()["user_acceptance_testing"]["revision_status"]
 
-    for number in range(1, 12):
+    for number in range(1, 11):
         revision_id = f"UAT-R{number:02d}"
         assert text.count(revision_id) >= 1
         assert revision_id in status
     table_rows = [line for line in text.splitlines() if line.startswith("UAT-R")]
-    assert len(table_rows) == 11
-    assert len({line.split("|", 1)[0].strip() for line in table_rows}) == 11
+    assert len(table_rows) == 10
+    assert len({line.split("|", 1)[0].strip() for line in table_rows}) == 10
+    assert "UAT-R11" not in text
+    assert "UAT-R11" not in status

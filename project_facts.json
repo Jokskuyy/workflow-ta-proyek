@@ -12,31 +12,34 @@
             "pembimbing_2": "Novi Trisman Hadi, S.Pd., M.Kom."
         },
         "mitra": {
-            "name": "UPA TIK UPN Veteran Jakarta",
-            "representative": "Asep Saeful Ridwan, S.Kom.",
-            "role": "Kepala UPA TIK UPNVJ"
+            "name": "Humas UPNVJ",
+            "representative": "Perwakilan Humas UPNVJ",
+            "role": "Mitra pengguna dan peserta UAT"
+        },
+        "institutional_coordination": {
+            "name": "Unit Penunjang Akademik Teknologi Informasi dan Komunikasi (UPA TIK) UPNVJ",
+            "role": "Koordinasi teknis, kebijakan data, kemungkinan integrasi institusional, wawancara, dan penyerahan pakta integritas",
+            "not_end_user_partner": true
         },
         "stakeholder_interviews": [
             {
                 "role": "Kepala UPA TIK UPNVJ",
                 "name": "Asep Saeful Ridwan, S.Kom",
-                "notes": "Membahas pembagian peran tim tugas akhir, merumuskan kebutuhan fungsional dan non-fungsional sistem."
+                "notes": "Koordinasi digunakan untuk memahami batas akses data dan kemungkinan integrasi teknis, bukan untuk menetapkan kebutuhan pengguna navigasi atau mengklaim persetujuan penerapan sistem."
             },
             {
                 "role": "Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi UPNVJ",
                 "name": "Dr. dr. Ria Maria Theresa, SpKJ., MH.",
                 "date": "2026-02-25",
                 "student_participant": "Dwikhi Deandra Purnianto",
-                "notes": "Wawancara memvalidasi kesulitan mahasiswa dan pengunjung dalam mencari ruangan serta rancangan dashboard dan denah 3D dengan pencarian lokasi. Narasumber menekankan bahwa data ruangan dinamis karena renovasi dan perubahan fungsi, sehingga data harus dapat diperbarui tanpa mengubah struktur dasar sistem. Pembahasan juga mencakup rencana penggunaan subdomain resmi UPNVJ, penyematan pada website universitas, kolaborasi dengan UPA TIK, koordinasi perolehan denah fisik terbaru melalui bagian terkait, kebutuhan surat permohonan data, dan perhatian terhadap stabilitas Wi-Fi. Narasumber memberikan respons positif terhadap arah digitalisasi sarana dan prasarana melalui proyek."
+                "notes": "Wawancara digunakan untuk memahami batas pembagian data mentah dan kemungkinan koordinasi institusional. Kebutuhan navigasi tetap didasarkan pada kuesioner pengguna dan hasil wawancara tidak digunakan sebagai bukti persetujuan atau prioritas strategis institusi."
             }
         ],
         "documents": {
             "pakta_integritas_upa_tik": {
                 "status": "documentation_available",
-                "evidence": [
-                    "dokumentasi/ttd pakta integritas UPA TIK.jpeg",
-                    "pakta_integritas/PAKTA INTEGRITAS RISET MAHASISWA.pdf"
-                ]
+                "evidence": "dokumentasi/ttd pakta integritas UPA TIK.jpeg",
+                "evidence_scope": "Foto mendokumentasikan penyerahan dokumen kepada staf UPA TIK; foto bukan pengganti salinan dokumen bertanda tangan dan tidak digunakan untuk mengklaim nomor surat, tanggal pengesahan, identitas penandatangan, atau persetujuan formal."
             },
             "wawancara_warek_2": {
                 "status": "completed",
@@ -74,13 +77,13 @@
             "penguji_1": "Dr. Widya Cholil, M.I.T",
             "penguji_2": "Kharisma Wiati Gusti, M.T."
         },
-        "humas": "Humas UPNVJ (sebagai responden/user mahasiswa)"
+        "humas": "Humas UPNVJ sebagai mitra pengguna; satu perwakilan mengikuti UAT tanpa digunakan untuk mengklaim persetujuan formal atau representasi seluruh pengguna UPNVJ"
     },
     "team_members": [
         {
             "name": "Muhammad Iman Nugraha",
             "nim": "2210511129",
-            "role": "Peran 1: Full Stack Web Developer & System Integrator",
+            "role": "Full Stack Web Developer, System Integrator, dan DevOps Engineer",
             "focus": [
                 "React Frontend",
                 "Serverless API",
@@ -93,7 +96,7 @@
         {
             "name": "Muammar Faiz Khairul Anam Setiawan",
             "nim": "2210511138",
-            "role": "Peran 2: 3D Simulator & Engine Developer",
+            "role": "3D Simulator dan Engine Developer",
             "focus": [
                 "Unity WebGL Engine",
                 "NavMesh pathfinding",
@@ -107,7 +110,7 @@
         {
             "name": "Dwikhi Deandra Purnianto",
             "nim": "2210511131",
-            "role": "Peran 3: 3D Asset Designer & Database/Asset Manager",
+            "role": "3D Asset Designer dan Database Schema Designer",
             "focus": [
                 "Creation and layout of all building and facility 3D GameObjects in Unity Editor without Blender",
                 "Prefab hierarchy and child Pointer target GameObjects",
@@ -186,7 +189,7 @@
     },
     "integration_pointer_and_sync": {
         "pointer_mechanism": {
-            "description": "Sebagai 3D Asset Designer & Database/Asset Manager, Dwikhi Deandra Purnianto membuat dan menata seluruh GameObject 3D gedung serta fasilitas yang dikerjakan pada scene Unity, menyusun child Pointer dan GameObject tujuan, serta menetapkan nama yang sesuai dengan unity_object_name di database Supabase.",
+            "description": "Sebagai 3D Asset Designer dan Database Schema Designer, Dwikhi Deandra Purnianto membuat dan menata seluruh GameObject 3D gedung serta fasilitas yang dikerjakan pada scene Unity, menyusun child Pointer dan GameObject tujuan, serta menetapkan nama yang sesuai dengan unity_object_name di database Supabase.",
             "hierarchy_screenshot": "dokumentasi/contoh_pointer.png"
         },
         "database_sync_checker": {
@@ -363,8 +366,8 @@
         "crud_entities": [
             "gedung",
             "fasilitas",
-            "fakultas",
-            "program_studi"
+            "program_studi",
+            "konfigurasi denah 2D"
         ]
     }
 }
