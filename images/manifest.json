@@ -15,13 +15,6 @@
       "inject_method": "post_com"
     },
     {
-      "id": "diagram_erd",
-      "file": "diagram_erd.png",
-      "caption_match": "Entity-Relationship Diagram",
-      "source": "diagrams/gambar-2-17-erd.png",
-      "inject_method": "post_com"
-    },
-    {
       "id": "diagram_use_case_legenda",
       "file": "diagram_use_case_legenda.png",
       "caption_match": "Legenda Use Case Diagram",
@@ -64,108 +57,129 @@
       "inject_method": "post_com"
     },
     {
-      "id": "mockup_login_admin",
-      "file": "mockup_login_admin.png",
-      "caption_match": "Halaman Login Admin",
-      "source": "dokumentasi/login-page.png",
+      "id": "ui_section_denah_kampus",
+      "file": "ui_section_denah_kampus.png",
+      "caption_match": "Panel Akses Denah 2D dan 3D",
+      "source": "dokumentasi/frontend-terbaru/section-denah-kampus.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "ui_webgl_canvas",
+      "file": "ui_webgl_canvas.png",
+      "caption_match": "Canvas Unity WebGL pada Build Aktif dengan Bantuan dan Bilah Pencarian React",
+      "source": "dokumentasi/frontend-terbaru/canvas-webgl-3d.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "ui_search_overlay",
+      "file": "ui_search_overlay.png",
+      "caption_match": "Hasil Pencarian Lokasi pada Denah 2D",
+      "source": "dokumentasi/frontend-terbaru/search-overlay-2d.png",
       "inject_method": "post_com"
     },
     {
       "id": "mockup_dashboard_admin",
       "file": "mockup_dashboard_admin.png",
-      "caption_match": "Halaman Dashboard Admin",
-      "source": "dokumentasi/header+gedung-view.png",
+      "caption_match": "Halaman Pengelolaan Fasilitas pada Admin Panel",
+      "source": "dokumentasi/frontend-terbaru/admin-fasilitas.png",
       "inject_method": "post_com"
     },
     {
-      "id": "mockup_modal_tambah_gedung",
-      "file": "mockup_modal_tambah_gedung.png",
-      "caption_match": "Modal Tambah Data Gedung",
-      "source": "dokumentasi/modal-create-gedung.png",
+      "id": "api_test_health",
+      "file": "api_test_health.png",
+      "caption_match": "Respons Health Check pada Deployment",
+      "source": "dokumentasi/TEST API/GET_apihealth.png",
       "inject_method": "post_com"
     },
     {
-      "id": "mockup_modal_edit_gedung",
-      "file": "mockup_modal_edit_gedung.png",
-      "caption_match": "Modal Update Data Gedung",
-      "source": "dokumentasi/modal-edit-gedung.png",
+      "id": "api_test_unity_data",
+      "file": "api_test_unity_data.png",
+      "caption_match": "Respons Data Runtime Unity dari Vercel Serverless Function",
+      "source": "dokumentasi/TEST API/GET_apiunitydata.png",
       "inject_method": "post_com"
     },
     {
-      "id": "mockup_modal_hapus_gedung",
-      "file": "mockup_modal_hapus_gedung.png",
-      "caption_match": "Modal Konfirmasi Hapus Data Gedung",
-      "source": "dokumentasi/modal-konfirmasi-delete-gedung.png",
+      "id": "api_test_unity_names",
+      "file": "api_test_unity_names.png",
+      "caption_match": "Respons Daftar Identifier untuk Tooling Unity Editor",
+      "source": "dokumentasi/TEST API/GET_apiunitynames.png",
       "inject_method": "post_com"
     },
     {
-      "id": "mockup_admin_traffic",
-      "file": "mockup_admin_traffic.png",
-      "caption_match": "Traffic Website Admin",
-      "source": "dokumentasi/section-admin-traffic-view.png",
+      "id": "api_test_rls_unauthorized",
+      "file": "api_test_rls_unauthorized.png",
+      "caption_match": "Penolakan Mutasi Tanpa Otorisasi oleh Supabase RLS",
+      "source": "dokumentasi/TEST API/POST_aaysacqsibquiulpdzwzsupabasecorestv1fasilitas.png",
       "inject_method": "post_com"
     },
     {
-      "id": "mockup_hero_section",
-      "file": "mockup_hero_section.png",
-      "caption_match": "Hero Section",
-      "source": "dokumentasi/section-header+hero.png",
+      "id": "uat_revisi_tutorial_faq",
+      "file": "uat_revisi_tutorial_faq.png",
+      "caption_match": "Tutorial dan FAQ Denah Kampus Setelah Revisi",
+      "source": "Hasil UAT/dokumentasi revisi/RR02_section_faq_dan_tutorial.png",
       "inject_method": "post_com"
     },
     {
-      "id": "mockup_public_traffic",
-      "file": "mockup_public_traffic.png",
-      "caption_match": "Public Traffic Statistics Website",
-      "source": "dokumentasi/traffic-web-public.png",
+      "id": "uat_revisi_mode_selector",
+      "file": "uat_revisi_mode_selector.png",
+      "caption_match": "Pemilihan Mode Denah 2D atau 3D",
+      "source": "Hasil UAT/dokumentasi revisi/RR03_choose_2d_or_3d.png",
       "inject_method": "post_com"
     },
     {
-      "id": "mockup_fasilitas_aset",
-      "file": "mockup_fasilitas_aset.png",
-      "caption_match": "Bagian Fasilitas dan Aset",
-      "source": "dokumentasi/section fasilitas-asset(dan gedung).png",
+      "id": "uat_revisi_map_2d",
+      "file": "uat_revisi_map_2d.png",
+      "caption_match": "Denah 2D dengan Titik Awal dan Label Lokasi",
+      "source": "Hasil UAT/dokumentasi revisi/RR03_tampilan_2d.png",
       "inject_method": "post_com"
     },
     {
-      "id": "mockup_modal_list_fasilitas",
-      "file": "mockup_modal_list_fasilitas.png",
-      "caption_match": "Modal List Fasilitas dan Aset",
-      "source": "dokumentasi/modal-fasilitas-aset.png",
+      "id": "uat_revisi_spawn_3d",
+      "file": "uat_revisi_spawn_3d.png",
+      "caption_match": "Pemilihan Titik Awal pada Denah 3D",
+      "source": "Hasil UAT/dokumentasi revisi/RR03_pilih_spawn_3d.png",
       "inject_method": "post_com"
     },
     {
-      "id": "mockup_modal_detail_fasilitas",
-      "file": "mockup_modal_detail_fasilitas.png",
-      "caption_match": "Modal Fasilitas dan Aset",
-      "source": "dokumentasi/modal-fasilitas-aset.png",
+      "id": "uat_revisi_minimap_3d",
+      "file": "uat_revisi_minimap_3d.png",
+      "caption_match": "Tampilan Denah 3D dengan Minimap dan Tombol Bantuan",
+      "source": "Hasil UAT/dokumentasi revisi/RR03_tampilan_ingame_3d_pov(jadi3rdperson)_minimap.png",
       "inject_method": "post_com"
     },
     {
-      "id": "mockup_footer",
-      "file": "mockup_footer.png",
-      "caption_match": "Bagian Footer",
-      "source": "dokumentasi/section-footer.png",
+      "id": "uat_revisi_notifikasi_tiba",
+      "file": "uat_revisi_notifikasi_tiba.png",
+      "caption_match": "Notifikasi Tiba di Tujuan Setelah Navigasi Selesai",
+      "source": "Hasil UAT/dokumentasi revisi/RR10_notif_sampai.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "blackbox_bb20_rute_aktif",
+      "file": "blackbox_bb20_rute_aktif.png",
+      "caption_match": "Retest BB-20 Saat Navigasi Masih Aktif",
+      "source": "Hasil UAT/dokumentasi revisi/BB20_1.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "blackbox_bb20_navigasi_selesai",
+      "file": "blackbox_bb20_navigasi_selesai.png",
+      "caption_match": "Retest BB-20 Setelah Navigasi Selesai",
+      "source": "Hasil UAT/dokumentasi revisi/BB20_2.png",
       "inject_method": "post_com"
     },
     {
       "id": "foto_wawancara_warek",
       "file": "foto_wawancara_warek.jpg",
-      "caption_match": "Dokumentasi Wawancara dan Penandatanganan Pakta Integritas",
+      "caption_match": "Dokumentasi Wawancara Pemangku Kepentingan",
       "source": "unpacked_ta/word/media/image12.jpg",
       "inject_method": "post_com"
     },
     {
-      "id": "impl_pointer_hierarchy",
-      "file": "impl_pointer_hierarchy.png",
-      "caption_match": "Hierarki Prefab Gedung dengan Child Pointer di Unity",
-      "source": "unpacked_ta/word/media/image31.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "impl_sync_db_checker",
-      "file": "impl_sync_db_checker.png",
-      "caption_match": "Tampilan UI Database Sync Checker di Unity Editor",
-      "source": "unpacked_ta/word/media/image32.png",
+      "id": "foto_penyerahan_pakta_upa_tik",
+      "file": "foto_penyerahan_pakta_upa_tik.jpeg",
+      "caption_match": "Dokumentasi Penyerahan Pakta Integritas kepada UPA TIK",
+      "source": "dokumentasi/ttd pakta integritas UPA TIK.jpeg",
       "inject_method": "post_com"
     },
     {

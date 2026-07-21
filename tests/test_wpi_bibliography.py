@@ -11,7 +11,7 @@ Covers design Properties 1, 2, 3 plus R1.8 / R1.9 unit cases against:
     SDT renderer, R1.3 style invariant + R1.8 missing-section guard).
 
 Draft is the single source of truth (no hardcoded references). The snapshot test
-asserts the 8 current draft entries parse to the same text + italic spans as the
+asserts the current draft entries parse to the same text + italic spans as the
 captured baseline ``tests/fixtures/wpi_baseline_bibliography.xml`` (Option B
 format/style preservation, R1.9).
 """
@@ -201,7 +201,7 @@ def test_unit_parse_missing_section_returns_empty_not_found():
 
 
 # =========================================================================== #
-# R1.9 snapshot: the 8 current draft entries parse to the same text + italic
+# R1.9 snapshot: the current draft entries parse to the same text + italic
 # spans as the captured baseline (Option B format/style preservation).
 # =========================================================================== #
 def _baseline_entry_spans():
@@ -232,23 +232,40 @@ def test_unit_snapshot_draft_entries_match_baseline_spans():
     assert result.section_found is True
 
     baseline = _baseline_entry_spans()
-    assert len(result) == len(baseline) == 11
+    assert len(result) == len(baseline) == 14
 
     for entry, base_spans in zip(result, baseline):
         # Text + italic-span structure must match the captured baseline.
         assert list(entry.spans) == base_spans
-        # Exactly one italic span per APA entry (the journal/source name).
-        assert sum(1 for _, ital in entry.spans if ital) == 1
+        # Journal articles and the Penmaru page carry one italic container
+        # span. The other official UPNVJ web pages have no container title.
+        expected_italic_spans = (
+            0
+            if entry.raw.startswith("UPNVJ.") and "(2026a)." not in entry.raw
+            else 1
+        )
+        assert sum(1 for _, ital in entry.spans if ital) == expected_italic_spans
 
 
 def test_unit_reference_key_surname_and_year():
     result = mrg.parse_bibliography_entries(str(DRAFT))
     keys = [mrg.reference_key(e) for e in result]
-    # First entry is "'Afiifah ... (2022)"; the leading transliteration
-    # apostrophe is stripped from the key (see reference_key()).
-    assert keys[0] == ('afiifah', '2022')
-    assert ('siv', '2025') in keys
+    assert keys[0] == ('aliyah', '2025')
+    assert ('upnvj', '2025a') in keys
+    assert ('upnvj', '2025b') in keys
+    assert ('upnvj', '2026a') in keys
+    assert ('upnvj', '2026b') in keys
     assert ('putra', '2026') in keys
+
+
+def test_unit_reference_key_keeps_year_suffix_and_strips_org_period():
+    result = mrg.parse_bibliography_entries(
+        "# DAFTAR PUSTAKA\n\nUPNVJ. (2025a). Halaman fasilitas.\n"
+    )
+
+    assert result[0].year == "2025a"
+    assert result[0].authors == ("UPNVJ.",)
+    assert mrg.reference_key(result[0]) == ("upnvj", "2025a")
 
 
 if __name__ == "__main__":

@@ -183,7 +183,7 @@ FIGURE_EXTENTS = [
     (5400000, 2342074), (5400000, 2392239), (5400000, 2443764), (5400000, 2529799),
     (5400000, 2580599), (5400000, 2729916), (5400000, 2755891), (5400000, 2766043),
     (5400000, 3037499), (5400000, 3195305), (5400000, 3977713), (5400000, 4056750),
-    (5400000, 4072771), (5400000, 4149818), (5400000, 4194174), (5400000, 4477215),
+    (5400000, 4072771), (5400000, 4194174), (5400000, 4248693), (5400000, 4477215),
     (5400000, 4673280), (5400000, 5189678), (5400000, 5373996),
 ]
 
@@ -388,8 +388,8 @@ def test_p8_existing_structural_validation_still_passes():
 
     Therefore Property 8 must NOT assert overall validator exit 0 here. Instead it
     asserts the STRUCTURAL Sections A-J are preserved: NO structural/Section A-J
-    error lines appear, and the ONLY failures present (if any) are the intended
-    content-level C2 ``survey_*`` errors (lines tagged ``[C2]`` mentioning ``survey``).
+    error lines appear. C1-C4 findings are content-integrity checks against the
+    current manifest and may legitimately flag this intentionally stale artifact.
     """
     result = run_validator(CAPTURED_DOCX)
     combined = (result.stdout or "") + "\n" + (result.stderr or "")
@@ -409,20 +409,24 @@ def test_p8_existing_structural_validation_still_passes():
     error_lines = [
         ln.strip() for ln in combined.splitlines() if ln.strip().startswith("- ")
     ]
-    # The ONLY permitted failures are the intended content-level C2 survey_* errors.
+    # C1-C4 belong to the separate content-integrity layer, not Sections A-J.
+    # Do not enumerate manifest IDs here: the captured DOCX is intentionally stale
+    # and the current manifest can gain valid figures without changing its structure.
     structural_errors = [
         ln for ln in error_lines
-        if not ("[C2]" in ln and "survey" in ln.lower())
+        if not any(f"[C{number}]" in ln for number in range(1, 5))
     ]
     assert not structural_errors, (
-        "structural/Section A-J validation regressed -- unexpected non-C2-survey "
+        "structural/Section A-J validation regressed -- unexpected non-C1-C4 "
         f"error lines present:\n" + "\n".join(structural_errors)
     )
-    # And every failure that IS present must be exactly the intended C2 survey case.
-    for ln in error_lines:
-        assert "[C2]" in ln and "survey" in ln.lower(), (
-            f"unexpected error line (not an intended C2 survey error): {ln!r}"
-        )
+    assert any("[C2]" in ln for ln in error_lines), (
+        "stale captured DOCX should still expose content-integrity drift"
+    )
+    assert all(
+        any(f"[C{number}]" in ln for number in range(1, 5))
+        for ln in error_lines
+    )
 
 
 @settings(PRESERVE_PBT)

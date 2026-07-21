@@ -1,6 +1,4 @@
-# INTEGRASI DENAH VIRTUAL UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAKARTA KAMPUS PONDOK LABU
-
-# (DASHBOARD PROFIL)
+# PENGEMBANGAN DASHBOARD WEB, INTEGRASI UNITY WEBGL, DAN DEPLOYMENT SISTEM DENAH VIRTUAL UPNVJ KAMPUS PONDOK LABU
 
 Muhammad Iman Nugraha
 2210511129
@@ -8,7 +6,7 @@ Muhammad Iman Nugraha
 INFORMATIKA
 FAKULTAS ILMU KOMPUTER
 UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAKARTA
-2025
+2026
 
 # DAFTAR GAMBAR
 
@@ -21,9 +19,11 @@ UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAKARTA
 # DAFTAR LAMPIRAN
 
 LAMPIRAN 1. Surat Pernyataan Keaslian
-LAMPIRAN 2. Surat Keterangan Implementasi Proyek dari Mitra
+LAMPIRAN 2. Dokumentasi Penyerahan Pakta Integritas kepada UPA TIK
 LAMPIRAN 3. Kode Sumber Utama
-LAMPIRAN 4. Panduan Pengguna (User Manual) (Rencana/Placeholder)
+LAMPIRAN 4. Panduan Pengguna dan Kontrak Operasional
+LAMPIRAN 5. Instrumen UAT dan Indeks Bukti Pengujian
+LAMPIRAN 6. Matriks Artefak dan Reproduksi Pengujian
 
 # BAB I PENDAHULUAN
 
@@ -35,24 +35,21 @@ LAMPIRAN 4. Panduan Pengguna (User Manual) (Rencana/Placeholder)
 
 Berdasarkan penjabaran latar belakang serta pengumpulan data awal yang telah diuraikan, identifikasi masalah dalam penelitian ini dirumuskan sebagai berikut:
 
-1. Masih terdapat kesulitan bagi mahasiswa dan pengunjung dalam menemukan lokasi tertentu di lingkungan kampus, terutama akibat keterbatasan media navigasi yang masih bersifat konvensional, statis, dan tidak interaktif.
-2. Informasi profil kampus, seperti data fasilitas, akademik, dan aset, masih tersebar di berbagai platform sehingga pengguna harus mengakses beberapa sumber secara terpisah untuk memperoleh informasi yang dibutuhkan.
-3. Belum tersedia media visualisasi berbasis 3D yang mampu merepresentasikan lingkungan kampus secara realistis dan interaktif, sehingga pengguna kesulitan memahami hubungan spasial antar lokasi.
-4. Belum terdapat sistem backend yang terpusat untuk mengelola dan menyediakan data secara dinamis melalui API yang dapat digunakan oleh berbagai komponen sistem, termasuk dashboard dan sistem visualisasi.
-5. Belum tersedia mekanisme integrasi antara backend dan engine visualisasi seperti Unity, sehingga data yang tersimpan dalam sistem belum dapat dimanfaatkan secara langsung dalam lingkungan 3D interaktif.
+1. Pengguna belum memiliki satu antarmuka web yang menyatukan informasi kampus, pencarian lokasi, dan akses ke denah virtual, sedangkan pengelola memerlukan antarmuka administratif untuk memperbarui konten secara terpusat.
+2. Data yang digunakan aplikasi web dan Unity WebGL memerlukan jalur akses yang konsisten melalui integrasi Supabase, autentikasi, dan REST API tanpa menduplikasi atau mengambil alih rancangan skema database.
+3. Hasil pencarian pada React perlu dihubungkan dengan runtime Unity melalui kontrak identifier yang stabil, kemudian layanan web perlu disebarkan dan dioperasikan dengan konfigurasi yang dapat disesuaikan pada lingkungan hosting saat ini maupun infrastruktur kampus pada masa mendatang.
 
 ## 1.3 Batasan Masalah
 
 Untuk menjaga fokus, ruang lingkup, serta kelayakan penelitian, maka batasan masalah dalam pengembangan sistem integrasi denah virtual kampus dan dashboard profil Universitas Pembangunan Nasional Veteran Jakarta ditetapkan sebagai berikut:
 
-1. Pengembangan sistem difokuskan pada integrasi antara backend, dashboard berbasis web, dan visualisasi denah virtual berbasis 3D, tanpa mencakup pengembangan sistem akademik utama seperti sistem perkuliahan atau keuangan.
+1. Pengembangan sistem difokuskan pada integrasi antara backend, dashboard berbasis web, Denah 2D, dan visualisasi denah virtual 3D, tanpa mencakup pengembangan sistem akademik utama seperti sistem perkuliahan atau keuangan.
 2. Cakupan area visualisasi dan data dibatasi pada lingkungan Kampus Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu.
-3. Data profil kampus seperti statistik mahasiswa, dosen, dan akreditasi tidak dikelola secara langsung dalam sistem backend, melainkan diperoleh melalui mekanisme integrasi atau embed dari sistem yang telah dikembangkan oleh unit terkait (UPA TIK).
-4. Pengembangan pada sisi backend difokuskan pada perancangan dan implementasi REST API, pengelolaan database, serta penyediaan data secara dinamis untuk mendukung kebutuhan dashboard dan integrasi dengan engine visualisasi.
-5. Sistem API yang dikembangkan mendukung penyediaan data publik serta manipulasi data (Create, Read, Update, Delete) yang dibatasi hanya untuk administrator melalui mekanisme autentikasi berbasis Supabase Auth, sehingga tidak semua endpoint dapat diakses secara terbuka oleh pengguna umum.
-6. Pengembangan visualisasi 3D dibatasi pada pembuatan aset dan lingkungan virtual oleh 3D Designer, tanpa membahas secara mendalam proses teknis pemodelan dalam laporan ini.
-7. Pengembangan pada sisi Unity atau simulator difokuskan pada integrasi dengan backend melalui pemanggilan API serta implementasi interaksi dasar, tanpa membahas secara mendalam pengembangan engine atau optimasi grafis tingkat lanjut.
-8. Sistem yang dikembangkan tidak mencakup integrasi real-time dengan seluruh sistem internal universitas, sehingga pembaruan data bergantung pada ketersediaan sumber data eksternal atau hasil pengelolaan internal sistem.
+3. Sistem tidak mengelola data akademik utama seperti data mahasiswa, dosen, dan akreditasi. Apabila integrasi dengan sistem institusional dikembangkan pada masa mendatang, pertukaran data harus mengikuti kontrak dan izin resmi dari unit terkait.
+4. Pengembangan pada sisi backend difokuskan pada perancangan dan implementasi REST API, integrasi layanan Supabase, serta penyediaan data secara dinamis untuk mendukung dashboard dan Unity WebGL. Perancangan skema database, kebijakan RLS, dan rancangan trigger basis data merupakan kontribusi Database Schema Designer; snapshot web saat ini mencatat audit melalui service aplikasi.
+5. REST API yang dikembangkan bersifat baca-saja untuk konsumen Unity dan integrator eksternal. Operasi Create, Read, Update, dan Delete pada Admin Panel dilakukan langsung melalui Supabase SDK dengan sesi Supabase Auth dan dibatasi oleh RLS.
+6. Skema database, RLS, rancangan trigger basis data, aset 3D, dan hierarchy `Pointer` digunakan sebagai dependensi integrasi yang disediakan Database Schema Designer dan 3D Asset Designer; implementasi runtime, navigasi, tooling, optimasi, dan proses build Unity WebGL disediakan Engine Developer.
+7. Lingkup penulis mencakup aplikasi React, REST API, integrasi Supabase Auth dan CRUD, bridge perintah React ke Unity, validasi callback penyelesaian navigasi pada React, deployment artefak WebGL yang diterima dari Engine Developer, serta operasional layanan web. Implementasi callback dibatasi pada event penyelesaian tujuan aktif dan tidak mencakup integrasi real-time dengan seluruh sistem internal universitas.
 
 Pembagian peran dan tanggung jawab pada proyek sistem dijelaskan lebih detail dalam [TABREF:peran_tanggung_jawab].
 
@@ -61,9 +58,9 @@ Pembagian peran dan tanggung jawab pada proyek sistem dijelaskan lebih detail da
 
 [TABLE]
 Role | Tugas dan Tanggung Jawab
-3D Designer | Merancang dan memproduksi aset visual tiga dimensi lingkungan kampus, termasuk pemodelan gedung dan elemen pendukung, serta melakukan optimasi aset agar sesuai untuk digunakan pada lingkungan visualisasi 3D interaktif.
-3D Simulator / Engine Developer | Mengembangkan engine visualisasi 3D interaktif sebagai modul navigasi spasial, termasuk pengelolaan scene, interaksi pengguna, optimasi performa, serta integrasi data satu arah dari API ke dalam lingkungan visualisasi 3D.
-Full Stack Developer (Dashboard Profile) | Merancang dan mengimplementasikan arsitektur backend dan frontend sistem, meliputi pengembangan database, RESTful API, dashboard publik, dan dashboard administrator untuk pengelolaan serta penyajian data profil kampus.
+3D Asset Designer dan Database Schema Designer | Merancang aset visual 3D dan hierarchy prefab beserta `Pointer`, serta merancang skema database Supabase PostgreSQL, ERD, kebijakan RLS, dan rancangan trigger basis data.
+3D Simulator dan Engine Developer | Mengembangkan runtime Unity WebGL, termasuk `BuildingDatabase`, `NavigationReceiver`, `DatabaseSyncChecker`, navigasi NavMesh, interaksi pengguna, optimasi performa, dan proses build WebGL.
+Full Stack Web Developer, System Integrator, dan DevOps Engineer | Mengembangkan Public Dashboard dan Admin Panel React, REST API pada Vercel Serverless Functions, integrasi Supabase Auth dan CRUD, bridge React ke Unity, pencatatan analitik aplikasi, pengujian web, serta deployment dan operasional layanan web; Express dan Umami dikelola sebagai jalur opsional.
 [/TABLE]
 
 ## 1.4 Tujuan dan Manfaat
@@ -72,22 +69,23 @@ Full Stack Developer (Dashboard Profile) | Merancang dan mengimplementasikan ars
 
 Berdasarkan rumusan masalah pada Subbab 1.2, maka tujuan dari penelitian ini adalah sebagai berikut:
 
-1. Mengembangkan sistem navigasi spasial kampus berbasis visualisasi 3D interaktif yang mampu meningkatkan efisiensi proses orientasi dan pencarian lokasi di lingkungan Kampus UPNVJ Pondok Labu.
-2. Menyediakan media informasi kampus yang intuitif, mudah diakses, dan interaktif untuk menjawab kebutuhan pengguna akan penyajian informasi yang cepat dan mudah dipahami.
-3. Mengintegrasikan informasi profil akademik, fasilitas, dan lingkungan kampus ke dalam satu sistem terpusat guna mengatasi fragmentasi sumber informasi yang selama ini terjadi.
-4. Merancang dan mengimplementasikan sistem digital terintegrasi yang menggabungkan denah virtual kampus berbasis 3D dengan dashboard profil kampus sebagai solusi Smart Campus yang saling terhubung dan berkelanjutan.
+1. Mengembangkan Public Dashboard dan Admin Panel berbasis React untuk menyajikan informasi kampus, pencarian lokasi, autentikasi administrator, serta pengelolaan data konten.
+2. Mengimplementasikan REST API berbasis Vercel Serverless Functions dan integrasi Supabase Auth untuk mendukung pertukaran data serta operasi CRUD sesuai kontrak data dan kebijakan akses yang disediakan Database Schema Designer.
+3. Mengimplementasikan integrasi antarkomponen melalui endpoint data dan bridge perintah React ke Unity menggunakan kontrak `unity_object_name`.
+4. Mengonfigurasi deployment dan operasional layanan web pada Vercel, termasuk aset Unity WebGL, environment variables, analitik aplikasi, health monitoring, serta kesiapan penyesuaian konfigurasi apabila layanan diintegrasikan dengan infrastruktur kampus pada tahap berikutnya.
 
 ### 1.4.2 Manfaat
 
 Penelitian ini diharapkan dapat memberikan manfaat bagi berbagai pihak, antara lain:
 
-1. Bagi sivitas akademika dan pengunjung, sistem integrasi denah virtual kampus dan dashboard profil diharapkan mampu meningkatkan efisiensi navigasi dan mempermudah akses terhadap informasi kampus secara terpadu dan interaktif.
-2. Bagi pihak manajemen dan pengelola fakultas, sistem ini menyediakan media informasi digital yang terpusat, mudah dikelola, dan mudah diperbarui untuk menyajikan profil akademik, fasilitas, dan data pendukung lainnya secara akurat.
-3. Bagi institusi UPNVJ secara keseluruhan, penelitian ini berkontribusi dalam meningkatkan citra dan daya sang universitas sebagai institusi pendidikan yang modern dan adaptif terhadap transformasi digital, sekaligus mendukung implementasi konsep Smart Campus secara berkelanjutan.
+1. Bagi pengguna publik, aplikasi menyediakan satu jalur akses untuk menelusuri informasi kampus, mencari gedung atau fasilitas, dan membuka denah virtual melalui peramban.
+2. Bagi staf pengelola, Admin Panel menyediakan antarmuka untuk memperbarui konten sesuai hak akses tanpa mengubah kode aplikasi maupun artefak Unity selama kontrak `unity_object_name` tetap konsisten.
+3. Bagi Humas UPNVJ sebagai mitra pengguna, aplikasi menjadi prototipe media informasi dan navigasi yang dapat dievaluasi untuk membantu mahasiswa baru, orang tua atau wali, sivitas akademika, dan pengunjung eksternal.
+4. Bagi UPA TIK dan tim pengembang, REST API, bridge React–Unity, serta konfigurasi deployment menyediakan kontrak teknis yang terdokumentasi dan dapat disesuaikan apabila sistem memperoleh persetujuan untuk dipindahkan ke infrastruktur institusi.
 
 ## 1.5 Jadwal Kegiatan
 
-Usulan jadwal kegiatan untuk penyelesaian proyek ini dirinci dalam bentuk Gantt Chart yang menyajikan alokasi waktu pengerjaan secara bertahap, sebagaimana disajikan pada [TABREF:jadwal_kegiatan]. Keseluruhan proyek ini direncanakan akan diselesaikan dalam kurun waktu 5 bulan atau 20 minggu.
+Jadwal pelaksanaan proyek dirinci dalam bentuk Gantt Chart yang menyajikan alokasi waktu pengerjaan secara bertahap, sebagaimana disajikan pada [TABREF:jadwal_kegiatan]. Keseluruhan rangkaian kegiatan dilaksanakan dalam lima bulan atau 20 minggu.
 
 [TABLE-ID:jadwal_kegiatan]
 [TABLECAPTION:Jadwal Kegiatan]
@@ -102,21 +100,21 @@ Revisi Final dan Penulisan Laporan | | | | | X
 Dokumentasi | X | X | X | X | X
 [/TABLE]
 
-Alur pengerjaan dirancang secara sekuensial dan bertahap, selaras dengan proses pengembangan. Tahapan-tahapan tersebut adalah:
+Alur pengerjaan dilaksanakan secara bertahap dengan beberapa kegiatan yang saling tumpang tindih. Tahapan-tahapan tersebut adalah:
 
-1. Desain Arsitektur dan UI (Bulan 1): Tahap fondasi yang berfokus pada perancangan blueprint sistem, termasuk ERD, Use Case Diagram, dan mockup UI.
-2. Pengembangan Backend (Bulan 2-3): Tahap implementasi kode sisi server, mencakup pembangunan database PostgreSQL dan RESTful API Node.js.
+1. Desain Arsitektur dan UI (Bulan 1): Tahap fondasi yang berfokus pada perancangan blueprint sistem, termasuk kontrak integrasi, Use Case Diagram, ERD yang dirancang Database Schema Designer, dan mockup UI.
+2. Pengembangan Backend (Bulan 2-3): Tahap implementasi kode sisi server, mencakup REST API Node.js dan integrasi layanan Supabase berdasarkan skema database yang dirancang Database Schema Designer.
 3. Pengembangan Frontend (Bulan 3-4): Tahap implementasi kode sisi klien, berfokus pada pembangunan Admin Dashboard dan Public Dashboard menggunakan React.js. Tahap ini berjalan tumpang tindih (overlap) dengan backend untuk efisiensi.
-4. Integrasi dan Pengujian Sistem (Bulan 4-5): Tahap validasi di mana frontend dan backend diintegrasikan dan diuji secara menyeluruh menggunakan skenario pengujian Black Box.
+4. Integrasi, Deployment, dan Pengujian Sistem (Bulan 4-5): Tahap penyatuan frontend, backend, dan Unity WebGL, konfigurasi deployment layanan web, serta validasi menggunakan skenario pengujian Black Box.
 5. Revisi Final dan Penulisan Laporan (Bulan 5): Alokasi waktu khusus untuk perbaikan bug akhir berdasarkan hasil pengujian dan penyusunan draf final laporan.
-6. Dokumentasi (Bulan 1-5): Aktivitas ini akan dilakukan secara paralel sepanjang proyek untuk memastikan semua proses, desain, dan kode terdokumentasi dengan baik.
+6. Dokumentasi (Bulan 1-5): Aktivitas ini dilakukan secara paralel sepanjang proyek untuk memastikan proses, desain, dan kode terdokumentasi dengan baik.
 
 ## 1.6 Sistematika Penulisan
 
 Sistematika penulisan laporan Tugas Akhir Proyek ini disusun secara terperinci ke dalam empat bab utama guna memberikan alur pembahasan yang runtut dan sistematis:
 
 1. **BAB I PENDAHULUAN**: Memaparkan latar belakang masalah navigasi spasial, identifikasi masalah, batasan penelitian, tujuan dan manfaat, jadwal kegiatan, serta sistematika penulisan.
-2. **BAB II RANCANGAN PROYEK**: Menguraikan hasil observasi sistem berjalan, usulan solusi teknis berupa arsitektur terintegrasi, identifikasi kebutuhan fungsional dan teknis, rencana pengembangan prototyping, desain UML (Use Case, Activity, Sequence), skema database ERD, rancangan antarmuka pengguna, serta rencana pengujian sistem.
+2. **BAB II RANCANGAN PROYEK**: Menguraikan hasil observasi sistem berjalan, usulan solusi teknis berupa arsitektur terintegrasi, identifikasi kebutuhan fungsional dan teknis, rencana pengembangan prototyping, desain UML (Use Case, Activity, Sequence), kontrak data integrasi, rancangan antarmuka pengguna, serta rencana pengujian sistem.
 3. **BAB III IMPLEMENTASI PROYEK**: Mendokumentasikan profil institusi mitra, metode pengembangan prototyping, detail implementasi sisi backend dan frontend (termasuk kode program), skema integrasi WebGL bridge, logbook aktivitas proyek, detail metadata sistem, serta hasil evaluasi pengujian fungsional (Black Box) dan penerimaan pengguna (UAT).
 4. **BAB IV PENUTUP**: Menyajikan kesimpulan akhir dari hasil pengembangan sistem dan evaluasi pengujian, serta saran rekomendasi untuk pengembangan sistem berkelanjutan.
 
@@ -124,220 +122,196 @@ Sistematika penulisan laporan Tugas Akhir Proyek ini disusun secara terperinci k
 
 # BAB II RANCANGAN PROYEK
 
-## 2.1 Observasi
+## 2.1 Observasi dan Analisis Kebutuhan Awal
 
-Tahap observasi awal merupakan fondasi penting dalam memahami permasalahan serta merumuskan kebutuhan sistem yang akan dikembangkan. Proses observasi dalam penelitian ini dilakukan melalui kombinasi beberapa metode, yaitu observasi lapangan, penyebaran kuesioner kepada mahasiswa, serta wawancara dengan stakeholder terkait. Pendekatan ini digunakan untuk memperoleh gambaran yang komprehensif, baik dari sisi pengguna maupun dari sisi institusi. Penggunaan denah virtual 3D sebagai media penunjang Smart Campus sejalan dengan tren riset twin digital (Jamaludin dan Saepuloh 2024). Visualisasi kampus digital untuk navigasi spasial terbukti mempermudah sivitas akademika dalam memahami tata letak fisik secara interaktif (Taurusta et al. 2024; Muharam et al. 2023).
+Analisis kebutuhan awal menggunakan tiga sumber bukti, yaitu kuesioner pengalaman navigasi, tinjauan terhadap jalur informasi yang tersedia bagi pengguna, serta wawancara dan koordinasi dengan pemangku kepentingan. Pembahasan dibatasi pada bukti yang tersedia untuk proyek ini dan tidak dimaksudkan sebagai audit menyeluruh terhadap seluruh sistem informasi UPNVJ.
 
-Berdasarkan hasil kuesioner yang telah disebarkan kepada mahasiswa, ditemukan bahwa mayoritas responden pernah mengalami kesulitan dalam menemukan lokasi tertentu di lingkungan kampus. Hal ini menunjukkan adanya permasalahan nyata pada aspek navigasi yang dirasakan langsung oleh pengguna, terutama mahasiswa baru dan pengunjung yang belum familiar dengan lingkungan kampus.
+### 2.1.1 Sumber Data dan Batas Observasi
 
-Selanjutnya, hasil observasi lapangan menunjukkan bahwa sistem navigasi yang tersedia saat ini masih mengandalkan media konvensional seperti papan penunjuk arah dan denah statis, yang bersifat pasif, tidak interaktif, serta sulit diperbarui. Kondisi ini menyebabkan keterbatasan dalam memberikan pengalaman navigasi yang efektif dan intuitif bagi pengguna.
+1. Kuesioner Pengguna
+   Kuesioner diisi oleh 21 responden untuk memperoleh gambaran awal mengenai pengalaman mencari lokasi, penggunaan media navigasi, kebutuhan informasi, dan minat terhadap denah virtual 3D. Hasilnya digunakan untuk mengidentifikasi kebutuhan pengguna dalam ruang lingkup sampel dan tidak digeneralisasi sebagai representasi seluruh sivitas akademika UPNVJ.
+2. Tinjauan Jalur Informasi dan Navigasi
+   Tinjauan dilakukan terhadap media navigasi fisik yang dikenal responden serta situs resmi UPNVJ. Situs tersebut telah menyediakan halaman lokasi kampus dan informasi fasilitas secara terpisah (UPNVJ 2022; UPNVJ 2025a). Temuan ini digunakan untuk mengidentifikasi kebutuhan agregasi informasi dalam ruang lingkup proyek, bukan untuk menyatakan bahwa UPNVJ sama sekali tidak memiliki sistem, backend, atau layanan informasi terpusat.
+3. Wawancara dan Koordinasi Pemangku Kepentingan
+   Koordinasi dengan Kepala UPA TIK dan wawancara dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi digunakan untuk memahami batas akses data serta kemungkinan integrasi teknis. Kebutuhan navigasi tetap diturunkan dari kuesioner pengguna, sedangkan keterlibatan Humas UPNVJ sebagai mitra pengguna dibuktikan melalui UAT pada tahap evaluasi.
 
-Untuk melengkapi analisis dari sisi institusi, dilakukan wawancara dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi (Wakil Rektor III). Berdasarkan hasil wawancara tersebut, tidak ditemukan adanya laporan formal yang secara spesifik membahas permasalahan navigasi kampus sebagai isu strategis. Namun demikian, pihak pimpinan universitas memberikan dukungan terhadap pengembangan solusi berbasis teknologi yang dapat meningkatkan kualitas layanan informasi kampus.
+Ketiga sumber tersebut menjadi dasar analisis kebutuhan. Keputusan mengenai React, REST API, Supabase, Unity WebGL, dan Vercel dibahas sebagai rancangan solusi pada Subbab 2.2, bukan sebagai hasil observasi lapangan.
 
-Selain itu, koordinasi juga dilakukan dengan unit pengelola teknologi informasi (UPA TIK) untuk memahami kondisi sistem yang sedang dikembangkan di lingkungan kampus. Hasil koordinasi menunjukkan bahwa beberapa data profil kampus, seperti statistik mahasiswa, dosen, dan akreditasi, telah dikelola dalam sistem terpisah, sehingga pendekatan integrasi melalui mekanisme embed menjadi solusi yang lebih relevan dibandingkan dengan pengelolaan data secara langsung dalam sistem yang dikembangkan.
+### 2.1.2 Analisis Kebutuhan Pengguna dan Sistem yang Berjalan
 
-Dengan menggabungkan hasil kuesioner, observasi lapangan, wawancara stakeholder, serta koordinasi teknis, dapat disimpulkan bahwa permasalahan utama terletak pada keterbatasan sistem navigasi yang belum interaktif serta belum terintegrasinya data dan visualisasi dalam satu platform yang terpadu. Temuan ini menjadi dasar dalam perumusan solusi sistem yang diusulkan pada penelitian ini.
-
-### 2.1.1 Observasi Lapangan Kegiatan
-
-Berdasarkan hasil observasi lapangan, data kuesioner mahasiswa, serta analisis terhadap sistem digital yang saat ini digunakan di Universitas Pembangunan Nasional Veteran Jakarta, diperoleh beberapa temuan terkait kondisi sistem yang sedang berjalan sebagai berikut:
-
-1. Keterbatasan Navigasi Spasial
-   a. Media navigasi masih mengandalkan papan penunjuk arah dan denah statis.
-   b. Berdasarkan hasil kuesioner, mayoritas mahasiswa pernah mengalami kesulitan dalam menemukan lokasi tertentu di lingkungan kampus.
-   c. Sistem yang ada belum mampu memberikan pengalaman navigasi yang interaktif dan intuitif.
-2. Fragmentasi Informasi Kampus
-   a. Data profil kampus seperti fasilitas, akademik, dan statistik tersedia, namun tersebar di berbagai halaman atau sistem yang berbeda.
-   b. Pengguna harus mengakses beberapa sumber secara terpisah untuk mendapatkan informasi yang lengkap.
-   c. Hal ini menyebabkan inefisiensi dalam pencarian informasi.
-3. Belum Tersedianya Visualisasi Interaktif
-   a. Sistem yang ada belum menyediakan media visualisasi berbasis 3D yang dapat membantu pengguna memahami tata letak kampus secara menyeluruh.
-   b. Keterbatasan ini berdampak pada rendahnya kemampuan pengguna dalam memahami hubungan spasial antar lokasi.
-4. Keterbatasan Arsitektur Backend
-   a. Belum terdapat sistem backend terpusat yang menyediakan data melalui API secara konsisten.
-   b. Data belum dapat didistribus async ke berbagai komponen sistem seperti dashboard dan engine visualisasi.
-5. Kondisi Integrasi Data Eksisting
-   a. Berdasarkan koordinasi dengan UPA TIK, sebagian data kampus telah dikelola dalam sistem terpisah yang sedang dikembangkan.
-   b. Oleh karena itu, pendekatan integrasi melalui embed atau konsumsi data eksternal menjadi lebih relevan dibandingkan pengelolaan data secara mandiri.
-
-Berdasarkan temuan tersebut, dapat disimpulkan bahwa sistem yang sedang berjalan masih memiliki keterbatasan pada aspek navigasi, integrasi data, serta arsitektur sistem. Kondisi ini menjadi dasar dalam perumusan solusi yang diusulkan pada Subbab 2.2.
-
-### 2.1.2 Analisis Sistem yang Sedang Berjalan
-
-Berdasarkan hasil kuesioner yang telah disebarkan kepada 21 responden, diperoleh beberapa temuan penting terkait pengalaman pengguna dalam melakukan navigasi di lingkungan Kampus Universitas Pembangunan Nasional Veteran Jakarta.
-
-Mayoritas responden merupakan sivitas akademika UPNVJ, yaitu sebesar 95,2%, sedangkan sisanya merupakan pengunjung eksternal. Hal ini menunjukkan bahwa data yang diperoleh cukup merepresentasikan pengalaman pengguna utama yang beraktivitas di lingkungan kampus secara rutin. Komposisi responden tersebut disajikan pada [FIGREF:survey_01_profil].
+Sebanyak 20 dari 21 responden atau 95,2 persen merupakan sivitas akademika UPNVJ, sedangkan satu responden merupakan pengunjung eksternal. Komposisi pada [FIGREF:survey_01_profil] menunjukkan bahwa temuan terutama menggambarkan pengalaman pengguna internal dalam sampel yang diteliti.
 
 [FIGURE:survey_01_profil]
 [FIGCAPTION:Hasil Kuesioner: Profil Status Akademik Responden]
 
-Dari aspek efektivitas media navigasi yang tersedia, diperoleh bahwa persepsi responden terhadap papan penunjuk arah dan denah statis cenderung berada pada kategori cukup hingga kurang informatif. Hal ini terlihat dari distribusi jawaban yang menunjukkan bahwa hanya sebagian kecil responden yang menilai sistem navigasi saat ini sangat membantu, sementara sebagian lainnya masih merasakan keterbatasan dalam memahami informasi yang disajikan. Penilaian efektivitas tersebut disajikan pada [FIGREF:survey_02_efektivitas].
+Penilaian terhadap papan penunjuk arah dan peta statis tidak menunjukkan penolakan yang dominan. Sebanyak 33,3 persen responden memberi nilai 1 atau 2, 23,8 persen memberi nilai 3, dan 42,9 persen memberi nilai 4 atau 5. Distribusi pada [FIGREF:survey_02_efektivitas] menunjukkan persepsi yang terbagi dengan nilai rata-rata sekitar 3,05 dari 5, sehingga kebutuhan sistem baru tidak dapat didasarkan pada klaim bahwa seluruh media yang tersedia tidak informatif.
 
 [FIGURE:survey_02_efektivitas]
 [FIGCAPTION:Hasil Kuesioner: Efektivitas Media Navigasi Kampus Saat Ini]
 
-Lebih lanjut, dalam satu semester terakhir, sebanyak 57,1% responden mengaku mengalami kesulitan menemukan lokasi sebanyak 1–3 kali, sementara 33,3% menyatakan tidak pernah mengalami kesulitan. Namun demikian, terdapat juga responden yang mengalami kesulitan lebih dari 3 kali, yang menunjukkan bahwa permasalahan navigasi masih terjadi secara berulang bagi sebagian pengguna. Distribusi frekuensi tersebut disajikan pada [FIGREF:survey_03_frekuensi].
+Dalam satu semester terakhir, sebanyak 57,1 persen responden mengalami kesulitan mencari lokasi sebanyak 1–3 kali, 9,5 persen mengalaminya lebih dari tiga kali, dan 33,3 persen tidak pernah mengalaminya. Dengan demikian, 14 dari 21 responden atau 66,7 persen pernah mengalami kesulitan setidaknya satu kali, sebagaimana disajikan pada [FIGREF:survey_03_frekuensi].
 
 [FIGURE:survey_03_frekuensi]
 [FIGCAPTION:Hasil Kuesioner: Frekuensi Kesulitan Menemukan Lokasi]
 
-Dari sisi perilaku pengguna dalam mencari informasi lokasi, sebanyak 90,5% responden menyatakan bahwa mereka lebih mengandalkan bantuan orang lain, seperti bertanya kepada mahasiswa lain atau petugas kampus, dibandingkan menggunakan media navigasi yang tersedia. Hal ini mengindikasikan bahwa sistem navigasi yang ada belum mampu menjadi sumber informasi utama yang efektif. Pola perilaku tersebut disajikan pada [FIGREF:survey_04_perilaku].
+Ketika mencari lokasi, sebanyak 90,5 persen responden paling sering bertanya kepada orang di sekitar, petugas keamanan, atau layanan mahasiswa. Pola pada [FIGREF:survey_04_perilaku] menunjukkan bahwa bantuan interpersonal masih menjadi jalur utama dalam sampel, sedangkan papan penunjuk dan situs kampus digunakan oleh sebagian kecil responden.
 
 [FIGURE:survey_04_perilaku]
 [FIGCAPTION:Hasil Kuesioner: Perilaku Pengguna Saat Mencari Lokasi]
 
-Terkait kebutuhan akan sistem yang lebih baik, mayoritas responden menyatakan bahwa keberadaan sistem peta virtual 3D interaktif yang terintegrasi dengan informasi fasilitas merupakan hal yang penting. Sebanyak 76,2% responden memberikan penilaian tinggi (skala 4 dan 5) terhadap pentingnya sistem tersebut, yang menunjukkan adanya kebutuhan yang signifikan terhadap solusi berbasis teknologi yang lebih interaktif. Penilaian urgensi tersebut disajikan pada [FIGREF:survey_05_urgensi].
+Sebanyak 76,2 persen responden memberi nilai 4 atau 5 terhadap pentingnya peta virtual 3D yang terintegrasi dengan informasi fasilitas. Penilaian pada [FIGREF:survey_05_urgensi] mendukung kebutuhan akan alternatif digital, tetapi tetap diperlakukan sebagai kebutuhan pengguna pada sampel, bukan bukti keberhasilan solusi yang belum diuji pada tahap observasi.
 
 [FIGURE:survey_05_urgensi]
 [FIGCAPTION:Hasil Kuesioner: Urgensi Kebutuhan Peta Virtual 3D]
 
-Selain itu, dalam hal potensi penggunaan, sebanyak 61,9% responden menyatakan akan menggunakan sistem denah virtual 3D ketika membutuhkan pencarian lokasi tertentu, sementara sebagian lainnya menyatakan akan menggunakan dalam kondisi tertentu atau jarang. Hal ini menunjukkan bahwa sistem yang diusulkan memiliki potensi adopsi yang baik, terutama dalam situasi yang membutuhkan orientasi lokasi. Potensi penggunaan tersebut disajikan pada [FIGREF:survey_06_adopsi].
+Dalam rencana penggunaan, 9,5 persen responden menyatakan akan menggunakan denah setiap kali berada di kampus, 61,9 persen ketika mencari lokasi tertentu, 23,8 persen hanya sesekali, dan 4,8 persen tidak akan menggunakannya. Distribusi pada [FIGREF:survey_06_adopsi] menunjukkan bahwa fungsi pencarian lokasi merupakan konteks penggunaan yang paling relevan.
 
 [FIGURE:survey_06_adopsi]
 [FIGCAPTION:Hasil Kuesioner: Potensi Adopsi Denah Virtual 3D]
 
-Dari aspek kebutuhan informasi, responden juga menunjukkan bahwa informasi yang paling penting untuk ditampilkan dalam sistem adalah nama gedung (95,2%), diikuti oleh fasilitas dalam ruangan (52,4%) dan kapasitas ruangan (38,1%). Temuan ini menjadi dasar dalam menentukan jenis data yang perlu disediakan oleh backend dan ditampilkan dalam sistem visualisasi. Prioritas informasi tersebut disajikan pada [FIGREF:survey_07_prioritas].
+Informasi yang paling banyak dipilih untuk ditampilkan adalah nama gedung sebesar 95,2 persen, fasilitas dalam ruangan sebesar 52,4 persen, dan kapasitas ruangan sebesar 38,1 persen. Prioritas pada [FIGREF:survey_07_prioritas] menjadi dasar pemilihan data yang disajikan oleh frontend dan kontrak API.
 
 [FIGURE:survey_07_prioritas]
 [FIGCAPTION:Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus]
 
-Berdasarkan keseluruhan hasil kuesioner tersebut, dapat disimpulkan bahwa terdapat kebutuhan nyata terhadap sistem navigasi kampus yang lebih interaktif, terintegrasi, dan berbasis data dinamis. Temuan ini memperkuat urgensi pengembangan sistem integrasi denah virtual berbasis 3D yang didukung oleh backend sebagai pusat distribusi data.
+Hasil kuesioner dan tinjauan sistem berjalan diringkas pada [TABREF:analisis_sistem_berjalan]. Matriks ini memisahkan kondisi yang teramati, kesenjangan dalam ruang lingkup proyek, dan implikasinya terhadap kontribusi penulis.
 
-Berdasarkan hasil observasi lapangan dan tinjauan pada aset digital kampus (situs web upnvj.ac.id), dilakukan analisis terhadap sistem yang sedang berjalan untuk penyediaan informasi navigasi dan profil. Analisis ini krusial untuk mengidentifikasi kesenjangan (gap) yang akan diisi oleh sistem baru yang diusulkan.
+[TABLE-ID:analisis_sistem_berjalan]
+[TABLECAPTION:Analisis Sistem yang Berjalan dan Implikasi Kebutuhan]
 
-Identifikasi kelemahan pada sistem yang sedang berjalan adalah sebagai berikut:
+[TABLE]
+Aspek | Kondisi Teramati atau Terverifikasi | Kesenjangan dalam Ruang Lingkup Proyek | Implikasi terhadap Kontribusi Penulis
+Pencarian lokasi | Responden masih dominan meminta bantuan orang lain dan 66,7 persen pernah mengalami kesulitan setidaknya satu kali dalam satu semester | Belum tersedia satu jalur web proyek yang menghubungkan pencarian lokasi dengan denah virtual | Menyediakan Search Overlay React dan bridge perintah navigasi ke Unity
+Informasi publik | Informasi lokasi dan fasilitas tersedia melalui beberapa halaman dan media | Pengguna proyek memerlukan agregasi informasi dan akses denah pada satu antarmuka | Mengembangkan Public Dashboard berbasis React
+Pengelolaan konten | Data proyek memiliki aturan akses dan sumber yang berbeda sesuai kebijakan pemangku kepentingan | Konten yang digunakan dashboard dan API memerlukan antarmuka pengelolaan sesuai hak akses | Mengembangkan Admin Panel serta integrasi Supabase Auth dan CRUD
+Distribusi data | React dan Unity membutuhkan bentuk data yang konsisten tetapi memiliki pola konsumsi berbeda | Konsumen web, runtime Unity, dan tooling editor memerlukan kontrak endpoint yang jelas | Menyediakan REST API dan membedakan `/api/unity/data` dari `/api/unity/names`
+Deployment layanan | Implementasi proyek menggunakan layanan cloud dan memiliki jalur analitik aktif serta jalur self-hosted opsional | Konfigurasi hosting, secret, aset WebGL, analitik, dan health monitoring perlu terdokumentasi | Mengelola deployment Vercel, environment variables, header/cache aset, analitik Supabase, endpoint health, serta kesiapan Express/Umami opsional
+[/TABLE]
 
-1. Aspek Navigasi Spasial
-   a. Sistem yang ada saat ini mengandalkan media konvensional, yaitu papan penunjuk arah fisik dan denah statis (berbasis gambar/PDF) yang terdapat di beberapa titik atau di situs web.
-   b. Kelemahan: Media ini bersifat pasif (tidak interaktif), dan sulit diperbarui. Hal ini secara langsung menyebabkan inefisiensi navigasi seperti yang diidentifikasi pada Bab 1.2.
-2. Aspek Penyajian Data Profil (Lingkup Full Stack)
-   a. Sistem yang ada saat ini untuk penyajian data profil kampus (statistik, akreditasi, fasilitas) bersifat terfragmentasi. Informasi tersimpan di berbagai laman dan sub-situs yang tidak saling terhubung, menciptakan fenomena fragmentasi data.
-   b. Kelemahan: Tidak ada dashboard terpusat yang menyajikan data secara agregat dan interaktif. Pengguna harus membuka banyak halaman untuk mendapatkan gambaran utuh, dan administrator tidak memiliki satu "pintu" (Admin Dashboard) untuk mengelola data konten tersebut secara efisien.
+Analisis tersebut tidak menyimpulkan bahwa UPNVJ secara institusional tidak memiliki backend atau sistem terpusat. Kesenjangan yang dimaksud adalah kebutuhan integrasi pada produk yang dikembangkan dalam proyek ini.
 
-### 2.1.3 Wawancara dengan Stakeholder
+### 2.1.3 Hasil Wawancara Pemangku Kepentingan dan Implikasi Kebutuhan
 
-Tahapan identifikasi kebutuhan sistem dilakukan melalui metode wawancara terstruktur dan mendalam dengan Asep Saeful Ridwan, S.Kom., yang bertindak sebagai Kepala UPA TIK UPNVJ sekaligus mitra pembangunan di lingkungan Universitas Pembangunan Nasional Veteran Jakarta. Interaksi ini bertujuan untuk memetakan strategi pengembangan proyek yang bersifat lintas disiplin. Dalam diskusi ini, narasumber menegaskan bahwa realisasi sistem denah virtual yang ideal memerlukan sinergi teknis dari tiga peran spesifik, yaitu:
+Koordinasi dengan Asep Saeful Ridwan, S.Kom. selaku Kepala UPA TIK UPNVJ digunakan untuk memahami batas penggunaan sumber data institusi dan kemungkinan integrasi teknis. Koordinasi tersebut tidak digunakan untuk mengklaim bahwa UPA TIK merupakan mitra pengguna atau telah memberikan persetujuan penerapan sistem.
 
-1. Peran 3D Asset Designer (Muhammad Dwikhi Deandra Purnianto) untuk visualisasi aset gedung secara langsung dalam Unity Editor (tanpa Blender) serta penyusunan skema database Supabase PostgreSQL beserta kebijakan Row Level Security (RLS) dan trigger audit logs.
-2. Peran 3D Simulator dan Engine Developer (Muammar Faiz Khairul Anam) untuk logika navigasi spasial seperti NavMesh pathfinding, interpolasi Catmull-Rom Centripetal, Building Culling, Pointer Lock, joystick virtual di mobile, serta pembuatan menu custom WebGL Settings Optimizer dan Database Sync Checker.
-3. Peran Full Stack Developer dan System Integrator (Muhammad Iman Nugraha) untuk manajemen infrastruktur data, meliputi React Frontend (Vite), Serverless API (Vercel), integrasi Supabase Auth, proxy Umami Analytics, integrasi komunikasi SendMessage React-Unity, dan pengujian unit menggunakan Vitest.
+Wawancara dengan Dr. dr. Ria Maria Theresa, SpKJ., MH. selaku Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi memberikan konteks bahwa pembagian data mentah dibatasi oleh kebijakan administratif. Oleh karena itu, kebutuhan navigasi dalam laporan ini didasarkan pada kuesioner pengguna, sedangkan wawancara digunakan untuk membatasi cara proyek mengakses dan menyajikan data.
 
-Berdasarkan pembagian tugas strategis tersebut, disepakati penentuan batasan lingkup kerja penulis yang difokuskan secara eksklusif pada peran Full Stack Developer dan System Integrator. Penulis dimandatkan untuk membangun arsitektur sistem yang tangguh guna menjamin skalabilitas dan ketersediaan data profil universitas secara real-time, yang nantinya akan dikonsumsi oleh engine simulasi yang dikembangkan anggota tim lain.
-
-Berdasarkan arahan narasumber, dirumuskanlah spesifikasi kebutuhan fungsional yang mencakup manajemen konten dinamis melalui Admin Dashboard serta penyediaan jalur distribusi data (API endpoints) untuk mendukung visualisasi pada Public Dashboard dan Denah Virtual. Lebih lanjut, narasumber menekankan krusialnya kebutuhan non-fungsional yang menitikberatkan pada aspek integritas data dan efisiensi waktu respons, mengingat backend sistem ini harus melayani permintaan data secara simultan dari antarmuka web dan engine 3D. Seluruh informasi teknis ini menjadi fondasi utama dalam penyusunan tiga skenario operasional sistem (Skenario A, B, dan C), yang dirancang sebagai strategi mitigasi risiko untuk menjaga reliabilitas sistem di tengah ketidakpastian ketersediaan data akademik eksternal.
-
-Selain wawancara dengan Kepala UPA TIK UPNVJ, penulis juga melakukan diskusi dan koordinasi dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi UPNVJ, yaitu Dr. dr. Ria Maria Theresa, SpKJ., MH. guna memverifikasi kebijakan pembagian data sarana prasarana. Berdasarkan wawancara tersebut, diperoleh hasil bahwa kebijakan administratif membatasi pembagian data mentah secara bebas demi menjaga keamanan informasi strategis kampus. Hambatan administratif ini justru memperkuat urgensi proyek yang diusulkan, yaitu penyediaan portal integrasi data yang aman berbasis Row Level Security (RLS) serta arsitektur backend-centric. Sebagai bukti penjaminan komitmen pengerjaan dan validasi lapangan, penulis melakukan penandatanganan pakta integritas dengan mitra serta dokumentasi pertemuan dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi (Wakil Rektor III) seperti yang ditunjukkan oleh [FIGREF:foto_wawancara_warek].
+Implikasi bagi penulis adalah membangun aplikasi dan kontrak integrasi yang tidak bergantung pada akses langsung ke seluruh sistem internal kampus. Humas UPNVJ ditempatkan sebagai mitra pengguna pada tahap evaluasi, sedangkan UPA TIK tetap menjadi pihak koordinasi teknis dan kebijakan data. Skema database dan kebijakan keamanannya merupakan kontribusi Database Schema Designer, sedangkan runtime Unity menjadi kontribusi Engine Developer. Pelaksanaan wawancara pemangku kepentingan didokumentasikan pada [FIGREF:foto_wawancara_warek].
 
 [FIGURE:foto_wawancara_warek]
-[FIGCAPTION:Dokumentasi Wawancara dan Penandatanganan Pakta Integritas]
+[FIGCAPTION:Dokumentasi Wawancara Pemangku Kepentingan]
 
 ## 2.2 Usulan Solusi
 
-Berdasarkan hasil identifikasi permasalahan pada Subbab 2.1, khususnya yang diperkuat oleh data kuesioner mahasiswa terkait kesulitan navigasi serta temuan mengenai fragmentasi informasi dan keterbatasan sistem, maka diusulkan pengembangan sistem “Integrasi Denah Virtual Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu” sebagai solusi terpadu berbasis integrasi data.
+Berdasarkan analisis pada Subbab 2.1, proyek mengusulkan aplikasi web yang menggabungkan penyajian informasi kampus, pengelolaan konten, dan akses denah virtual dalam satu pengalaman pengguna. Solusi ini tidak dimaksudkan untuk menggantikan seluruh sistem institusional UPNVJ. Kontribusi penulis difokuskan pada antarmuka React, REST API, integrasi layanan, bridge React–Unity, serta deployment dan operasional layanan web.
 
 Secara umum, solusi yang diusulkan memiliki karakteristik sebagai berikut:
 
-1. Pendekatan Berbasis API (Backend-Centric)
-   a. Backend berperan sebagai pusat distribusi data melalui REST API.
-   b. Data dapat diakses oleh berbagai komponen sistem secara konsisten, termasuk dashboard dan Unity WebGL.
-2. Integrasi Multi-Platform
-   a. Sistem menghubungkan dashboard berbasis web dengan visualisasi denah virtual berbasis Unity.
-   b. Data yang sama dapat disajikan dalam bentuk informasi tekstual dan visualisasi spasial.
-3. Penyajian Data Secara Dinamis
-   a. Informasi kampus seperti fasilitas, dosen, dan statistik disajikan secara dinamis melalui API.
-   b. Dashboard dan Unity tidak menggunakan data statis, melainkan data yang diambil secara langsung dari backend.
-4. Strategi Integrasi Data Eksisting
-   a. Data tertentu seperti statistik dan akreditasi diperoleh melalui mekanisme embed dari sistem UPA TIK.
-   b. Sistem tidak menggantikan sistem yang sudah ada, tetapi berfungsi sebagai layer integrasi.
-5. Pendekatan Kolaboratif Multi-Role
-   a. Sistem dikembangkan melalui kolaborasi antara 3D Asset Designer, Simulator/Engine Developer, dan Full Stack Developer dan System Integrator.
-   b. Fokus utama penelitian ini berada pada pengembangan backend, dashboard web, dan integrasi sistem.
+1. Antarmuka Aplikasi Web
+   a. Public Dashboard menyajikan informasi kampus, pemilih denah 2D atau tur 3D, pencarian lokasi, petunjuk interaksi, dan bantuan pemuatan.
+   b. Admin Panel menyediakan autentikasi, pengelolaan data, konfigurasi denah 2D, audit log, dan analitik melalui protected route.
+2. Integrasi Berbasis Kontrak
+   a. React menggunakan Supabase Auth dan Supabase SDK secara langsung untuk autentikasi, sesi, query, dan CRUD sesuai kebijakan akses yang tersedia.
+   b. Vercel Serverless Functions menyediakan kontrak REST untuk konsumen yang memerlukan respons JSON, termasuk runtime dan tooling Unity.
+3. Pemisahan Data dan Perintah Unity
+   a. Unity menarik data runtime secara mandiri melalui `GET /api/unity/data`.
+   b. React hanya mengirim identifier tujuan melalui `SendMessage`; React tidak mengirim payload data gedung atau fasilitas ke Unity.
+4. Deployment dan Operasional
+   a. Implementasi saat ini menggunakan Vercel untuk React SPA, serverless API, dan penyajian artefak WebGL. Antarmuka analitik aktif menggunakan data Supabase, sedangkan Express dan Umami self-hosted dipertahankan sebagai jalur operasional opsional.
+   b. Konfigurasi domain, environment variables, secret, dan konektivitas layanan dapat disesuaikan apabila sistem kelak diintegrasikan dengan infrastruktur kampus.
+5. Batas Kolaborasi
+   a. Penulis mengembangkan frontend, API, bridge sisi React, dan operasional layanan web.
+   b. Skema database dan kontrol pada tingkat database disediakan Database Schema Designer, sedangkan runtime serta proses build Unity disediakan Simulator dan Engine Developer.
 
-Dengan pendekatan tersebut, sistem yang diusulkan diharapkan mampu mengatasi permasalahan navigasi yang teridentifikasi melalui survei, sekaligus menyediakan platform informasi kampus yang terintegrasi, dinamis, dan interaktif. Implementasi twin digital berskala besar pada infrastruktur gedung kampus mendukung manajemen fasilitas secara cerdas dan efisien (Siv 2025). Sebelum merinci komponen teknis yang menjadi tanggung jawab penulis, struktur arsitektur sistem secara high-level disajikan pada [FIGREF:diagram_arsitektur].
+Karakteristik tersebut menempatkan aplikasi sebagai lapisan integrasi yang menghubungkan beberapa komponen tanpa mengaburkan batas kontribusi implementasinya. Struktur arsitektur sistem secara umum disajikan pada [FIGREF:diagram_arsitektur].
 
 [FIGURE:diagram_arsitektur]
 [FIGCAPTION:Diagram Arsitektur Sistem]
 
-Sebagaimana diilustrasikan pada [FIGREF:diagram_arsitektur], arsitektur sistem dirancang dengan alur kerja yang saling terhubung antar ketiga peran tersebut:
+Sebagaimana diilustrasikan pada [FIGREF:diagram_arsitektur], interaksi frontend, backend, dan Unity WebGL berlangsung melalui tujuh alur berikut:
 
-1. Integrasi Aset Visual
-   Aset 3D yang dihasilkan oleh 3D Asset Designer diekspor dan diimpor ke dalam sistem Denah Virtual yang dikelola oleh Simulator/Engine Developer.
-2. Alur Pengguna Publik (User)
-   Pengguna berinteraksi melalui Frontend Public Dashboard. Halaman ini berfungsi sebagai wadah (container) yang menampilkan Denah Virtual (Unity WebGL) sekaligus menyajikan informasi profil kampus secara dinamis.
-3. Alur Administrator (Admin)
-   Administrator memiliki jalur akses khusus melalui Frontend Admin Dashboard untuk mengelola data konten kampus (seperti data gedung, fasilitas, fakultas, dan program studi) melalui mekanisme CRUD.
-4. Pusat Pertukaran Data
-   Seluruh interaksi data bermuara pada satu titik pusat, yaitu Backend Main API berbasis Node.js yang di-deploy sebagai Vercel Serverless Functions. Komponen ini bertindak sebagai pusat data yang melayani permintaan dari Denah Virtual Unity (Unity menarik data gedung/fasilitas secara mandiri melalui endpoint `/api/unity/data` saat runtime untuk keperluan navigasi/pathfinding) dan menyediakan data untuk kedua dashboard.
+1. Pemuatan Aplikasi dan Aset: Browser memuat React SPA beserta artefak Unity WebGL dari Vercel Static Hosting. Penulis mengelola konfigurasi deployment, environment variables, serta header dan cache aset pada lapisan hosting tersebut.
+2. Autentikasi dan Pengelolaan Data Frontend: React berinteraksi langsung dengan Supabase Auth melalui SDK untuk melakukan autentikasi administrator dan memperoleh sesi JWT. Public Dashboard dan Admin Panel melakukan query atau CRUD melalui Supabase SDK sesuai kebijakan RLS yang dirancang Database Schema Designer.
+3. Penyediaan REST API: Vercel Serverless Functions menyediakan endpoint REST `/api/buildings`, `/api/rooms`, `/api/unity/data`, `/api/unity/names`, dan `/api/health`. Fungsi serverless mengambil data dari Supabase dan mengembalikannya dalam format JSON sesuai kebutuhan konsumennya.
+4. Penarikan Data oleh Unity WebGL: Saat runtime dimulai, modul `BuildingDatabase` milik Unity memanggil `GET /api/unity/data` secara mandiri untuk memperoleh data gedung dan fasilitas. React tidak mengirimkan data JSON ke Unity. Endpoint `/api/unity/names` digunakan oleh `DatabaseSyncChecker` pada Unity Editor, bukan sebagai jalur data runtime.
+5. Perintah dan Penyelesaian Navigasi: Ketika pengguna memilih lokasi pada mode 3D, frontend mengirim `unity_object_name` melalui `SendMessage("NavigationReceiver", "NavigateTo", unity_object_name)`. Setelah player tiba secara normal, runtime Unity mengirim `OnNavigationCompleted` dengan payload JSON `unity_object_name`. React memvalidasi payload terhadap tujuan aktif sebelum menampilkan popup tiba; event kosong, rusak, berbeda, atau diterima setelah pembatalan diabaikan.
+6. Integrasi Analitik: Jalur aktif pada antarmuka mencatat dan mengagregasi `web_analytics_log` melalui Supabase. Express.js pada port 3001 menyediakan rate limiter dan endpoint proxy Umami sebagai jalur opsional untuk pengoperasian Umami self-hosted melalui Docker.
+7. Batas Ownership Integrasi: Penulis memiliki frontend, REST API, bridge sisi React, pencatatan audit pada service aplikasi, dan operasional layanan web. Database Schema Designer memiliki ERD, skema database, RLS, serta rancangan trigger basis data; 3D Asset Designer memiliki aset 3D dan hierarchy `Pointer`. Simulator dan Engine Developer memiliki runtime Unity, pemetaan GameObject, navigasi, optimasi, dan proses build WebGL.
 
-Fokus utama dari usulan solusi dalam laporan ini akan menitikberatkan pada pengembangan komponen Full Stack Web yang terdiri dari empat modul fungsional berikut:
+Fokus utama usulan solusi dalam laporan ini adalah pengembangan aplikasi Full Stack Web, integrasi antarsistem, dan operasional layanan web.
 
 ### 2.2.1 Identifikasi Kebutuhan Fungsional
 
-Identifikasi kebutuhan sistem dirumuskan berdasarkan hasil wawancara mendalam dengan pemangku kepentingan (stakeholder) pada Bab 2.1.3 dan analisis sistem berjalan pada Bab 2.1.2. Mengingat proyek ini merupakan kolaborasi lintas peran, analisis kebutuhan difokuskan untuk menerjemahkan arahan strategis menjadi spesifikasi teknis yang mendukung kinerja tiga peran pengembang. Hasil analisis ini dikonversi menjadi serangkaian Kebutuhan Fungsional sistem yang spesifik, yang menjadi landasan utama untuk perancangan Use Case Diagram (Bab 2.3.3) dan penyusunan skenario pengujian (Bab 2.4).
-
-Secara garis besar, kebutuhan fungsional sistem diklasifikasikan ke dalam tiga kategori utama:
+Kebutuhan fungsional diturunkan dari kebutuhan pengguna, batas akses data, dan arsitektur integrasi pada Subbab 2.1 dan 2.2. Kebutuhan berikut difokuskan pada komponen yang dikembangkan atau diintegrasikan oleh penulis.
 
 1. Kebutuhan Fungsional Pengguna Publik (User)
-   a. Sistem harus dapat menyajikan data statistik lalu lintas website (tren harian pengunjung).
-   b. Sistem harus dapat menyajikan data profil kampus (akreditasi, fasilitas, aset).
-   c. Sistem harus dapat menyajikan data terperinci saat kartu indikator aset atau item fasilitas diklik.
-   d. Sistem harus dapat menampilkan viewport Denah Virtual (yang diintegrasikan oleh Simulator Developer menggunakan aset dari 3D Designer).
-   e. Sistem harus menyediakan toggle bahasa (Bahasa Indonesia ↔ English) dengan penyimpanan preferensi di localStorage.
+   a. Sistem harus menyajikan informasi utama kampus, statistik kunjungan, kartu gedung atau fasilitas, serta akses pencarian lokasi yang tersedia untuk publik.
+   b. Sistem harus menyediakan pemilih mode denah 2D atau tur 3D sesuai dukungan hosting dan perangkat pengguna.
+   c. Mode 2D harus menggunakan konfigurasi node, edge, dan entrance untuk menghitung serta menggambar rute menuju gedung yang dipilih.
+   d. Mode 3D harus menyediakan canvas Unity WebGL beserta indikator pemuatan, pesan kesalahan, dan petunjuk interaksi.
+   e. Sistem harus menyediakan pencarian gedung atau fasilitas pada antarmuka React dan menerjemahkan pilihan pengguna menjadi `buildingId` untuk denah 2D atau `unity_object_name` untuk tur 3D.
+   f. Sistem harus menyediakan tombol bantuan atau petunjuk yang relevan pada area denah.
+   g. Sistem harus mendukung Bahasa Indonesia dan Inggris serta menyimpan preferensi bahasa pada browser.
 2. Kebutuhan Fungsional Administrator (Admin)
-   a. Sistem harus menyediakan halaman login yang aman (autentikasi JWT) untuk Admin.
-   b. Sistem harus dapat menampilkan widget analitik kunjungan.
-   c. Sistem harus menyediakan fungsionalitas CRUD (Create, Read, Update, Delete) untuk mengelola data Gedung, Fasilitas, Fakultas, dan Program Studi.
-   d. Sistem harus menampilkan pop-up konfirmasi modal sebelum operasi hapus dilakukan.
-   e. Sistem harus menampilkan riwayat audit logs dari perubahan data secara read-only.
-3. Kebutuhan Fungsional Integrasi (API untuk 3D Engine)
-   a. Sistem harus menyediakan endpoint API `GET /api/unity/data` yang menyajikan data gedung dan fasilitas beserta `unity_object_name` dalam satu response JSON terstruktur.
+   a. Sistem harus mengautentikasi administrator melalui Supabase Auth dan mempertahankan sesi pada protected route.
+   b. Sistem harus menyediakan CRUD data gedung, fasilitas, program studi, dan konfigurasi jalur denah 2D melalui Supabase SDK sesuai kebijakan RLS. Data fakultas digunakan sebagai referensi pilihan pada formulir program studi dan tidak dikelola melalui tab CRUD terpisah.
+   c. Sistem harus meminta konfirmasi sebelum penghapusan dan menampilkan status berhasil atau gagal dari setiap operasi.
+   d. Sistem harus menampilkan audit log secara read-only dan menyajikan analitik yang tersedia bagi administrator.
+3. Kebutuhan Fungsional API dan Bridge Unity
+   a. Sistem harus menyediakan endpoint API `GET /api/unity/data` yang menyajikan data gedung dan fasilitas beserta `unity_object_name` dalam satu respons JSON terstruktur.
    b. Sistem harus menyediakan endpoint API `GET /api/unity/names` yang menyajikan array nama unik objek terdaftar untuk validasi sinkronisasi di Unity Editor.
-   c. API harus menyediakan data dalam format JSON yang terstruktur agar mudah di-parse oleh engine Unity WebGL yang dikelola 3D Simulator Developer.
+   c. Sistem harus menyediakan endpoint `/api/buildings`, `/api/rooms`, dan `/api/health` untuk akses data dan pemeriksaan kondisi layanan sesuai kontrak masing-masing.
+   d. Frontend harus mengirim `unity_object_name` ke method `NavigateTo` pada `NavigationReceiver` ketika pengguna memilih tujuan dan mengirim perintah berhenti ketika navigasi dibatalkan.
+   e. Bridge tidak mengirim data gedung sebagai JSON melalui `SendMessage`. Setelah navigasi selesai normal, React harus memvalidasi JSON `unity_object_name` pada event `OnNavigationCompleted` terhadap tujuan aktif sebelum memperbarui state popup kedatangan.
+4. Kebutuhan Fungsional Deployment dan Operasional
+   a. Sistem harus memisahkan konfigurasi layanan melalui environment variables dan tidak menanamkan secret ke dalam kode sumber.
+   b. Hosting harus menyajikan React SPA, serverless API, serta artefak WebGL dengan header tipe konten dan cache yang sesuai.
+   c. Operasional layanan harus menyediakan health check serta pembatasan permintaan pada helper Express untuk layanan analitik.
 
 ### 2.2.2 Identifikasi Kebutuhan Teknis
 
-Untuk membangun komponen proyek Full Stack yang telah dirinci, proyek ini mengandalkan tumpukan teknologi (tech stack) terintegrasi untuk frontend, backend, database, dan modul penunjang:
+Kebutuhan teknis dipetakan berdasarkan fungsi setiap komponen dalam implementasi sebagai berikut:
 
-1. Frontend Framework: React.js (Single Page Application via Vite)
-   a. Dipilih karena performa tinggi dalam memanipulasi DOM secara virtual (Virtual DOM) dan reaktivitas komponen.
-   b. Menangani integrasi container canvas Unity WebGL reaktif via `react-unity-webgl`.
-2. Backend dan Serverless API: Node.js (Express.js) + Vercel Serverless Functions
-   a. Router Express.js menyediakan rute RESTful API yang bersih.
-   b. Dideploy secara terfragmentasi pada serverless functions Vercel untuk efisiensi beban runtime.
-3. Database Management System (DBMS): PostgreSQL (Supabase Cloud BaaS)
-   a. PostgreSQL dipilih untuk integritas data relasional yang andal.
-   b. Supabase memfasilitasi hosting database cloud, JWT-based Supabase Auth, Row-Level Security (RLS) policies, serta database triggers.
-4. Analytics Tracking Platform: Umami Analytics (Self-hosted via Docker)
-   a. Dipilih sebagai platform analitik yang ramah privasi (GDPR compliant) tanpa cookie.
-   b. Menggunakan Express.js proxy di port 3001 untuk mengamankan data collect metrik dari ad-blocker browser client.
-5. Modul Penunjang Frontend:
-   a. Tailwind CSS (v4) untuk penyusunan antarmuka yang efisien melalui pendekatan utility-first.
-   b. Recharts untuk visualisasi data metrik kampus dalam bentuk grafik.
-   c. Fuse.js untuk implementasi pencarian cerdas (fuzzy search) pada sisi klien.
-   d. Lucide React untuk pustaka ikon berbasis vektor (SVG).
-   e. TypeScript untuk pengetesan tipe data secara statis (static typing) yang menjamin stabilitas integrasi sistem.
+1. Frontend Web
+   a. React, TypeScript, dan Vite digunakan untuk membangun SPA, routing, state antarmuka, serta pemisahan Public Dashboard dan Admin Panel.
+   b. Tailwind CSS dan Lucide React digunakan untuk penyusunan tampilan, sedangkan Recharts digunakan untuk grafik dan Fuse.js untuk pencarian toleran terhadap variasi kata.
+   c. Unity WebGL loader API digunakan untuk memuat artefak engine ke elemen canvas, memantau progres, dan menyediakan method `SendMessage` melalui instance Unity.
+2. Autentikasi dan Akses Data Aplikasi
+   a. Supabase Auth menyediakan autentikasi dan sesi administrator.
+   b. Supabase SDK digunakan React untuk query dan CRUD sesuai skema serta kebijakan RLS yang disediakan Database Schema Designer.
+3. Backend dan Kontrak API
+   a. Vercel Serverless Functions berbasis Node.js digunakan sebagai REST API utama.
+   b. Setiap handler memvalidasi method HTTP, mengambil data melalui Supabase client, membentuk respons JSON, dan menangani kondisi kesalahan.
+4. Analitik dan Helper Operasional
+   a. Jalur analitik aktif menggunakan pencatatan dan agregasi `web_analytics_log` melalui Supabase.
+   b. Express pada port 3001 menyediakan endpoint analitik Umami dan rate limiter sebagai jalur opsional; Umami dapat dijalankan secara self-hosted melalui Docker. Express bukan API utama yang dideploy melalui Vercel.
+5. Hosting
+   a. Vercel digunakan untuk menyajikan React SPA, Vercel Serverless Functions, dan artefak Unity WebGL.
+   b. Environment variables, header respons, content type, cache aset, dan fallback routing SPA dikelola pada konfigurasi deployment.
 
 ### 2.2.3 Identifikasi Kebutuhan Non-Fungsional
 
-Selain kebutuhan fungsional dan teknis, sistem juga harus memenuhi sejumlah kebutuhan non-fungsional yang menjadi tolok ukur kualitas layanan. Kebutuhan ini menjadi acuan utama pada tahap pengujian performa (Lighthouse) dan penerimaan pengguna (UAT).
+Kebutuhan non-fungsional digunakan sebagai acuan kualitas aplikasi web dan operasional layanan. Pemenuhannya dievaluasi melalui pengujian web, pemeriksaan deployment, Lighthouse, Black Box, dan UAT.
 
 1. Performa (Performance)
-   a. Halaman publik beserta modul denah virtual 3D harus termuat dalam waktu kurang dari 10 detik pada koneksi normal.
-   b. Aset Unity WebGL dikompresi (Brotli) dan diterapkan strategi pemuatan adaptif (connection-aware preloading) untuk menekan waktu transfer.
+   a. React SPA harus tetap dapat digunakan sebelum pengguna mengaktifkan atau menunggu inisialisasi Unity WebGL.
+   b. Pemuatan aset WebGL harus menampilkan progres dan pesan kondisi, menggunakan cache, serta menyesuaikan preload berdasarkan perangkat, preferensi Save-Data, dan kualitas koneksi yang dapat dideteksi browser.
+   c. Performa halaman harus diukur secara berulang dengan Lighthouse pada mode mobile dan desktop sebagai dasar optimasi, bukan dinyatakan berhasil berdasarkan batas waktu yang tidak memiliki bukti pengukuran.
 2. Kompatibilitas dan Aksesibilitas (Compatibility)
    a. Antarmuka harus responsif dan dapat diakses dengan baik melalui peramban perangkat seluler (mobile-first) sebagai platform utama pengguna, serta tetap optimal pada desktop.
    b. Antarmuka mendukung dua bahasa (Indonesia dan Inggris) dengan preferensi tersimpan secara persisten.
 3. Keamanan (Security)
-   a. Seluruh operasi modifikasi data wajib diproteksi autentikasi JWT (Supabase Auth).
-   b. Akses data diatur pada level basis data melalui Row-Level Security (RLS): anonim hanya dapat membaca (SELECT), sedangkan operasi tulis hanya untuk pengguna terautentikasi.
-   c. Operasi sensitif dibatasi melalui mekanisme rate limiter.
+   a. Seluruh operasi modifikasi data pada Admin Panel wajib menggunakan sesi Supabase Auth yang valid.
+   b. Frontend dan API harus mengikuti kebijakan RLS yang disediakan Database Schema Designer serta tidak menanamkan service role key atau secret ke bundle browser.
+   c. Helper Express harus membatasi jumlah permintaan sesuai konfigurasi rate limiter.
 4. Privasi (Privacy)
-   a. Pemantauan lalu lintas tidak mengumpulkan data pribadi (PII) dan tidak menggunakan cookie pelacak.
+   a. Konfigurasi analitik harus membatasi data yang dikirim sesuai kebutuhan statistik penggunaan dan kebijakan layanan yang berlaku.
 5. Usabilitas dan Aksesibilitas (Usability dan Accessibility)
-   a. Sistem menampilkan loading screen informatif (progress bar) saat engine 3D dimuat.
-   b. Modal konfirmasi penghapusan data dilengkapi focus trap untuk aksesibilitas keyboard.
+   a. Sistem harus menampilkan loading screen, progres, pesan kesalahan, dan opsi mencoba kembali ketika engine 3D gagal dimuat.
+   b. Search Overlay dan modal konfirmasi harus dapat dioperasikan menggunakan keyboard serta menyediakan label yang dapat dikenali teknologi bantu.
 6. Keterpeliharaan (Maintainability)
-   a. Perubahan data gedung/fasilitas melalui Admin Panel harus langsung tercermin pada kemampuan navigasi denah virtual tanpa membangun ulang (rebuild) aplikasi 3D.
+   a. Perubahan data gedung atau fasilitas melalui Admin Panel dapat dikonsumsi pada pemuatan data berikutnya tanpa build ulang Unity selama nilai `unity_object_name` tetap sesuai dengan GameObject yang tersedia.
+   b. Domain, kredensial layanan, versi artefak WebGL, dan konfigurasi hosting harus dapat disesuaikan tanpa mengubah kontrak data antarkomponen.
 
 ## 2.3 Rancangan Proyek
 
@@ -346,13 +320,13 @@ Selain kebutuhan fungsional dan teknis, sistem juga harus memenuhi sejumlah kebu
 Proses pengembangan proyek ini mengikuti model Prototyping yang terbagi ke dalam empat tahapan iteratif. Metode prototyping merupakan salah satu pendekatan pengembangan perangkat lunak yang bersifat iteratif dan berorientasi pada umpan balik pengguna, yang sangat berguna ketika kebutuhan sistem belum sepenuhnya spesifik (Syarif dan Risdiansyah 2024; Pricillia dan Zulfachmi 2021). Langkah-langkah dalam model pengembangan ini adalah sebagai berikut:
 
 1. Pengumpulan Kebutuhan (Requirement Gathering)
-   Melakukan wawancara pemangku kepentingan dan survei awal guna memetakan fungsionalitas Full Stack API dan dashboard.
+   Melakukan wawancara pemangku kepentingan dan kuesioner awal untuk memetakan kebutuhan aplikasi web, kontrak API, integrasi denah, dan operasional layanan.
 2. Membangun Prototyping Awal (Quick Design)
-   Mendesain skema database relasional (ERD) dan menyusun antarmuka mockup visual untuk dashboard admin dan publik.
+   Menyusun arsitektur aplikasi, kontrak data yang dikonsumsi, alur integrasi, dan mockup antarmuka Public Dashboard serta Admin Panel dengan mengacu pada ERD yang disediakan Database Schema Designer.
 3. Evaluasi Prototipe (Evaluation dan Testing)
-   Menguji backend API dan dashboard fungsional menggunakan metode Black Box Testing dan validasi internal.
+   Menguji komponen React, endpoint API, alur pengguna, bridge React–Unity, deployment, dan fungsi sistem menggunakan pengujian terotomasi serta Black Box Testing.
 4. Iterasi Perbaikan (Iteration)
-   Memperbaiki bug fungsionalitas CRUD, RLS database, atau koneksi API berdasarkan hasil evaluasi sebelum dinyatakan siap rilis.
+   Memperbaiki antarmuka, operasi CRUD sisi aplikasi, kontrak API, bridge, dan konfigurasi deployment berdasarkan hasil evaluasi. Perubahan skema atau kebijakan RLS dikoordinasikan dengan Database Schema Designer.
 
 Tahapan pengembangan ini secara visual digambarkan pada [FIGREF:diagram_tahap_pengembangan].
 
@@ -364,18 +338,18 @@ Tahapan pengembangan ini secara visual digambarkan pada [FIGREF:diagram_tahap_pe
 Perancangan Information Architecture membagi aplikasi web ke dalam dua zona akses utama:
 
 1. Halaman Publik (Public Route)
-   a. Dashboard Utama (`/`): Menampilkan widget statistik lalu lintas website (grafik tren pengunjung dari Umami), kartu indikator (KPI) aset kampus (gedung dan fasilitas), tabel akreditasi program studi, serta modul visualisasi peta denah virtual 3D.
+   a. Dashboard Utama (`/`): Menampilkan informasi utama kampus, statistik kunjungan, kartu aset gedung dan fasilitas, pemilih Denah 2D atau Denah 3D, pencarian lokasi, serta Tutorial dan FAQ.
    b. Pengaturan Bahasa: Toggle dinamis untuk memicu perubahan kamus bahasa lokal (ID/EN) yang diinjeksi ke komponen-komponen React.
 2. Halaman Administratif (Protected Route)
    a. Login (`/login`): Form otentikasi administrator terproteksi JWT.
-   b. Admin Panel (`/admin`): Mengelola entitas database relasional dengan aksi CRUD, memuat tabel data gedung, fasilitas, fakultas, dan program studi, serta read-only dashboard audit logs.
+   b. Admin Panel (`/admin`): Mengelola data gedung, fasilitas, program studi, dan konfigurasi denah 2D, serta menampilkan analitik dan audit log pada tab yang terpisah.
 
 ### 2.3.3 Perancangan Unified Modelling Language (UML)
 
 Interaksi sistem dan diagram alir data dirancang menggunakan tiga jenis diagram UML. Unified Modelling Language (UML) merupakan standar pemodelan visual untuk menspesifikasikan, menggambarkan, membangun, dan mendokumentasikan artefak sistem perangkat lunak (Kurniawan 2018).
 
 1. Use Case Diagram
-   Aktor 'User' memiliki hak akses read-only untuk melihat visualisasi grafik profil dan denah virtual. Aktor 'Admin' harus melalui use case login sebelum diberikan hak akses penuh untuk melakukan operasi CRUD data. Legenda simbol use case ditunjukkan oleh [FIGREF:diagram_use_case_legenda], sedangkan diagram use case sistem terinci pada [FIGREF:diagram_use_case].
+   Aktor 'Pengguna Publik' dapat melihat informasi dan statistik kunjungan, mencari lokasi, membaca Tutorial/FAQ, serta memilih Denah 2D atau Denah 3D. Aktor 'Administrator' harus login sebelum mengelola gedung, fasilitas, program studi, dan konfigurasi Denah 2D atau meninjau analitik serta audit log. Legenda simbol use case ditunjukkan oleh [FIGREF:diagram_use_case_legenda], sedangkan diagram use case sistem terinci pada [FIGREF:diagram_use_case].
 
    [FIGURE:diagram_use_case_legenda]
    [FIGCAPTION:Legenda Use Case Diagram]
@@ -384,7 +358,7 @@ Interaksi sistem dan diagram alir data dirancang menggunakan tiga jenis diagram 
    [FIGCAPTION:Use Case Diagram]
 
 2. Activity Diagram
-   Alur kerja pengelolaan data CRUD oleh administrator digambarkan pada [FIGREF:diagram_activity_kelola_data], sedangkan alur logika mitigasi skenario ketersediaan data akademik eksternal (Skenario A, B, C) digambarkan pada [FIGREF:diagram_activity_integrasi].
+   Alur kerja pengelolaan data CRUD langsung melalui Supabase SDK digambarkan pada [FIGREF:diagram_activity_kelola_data], sedangkan pemilihan Denah 2D atau 3D beserta aliran perintah dan callback integrasinya digambarkan pada [FIGREF:diagram_activity_integrasi].
 
    [FIGURE:diagram_activity_kelola_data]
    [FIGCAPTION:Activity Diagram: Pengelolaan Data oleh Admin]
@@ -393,7 +367,7 @@ Interaksi sistem dan diagram alir data dirancang menggunakan tiga jenis diagram 
    [FIGCAPTION:Activity Diagram: Integrasi Data Denah]
 
 3. Sequence Diagram
-   a. Autentikasi Admin: Memetakan proses login dari frontend React, pengiriman kredensial ke backend API, verifikasi ke Supabase Auth, pengembalian JWT token, dan pembukaan akses router admin, seperti yang diilustrasikan pada [FIGREF:diagram_sequence_autentikasi].
+   a. Autentikasi Admin: Memetakan proses login dari frontend React langsung ke Supabase Auth melalui `signInWithPassword`, pengembalian sesi JWT, dan pembukaan protected route setelah sesi tervalidasi, seperti yang diilustrasikan pada [FIGREF:diagram_sequence_autentikasi].
    b. Sinkronisasi Data: Memetakan aliran pembaruan field `unity_object_name` dari Admin Dashboard, penyimpanan ke database Supabase, penarikan data JSON oleh Unity `BuildingDatabase` via HTTP request, dan pencocokan nama GameObject visual di scene, seperti yang diilustrasikan pada [FIGREF:diagram_sequence_sinkronisasi].
 
    [FIGURE:diagram_sequence_autentikasi]
@@ -402,178 +376,98 @@ Interaksi sistem dan diagram alir data dirancang menggunakan tiga jenis diagram 
    [FIGURE:diagram_sequence_sinkronisasi]
    [FIGCAPTION:Sequence Diagram: Sinkronisasi Data Gedung dan Unity]
 
-### 2.3.4 Perancangan Modul Keamanan dan Analitik
+### 2.3.4 Perancangan Integrasi Keamanan dan Analitik
 
-Perancangan modul keamanan data dan mitigasi penelusuran lalu lintas web mencakup spesifikasi arsitektur berikut:
+Perancangan pada subbab ini membahas cara aplikasi menggunakan kontrol keamanan dan layanan analitik, bukan perancangan kebijakan database oleh penulis.
 
-1. Keamanan Row-Level Security (RLS) Database
-   Penerapan kebijakan keamanan data pada level basis data menggunakan Row-Level Security (RLS) di platform Supabase menjamin bahwa hak akses pengguna terautentikasi dan pengguna anonim dapat dibatasi secara ketat langsung pada PostgreSQL (Putra et al. 2026).
-   a. Tabel publik (`gedung`, `fasilitas`, `fakultas`, `program_studi`) diberikan kebijakan izin SELECT secara terbuka untuk publik (`anon`).
-   b. Kebijakan INSERT, UPDATE, dan DELETE diamankan secara database-level, hanya mengizinkan modifikasi bagi koneksi client yang memiliki JWT token bertipe `authenticated` (admin).
-2. Sistem Audit Logs Otomatis
-   a. Merancang trigger basis data `log_data_mutation()` yang aktif setiap kali terjadi modifikasi data (INSERT/UPDATE/DELETE) pada tabel penting.
-   b. Trigger menyimpan metadata perubahan (nama tabel, jenis operasi, ID rekaman, UUID admin, timestamp, old_data, new_data) ke dalam tabel `audit_logs` secara otomatis.
-3. Reverse Proxy Umami Analytics
-   a. Mengonfigurasi Express.js proxy server pada port 3001 untuk memotong request collect tracker Umami dari client.
-   b. Proxy menyembunyikan endpoint Umami Docker internal (port 3000) dan menyajikan file JavaScript pelacak secara transparan guna menghindari sensor dari ekstensi browser ad-blocker.
+1. Autentikasi dan Sesi Aplikasi
+   a. Halaman login React memanggil Supabase Auth melalui adapter aplikasi dan menyimpan status sesi pada `AuthContext`.
+   b. `ProtectedRoute` hanya menampilkan Admin Panel setelah sesi tervalidasi, sedangkan logout menghapus sesi melalui Supabase Auth.
+2. Konsumsi Kontrol Akses Database dan Audit Aplikasi
+   a. React menjalankan query dan CRUD melalui Supabase SDK menggunakan konteks sesi pengguna.
+   b. Pembatasan `anon` dan `authenticated` dilaksanakan oleh RLS yang dirancang Database Schema Designer (Putra et al. 2026). Pada snapshot implementasi, service frontend memanggil fungsi pencatatan audit setelah operasi CRUD; trigger basis data tidak diklaim aktif karena tidak ditemukan pada artefak skema yang diperiksa.
+3. Integrasi Analitik dan Rate Limiting
+   a. Jalur analitik aktif mencatat dan mengagregasi `web_analytics_log` melalui Supabase, sedangkan Umami self-hosted dan helper Express tersedia sebagai jalur alternatif.
+   b. Middleware rate limiter pada helper Express membatasi jumlah permintaan per alamat client dalam jendela waktu yang dikonfigurasi ketika jalur opsional tersebut dijalankan.
 
-### 2.3.5 Perancangan Entity Relationship Diagram (ERD)
+### 2.3.5 Perancangan Kontrak Data Integrasi
 
-Rancangan struktur data relasional untuk sistem integrasi denah virtual kampus dan dashboard profil UPNVJ divisualisasikan melalui skema Entity-Relationship Diagram (ERD) yang dapat dilihat pada [FIGREF:diagram_erd]. Entity Relationship Diagram (ERD) adalah suatu model untuk menjelaskan hubungan antar data dalam basis data relasional berdasarkan objek-objek dasar data yang mempunyai hubungan antar relasi tersebut ('Afiifah et al. 2022). Struktur basis data ini dirancang pada RDBMS PostgreSQL untuk menghubungkan profil akademik, aset fisik kampus, dan log aktivitas audit secara terintegrasi.
+ERD, relasi antartabel, kebijakan RLS, dan rancangan trigger basis data merupakan kontribusi Database Schema Designer. Dalam lingkup System Integrator, penulis menetapkan field yang dibutuhkan oleh antarmuka, API, dan bridge tanpa mengubah kepemilikan struktur database. Snapshot implementasi web mencatat audit melalui service aplikasi dan tidak dijadikan bukti aktivasi trigger. Pemetaan kontrak tersebut dirangkum pada [TABREF:kontrak_data_integrasi].
 
-[FIGURE:diagram_erd]
-[FIGCAPTION:Entity-Relationship Diagram]
+[TABLE-ID:kontrak_data_integrasi]
+[TABLECAPTION:Kontrak Data yang Dikonsumsi Aplikasi dan API]
 
-Penjelasan mengenai struktur tabel, kolom, tipe data, serta aturan relasi antartabel dijabarkan sebagai berikut:
+[TABLE]
+Sumber Data | Field Utama yang Dikonsumsi | Penggunaan dalam Lingkup Penulis
+`gedung` | `id`, `nama_gedung`, `deskripsi_gedung`, `lokasi`, `jumlah_lantai`, `foto_url`, `unity_object_name` | Kartu informasi, pencarian, CRUD Admin Panel, `/api/buildings`, dan payload gedung `/api/unity/data`
+`fasilitas` | `id`, `nama_fasilitas`, `deskripsi_fasilitas`, `tipe_fasilitas`, `color`, `lantai`, `foto_url`, `id_gedung`, `unity_object_name` | Daftar fasilitas, pencarian, CRUD Admin Panel, `/api/rooms`, dan payload fasilitas `/api/unity/data`
+`fakultas` | `id`, `nama_fakultas` | Referensi pilihan fakultas pada formulir program studi; tidak tersedia sebagai tab CRUD terpisah
+`program_studi` | `id`, `nama_prodi`, `jenjang`, `id_fakultas`, `akreditasi` | CRUD program studi pada Admin Panel; tidak disajikan sebagai tabel publik pada snapshot yang diverifikasi
+`admin_users` | `username`, `nama_lengkap`, `role` | Metadata profil tambahan setelah autentikasi Supabase; bukan sumber password utama
+`web_analytics_log` | hash pengunjung, path, perangkat, dan waktu kunjungan | Pencatatan page view dan agregasi statistik pada jalur analitik UI aktif
+`audit_logs` | metadata aktor, aksi, tabel, record, waktu, data lama, dan data baru | Riwayat perubahan read-only pada Admin Panel
+`campus_maps` dan tabel konfigurasi jalur | metadata peta, node, edge, marker gedung, dan entrance | Pemuatan denah 2D, perhitungan rute A*, dan editor konfigurasi denah pada Admin Panel
+Supabase Auth | identitas pengguna dan sesi | Login, validasi protected route, logout, dan konteks JWT untuk operasi CRUD
+[/TABLE]
 
-1. Tabel `gedung`
-   Entitas ini menyimpan data administratif dan fisik dari seluruh bangunan/gedung yang ada di lingkungan UPNVJ Kampus Pondok Labu.
-   a. Atribut tabel terdiri atas:
-   1. `id`: Tipe `SERIAL` bertindak sebagai Primary Key.
-   2. `nama_gedung`: Tipe `VARCHAR(255)`, bernilai unik (_unique_) dan tidak boleh kosong (_not null_).
-   3. `deskripsi_gedung`: Tipe `TEXT` untuk penjelasan detail gedung.
-   4. `lokasi`: Tipe `TEXT` untuk deskripsi letak fisik.
-   5. `jumlah_lantai`: Tipe `INT` dengan nilai default 1.
-   6. `foto_url`: Tipe `VARCHAR(255)` untuk menyimpan tautan gambar gedung.
-   7. `unity_object_name`: Tipe `TEXT` bersifat unik, berfungsi sebagai jembatan penamaan GameObject pada scene Unity (konvensi lowercase + underscore).
-      b. Relasi tabel:
-   8. Berelasi One-to-Many dengan tabel `fasilitas` melalui foreign key `id_gedung`.
-   9. Berelasi One-to-One / Many-to-One dengan tabel `fakultas` melalui foreign key `id_gedung_utama`.
-
-2. Tabel `fasilitas`
-   Entitas ini menyimpan data fasilitas spesifik yang berada di dalam suatu gedung (misalnya ruang kelas, laboratorium, perpustakaan, toilet, dll.).
-   a. Atribut tabel terdiri atas:
-   1. `id`: Tipe `SERIAL` bertindak sebagai Primary Key.
-   2. `nama_fasilitas`: Tipe `VARCHAR(255)` untuk nama fasilitas.
-   3. `deskripsi_fasilitas`: Tipe `TEXT` untuk penjelasan detail fasilitas.
-   4. `tipe_fasilitas`: Tipe `VARCHAR(100)` untuk klasifikasi jenis fasilitas.
-   5. `color`: Tipe `VARCHAR(50)` dengan default 'gray' untuk penanda warna visual pada frontend React.
-   6. `lantai`: Tipe `INT` dengan default 1 untuk menunjukkan posisi lantai fasilitas.
-   7. `foto_url`: Tipe `TEXT` untuk menyimpan tautan gambar fasilitas.
-   8. `id_gedung`: Tipe `INT` sebagai Foreign Key yang merujuk ke tabel `gedung` (ON DELETE SET NULL).
-   9. `unity_object_name`: Tipe `TEXT` bersifat unik, berfungsi sebagai jembatan penamaan GameObject fasilitas pada scene Unity.
-      b. Relasi tabel: Merupakan tabel anak yang bergantung pada tabel `gedung`.
-
-3. Tabel `fakultas`
-   Entitas ini menampung data profil fakultas yang berada di lingkungan universitas.
-   a. Atribut tabel terdiri atas:
-   1. `id`: Tipe `SERIAL` bertindak sebagai Primary Key.
-   2. `nama_fakultas`: Tipe `VARCHAR(255)` bersifat unik dan tidak boleh kosong.
-   3. `deskripsi_fakultas`: Tipe `TEXT` untuk rincian profil fakultas.
-   4. `email`: Tipe `VARCHAR(255)` untuk kontak surat elektronik fakultas.
-   5. `website`: Tipe `VARCHAR(255)` untuk alamat web resmi fakultas.
-   6. `id_gedung_utama`: Tipe `INT` sebagai Foreign Key yang merujuk ke tabel `gedung` (ON DELETE SET NULL).
-      b. Relasi tabel:
-   7. Berelasi One-to-Many dengan tabel `program_studi` melalui foreign key `id_fakultas` pada tabel prodi.
-   8. Berelasi Many-to-One dengan tabel `gedung` untuk menentukan gedung administrasi utama.
-
-4. Tabel `program_studi`
-   Entitas ini menyimpan data program studi yang dinaungi oleh masing-masing fakultas.
-   a. Atribut tabel terdiri atas:
-   1. `id`: Tipe `SERIAL` bertindak sebagai Primary Key.
-   2. `nama_prodi`: Tipe `VARCHAR(255)` untuk nama program studi.
-   3. `jenjang`: Tipe `VARCHAR(10)` untuk tingkat pendidikan (D3/S1/S2/S3).
-   4. `id_fakultas`: Tipe `INT` sebagai Foreign Key yang merujuk ke tabel `fakultas` (ON DELETE CASCADE).
-   5. `akreditasi`: Tipe `VARCHAR(50)` untuk peringkat akreditasi program studi.
-      b. Relasi tabel: Bergantung penuh pada tabel `fakultas` melalui foreign key `id_fakultas`. Terdapat batasan unik gabungan (_composite unique key_) pada kolom `nama_prodi`, `jenjang`, dan `id_fakultas`.
-
-5. Tabel `admin_users`
-   Entitas ini menyimpan informasi akun administrator yang memiliki hak akses untuk mengelola data konten melalui Admin Panel.
-   a. Atribut tabel terdiri atas:
-   1. `id`: Tipe `SERIAL` bertindak sebagai Primary Key.
-   2. `username`: Tipe `VARCHAR(100)` bersifat unik dan tidak boleh kosong.
-   3. `password_hash`: Tipe `TEXT` untuk menyimpan hash kata sandi yang terenkripsi.
-   4. `nama_lengkap`: Tipe `VARCHAR(255)` untuk nama lengkap administrator.
-   5. `role`: Tipe `VARCHAR(50)` dengan default 'admin'.
-   6. `created_at`: Tipe `TIMESTAMP` dengan default waktu saat data dibuat.
-      b. Relasi tabel: Tabel independen untuk kebutuhan autentikasi dan otorisasi.
-
-6. Tabel `audit_logs`
-   Entitas ini digunakan sebagai pencatat riwayat (audit trail) otomatis terhadap setiap operasi manipulasi data (CRUD) yang dilakukan oleh administrator.
-   a. Atribut tabel terdiri atas:
-   1. `id`: Tipe `BIGSERIAL` bertindak sebagai Primary Key.
-   2. `actor_id`: Tipe `UUID` untuk menyimpan ID admin yang melakukan aksi.
-   3. `actor_email`: Tipe `TEXT` untuk menyimpan email administrator.
-   4. `action`: Tipe `TEXT` untuk jenis operasi (INSERT/UPDATE/DELETE).
-   5. `table_name`: Tipe `TEXT` untuk nama tabel yang mengalami mutasi.
-   6. `record_id`: Tipe `TEXT` untuk ID rekaman data yang diubah.
-   7. `old_data`: Tipe `JSONB` untuk menyimpan kondisi data lama sebelum diubah (bernilai null saat INSERT).
-   8. `new_data`: Tipe `JSONB` untuk menyimpan kondisi data baru sesudah diubah (bernilai null saat DELETE).
-   9. `created_at`: Tipe `TIMESTAMP` dengan default waktu mutasi tercatat.
-      b. Relasi tabel: Mencatat riwayat mutasi dari tabel-tabel utama secara transparan melalui trigger basis data.
-
-7. Tabel `web_analytics_log` (Legacy)
-   Entitas pendukung ini bersifat legacy dan berfungsi untuk mencatat log kunjungan pengguna ke halaman web secara mandiri sebelum digantikan oleh integrasi Umami Analytics.
-   a. Atribut tabel terdiri atas:
-   1. `id`: Tipe `SERIAL` bertindak sebagai Primary Key.
-   2. `visitor_hash`: Tipe `VARCHAR(255)` untuk sidik jari unik browser pengunjung.
-   3. `page_path`: Tipe `VARCHAR(255)` untuk menyimpan path halaman yang diakses.
-   4. `device_type`: Tipe `VARCHAR(100)` untuk jenis perangkat yang digunakan.
-   5. `visited_at`: Tipe `TIMESTAMP` dengan default waktu kunjungan.
-      b. Relasi tabel: Tabel mandiri yang mengumpulkan data analitik kunjungan.
+Field `unity_object_name` merupakan kontrak lintas komponen. Frontend menggunakannya sebagai nilai tujuan pencarian, API mengirimkannya kepada konsumen Unity, dan runtime Unity memetakannya ke GameObject. Penulis menjaga konsistensi identifier pada lapisan aplikasi dan API; penataan GameObject serta validasi di Unity tetap menjadi kontribusi anggota terkait.
 
 ### 2.3.6 Perancangan Antarmuka
 
-Rancangan antarmuka pengguna diwujudkan melalui serangkaian mockup visual:
+Rancangan antarmuka tidak mendokumentasikan seluruh halaman secara terpisah, melainkan memilih bukti visual yang langsung mendukung kontribusi penulis pada frontend dan integrasi sistem. Pilihan ini menjaga pembahasan tetap berfokus pada alur akses denah, pencarian React, bridge menuju Unity, dan pengelolaan konten oleh administrator.
 
-1. Bagian Admin Dashboard
-   Mockup halaman login admin disajikan pada [FIGREF:mockup_login_admin], halaman utama dashboard admin pada [FIGREF:mockup_dashboard_admin], modal formulir tambah data pada [FIGREF:mockup_modal_tambah_gedung], modal formulir edit data pada [FIGREF:mockup_modal_edit_gedung], modal konfirmasi hapus data pada [FIGREF:mockup_modal_hapus_gedung], serta visualisasi statistik analitik admin pada [FIGREF:mockup_admin_traffic].
+1. Akses Denah dan Interaksi Publik
+   Panel akses denah terbaru pada [FIGREF:ui_section_denah_kampus] menjadi titik masuk menuju pilihan Denah 2D atau Denah 3D serta menampilkan informasi cache aset WebGL. Pada mode 3D, canvas pada [FIGREF:ui_webgl_canvas] memperlihatkan runtime build aktif beserta bilah pencarian React, tombol bantuan, kontrol pergantian mode, minimap, dan petunjuk kontrol ringkas pada footer. Hasil pencarian pada mode 2D dalam [FIGREF:ui_search_overlay] membawa `buildingId` menuju gedung tujuan, sedangkan mode 3D menggunakan `unity_object_name` untuk bridge ke Unity; implementasi navigasi di dalam runtime Unity tetap menjadi tanggung jawab Engine Developer.
 
-   [FIGURE:mockup_login_admin]
-   [FIGCAPTION:Halaman Login Admin]
+   [FIGURE:ui_section_denah_kampus]
+   [FIGCAPTION:Panel Akses Denah 2D dan 3D]
+   [FIGURE:ui_webgl_canvas]
+[FIGCAPTION:Canvas Unity WebGL pada Build Aktif dengan Bantuan dan Bilah Pencarian React]
+   [FIGURE:ui_search_overlay]
+   [FIGCAPTION:Hasil Pencarian Lokasi pada Denah 2D]
+
+2. Pengelolaan Konten Administrator
+   Tampilan Admin Panel pada [FIGREF:mockup_dashboard_admin] menjadi bukti antarmuka React untuk memfilter dan menampilkan data fasilitas serta menyediakan aksi tambah, edit, dan hapus. Tangkapan layar deployment memperlihatkan 331 fasilitas pada database live saat pengambilan gambar. Angka tersebut tidak disamakan dengan 311 record pada seed final karena penerapan ulang seed ke Supabase live belum diverifikasi. Rincian autentikasi, pemanggilan Supabase SDK, dan pembatasan operasi berdasarkan RLS dijelaskan pada Subbab 3.2, sehingga tidak diperlukan tangkapan layar terpisah untuk setiap modal CRUD.
+
    [FIGURE:mockup_dashboard_admin]
-   [FIGCAPTION:Halaman Dashboard Admin]
-   [FIGURE:mockup_modal_tambah_gedung]
-   [FIGCAPTION:Modal Tambah Data Gedung]
-   [FIGURE:mockup_modal_edit_gedung]
-   [FIGCAPTION:Modal Update Data Gedung]
-   [FIGURE:mockup_modal_hapus_gedung]
-   [FIGCAPTION:Modal Konfirmasi Hapus Data Gedung]
-   [FIGURE:mockup_admin_traffic]
-   [FIGCAPTION:Traffic Website Admin]
-
-2. Bagian Public Dashboard
-   Mockup hero section disajikan pada [FIGREF:mockup_hero_section], visualisasi analitik publik pada [FIGREF:mockup_public_traffic], bagian pencarian fasilitas dan aset pada [FIGREF:mockup_fasilitas_aset], modal daftar fasilitas kategori pada [FIGREF:mockup_modal_list_fasilitas], modal detail spesifik fasilitas unggulan pada [FIGREF:mockup_modal_detail_fasilitas], dan footer halaman pada [FIGREF:mockup_footer].
-
-   [FIGURE:mockup_hero_section]
-   [FIGCAPTION:Hero Section]
-   [FIGURE:mockup_public_traffic]
-   [FIGCAPTION:Public Traffic Statistics Website]
-   [FIGURE:mockup_fasilitas_aset]
-   [FIGCAPTION:Bagian Fasilitas dan Aset]
-   [FIGURE:mockup_modal_list_fasilitas]
-   [FIGCAPTION:Modal List Fasilitas dan Aset]
-   [FIGURE:mockup_modal_detail_fasilitas]
-   [FIGCAPTION:Modal Fasilitas dan Aset]
-   [FIGURE:mockup_footer]
-   [FIGCAPTION:Bagian Footer]
+   [FIGCAPTION:Halaman Pengelolaan Fasilitas pada Admin Panel]
 
 ## 2.4 Rencana Pengujian Proyek
 
-### 2.4.1 Pengujian Backend (API dan Integration Testing)
+### 2.4.1 Pengujian API dan Integrasi Data
 
-Pengujian backend difokuskan pada pengujian integrasi fungsional (Integration Testing) untuk memvalidasi:
+Pengujian API dirancang untuk memvalidasi handler Vercel Serverless Functions dan kontraknya dengan Supabase sebagai berikut:
 
-1. Validasi Koneksi Database: Menguji apakah RESTful API dapat terhubung secara lancar ke database Supabase Cloud.
-2. Pengujian Endpoint API: Melakukan tes terhadap endpoint publik (`/api/unity/data`, `/api/unity/names`, `/api/buildings`, `/api/rooms`) untuk memvalidasi format data keluaran JSON dan status response HTTP (200 OK).
-3. Pengujian Proteksi Autentikasi: Memastikan endpoint modifikasi data (POST/PUT/DELETE) menolak request (status 401 Unauthorized) jika tidak dibarengi dengan token JWT admin yang valid dari Supabase Auth.
+1. Memastikan endpoint `/api/buildings`, `/api/rooms`, `/api/unity/data`, dan `/api/unity/names` mengembalikan status serta struktur JSON sesuai kontrak ketika data tersedia.
+2. Memastikan `/api/unity/data` memisahkan array `gedung` dan `fasilitas`, sedangkan `/api/unity/names` hanya mengembalikan daftar `unityObjectNames` yang valid.
+3. Memastikan method selain `GET` atau `OPTIONS` ditolak pada endpoint yang bersifat read-only dan kegagalan akses data menghasilkan respons kesalahan tanpa memaparkan kredensial.
+4. Memastikan `/api/health` mengembalikan status layanan yang dapat digunakan untuk pemeriksaan operasional.
+5. Menguji operasi query dan CRUD React melalui Supabase SDK menggunakan sesi terautentikasi serta memastikan kegagalan RLS ditampilkan sebagai kesalahan aplikasi. Pengujian ini tidak menggunakan endpoint POST, PUT, atau DELETE pada REST API.
 
-### 2.4.2 Pengujian Fungsional (Black Box Testing)
+### 2.4.2 Pengujian Web dan Operasional
 
-Pengujian fungsional sistem menggunakan metode Black Box Testing untuk menguji 18 skenario interaksi antarmuka pengguna pada dashboard admin dan dashboard publik. Pengujian fungsionalitas sistem menggunakan metode Black Box Testing berfokus pada pengujian persyaratan fungsional perangkat lunak tanpa harus melihat struktur kode internal program (Maulida et al. 2025). Skenario tersebut meliputi:
+Pengujian yang langsung berkaitan dengan kontribusi penulis direncanakan sebagai berikut:
 
-1. Pengujian fungsionalitas CRUD pada dashboard admin untuk setiap entitas data (Gedung, Fasilitas, Fakultas, dan Program Studi).
-2. Pengujian validitas form login admin dan penanganan error kredensial yang tidak valid.
-3. Pengujian interaktivitas grafik statistik lalu lintas website.
-4. Pengujian sinkronisasi filter bahasa (Bahasa Indonesia dan English) pada public dashboard.
-5. Pengujian keakuratan modul pencarian gabungan (Search Overlay) di frontend React.
-6. Pengujian jembatan komunikasi navigasi (React→Unity SendMessage bridge) untuk memastikan runtime 3D bereaksi terhadap aksi input web.
+1. Vitest dan React Testing Library digunakan untuk menguji utility, adapter autentikasi, komponen modal, translasi, perlindungan data, serta preload WebGL.
+2. Integration test digunakan untuk memeriksa endpoint health, data gedung atau fasilitas, kontrak data Unity, dan kondisi kegagalan akses Supabase.
+3. Alur browser diperiksa melalui Black Box Testing dan UAT. Playwright ditetapkan sebagai pengembangan pengujian lanjutan karena snapshot implementasi belum memiliki suite end-to-end yang dapat dilaporkan sebagai hasil.
+4. Lighthouse digunakan pada production build melalui preview server lokal untuk mengukur performa, aksesibilitas, best practices, dan SEO pada mode mobile serta desktop. Artefak JSON menjadi sumber angka, sedangkan hasil otomatis dibedakan dari pemeriksaan manual dan data pengguna nyata.
+5. Pemeriksaan deployment memastikan React SPA, endpoint API, fallback route, header keamanan, content type, cache aset WebGL, dan health check tersedia sesuai konfigurasi.
 
-### 2.4.3 User Acceptance Testing
+### 2.4.3 Pengujian Fungsional (Black Box Testing)
 
-User Acceptance Testing (UAT) dirancang untuk mengukur tingkat kepuasan pengguna (Usability Testing) terhadap sistem yang dikembangkan. Pengujian melibatkan perwakilan responden dari dua kelompok target, yaitu pengguna publik (mahasiswa dan pengunjung) dan pengguna administratif (staf administrasi UPA TIK UPNVJ). User Acceptance Testing (UAT) dilakukan untuk memastikan bahwa sistem yang dibangun telah sesuai dengan kebutuhan pengguna serta dapat diterima dengan baik oleh pengguna akhir (Aliyah et al. 2024).
+Pengujian fungsional sistem menggunakan metode Black Box Testing untuk menguji 24 skenario pada dashboard admin, dashboard publik, API, dan integrasi navigasi Unity. Pengujian ini berfokus pada persyaratan fungsional perangkat lunak tanpa meninjau struktur kode internal program (Maulida et al. 2025). Cakupan skenario meliputi:
 
-Pengukuran usability dilakukan menggunakan skala Likert melalui kuesioner terstruktur setelah responden menyelesaikan serangkaian skenario tugas yang diberikan. Indeks kepuasan dihitung secara kuantitatif untuk memvalidasi penerimaan sistem. Hasil pengujian ini akan memberikan feedback untuk perbaikan sistem pasca-uji.
+1. Autentikasi admin, proteksi Row-Level Security (RLS), dan pencatatan audit log.
+2. Operasi Create, Read, Update, dan Delete (CRUD), validasi formulir, serta fitur tabel pada dashboard admin.
+3. Agregasi kategori, pencarian, pergantian bahasa, penanganan kondisi pemuatan atau kesalahan, dan responsivitas dashboard publik.
+4. Endpoint data denah, jembatan komunikasi React ke Unity, navigasi NavMesh, ketahanan `unity_object_name`, interupsi rute, dan pemuatan awal Unity WebGL.
+
+### 2.4.4 User Acceptance Testing
+
+User Acceptance Testing (UAT) dirancang untuk mengukur tingkat penerimaan dan penilaian pengguna terhadap sistem yang dikembangkan. Peserta dipilih secara purposif berdasarkan keterlibatan dan kompetensinya dalam mengevaluasi proyek, yaitu dua dosen penguji, dua dosen pembimbing, dan satu perwakilan Humas UPNVJ. Humas ditempatkan sebagai mitra pengguna, tetapi penilaian satu perwakilan tidak digunakan untuk mengklaim persetujuan formal atau mewakili seluruh pengguna UPNVJ. UAT dilakukan untuk memastikan bahwa sistem yang dibangun telah sesuai dengan kebutuhan pengguna serta dapat diterima oleh peserta pengujian (Aliyah et al. 2025).
+
+Pengukuran dilakukan menggunakan skala Likert 1 sampai 5 melalui dua kuesioner terstruktur. Instrumen pengguna publik memuat sembilan pernyataan dan instrumen dashboard admin memuat sebelas pernyataan. Setiap instrumen diisi oleh empat peserta, dengan total lima peserta unik karena sebagian peserta mengevaluasi kedua instrumen. Persentase penerimaan dihitung dari perbandingan skor aktual terhadap skor maksimum, sedangkan masukan terbuka digunakan sebagai dasar penyusunan tindak lanjut pasca-uji.
 
 ---
 
@@ -583,417 +477,428 @@ Pengukuran usability dilakukan menggunakan skala Likert melalui kuesioner terstr
 
 ### 3.1.1 Nama Organisasi/Lembaga Mitra
 
-Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu (Unit Penunjang Akademik Teknologi Informasi dan Komunikasi - UPA TIK UPNVJ).
+Humas Universitas Pembangunan Nasional “Veteran” Jakarta (Humas UPNVJ).
 
 ### 3.1.2 Deskripsi Mitra
 
-Universitas Pembangunan Nasional “Veteran” Jakarta (UPNVJ) Kampus Pondok Labu merupakan salah satu institusi pendidikan tinggi negeri yang memiliki peran strategis dalam pengembangan sumber daya manusia di bidang akademik dan profesional. Sejak memperoleh status sebagai Perguruan Tinggi Negeri pada tahun 2014, UPNVJ terus berkomitmen dalam meningkatkan kualitas pendidikan, penelitian, dan pengabdian kepada masyarakat dengan mengedepankan nilai-nilai bela negara.
+Humas UPNVJ menjadi mitra pengguna dalam proyek ini karena layanan navigasi ditujukan untuk membantu penyampaian informasi lokasi kepada mahasiswa baru, orang tua atau wali, sivitas akademika, dan pengunjung eksternal. Halaman resmi UPNVJ mendokumentasikan bahwa Humas UPNVJ mengoordinasikan strategi komunikasi digital bersama humas fakultas (UPNVJ 2026b). Keterkaitan tersebut digunakan sebagai konteks peran komunikasi kepada publik, bukan sebagai bukti bahwa sistem telah diterima sebagai layanan resmi institusi.
 
-Kampus Pondok Labu sebagai salah satu pusat kegiatan akademik UPNVJ memiliki lingkungan yang luas dengan berbagai fasilitas pendukung, seperti gedung fakultas, ruang perkuliahan, laboratorium, serta sarana umum lainnya. Seiring dengan perkembangan jumlah mahasiswa dan kompleksitas infrastruktur kampus, kebutuhan akan sistem informasi yang terintegrasi dan mudah diakses menjadi semakin penting.
-
-Dalam konteks transformasi digital menuju konsep Smart Campus, UPNVJ telah mulai mengembangkan berbagai sistem informasi untuk mendukung pengelolaan data akademik dan layanan kampus. Namun, berdasarkan kondisi eksisting, penyajian informasi kampus masih bersifat terfragmentasi dan sistem navigasi yang tersedia masih mengandalkan media konvensional seperti papan petunjuk dan denah statis.
-
-Oleh karena itu, UPNVJ Kampus Pondok Labu menjadi lingkungan yang relevan sebagai mitra dalam pengembangan sistem integrasi denah virtual dan dashboard profil kampus. Proyek ini diharapkan dapat mendukung upaya digitalisasi layanan informasi serta meningkatkan pengalaman pengguna dalam mengakses informasi dan melakukan navigasi di lingkungan kampus.
+Universitas Pembangunan Nasional “Veteran” Jakarta (UPNVJ) berstatus Perguruan Tinggi Negeri sejak 6 Oktober 2014 berdasarkan Peraturan Presiden Nomor 120 Tahun 2014 (UPNVJ 2025b). Kampus Pondok Labu merupakan konteks penerapan proyek dan beralamat di Jalan R.S. Fatmawati Nomor 1, Jakarta Selatan. Halaman resmi lokasi kampus mencatat luas lahan 2,4 hektare, luas lantai bangunan 28.887 meter persegi, dan 71 ruang kuliah (UPNVJ 2022).
 
 ### 3.1.3 Hubungan Mitra dengan Proyek
 
-Pengembangan sistem integrasi denah virtual kampus dan dashboard profil UPNVJ melibatkan keterkaitan langsung dengan mitra, yaitu Universitas Pembangunan Nasional “Veteran” Jakarta Kampus Pondok Labu, sebagai lingkungan implementasi dan sumber data utama. Hubungan antara mitra dan proyek secara rinci dijabarkan pada [TABREF:hubungan_mitra_proyek].
+Humas UPNVJ berperan sebagai mitra pengguna dan satu perwakilannya mengikuti UAT untuk memberikan perspektif evaluasi terhadap informasi serta navigasi. Keikutsertaan tersebut tidak digunakan untuk mengklaim persetujuan formal, serah terima sistem, atau representasi seluruh pengguna UPNVJ. UPA TIK tetap dicatat secara terpisah sebagai pihak koordinasi teknis, batas akses data, kemungkinan integrasi institusional, dan penyerahan pakta integritas. Hubungan setiap pihak dirangkum pada [TABREF:hubungan_mitra_proyek].
 
 [TABLE-ID:hubungan_mitra_proyek]
-[TABLECAPTION:Hubungan Mitra dengan Proyek]
+[TABLECAPTION:Hubungan Pemangku Kepentingan dengan Proyek]
 
 [TABLE]
-Entitas | Peran | Manfaat
-UPNVJ Kampus Pondok Labu | 1. Menjadi objek utama dalam pengembangan dan implementasi sistem, khususnya dalam penyediaan data spasial (gedung dan fasilitas) serta data profil kampus.<br>2. Menyediakan lingkungan nyata (real-world environment) sebagai dasar observasi, analisis kebutuhan, serta validasi sistem yang dikembangkan.<br>3. Mendukung proses pengembangan melalui koordinasi dengan stakeholder terkait, seperti pihak pengelola teknologi informasi (UPA TIK). | 1. Mendapatkan solusi sistem navigasi kampus berbasis visualisasi 3D yang lebih interaktif dibandingkan metode konvensional.<br>2. Memperoleh platform dashboard profil kampus yang terintegrasi, sehingga penyajian informasi menjadi lebih terpusat dan mudah diakses.<br>3. Mendukung implementasi konsep Smart Campus melalui integrasi teknologi backend, dashboard web, dan visualisasi 3D.
-Sivitas Akademika (Mahasiswa dan Tamu) | 1. Bertindak sebagai pengguna utama sistem (end-user) yang berinteraksi langsung dengan public dashboard dan denah virtual.<br>2. Menjadi sumber data kebutuhan sistem melalui kuesioner dan observasi pengalaman navigasi kampus. | 1. Mempermudah proses pencarian lokasi di lingkungan kampus melalui sistem navigasi berbasis visualisasi 3D.<br>2. Meningkatkan kemudahan akses terhadap informasi kampus yang sebelumnya tersebar di berbagai platform.
-Administrator Sistem (Staf Pengelola) | 1. Mengelola data konten kampus melalui admin dashboard, termasuk data fasilitas, gedung, dan profil.<br>2. Menjaga konsistensi dan keakuratan data yang digunakan oleh sistem. | 1. Memperoleh sistem manajemen konten terpusat yang mempermudah pengelolaan data secara efisien.<br>2. Mendukung proses pembaruan informasi secara real-time tanpa perlu mengubah sistem secara keseluruhan.
+Entitas | Hubungan dengan Proyek | Keluaran yang Relevan
+Humas UPNVJ | Menjadi mitra pengguna; satu perwakilan mengikuti UAT dan memberikan perspektif evaluasi informasi serta navigasi | Masukan penerimaan pengguna yang dibatasi pada peserta UAT, tanpa klaim persetujuan institusional
+Pengguna Publik | Memberikan data kebutuhan awal melalui kuesioner dan menggunakan Public Dashboard serta Denah 2D atau 3D | Antarmuka informasi, pencarian lokasi, petunjuk penggunaan, dan alternatif navigasi berbasis web
+UPA TIK UPNVJ | Menjadi pihak koordinasi teknis untuk batas akses data, kemungkinan integrasi institusional, wawancara, dan penyerahan pakta integritas | Kontrak teknis dan batas penggunaan data tanpa mengklaim UPA TIK sebagai mitra pengguna atau penerima sistem
+Tim Pengembang | Menyediakan komponen database, aset, runtime Unity, aplikasi web, dan deployment sesuai pembagian peran | Artefak lintas komponen yang terhubung melalui kontrak data dan deployment yang terdokumentasi
 [/TABLE]
 
 ## 3.2 Metode Implementasi
 
-Implementasi sistem dalam proyek ini dilakukan menggunakan pendekatan prototyping yang iteratif. Proses pengembangan secara eksklusif difokuskan pada kontribusi penulis selaku Full Stack Web Developer dan System Integrator. Subbab ini menguraikan **metode dan teknik implementasi** (cara membangun) tiap komponen, sedangkan bukti keluaran dan hasil akhirnya disajikan pada Subbab 3.4.
+Implementasi sistem dalam proyek ini dilakukan menggunakan pendekatan prototyping yang iteratif. Proses pengembangan difokuskan pada kontribusi penulis selaku Full Stack Web Developer, System Integrator, dan DevOps Engineer. Subbab ini menguraikan **metode dan teknik implementasi** (cara membangun) tiap komponen, sedangkan bukti keluaran dan hasil akhirnya disajikan pada Subbab 3.4.
 
 ### 3.2.1 Implementasi Back-end
 
-Backend dikembangkan sebagai RESTful API menggunakan Node.js dan framework Express.js. Untuk mendukung skalabilitas, backend dideploy pada Vercel Serverless Functions. Basis data PostgreSQL diinangi di Supabase Cloud. Struktur skema database yang dibuat secara relasional diwujudkan melalui SQL DDL berikut:
+Backend yang menjadi tanggung jawab penulis adalah REST API read-only berbasis Node.js pada folder `api/` dan dijalankan sebagai Vercel Serverless Functions. React tidak memakai endpoint tersebut untuk login atau CRUD utama; operasi tersebut berlangsung langsung melalui Supabase SDK. API disediakan bagi runtime Unity, tooling editor, pemeriksaan kesehatan layanan, serta konsumen eksternal yang memerlukan kontrak HTTP.
 
-```sql
--- Membuat tabel gedung
-CREATE TABLE gedung (
-  id SERIAL PRIMARY KEY,
-  nama_gedung VARCHAR(255) UNIQUE NOT NULL,
-  deskripsi_gedung TEXT,
-  lokasi TEXT,
-  jumlah_lantai INT DEFAULT 1,
-  foto_url VARCHAR(255),
-  unity_object_name TEXT UNIQUE
-);
+Setiap handler menerapkan CORS, menerima `GET` dan `OPTIONS`, menolak method lain dengan status 405, membuat Supabase client dari environment variables, lalu mengembalikan JSON atau status 500 ketika query gagal. Potongan implementasi aktual `/api/unity/data` berikut menunjukkan query paralel dan pembentukan payload tanpa memuat kredensial:
 
--- Membuat tabel fasilitas
-CREATE TABLE fasilitas (
-  id SERIAL PRIMARY KEY,
-  nama_fasilitas VARCHAR(255) NOT NULL,
-  deskripsi_fasilitas TEXT,
-  tipe_fasilitas VARCHAR(100),
-  color VARCHAR(50) DEFAULT 'gray',
-  lantai INT DEFAULT 1,
-  id_gedung INT REFERENCES gedung(id) ON DELETE SET NULL,
-  foto_url TEXT,
-  unity_object_name TEXT UNIQUE
-);
+```javascript
+const [gedungResult, fasilitasResult] = await Promise.all([
+  supabase
+    .from("gedung")
+    .select("id, nama_gedung, deskripsi_gedung, lokasi, jumlah_lantai, unity_object_name")
+    .order("id", { ascending: true }),
+  supabase
+    .from("fasilitas")
+    .select("id, nama_fasilitas, deskripsi_fasilitas, tipe_fasilitas, id_gedung, lantai, foto_url, unity_object_name")
+    .order("id_gedung", { ascending: true })
+    .order("lantai", { ascending: true }),
+]);
 
--- Membuat tabel fakultas
-CREATE TABLE fakultas (
-  id SERIAL PRIMARY KEY,
-  nama_fakultas VARCHAR(255) UNIQUE NOT NULL,
-  deskripsi_fakultas TEXT,
-  email VARCHAR(255),
-  website VARCHAR(255),
-  id_gedung_utama INT REFERENCES gedung(id) ON DELETE SET NULL
-);
+if (gedungResult.error) throw gedungResult.error;
+if (fasilitasResult.error) throw fasilitasResult.error;
 
--- Membuat tabel program_studi
-CREATE TABLE program_studi (
-  id SERIAL PRIMARY KEY,
-  nama_prodi VARCHAR(255) NOT NULL,
-  jenjang VARCHAR(10),
-  id_fakultas INT REFERENCES fakultas(id) ON DELETE CASCADE,
-  akreditasi VARCHAR(50),
-  CONSTRAINT unique_prodi_jenjang_fakultas UNIQUE (nama_prodi, jenjang, id_fakultas)
-);
-
--- Membuat tabel admin_users
-CREATE TABLE admin_users (
-  id SERIAL PRIMARY KEY,
-  username VARCHAR(100) UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
-  nama_lengkap VARCHAR(255),
-  role VARCHAR(50) DEFAULT 'admin',
-  created_at TIMESTAMP DEFAULT now()
-);
-
--- Membuat tabel audit_logs
-CREATE TABLE audit_logs (
-  id BIGSERIAL PRIMARY KEY,
-  actor_id UUID,
-  actor_email TEXT,
-  action TEXT,
-  table_name TEXT,
-  record_id TEXT,
-  old_data JSONB,
-  new_data JSONB,
-  created_at TIMESTAMP DEFAULT now()
-);
+return res.status(200).json({
+  gedung: gedungResult.data || [],
+  fasilitas: fasilitasResult.data || [],
+});
 ```
 
-Keamanan akses diimplementasikan pada tingkat basis data dengan menerapkan kebijakan Row-Level Security (RLS) di Supabase. RLS diatur agar pengguna anonim (`anon`) hanya diizinkan melakukan pembacaan data (`SELECT`), sedangkan operasi manipulasi data (`INSERT`, `UPDATE`, `DELETE`) dibatasi hanya untuk pengguna yang terautentikasi (`authenticated`) melalui JWT token admin.
+Kontrak endpoint pada snapshot implementasi diringkas pada [TABREF:kontrak_endpoint_api].
 
-Penerapan otomatisasi pencatatan perubahan data (audit logs) di sisi basis data diwujudkan melalui SQL DDL sebagai berikut:
+[TABLE-ID:kontrak_endpoint_api]
+[TABLECAPTION:Kontrak Endpoint Vercel Serverless Functions]
 
-```sql
--- Mengaktifkan RLS pada tabel gedung
-ALTER TABLE gedung ENABLE ROW LEVEL SECURITY;
+[TABLE]
+Endpoint | Respons Utama | Konsumen atau Tujuan
+`GET /api/health` | envelope status, pesan, dan timestamp | Health check layanan
+`GET /api/buildings` | daftar gedung beserta fasilitas terkait | Integrator eksternal dan kompatibilitas kontrak
+`GET /api/rooms` | daftar fasilitas beserta data gedung | Integrator eksternal dan kompatibilitas kontrak
+`GET /api/unity/data` | objek dengan array `gedung` dan `fasilitas` | `BuildingDatabase` pada runtime Unity
+`GET /api/unity/names?type=gedung|fasilitas` | array `unityObjectNames` | `DatabaseSyncChecker` pada Unity Editor
+[/TABLE]
 
--- Kebijakan akses SELECT publik
-CREATE POLICY "Allow public select" ON gedung FOR SELECT TO anon USING (true);
-
--- Kebijakan manipulasi data admin
-CREATE POLICY "Allow admin write" ON gedung FOR ALL TO authenticated
-  USING (auth.role() = 'authenticated')
-  WITH CHECK (auth.role() = 'authenticated');
-
--- Fungsi trigger mencatat log perubahan ke audit_logs
-CREATE OR REPLACE FUNCTION log_data_mutation()
-RETURNS TRIGGER AS $$
-DECLARE
-  current_actor_id UUID;
-  current_actor_email TEXT;
-BEGIN
-  -- Mendapatkan ID dan email actor dari auth context Supabase
-  current_actor_id := auth.uid();
-  current_actor_email := auth.email();
-
-  INSERT INTO audit_logs (
-    actor_id,
-    actor_email,
-    action,
-    table_name,
-    record_id,
-    old_data,
-    new_data,
-    created_at
-  )
-  VALUES (
-    current_actor_id,
-    current_actor_email,
-    TG_OP,
-    TG_TABLE_NAME,
-    COALESCE(NEW.id::text, OLD.id::text),
-    CASE WHEN TG_OP = 'INSERT' THEN NULL ELSE row_to_json(OLD)::jsonb END,
-    CASE WHEN TG_OP = 'DELETE' THEN NULL ELSE row_to_json(NEW)::jsonb END,
-    now()
-  );
-  RETURN COALESCE(NEW, OLD);
-END;
-$$ LANGUAGE plpgsql;
-
--- Memicu trigger pada tabel gedung
-CREATE TRIGGER audit_gedung_trigger
-AFTER INSERT OR UPDATE OR DELETE ON gedung
-FOR EACH ROW EXECUTE FUNCTION log_data_mutation();
-```
-
-RESTful API backend menyediakan beberapa endpoint utama untuk mendistribusikan data ke client-side, yang meliputi:
-
-1. `GET /api/buildings`: Mengembalikan data gedung untuk React frontend.
-2. `GET /api/rooms`: Mengembalikan data fasilitas/ruangan untuk React frontend.
-3. `GET /api/unity/data`: Mengembalikan data terintegrasi (gedung dan fasilitas) yang dibutuhkan oleh runtime Unity WebGL.
-4. `GET /api/unity/names`: Mengembalikan array string `unityObjectNames` terdaftar untuk validasi sinkronisasi di Unity Editor.
-5. `GET /api/health`: Mengembalikan status kesehatan server/koneksi database.
+Supabase client pada fungsi serverless menggunakan URL proyek dan anon key dari environment deployment. Service role key tidak digunakan pada browser maupun handler Vercel read-only. Skema, relasi, dan RLS tetap menjadi dependensi dari Database Schema Designer; kontribusi penulis berada pada pemilihan field, stabilitas bentuk respons, penanganan method, CORS, dan kondisi kesalahan.
 
 ### 3.2.2 Implementasi Front-end
 
-Frontend dirancang sebagai Single Page Application (SPA) menggunakan Vite dan React.js. Antarmuka terbagi menjadi dua bagian: Public Dashboard untuk pengguna umum (routing `/` dengan `<DashboardProvider>`) dan Admin Dashboard untuk staf pengelola data (routing protected `/admin` dengan lazy loading `<AdminDashboard>` dan `<Login>`).
+Frontend diimplementasikan sebagai SPA menggunakan React 19, TypeScript, dan Vite 7. Provider aplikasi menyusun konteks bahasa, autentikasi, notifikasi, dan routing. Route `/` memuat Public Dashboard, `/login` dan `/admin/login` memuat halaman autentikasi, sedangkan `/admin` dibungkus `ProtectedRoute`. Komponen berat di bawah bagian awal halaman dimuat secara lazy agar initial render tidak menunggu seluruh modul.
 
-Untuk menjaga kinerja pemuatan halaman di perangkat seluler (mobile devices) yang mengakses visualisasi WebGL Unity yang berukuran besar, diimplementasikan mekanisme _connection-aware preloading_. Mekanisme ini mengevaluasi tipe koneksi jaringan browser client menggunakan API `navigator.connection` guna menghindari preload aset WebGL secara otomatis pada jaringan lambat, tipe koneksi seluler, atau ketika fitur Save-Data diaktifkan:
-
-```typescript
-// Mengecek jenis koneksi jaringan pengguna
-const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
-const isConnectionSlow = connection dandan (connection.saveData || ['slow-2g', '2g', '3g'].includes(connection.effectiveType));
-
-if (isConnectionSlow) {
-  // Lewati preload otomatis WebGL dan tampilkan tombol aktivasi manual
-  setShowManualActivationButton(true);
-} else {
-  // Lakukan preload aset WebGL secara otomatis di latar belakang setelah 10 detik idle
-  const schedulePreload = () => {
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(() => triggerWebGLPreload());
-    } else {
-      setTimeout(() => triggerWebGLPreload(), 10000);
-    }
-  };
-  schedulePreload();
-}
-```
-
-Integrasi komunikasi satu arah dari React menuju runtime Unity WebGL dijembatani menggunakan pustaka `react-unity-webgl`. Ketika pengguna melakukan pencarian lokasi di sisi frontend React (melalui modul `SearchOverlay.tsx` dan `useBuildingSearch.ts`), instruksi navigasi dikirim secara asinkron ke container WebGL dengan memicu method penerima rute di Unity:
+1. Public Dashboard
+   Public Dashboard mengambil data melalui Supabase SDK, menyajikan profil kampus, fasilitas, akreditasi, statistik, tutorial atau FAQ, serta pemilih denah 2D atau 3D. `DashboardContext` mengatur kondisi loading, error, cache, dan pemuatan ulang data.
+2. Admin Panel
+   `AuthContext` memanggil adapter Supabase Auth, mempertahankan sesi, dan mengarahkan pengguna yang valid ke protected route. CRUD gedung, fasilitas, program studi, dan konfigurasi denah 2D dilakukan melalui service aplikasi yang memanggil Supabase langsung. Modal validasi, konfirmasi penghapusan, toast, dan pembaruan cache menangani umpan balik operasi kepada administrator.
+3. Denah 2D
+   Mode 2D memuat konfigurasi peta aktif, node, edge, marker gedung, dan entrance dari Supabase. Setelah pengguna menentukan titik awal dan tujuan, frontend menggunakan `buildingId` untuk mencari entrance terkait, menjalankan algoritma A*, dan menggambar jalur sebagai SVG di atas gambar denah. Editor pada Admin Panel digunakan untuk mengatur marker, entrance, node, dan koneksi edge.
+4. Pemuatan Unity WebGL
+   Build Unity v0.8.6.1 dimuat menggunakan loader native Unity tanpa dependency `react-unity-webgl`. React membuat elemen canvas, menyiapkan URL loader, framework, WebAssembly, dan data, lalu menyimpan instance pada `window.unityInstance`. Potongan berikut berasal dari implementasi loader yang aktif:
 
 ```typescript
-import { useUnityContext } from "react-unity-webgl";
-
-// Inisialisasi konteks Unity WebGL
-const { sendMessage, isLoaded } = useUnityContext({
-  loaderUrl: "build/UnityWebGL.loader.js",
-  dataUrl: "build/UnityWebGL.data",
-  frameworkUrl: "build/UnityWebGL.framework.js",
-  codeUrl: "build/UnityWebGL.wasm",
-});
-
-const handleNavigate = (unityObjectName: string) => {
-  if (isLoaded) {
-    // Mengirim nama objek visual ke Unity receiver (case-insensitive)
-    sendMessage("NavigationReceiver", "NavigateTo", unityObjectName);
-  }
+const unityConfig = {
+  dataUrl: `${basePath}unity-builds/v0.8.6.1/Build/v0.8.6.1.data.unityweb`,
+  frameworkUrl: `${basePath}unity-builds/v0.8.6.1/Build/v0.8.6.1.framework.js.unityweb`,
+  codeUrl: `${basePath}unity-builds/v0.8.6.1/Build/v0.8.6.1.wasm.unityweb`,
+  streamingAssetsUrl: "StreamingAssets",
+  productVersion: "v0.8.6.1",
+  matchWebGLToCanvasSize: true,
+  devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
 };
 
-const handleStopNavigation = () => {
-  if (isLoaded) {
-    // Menghentikan panduan navigasi aktif di Unity
-    sendMessage("NavigationReceiver", "StopNavigation", "");
-  }
-};
-```
-
-Pada perangkat seluler, sistem secara dinamis mendeteksi jenis interaksi layar sentuh dan menampilkan prefab virtual joystick untuk pergerakan karakter, serta tombol melepaskan kamera Pointer Lock yang diintegrasikan agar responsif untuk pengalaman mobile.
-
-### 3.2.3 Implementasi Integrasi (WebGL Bridge React–Unity)
-
-Sebagai System Integrator, kontribusi inti penulis adalah menjembatani dua dunia yang berbeda: antarmuka web (React) dan engine 3D (Unity WebGL). Integrasi ini diwujudkan melalui dua mekanisme utama yang bekerja secara komplementer.
-
-1. Jembatan Komunikasi Satu Arah (React → Unity)
-   Komunikasi runtime bersifat satu arah dari React menuju Unity menggunakan pustaka `react-unity-webgl`. Saat pengguna memilih lokasi pada hasil pencarian, frontend memanggil `sendMessage("NavigationReceiver", "NavigateTo", unity_object_name)` untuk memicu sistem pathfinding di dalam scene. Sebaliknya, tidak ada callback dari Unity ke React (di luar lingkup); seluruh informasi tekstual gedung/fasilitas tetap disajikan di sisi React.
-
-2. Jembatan Data melalui `unity_object_name`
-   Field `unity_object_name` berfungsi sebagai kunci penghubung tunggal antara baris data di basis data (tabel `gedung`/`fasilitas`) dan GameObject pada scene Unity. Unity menarik data secara mandiri melalui permintaan `HTTP GET /api/unity/data` saat inisialisasi, lalu mencocokkan nama objek secara case-insensitive. Alur sinkronisasi data ini telah dipetakan pada [FIGREF:diagram_sequence_sinkronisasi], sehingga setiap perubahan data melalui Admin Panel langsung tercermin pada kemampuan navigasi denah virtual tanpa perlu membangun ulang aplikasi 3D.
-
-## 3.3 Konfigurasi dan Metadata Sistem
-
-### 3.3.1 Basis Data
-
-Infrastruktur basis data PostgreSQL dirancang relasional untuk menjamin integritas referensial. Tabel `gedung` bertindak sebagai entitas induk yang menaungi tabel `fasilitas`. Relasi kedua tabel dihubungkan oleh foreign key `id_gedung`.
-
-Untuk menjamin sinkronisasi data visual 3D Unity dengan record data di database web, field `unity_object_name` diimplementasikan secara konsisten pada tabel `gedung` dan `fasilitas`. Field ini bertindak sebagai jembatan penamaan unik (unique naming bridge) yang dicocokkan case-insensitive dengan hierarki GameObject di Unity scene.
-
-Sebagai integrator, penulis membuat penamaan objek Unity di dalam editor (seperti prefab dewi sartika) yang memiliki child pointer di dalamnya. Child pointer ini berupa child empty GameObject dengan nama yang disesuaikan secara presisi dengan kolom `unity_object_name` di database Supabase (seperti diilustrasikan pada [FIGREF:impl_pointer_hierarchy]). Mekanisme ini mempermudah pencarian node visual dan penargetan navigasi rute visual secara dinamis saat runtime.
-
-[FIGURE:impl_pointer_hierarchy]
-[FIGCAPTION:Hierarki Prefab Gedung dengan Child Pointer di Unity]
-
-Untuk meminimalkan kesalahan pengetikan manusia (_human error_) dan menjamin validitas pemetaan nama objek sebelum melakukan _build_, diimplementasikan sebuah skrip editor khusus di sisi Unity yaitu `DatabaseSyncChecker.cs` yang dapat diakses melalui menu `Tools > UPNVJ > Check Database Sync` (dijelaskan pada Lampiran 3 dan diilustrasikan pada [FIGREF:impl_sync_db_checker]).
-
-Skrip `DatabaseSyncChecker.cs` ini bertindak sebagai alat validasi otomatis yang melakukan tugas-tugas berikut:
-
-1. Mengambil seluruh record penamaan objek (`unityObjectNames`) secara asinkron dari endpoint API backend `/api/unity/names`.
-2. Melakukan penelusuran (_traverse_) hierarki scene aktif di Unity Editor secara rekursif untuk mengumpulkan seluruh nama GameObject yang aktif.
-3. Mencocokkan nama GameObject di scene dengan data dari database secara case-insensitive untuk mengklasifikasikannya ke dalam tiga kategori: objek yang sudah sinkron antara database dan scene (hijau), objek yang terdaftar di database tetapi tidak ditemukan di scene (_missing_ - merah), serta objek yang ada di scene tetapi belum didaftarkan di database (kuning, saat ini pengecekan kategori kuning terbatas pada root objects).
-4. Menampilkan laporan diagnostik interaktif dalam Editor Window khusus lengkap dengan statistik visual berkode warna dan tombol salin ke clipboard (_copy to clipboard_).
-
-[FIGURE:impl_sync_db_checker]
-[FIGCAPTION:Tampilan UI Database Sync Checker di Unity Editor]
-
-### 3.3.2 Proxy Analytics
-
-Pemantauan lalu lintas data dashboard menggunakan platform Umami Analytics yang di-deploy secara mandiri (_self-hosted_) menggunakan container Docker di port 3000.
-
-Untuk menghindari pemblokiran skrip pelacakan (tracking script) oleh ekstensi ad-blocker pada browser pengguna, server Express.js di port 3001 dikonfigurasi sebagai reverse proxy. Proxy menyamarkan request pelacakan dan mengarahkannya ke endpoint internal proxy `/api/collect`, yang kemudian meneruskannya ke Umami di port 3000 secara transparan. Integrasi proxy server Express.js ini diwujudkan melalui skrip berikut:
-
-```javascript
-const express = require("express");
-const { createProxyMiddleware } = require("http-proxy-middleware");
-const app = express();
-
-// Proxy route untuk mengamankan data collect analitik
-app.use(
-  "/api/collect",
-  createProxyMiddleware({
-    target: "http://localhost:3000/api/send",
-    changeOrigin: true,
-    pathRewrite: {
-      "^/api/collect": "",
-    },
-    onProxyReq: (proxyReq, req, res) => {
-      // Meneruskan IP client asli ke Umami backend
-      proxyReq.setHeader("X-Forwarded-For", req.ip);
-    },
-  }),
+const instance = await window.createUnityInstance(
+  canvas,
+  configWithProgress,
+  configWithProgress.onProgress,
 );
-
-app.listen(3001, () => {
-  console.log("Proxy server running on port 3001");
-});
+window.unityInstance = instance;
 ```
 
-### 3.3.3 Web Manifest dan Web Assets
+5. Preload dan Penanganan Kondisi
+   `scheduleUnityPreload(10000)` menjadwalkan pengunduhan loader, framework, WebAssembly, dan data secara berurutan dengan prioritas rendah setelah halaman stabil. Preload otomatis dilewati pada perangkat mobile, mode Save-Data, koneksi 2G atau slow-2G, dan GitHub Pages. Ketika pengguna memulai mode 3D, antarmuka memeriksa dukungan WebGL, menampilkan progres dan pesan kesalahan, serta memanggil `Quit()` saat instance dilepas. Penanganan ini merupakan kontribusi frontend; implementasi joystick, NavMesh, dan kontrol di dalam runtime tetap menjadi kontribusi Simulator dan Engine Developer.
 
-Visualisasi Unity WebGL dikompilasi menggunakan kompresi Brotli guna memperkecil ukuran aset transfer data di jaringan browser. Konfigurasi fallback dekompresi diatur di `vercel.json` untuk menjamin file wasm dan data terkompresi didekompresi dengan benar oleh browser client meskipun server web tidak mendukung header kompresi secara default. Pengaturan header disajikan pada potongan file konfigurasi berikut:
+### 3.2.3 Implementasi Integrasi Front-end, Back-end, dan Unity WebGL
+
+Sebagai System Integrator, penulis menghubungkan React, Supabase, Vercel Serverless Functions, dan artefak Unity WebGL melalui kontrak yang berbeda untuk autentikasi, data, serta perintah navigasi. Pemisahan ini mencegah frontend, API, dan runtime Unity menggunakan jalur data yang keliru.
+
+1. Autentikasi dan Pengelolaan Data
+   Halaman login React memanggil `signInWithPassword` melalui adapter Supabase Auth dan menerima sesi secara langsung. Setelah sesi tervalidasi, protected route membuka Admin Panel. Query, CRUD, konfigurasi denah 2D, dan pencatatan audit dari service aplikasi menggunakan Supabase SDK sesuai RLS. Kontribusi penulis berada pada adapter, state sesi, formulir, service data, penanganan respons, cache, dan umpan balik antarmuka.
+2. Penyediaan Data melalui REST API
+   Vercel Serverless Functions menyediakan kontrak JSON read-only. Endpoint `/api/unity/data` menyajikan data gedung dan fasilitas untuk runtime Unity, sedangkan `/api/unity/names` menyajikan daftar `unity_object_name` untuk `DatabaseSyncChecker` pada Unity Editor. React UI tidak bergantung pada `/api/buildings` atau `/api/rooms` untuk alur utamanya karena mengambil data langsung melalui Supabase SDK.
+3. Penarikan Data Mandiri oleh Unity
+   Saat Unity WebGL diinisialisasi, `BuildingDatabase` yang dikembangkan Simulator dan Engine Developer memanggil `GET /api/unity/data`, menyimpan data nama tampilan dan `unity_object_name` ke cache, lalu menyiapkannya bagi `NavigationReceiver`. React tidak mengirimkan payload data gedung atau fasilitas melalui `SendMessage`. Alur ini dipetakan pada [FIGREF:diagram_sequence_sinkronisasi].
+4. Pengiriman Perintah Navigasi dari React
+   `SearchOverlay` membentuk hasil yang memisahkan label tampilan, `buildingId`, dan `unityObjectName`. Pada mode 2D, `buildingId` digunakan frontend untuk menghitung rute A*. Pada mode 3D, React memanggil `window.unityInstance.SendMessage("NavigationReceiver", "NavigateTo", unityObjectName)`. Pembatalan rute menggunakan method `StopNavigation`.
+5. Validasi Callback Penyelesaian Navigasi
+   Commit Unity `1845c65` memisahkan `CompleteNavigation()` dari `StopNavigation()` sehingga pembatalan dan pergantian spawn tidak memancarkan completion. Setelah tiba normal, plugin WebGL mengirim `OnNavigationCompleted` dengan string JSON yang memuat `unity_object_name`. Listener React yang diperkenalkan pada commit `b572a48` mengurai payload dan menormalisasi key dengan `trim().toLowerCase()`, kemudian kode sumber aktif `08ebc06` membandingkannya dengan tujuan pada `activeNavigationRef`. Popup hanya ditampilkan untuk tujuan aktif yang cocok; payload kosong, JSON rusak, field kosong, target berbeda, state tanpa tujuan, dan event setelah pembatalan diabaikan. Commit `d2e8fdb` menambahkan pengujian completion segera dan reset tanpa perintah pembatalan.
+6. Deployment dan Batas Ownership
+   Penulis mengelola deployment React SPA, Vercel Serverless Functions, environment variables, header/cache aset, serta penyebaran artefak Unity WebGL yang diberikan oleh Engine Developer. Database Schema Designer tetap memiliki ERD, skema database, RLS, dan rancangan trigger basis data, sedangkan 3D Asset Designer memiliki aset 3D dan hierarchy `Pointer`. Simulator dan Engine Developer memiliki `BuildingDatabase`, `NavigationReceiver`, `DatabaseSyncChecker`, navigasi, optimasi, dan proses build Unity WebGL. Snapshot web yang diperiksa mencatat audit melalui service aplikasi dan tidak memberikan bukti bahwa trigger basis data sedang aktif.
+
+### 3.2.4 Implementasi Deployment, Operasional Layanan, dan Kesiapan Integrasi Institusional
+
+Pada tahap implementasi saat ini, Vercel digunakan untuk meng-host React SPA, Vercel Serverless Functions, dan artefak Unity WebGL v0.8.6.1. Supabase menyediakan data dan autentikasi. Jalur analitik antarmuka aktif juga menggunakan Supabase, sedangkan Express dan Umami tersedia sebagai jalur operasional opsional.
+
+1. Deployment dan Konfigurasi Layanan
+   Penulis mengelola environment variables, konfigurasi domain, fallback SPA, header keamanan, cache, serta content type artefak Unity WebGL. Artefak v0.8.6.1 yang telah dibangun oleh Engine Developer ditempatkan pada folder versi di layanan web; tahap kompilasi Unity dan optimasi engine tidak termasuk dalam kontribusi penulis.
+2. Operasional dan Pemantauan
+   Operasional layanan mencakup endpoint `/api/health`, pemeriksaan status respons aset WebGL, pengaturan cache, serta rate limiter pada helper Express. Docker Compose Umami dan endpoint proxy Express dipertahankan untuk jalur analitik alternatif, tetapi bukan dependensi jalur UI analitik yang aktif.
+3. Kesiapan Integrasi Institusional
+   Penggunaan Vercel pada tahap ini merupakan pilihan hosting implementasi proyek, bukan ketetapan arsitektur permanen. Apabila sistem kelak diintegrasikan dengan infrastruktur kampus, penyesuaian dapat dilakukan pada domain, environment variables, pengelolaan secret, konektivitas API, serta mekanisme identitas yang disetujui institusi. Kontrak REST API, struktur respons JSON, dan bridge React–Unity dipertahankan agar perubahan platform hosting tidak mengubah perilaku antarkomponen. Integrasi institusional tersebut belum diimplementasikan dan menjadi rencana pengembangan lanjutan.
+
+## 3.3 Konfigurasi dan Kontrak Operasional Sistem
+
+### 3.3.1 Environment Variables dan Kontrak Identifier
+
+Konfigurasi dipisahkan antara nilai yang boleh digunakan browser dan rahasia khusus server. Pemetaan pada [TABREF:konfigurasi_environment] mencegah service role key atau kredensial Umami masuk ke bundle frontend.
+
+[TABLE-ID:konfigurasi_environment]
+[TABLECAPTION:Pemisahan Environment Variables Berdasarkan Lingkungan]
+
+[TABLE]
+Lingkungan | Variabel Utama | Penggunaan
+Browser React dan Vercel API read-only | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Membuat Supabase client dengan hak yang dibatasi RLS
+Helper Express | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `PORT`, `FRONTEND_URL` | Koneksi server, pemilihan port, dan whitelist origin; service role tidak boleh dibundle ke browser
+Umami opsional | `UMAMI_API_URL`, `UMAMI_WEBSITE_ID`, `UMAMI_API_USER`, `UMAMI_API_PASSWORD`, `UMAMI_APP_SECRET` | Autentikasi helper Express ke layanan Umami self-hosted
+Vite dan hosting | `BASE_URL` serta path versi build | Resolusi aset statis, denah, dan loader Unity WebGL
+[/TABLE]
+
+Kontrak lintas repository yang paling sensitif adalah `unity_object_name`. Nilai ini disimpan pada data gedung atau fasilitas, dikirim melalui `/api/unity/data`, dan digunakan Search Overlay sebagai payload `NavigateTo`. Fasilitas yang tidak memiliki identifier sendiri dapat menggunakan target gedung induknya pada pencarian. Perubahan identifier harus dikoordinasikan dengan GameObject pada project Unity dan diverifikasi sebelum artefak WebGL baru dipublikasikan.
+
+Versi folder build juga diperlakukan sebagai kontrak deployment. Pada source deployment yang ditinjau 21 Juli 2026, build aktif adalah v0.8.6.1 sehingga path pada loader React, preloader, dan `vercel.json` harus menunjuk ke folder versi yang sama.
+
+### 3.3.2 Analitik dan Helper Express
+
+Implementasi analitik berada dalam masa transisi dan didokumentasikan berdasarkan jalur yang benar-benar aktif. `trackingService` mencatat page view ke `web_analytics_log`, sedangkan service agregasi pada React membaca tabel yang sama untuk membentuk statistik. Dengan demikian, Public Dashboard dan Admin Panel dapat menampilkan analitik tanpa menjalankan Express atau Umami.
+
+Express pada port 3001 tetap tersedia sebagai server opsional. Server ini menerapkan whitelist CORS dan rate limiter in-memory sebanyak 100 permintaan per alamat client per menit, serta menyediakan endpoint `/api/analytics/*` yang berkomunikasi dengan Umami API. Docker Compose menyalakan Umami dan database internalnya. Jalur tersebut dipertahankan sebagai alternatif self-hosted dan tidak disebut sebagai jalur wajib frontend saat ini.
+
+Pemisahan ini juga membatasi klaim DevOps: penulis mengelola konfigurasi dan kesiapan operasional Express/Umami, tetapi hasil analitik pada UI snapshot aktif berasal dari Supabase. Penyatuan menjadi satu strategi analitik menjadi pekerjaan lanjutan agar dua jalur tidak terus mengalami drift.
+
+### 3.3.3 Konfigurasi Hosting Vercel dan Aset WebGL
+
+Artefak Unity WebGL v0.8.6.1 dibangun oleh Simulator dan Engine Developer lalu diserahkan kepada penulis untuk ditempatkan pada `public/unity-builds/v0.8.6.1/`. Vercel digunakan karena mendukung Vercel Serverless Functions, fallback routing SPA, serta header content type, Content-Encoding, dan cache yang diperlukan aset Unity. Potongan konfigurasi berikut menunjukkan pola header untuk build aktif:
 
 ```json
 {
   "headers": [
     {
-      "source": "/unity-builds/(.*)\\.br",
+      "source": "/unity-builds/v0.8.6.1/Build/(.*)\\.wasm\\.unityweb",
       "headers": [
+        { "key": "Content-Type", "value": "application/wasm" },
         { "key": "Content-Encoding", "value": "br" },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
     },
     {
-      "source": "/unity-builds/(.*)\\.wasm\\.br",
-      "headers": [{ "key": "Content-Type", "value": "application/wasm" }]
-    },
-    {
-      "source": "/unity-builds/(.*)\\.js\\.br",
-      "headers": [{ "key": "Content-Type", "value": "application/javascript" }]
+      "source": "/unity-builds/v0.8.6.1/Build/(.*)\\.data\\.unityweb",
+      "headers": [
+        { "key": "Content-Type", "value": "application/octet-stream" },
+        { "key": "Content-Encoding", "value": "br" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
     }
   ]
 }
 ```
 
+GitHub Pages tetap dapat menyajikan build React, tetapi pilihan tur 3D dinonaktifkan pada domain `github.io` karena jalur tersebut tidak digunakan untuk konfigurasi header build WebGL. Denah 2D tetap tersedia sebagai fallback. Jika sistem dipindahkan ke infrastruktur kampus, server tujuan harus menyediakan padanan fallback SPA, endpoint API, HTTPS, header aset, cache, environment variables, dan pengelolaan secret sebelum domain dialihkan.
+
 ## 3.4 Laporan Implementasi Proyek
 
-Subbab ini menyajikan **bukti dan hasil keluaran** dari implementasi yang metodenya telah diuraikan pada Subbab 3.2, mencakup logbook aktivitas serta hasil nyata pada sisi backend dan frontend.
+Subbab ini menyajikan **bukti dan hasil keluaran** dari implementasi yang metodenya telah diuraikan pada Subbab 3.2, mencakup logbook aktivitas serta hasil nyata pada sisi frontend, backend, integrasi sistem, dan DevOps.
 
 ### 3.4.1 Logbook Implementasi Proyek
 
-Logbook aktivitas implementasi proyek dari awal perencanaan hingga tahap evaluasi akhir dirinci pada [TABREF:logbook_implementasi].
+Ringkasan aktivitas pada [TABREF:logbook_implementasi] disusun berdasarkan artefak yang dapat ditelusuri pada repository aplikasi, konfigurasi deployment, dan hasil pengujian. Kolom terakhir tidak menggunakan klaim persetujuan pemangku kepentingan yang tidak dilengkapi bukti formal.
 
 [TABLE-ID:logbook_implementasi]
 [TABLECAPTION:Logbook Implementasi Proyek]
 
 [TABLE]
-Minggu ke- | Aktivitas Pengembangan | Kontribusi Peran Full Stack | Validasi User
-1-4 | Requirement Gathering dan UI Design | Menganalisis kebutuhan API, menyusun rancangan database ERD, merancang mockup Admin/Public Dashboard | Disetujui Stakeholder (Asep Saeful Ridwan, S.Kom.)
-5-8 | Backend Development | Membangun database PostgreSQL di Supabase, menerapkan aturan keamanan RLS, membuat RESTful API serverless | Lulus validasi uji koneksi DB
-9-12 | Frontend Development | Memprogram komponen React SPA, mengintegrasikan Umami Analytics Proxy, menerapkan connection-aware | Antarmuka responsif di desktop
-13-16 | System Integration | Mengintegrasikan container Unity WebGL dengan React menggunakan react-unity-webgl, menguji bridge SendMessage | Navigasi terpemicu dari pencarian React
-17-20 | Testing dan Evaluation | Melakukan pengujian performa Lighthouse, melakukan uji fungsionalitas Black Box, menyusun laporan Tugas Akhir | [TBD: Evaluasi UAT Selesai]
+Rentang Kegiatan | Aktivitas | Kontribusi Penulis | Bukti atau Artefak
+Tahap kebutuhan dan desain | Analisis pengguna, arsitektur, IA, UML, dan antarmuka | Merumuskan kebutuhan aplikasi, API, bridge, deployment, serta mockup Public Dashboard dan Admin Panel | Draf kebutuhan, diagram arsitektur, diagram alur, dan rancangan UI
+Tahap backend dan data aplikasi | Implementasi Vercel Functions, Auth adapter, service data, dan CRUD | Membuat endpoint read-only, mengintegrasikan Supabase Auth/SDK, serta menangani respons dan cache aplikasi | Folder `api/`, adapter Auth, service Supabase, dan kontrak endpoint
+Tahap frontend | Implementasi React SPA, denah 2D, pemuat Unity, pencarian, dan Admin Panel | Membuat route, provider, komponen UI, A* frontend, loader native Unity, dan editor konfigurasi map | Komponen React, utility preload, service map, dan empat bukti UI terpilih
+Tahap integrasi dan DevOps | Sinkronisasi kontrak data dan publikasi build | Menghubungkan `buildingId`/`unity_object_name`, memasang artefak v0.8.6.1, serta mengatur environment, header, cache, dan health handler | `vercel.json`, folder build versi, handler API, dan hasil Network browser
+Tahap evaluasi | Pengujian web, Black Box, Lighthouse, dan UAT | Menjalankan atau mengompilasi bukti pengujian sesuai batas kontribusi serta mencatat keterbatasan hasil | Handoff verifikasi web, dokumen Black Box, laporan Lighthouse, dan berkas UAT
 [/TABLE]
 
 ### 3.4.2 Hasil dan Bukti Implementasi Back-end
 
-Backend API berhasil diimplementasikan dan dideploy di Vercel. Hasil keluaran data JSON terstruktur untuk endpoint `GET /api/unity/data` yang dikonsumsi oleh Unity `BuildingDatabase.cs` adalah sebagai berikut:
+Backend API diimplementasikan pada Vercel Serverless Functions. Struktur respons `/api/unity/data` yang dibentuk handler dan dikonsumsi `BuildingDatabase` adalah sebagai berikut. Nilai record disamarkan karena bagian ini menjelaskan kontrak, bukan menyalin data produksi.
 
 ```json
 {
   "gedung": [
     {
-      "id": 1,
-      "nama_gedung": "Gedung FIK Kampus Pondok Labu",
-      "deskripsi_gedung": "Gedung Fakultas Ilmu Komputer UPNVJ",
-      "lokasi": "Area Timur Kampus",
-      "jumlah_lantai": 4,
-      "foto_url": "https://supabase-storage/fik.jpg",
-      "unity_object_name": "gedung_fik"
+      "id": "<number>",
+      "nama_gedung": "<string>",
+      "deskripsi_gedung": "<string>",
+      "lokasi": "<string>",
+      "jumlah_lantai": "<number>",
+      "unity_object_name": "<canonical_name>"
     }
   ],
   "fasilitas": [
     {
-      "id": 10,
-      "nama_fasilitas": "Laboratorium Rekayasa Perangkat Lunak",
-      "deskripsi_fasilitas": "Laboratorium RPL Lantai 2 Gedung FIK",
-      "tipe_fasilitas": "Laboratorium",
-      "color": "blue",
-      "lantai": 2,
-      "id_gedung": 1,
-      "foto_url": "https://supabase-storage/lab_rpl.jpg",
-      "unity_object_name": "lab_rpl_fik"
+      "id": "<number>",
+      "nama_fasilitas": "<string>",
+      "deskripsi_fasilitas": "<string>",
+      "tipe_fasilitas": "<string>",
+      "lantai": "<number>",
+      "id_gedung": "<number>",
+      "foto_url": "<url_or_empty>",
+      "unity_object_name": "<canonical_name_or_empty>"
     }
   ]
 }
 ```
 
+Respons aktual deployment pada [FIGREF:api_test_unity_data] menunjukkan bahwa request `GET /api/unity/data` memperoleh status `200 OK` dan mengembalikan objek JSON dengan array `gedung`. Record yang terlihat memuat `id`, `nama_gedung`, `deskripsi_gedung`, `lokasi`, `jumlah_lantai`, dan `unity_object_name`, sehingga bentuk respons aktual konsisten dengan kontrak yang digunakan runtime Unity. Waktu 2,86 detik dan ukuran 12,24 kB merupakan hasil satu request manual, bukan tolok ukur performa untuk seluruh kondisi jaringan.
+
+[FIGURE:api_test_unity_data]
+[FIGCAPTION:Respons Data Runtime Unity dari Vercel Serverless Function]
+
 ### 3.4.3 Hasil dan Bukti Implementasi Front-end
 
-Frontend React SPA berhasil dideploy secara statis. Antarmuka pengguna menyajikan:
+Frontend React SPA berhasil dibangun pada snapshot 21 Juli 2026. Empat bukti antarmuka inti pada Subbab 2.3.6 diambil ulang langsung dari deployment setelah revisi agar tidak mencampurkan UI lama dengan implementasi aktif. Bukti tetap dipilih secara selektif agar pembahasan tidak berubah menjadi galeri seluruh halaman.
 
-1. Public Dashboard: Menyajikan widget grafik statistik lalu lintas website (tren harian pengunjung dan page views dari Umami), bilah pencarian gabungan (Search Overlay), serta viewport canvas WebGL yang memuat peta 3D UPNVJ secara halus.
-2. Admin Dashboard: Menyediakan halaman login aman, halaman pengelolaan data CRUD untuk semua entitas dengan modal form interaktif, serta widget traffic analitik dari Umami proxy.
+1. Public Dashboard menyediakan informasi kampus, tutorial/FAQ, pemilih denah 2D atau 3D, serta pencarian bersama. Mode 2D menghitung rute A* di frontend, sedangkan mode 3D mengirim `unity_object_name` kepada Unity.
+2. Loader React menampilkan progres dan fallback, membatasi device pixel ratio, meneruskan tipe perangkat melalui `SetDevice`, serta menghentikan instance ketika komponen dilepas.
+3. Admin Panel menyediakan protected route untuk CRUD gedung, fasilitas, program studi, dan konfigurasi denah 2D, serta tab analitik dan audit.
+4. Implementasi tidak menggunakan `react-unity-webgl`; integrasi dilakukan melalui loader native dan `window.unityInstance` sesuai build aktif v0.8.6.1.
+5. Tangkapan layar Admin Panel mencatat 331 fasilitas pada Supabase live, sedangkan cleanup seed menghasilkan 311 record. Perbedaan tersebut dipertahankan sebagai batas verifikasi bahwa seed final belum dibuktikan telah diterapkan ulang ke database live. Oleh karena itu, tangkapan layar pencarian tidak digunakan untuk mengklaim alias revisi R01 telah aktif pada deployment.
+
+### 3.4.4 Hasil dan Bukti Deployment dan Operasional Layanan
+
+Layanan web menggunakan Vercel untuk React SPA, artefak Unity WebGL, dan Vercel Serverless Functions. Konfigurasi pada Subbab 3.3.3 menunjukkan pemetaan content type, Brotli, cache immutable, header keamanan, dan fallback SPA. Handler `/api/health` tersedia untuk pemeriksaan layanan, sedangkan Express/Umami tetap merupakan jalur opsional.
+
+Pemeriksaan operasional pada [FIGREF:api_test_health] menunjukkan bahwa `GET /api/health` memperoleh status `200 OK` dan mengembalikan `success: true`, status `OK`, pesan `Server is running`, serta timestamp respons. Bukti tersebut merupakan health check manual terhadap environment yang dipilih pada API client dan tidak diperlakukan sebagai pemantauan ketersediaan berkelanjutan.
+
+[FIGURE:api_test_health]
+[FIGCAPTION:Respons Health Check pada Deployment]
+
+Pemeriksaan Network browser terhadap tiga aset utama build v0.8.0 menunjukkan seluruh request memperoleh status 200. Hasil satu kali observasi tersebut ditranskripsikan pada [TABREF:webgl_network_loading] dan tidak diperlakukan sebagai benchmark untuk seluruh perangkat atau jaringan. Observasi ini mendahului pembaruan artefak aktif ke v0.8.6.1 sehingga ukuran dan waktu pada tabel tidak diekstrapolasi ke build terbaru.
+
+[TABLE-ID:webgl_network_loading]
+[TABLECAPTION:Observasi Pemuatan Aset Utama Unity WebGL v0.8.0]
+
+[TABLE]
+Aset | Status | Ukuran Transfer yang Ditampilkan | Waktu yang Ditampilkan
+`v0.8.0.framework.js.unityweb` | 200 | 72,5 kB | 351 ms
+`v0.8.0.wasm.unityweb` | 200 | 6.528 kB | 1,95 detik
+`v0.8.0.data.unityweb` | 200 | 76.864 kB | 15,92 detik
+[/TABLE]
+
+Data tersebut menunjukkan bahwa file data merupakan komponen transfer terbesar pada observasi yang diberikan. Karena hasil hanya berasal dari satu kondisi browser, evaluasi performa tetap harus memisahkan ukuran transfer, waktu download, dekompresi, inisialisasi Unity, dan kondisi cache. Apabila sistem dipindahkan ke infrastruktur UPNVJ, perubahan dipusatkan pada domain, secret, konektivitas layanan, header aset, dan kebijakan identitas tanpa mengubah kontrak REST API atau payload bridge.
 
 ## 3.5 Hasil Pengujian Proyek
 
-### 3.5.1 Black Box Testing
+### 3.5.1 Pengujian Web dan API
+
+Snapshot teknis 21 Juli 2026 mencatat bahwa lint, unit/component test, dan production build aplikasi web berhasil dijalankan. Hasil yang tersedia dirangkum pada [TABREF:hasil_pengujian_web].
+
+[TABLE-ID:hasil_pengujian_web]
+[TABLECAPTION:Hasil Verifikasi Repository Aplikasi Web]
+
+[TABLE]
+Pemeriksaan | Hasil Terverifikasi | Batas Interpretasi
+ESLint | Lulus | Menunjukkan rule lint tidak menghasilkan error pada snapshot
+Vitest dan React Testing Library | 13 file pengujian dan 129 pengujian lulus | Mencakup utility, adapter Auth, modal, translasi, perlindungan data, komponen, serta 11 pengujian validasi `OnNavigationCompleted`; bukan pengujian internal Unity runtime
+Production build | `tsc -b` dan Vite build lulus | Menunjukkan type checking dan bundling berhasil; warning freshness data browser bukan error proyek
+Playwright | Belum tersedia sebagai suite hasil | Alur browser masih dibuktikan melalui Black Box dan UAT; tidak ada angka E2E yang diklaim
+[/TABLE]
+
+Selain test repository, empat pemeriksaan manual dijalankan melalui API client terhadap environment deployment dan Supabase. Hasilnya dirangkum pada [TABREF:hasil_pengujian_api_deployment]. Status lulus ditentukan berdasarkan kesesuaian hasil aktual dengan hasil yang diharapkan; karena itu, respons `401 Unauthorized` pada skenario mutasi tanpa autentikasi merupakan keberhasilan kontrol akses, bukan kegagalan endpoint.
+
+[TABLE-ID:hasil_pengujian_api_deployment]
+[TABLECAPTION:Hasil Pengujian Manual API dan Integrasi Supabase]
+
+[TABLE]
+Skenario | Hasil yang Diharapkan | Hasil Aktual | Status
+`GET /api/health` | HTTP 200 dan status layanan dapat dibaca | HTTP 200; `success: true`, status `OK`, pesan layanan, dan timestamp tersedia | Lulus
+`GET /api/unity/data` | HTTP 200 dengan objek `gedung` dan `fasilitas` sesuai kontrak runtime | HTTP 200; respons JSON memuat data gedung beserta `unity_object_name` dan struktur kontrak runtime | Lulus
+`GET /api/unity/names` | HTTP 200 dengan array `unityObjectNames` untuk tooling editor | HTTP 200; array identifier Unity diterima | Lulus
+`POST /rest/v1/fasilitas` tanpa autentikasi | Mutasi ditolak oleh kebijakan akses data | HTTP 401; kode PostgreSQL `42501` menyatakan row melanggar row-level security policy | Lulus
+[/TABLE]
+
+Respons daftar identifier pada [FIGREF:api_test_unity_names] menunjukkan bahwa `GET /api/unity/names` memperoleh status `200 OK` dan mengembalikan array `unityObjectNames`. Endpoint tersebut menjadi kontrak bagi tooling Unity Editor untuk memeriksa identifier, sedangkan runtime tetap menggunakan `/api/unity/data`.
+
+[FIGURE:api_test_unity_names]
+[FIGCAPTION:Respons Daftar Identifier untuk Tooling Unity Editor]
+
+Skenario negatif pada [FIGREF:api_test_rls_unauthorized] mengirim data uji ke REST API Supabase tanpa kredensial yang memenuhi policy. Respons `401 Unauthorized` dengan kode `42501` membuktikan bahwa mutasi tersebut ditolak oleh RLS. Penulis menggunakan hasil ini untuk memverifikasi bahwa integrasi web tunduk pada kontrol akses yang tersedia; rancangan policy RLS tetap merupakan kontribusi Database Schema Designer.
+
+[FIGURE:api_test_rls_unauthorized]
+[FIGCAPTION:Penolakan Mutasi Tanpa Otorisasi oleh Supabase RLS]
+
+Keempat pemeriksaan tersebut merupakan smoke test manual dan belum menggantikan suite deployment otomatis. Belum tersedia Playwright yang menguji autentikasi, CRUD terotorisasi, header production, dan integrasi Unity secara end-to-end. Keterbatasan tersebut dipisahkan dari hasil 129 pengujian agar cakupan pengujian tidak dilebihkan.
+
+### 3.5.2 Black Box Testing
 
 <!-- PIPELINE:INCLUDE content/shared/testing/blackbox.md -->
 
-### 3.5.2 Lighthouse Testing
+Pengujian ulang BB-20 didokumentasikan dalam dua frame berurutan karena perilaku yang diperiksa berlangsung selama transisi navigasi. Kondisi saat player telah berada dekat tujuan tetapi belum mencapai batas penyelesaian pada [FIGREF:blackbox_bb20_rute_aktif] memperlihatkan garis rute masih aktif, jarak tersisa 16 meter, dan label menggunakan nama yang mudah dibaca, yaitu `Gedung Dewi Sartika`, bukan identifier internal `unity_object_name`.
 
-Pengujian performa non-fungsional, aksesibilitas, best practices, dan SEO pada public dashboard diuji menggunakan Google Lighthouse. Pengujian Lighthouse awal (baseline) dijalankan pada build produksi lokal menggunakan preview server Vite sebelum dilakukan optimasi performa lebih lanjut pada codebase. Hal ini ditujukan untuk mengukur metrik awal (baseline metrics) guna menentukan area yang membutuhkan peningkatan performa. Hasil evaluasi Lighthouse awal dirangkum pada [TABREF:performa_lighthouse].
+[FIGURE:blackbox_bb20_rute_aktif]
+[FIGCAPTION:Retest BB-20 Saat Navigasi Masih Aktif]
+
+Kondisi setelah player mencapai tujuan pada [FIGREF:blackbox_bb20_navigasi_selesai] memperlihatkan garis rute telah dibersihkan dan notifikasi kedatangan tampil dengan nama tujuan yang sama. Kedua frame tersebut menjadi bukti visual pengujian ulang BB-20 setelah tindakan korektif sehingga status akhirnya dinyatakan lulus.
+
+[FIGURE:blackbox_bb20_navigasi_selesai]
+[FIGCAPTION:Retest BB-20 Setelah Navigasi Selesai]
+
+### 3.5.3 Lighthouse Testing
+
+Audit Lighthouse terbaru dijalankan pada 21 Juli 2026 sekitar pukul 08.15 WIB terhadap production build melalui preview server Vite pada `http://127.0.0.1:4173/`. State aplikasi tersimpan pada commit `bdeb5bc`, sedangkan perintah `npm run lighthouse` menjalankan build, menyalakan preview server, dan menghasilkan report mobile serta desktop. Audit menggunakan Lighthouse 12.8.2, HeadlessChrome 150, simulated throttling, dan pembersihan storage terpilih. Skor kategori dari artefak JSON dirangkum pada [TABREF:performa_lighthouse].
 
 [TABLE-ID:performa_lighthouse]
-[TABLECAPTION:Perbandingan Metrik Performa Lighthouse]
+[TABLECAPTION:Hasil Audit Lighthouse Mobile dan Desktop]
 
 [TABLE]
-Kategori Audit | Skor Metrik Awal (Baseline) | Keterangan
-Performance | 56/100 | Rendahnya skor disebabkan oleh ukuran asset WebGL (WASMBinary + Data) yang berkisar ~25MB, yang memblokir main thread browser saat proses dekompresi dan inisialisasi awal engine.
-Accessibility | 93/100 | Menunjukkan kepatuhan aksesibilitas yang sangat baik dengan penggunaan elemen HTML semantik dan atribut ARIA yang lengkap.
-Best Practices | 100/100 | Menunjukkan kepatuhan sempurna terhadap standar keamanan web modern, HTTPS, dan tidak adanya API usang.
-SEO | 92/100 | Menunjukkan optimasi mesin pencari yang solid dengan metadata terstruktur dan struktur heading yang tepat.
+Mode | Performance | Accessibility | Best Practices | SEO
+Mobile | 86/100 | 100/100 | 100/100 | 100/100
+Desktop | 99/100 | 100/100 | 100/100 | 100/100
 [/TABLE]
 
-Berdasarkan hasil pengujian awal di atas, skor performa (56/100) menjadi dasar dilakukannya implementasi connection-aware preloading untuk mengoptimalkan transfer aset. Pengujian performa tahap kedua akan dijalankan setelah proses optimasi codebase dan kompresi WebGL project diselesaikan secara menyeluruh.
+Metrik utama yang membentuk skor tersebut disajikan pada [TABREF:metrik_lighthouse]. Nilai dibulatkan untuk keterbacaan, sedangkan data mentah tetap tersedia pada `reports/lighthouse/latest-mobile.json` dan `reports/lighthouse/latest-desktop.json`.
 
-### 3.5.3 User Acceptance Test (UAT)
+[TABLE-ID:metrik_lighthouse]
+[TABLECAPTION:Metrik Utama Lighthouse Mobile dan Desktop]
+
+[TABLE]
+Metrik | Mobile | Desktop | Interpretasi
+First Contentful Paint | 2.444 ms | 541 ms | FCP mobile masih menjadi area optimasi
+Largest Contentful Paint | 3.681 ms | 775 ms | LCP mobile merupakan hambatan utama; desktop sangat baik
+Speed Index | 2.444 ms | 589 ms | Kecepatan tampilan desktop sangat baik dan mobile masih dapat ditingkatkan
+Total Blocking Time | 89 ms | 6 ms | Keduanya berada di bawah 200 ms
+Cumulative Layout Shift | 0 | 0 | Tidak terdeteksi pergeseran tata letak pada audit
+Time to Interactive | 3.913 ms | 781 ms | Interaktivitas mobile masih dapat dipercepat
+Total Byte Weight | 419.577 byte | 566.763 byte | Desktop lebih besar karena memakai aset hero desktop
+[/TABLE]
+
+Elemen LCP pada kedua mode adalah gambar hero pertama dengan alt `UPNVJ Campus 1`. Pada mobile, `hero1-mobile.webp` berukuran transfer sekitar 32,2 KiB dan telah dimuat secara eager, dapat ditemukan dari dokumen awal, serta memakai `fetchpriority="high"`. Breakdown LCP menunjukkan render delay sekitar 3.228 ms atau 88 persen, sehingga menambah prioritas unduhan bukan fokus utama berikutnya. Peluang terukur yang masih tersedia meliputi sekitar 75 KiB JavaScript tidak terpakai, optimasi kompresi atau responsivitas gambar hero, dan stylesheet render-blocking sekitar 16 KiB.
+
+Hasil ini merupakan lab data lokal, bukan Chrome UX Report atau real-user monitoring. Seluruh 19 audit otomatis Accessibility yang berlaku lulus, tetapi 10 pemeriksaan manual masih diperlukan. Sembilan audit otomatis SEO lulus dengan satu pemeriksaan manual tersisa, sedangkan kategori PWA tidak diuji. Audit halaman awal ini juga tidak menggantikan observasi pemuatan artefak Unity WebGL setelah pengguna mengaktifkan mode 3D.
+
+### 3.5.4 User Acceptance Test (UAT)
 
 <!-- PIPELINE:INCLUDE content/shared/testing/uat.md -->
 
-### 3.5.4 Implementasi Hasil User Acceptance Test (UAT)
+### 3.5.5 Tindak Lanjut Hasil User Acceptance Test (UAT)
 
 <!-- PIPELINE:INCLUDE content/shared/testing/uat-revisions.md -->
+
+### 3.5.6 Dokumentasi Implementasi Revisi UAT
+
+Dokumentasi pada subbab ini menjelaskan realisasi tindak lanjut UAT berdasarkan batas kontribusi penulis sebagai Full Stack Web Developer, System Integrator, dan DevOps Engineer. Pemeriksaan dilakukan melalui audit kode sumber, hasil pengujian otomatis, sumber resmi, serta tangkapan layar deployment tanggal 21 Juli 2026. Tangkapan layar tersebut merupakan verifikasi visual pascaimplementasi dan tidak diperlakukan sebagai kuesioner UAT kedua.
+
+1. Perbaikan Data dan Pencarian
+   Tindak lanjut UAT-R01 dilakukan dalam dua tahap utama. Commit `c42ad0f` menstandarkan 119 nama fasilitas dan memperbaiki deskripsi pada 189 record dengan menambahkan istilah umum, kepanjangan unit, serta alias seperti Korprodi/Koorprodi, Kaprodi, Kajur, Wadek, Warek, Kalab, dan TU. Commit `71ebf30` kemudian mengeluarkan 27 record tanpa `unity_object_name` yang valid dari 339 record awal. Audit lanjutan menyelesaikan satu duplikasi sehingga seed akhir memuat 311 fasilitas dengan identifier unik dan tidak kosong.
+
+   Integrasi pencarian React membentuk `searchText` dari nama fasilitas, deskripsi fasilitas, nama gedung, deskripsi gedung, dan lokasi. Dengan demikian, istilah familiar yang disisipkan pada deskripsi dapat ditemukan melalui search bar tanpa mengganti label resmi atau payload `unity_object_name`. Tindak lanjut UAT-R09 memakai audit struktural yang sama untuk memeriksa kelengkapan nama, deskripsi, relasi gedung, dan identifier. Hasil tersebut dibatasi pada berkas seed; laporan tidak mengklaim bahwa proses reseed PostgreSQL atau sinkronisasi seluruh GameObject terhadap Supabase live telah diverifikasi.
+
+2. Onboarding dan Pilihan Pengalaman Navigasi
+   Tindak lanjut UAT-R02 diwujudkan melalui bagian Tutorial dan FAQ yang membedakan panduan Denah 2D dan Denah 3D serta perangkat desktop dan mobile. Deteksi perangkat dapat diganti secara manual oleh pengguna. Tutorial 2D menjelaskan lokasi awal, pencarian tujuan, garis rute, dan perubahan perjalanan, sedangkan tutorial 3D menjelaskan pemuatan WebGL, kontrol gerak, kamera, dan pencarian. Setelah pemilihan spawn, runtime Unity juga memberikan tutorial interaktif yang memeriksa pergerakan, rotasi kamera, sprint, lompatan, dan penggunaan pencarian. Tampilan pada [FIGREF:uat_revisi_tutorial_faq] memperlihatkan panduan langkah dan FAQ dalam satu bagian agar bantuan tersedia sebelum pengguna membuka denah.
+
+[FIGURE:uat_revisi_tutorial_faq]
+[FIGCAPTION:Tutorial dan FAQ Denah Kampus Setelah Revisi]
+
+   Tindak lanjut UAT-R03 dan UAT-R05 tidak diwujudkan melalui profil persona tersimpan. Sistem menyediakan adaptasi kontekstual berupa bahasa, perangkat, pilihan mode, tutorial, pencarian tujuan, dan lokasi awal. Pemilih pada [FIGREF:uat_revisi_mode_selector] memberi pengguna opsi Denah 2D untuk navigasi sederhana atau Denah 3D untuk eksplorasi Unity WebGL. Pendekatan ini memungkinkan pengguna yang tidak terbiasa dengan kontrol permainan memilih alur 2D tanpa mewajibkan pemuatan runtime 3D.
+
+[FIGURE:uat_revisi_mode_selector]
+[FIGCAPTION:Pemilihan Mode Denah 2D atau 3D]
+
+   Pada mode 2D, pengguna memilih gedung awal, mencari gedung atau fasilitas, lalu frontend menghitung jalur A* melalui node, edge yang dapat diakses, dan entrance gedung. Fasilitas dipetakan ke entrance gedung induknya sehingga keterbatasan navigasi tingkat gedung dijelaskan secara eksplisit pada FAQ. Verifikasi visual pada [FIGREF:uat_revisi_map_2d] menunjukkan label lokasi, marker titik awal, search bar, dan kontrol perubahan titik awal tersedia dalam satu tampilan.
+
+[FIGURE:uat_revisi_map_2d]
+[FIGCAPTION:Denah 2D dengan Titik Awal dan Label Lokasi]
+
+   Tindak lanjut UAT-R07 menyediakan pemilihan awal pada kedua mode. Mode 2D menerima gedung awal melalui dialog React, sedangkan mode 3D menyediakan 16 titik spawn. Engine Developer menerapkan pemindahan player hanya apabila `NavMesh.SamplePosition` berhasil, menghentikan navigasi aktif sebelum teleport, dan tidak mengubah posisi ketika Transform, player, atau NavMesh tidak valid. Overview pada [FIGREF:uat_revisi_spawn_3d] memperlihatkan landmark yang dapat dipilih sebelum pengalaman 3D dimulai.
+
+[FIGURE:uat_revisi_spawn_3d]
+[FIGCAPTION:Pemilihan Titik Awal pada Denah 3D]
+
+3. Bantuan dan Integrasi Runtime
+   Tindak lanjut UAT-R04 menggunakan solusi ekuivalen berupa label tujuan dinamis yang menampilkan nama tampilan dan jarak selama navigasi, dilengkapi object tulisan pada sejumlah gedung dan area di scene. Narasi ini tidak menyatakan seluruh 311 fasilitas mempunyai label statis. UAT-R06 menambahkan minimap north-up yang mengikuti posisi dan rotasi player serta menampilkan tujuan aktif. Bukti pada [FIGREF:uat_revisi_minimap_3d] memperlihatkan minimap, search bar, tombol pergantian mode, dan tombol bantuan tetap tersedia pada pengalaman 3D.
+
+[FIGURE:uat_revisi_minimap_3d]
+[FIGCAPTION:Tampilan Denah 3D dengan Minimap dan Tombol Bantuan]
+
+   Pada UAT-R08, tombol bantuan membuka panduan pencarian, pembatalan navigasi, pergantian mode, dan pemulihan pemuatan. Modal juga menampilkan nomor `021-7699431` dan `021-7656971`. Kedua nomor tersebut diverifikasi terhadap halaman resmi Subbagian Registrasi dan Statistik pada Penmaru UPNVJ (UPNVJ 2026a), sehingga laporan tidak menggunakan nomor personal atau kontak yang tidak memiliki sumber institusional.
+
+   Tindak lanjut UAT-R10 mengubah bridge menjadi kontrak penyelesaian terarah. Ketika pengguna memilih tujuan, React tetap mengirim `unity_object_name` melalui `SendMessage`. Commit Unity `1845c65` hanya memancarkan `OnNavigationCompleted` dari `CompleteNavigation()` normal dan mengirim string JSON yang memuat identifier tujuan. Commit React `b572a48` memperkenalkan listener beserta sembilan pengujian awal, sedangkan `d2e8fdb` menambahkan dua pengujian lanjutan. Pada kode sumber aktif `08ebc06`, React mencocokkan identifier callback dengan tujuan pada `activeNavigationRef` sebelum menampilkan popup. Sebelas pengujian membuktikan payload yang cocok diterima, sedangkan payload berbeda, kosong, rusak, tanpa key, tanpa tujuan aktif, atau setelah pembatalan diabaikan. Full suite web mencatat 13 file dan 129 pengujian lulus; lint, TypeScript build, dan production build juga lulus. Alur positif pada deployment terlihat pada [FIGREF:uat_revisi_notifikasi_tiba], yaitu popup `Tiba di Tujuan` menampilkan nama `Gedung Dewi Sartika` setelah completion normal. Dengan demikian, R10 diverifikasi secara visual dan teknis, sedangkan kondisi negatif dibuktikan melalui pengujian otomatis.
+
+[FIGURE:uat_revisi_notifikasi_tiba]
+[FIGCAPTION:Notifikasi Tiba di Tujuan Setelah Navigasi Selesai]
+
+   Kesepuluh tindak lanjut tersebut menunjukkan bahwa masukan UAT telah diterjemahkan menjadi perubahan data, onboarding, pilihan mode, navigasi, bantuan, serta kontrak integrasi. Hasil UAT awal tetap dipertahankan sebagai baseline; pemeriksaan visual dan teknis pascaimplementasi tidak dihitung sebagai pengulangan kuesioner terhadap lima responden awal.
 
 ---
 
@@ -1003,44 +908,54 @@ Berdasarkan hasil pengujian awal di atas, skor performa (56/100) menjadi dasar d
 
 Berdasarkan hasil pengembangan, implementasi, dan pengujian sistem integrasi denah virtual kampus dan dashboard profil UPNVJ Kampus Pondok Labu, dapat ditarik beberapa kesimpulan sebagai berikut:
 
-1. Sistem integrasi denah virtual berbasis visualisasi 3D interaktif dan dashboard profil kampus berhasil dirancang dan diimplementasikan secara Full Stack dengan mengintegrasikan frontend React SPA, RESTful API serverless (Vercel Functions berbasis Node.js), database PostgreSQL Supabase, dan engine Unity WebGL.
-2. Aturan keamanan data relasional berhasil diterapkan secara andal menggunakan Row-Level Security (RLS) di tingkat database serta mekanisme pencatatan audit logs yang menjamin akuntabilitas perubahan data oleh administrator.
-3. Integrasi data dinamis satu arah dari React ke Unity menggunakan metode `SendMessage` terbukti stabil dalam memicu NavMesh pathfinding rute visual 3D berdasarkan pencarian spasial pengguna di frontend web.
-4. Evaluasi fungsionalitas sistem (Black Box) dan tingkat penerimaan pengguna (UAT) akan disimpulkan di sini setelah seluruh rangkaian pengujian selesai dilaksanakan. [TBD: Kesimpulan Hasil Uji]
+1. Penulis berhasil mengembangkan Public Dashboard dan Admin Panel berbasis React yang menyediakan informasi kampus, tutorial dan bantuan, pencarian, denah 2D, serta pemuatan denah 3D Unity WebGL. REST API baca-saja pada Vercel Serverless Functions menyediakan kontrak data bagi runtime Unity dan konsumen eksternal.
+2. Aplikasi web berhasil diintegrasikan langsung dengan Supabase Auth dan Supabase SDK untuk sesi, query, serta CRUD yang tunduk pada RLS rancangan Database Schema Designer. Pada implementasi web yang diperiksa, service aplikasi juga mencatat audit operasi CRUD agar riwayat perubahan dapat ditinjau melalui Admin Panel.
+3. Bridge React–Unity berhasil mengirimkan `unity_object_name` melalui `SendMessage` dan menerima penyelesaian navigasi melalui `OnNavigationCompleted`. Unity mengirim JSON identifier hanya setelah completion normal, sedangkan React memvalidasinya terhadap tujuan aktif sebelum menampilkan popup. Pembatalan, payload kosong, JSON rusak, dan identifier berbeda tidak mengubah state kedatangan.
+4. Deployment React SPA, Vercel Serverless Functions, dan artefak Unity WebGL v0.8.6.1 pada Vercel berhasil dikonfigurasi bersama environment variables, header/cache aset, endpoint health, serta pencatatan analitik aktif melalui Supabase. Express dan Umami dipertahankan sebagai jalur operasional opsional. Konfigurasi hosting dapat disesuaikan apabila integrasi institusional dilakukan pada tahap lanjutan.
+5. Verifikasi repositori pada kode sumber aktif `08ebc06` mencatat 13 file dan 129 pengujian Vitest lulus, termasuk 11 pengujian callback penyelesaian; lint, TypeScript build, dan production build juga lulus. Empat smoke test manual API turut memenuhi hasil yang diharapkan: health check, data runtime Unity, daftar identifier editor, dan penolakan mutasi tanpa otorisasi. Audit Lighthouse pada snapshot `bdeb5bc` menghasilkan Performance 86 pada mobile dan 99 pada desktop, sedangkan Accessibility, Best Practices, dan SEO memperoleh 100 pada kedua mode. Hasil Lighthouse merupakan data lab lokal pada snapshot audit; FCP dan LCP mobile tetap menjadi fokus optimasi berikutnya.
+6. Pengujian Black Box awal menghasilkan 23 dari 24 skenario lulus atau tingkat keberhasilan 95,83 persen. Setelah tindakan korektif, pengujian ulang BB-20 memperlihatkan label tujuan yang mudah dibaca, garis rute aktif sebelum tiba, serta pembersihan garis dan notifikasi kedatangan setelah navigasi selesai. Dengan demikian, status akhir menjadi 24 dari 24 skenario terverifikasi lulus. UAT awal menghasilkan 77,78 persen untuk pengguna publik, 84,55 persen untuk dashboard admin, dan 81,50 persen berdasarkan seluruh jawaban. Tindak lanjut UAT-R01 sampai UAT-R10 telah diterapkan dan diperiksa melalui kombinasi audit kode sumber, pengujian otomatis, sumber resmi, dan tangkapan layar deployment; pemeriksaan tersebut tidak diklaim sebagai pengulangan kuesioner UAT.
 
 ## 4.2 Saran
 
 Beberapa saran yang direkomendasikan untuk pengembangan sistem lebih lanjut di masa mendatang adalah:
 
-1. Mengintegrasikan basis data sistem denah ini dengan API akademik utama (SIK UPNVJ) secara langsung untuk menyinkronkan jadwal pemakaian ruang kuliah dan profil dosen secara otomatis.
-2. Menerapkan optimasi kompresi dan culling grafis tingkat lanjut pada model 3D kampus agar waktu pemuatan awal (initial load time) visualisasi WebGL pada jaringan seluler mobile dapat dipangkas seminimal mungkin.
-3. Menambahkan dukungan suara (audio navigation guidance) guna meningkatkan aspek aksesibilitas bagi pengguna dengan kebutuhan khusus.
+1. Menyiapkan adapter identitas, domain, secret management, dan API institusional apabila sistem memperoleh persetujuan untuk diintegrasikan dengan infrastruktur kampus. Integrasi tersebut perlu dilakukan melalui kontrak resmi tanpa menanamkan ketergantungan pada satu platform hosting.
+2. Meningkatkan konsistensi Performance mobile hingga sekurang-kurangnya 90 tanpa menurunkan skor Accessibility, Best Practices, dan SEO. Prioritas optimasi adalah mengurangi render delay hero, JavaScript tidak terpakai sekitar 75 KiB, gambar yang belum responsif atau optimal, serta stylesheet render-blocking; perubahan perlu diverifikasi melalui audit mobile dan desktop yang dapat direproduksi.
+3. Menambahkan suite browser dan WebGL end-to-end untuk login, protected route, CRUD, pemilih denah, pencarian 2D/3D, pemuatan WebGL, kontrak `OnNavigationCompleted`, serta pemeriksaan endpoint deployment. Pengujian pengguna berulang juga perlu melibatkan mahasiswa baru, orang tua atau wali, dan pengunjung eksternal agar efektivitas adaptasi kontekstual dapat diukur di luar pemeriksaan tangkapan layar.
+4. Menetapkan satu jalur analitik utama antara Supabase dan Umami agar definisi metrik, retensi data, privasi, serta operasional layanan tidak mengalami drift.
+5. Berkoordinasi dengan Database Schema Designer untuk menerapkan otorisasi admin yang lebih granular dan memastikan pencatatan audit tetap berlaku pada mutasi yang tidak berasal dari frontend.
 
 ---
 
 # DAFTAR PUSTAKA
 
-'Afiifah, K., Azzahra, Z. F., dan Anggoro, A. D. (2022). Analisis teknik Entity-Relationship Diagram dalam perancangan database: Sebuah literature review. _INTECH (Informatika dan Teknologi)_, 3(1), 8–14. https://doi.org/10.54895/intech.v3i1.1261
+Aliyah, A., Hartono, N., dan Muin, A. A. (2025). Penggunaan User Acceptance Testing (UAT) pada pengujian sistem informasi pengelolaan keuangan dan inventaris barang. *Switch: Jurnal Sains dan Teknologi Informasi*, 3(2), 42–58. https://doi.org/10.62951/switch.v3i1.330
 
-Aliyah, A., Hartono, N., dan Muin, A. A. (2024). Penggunaan User Acceptance Testing (UAT) pada pengujian sistem informasi pengelolaan keuangan dan inventaris barang. _Switch: Jurnal Sains dan Teknologi Informasi_, 3(1), 84–100. https://doi.org/10.62951/switch.v3i1.330
+Jamaludin, J., dan Saepuloh, L. (2024). Tren riset twin digital smart campus. *Sang Pencerah: Jurnal Ilmiah Universitas Muhammadiyah Buton*, 10(2), 408–425. https://doi.org/10.35326/pencerah.v10i2.5317
 
-Jamaludin, J., dan Saepuloh, L. (2024). Tren riset twin digital smart campus. _Sang Pencerah: Jurnal Ilmiah Universitas Muhammadiyah Buton_, 10(2), 408–425. https://doi.org/10.35326/pencerah.v10i2.5317
+Kurniawan, T. A. (2018). Pemodelan Use Case (UML): Evaluasi terhadap beberapa kesalahan dalam praktik. *Jurnal Teknologi Informasi dan Ilmu Komputer (JTIIK)*, 5(1), 77–86. https://doi.org/10.25126/jtiik.201851610
 
-Kurniawan, T. A. (2018). Pemodelan Use Case (UML): Evaluasi terhadap beberapa kesalahan dalam praktik. _Jurnal Teknologi Informasi dan Ilmu Komputer (JTIIK)_, 5(1), 77–86. https://doi.org/10.25126/jtiik.201851610
+Maulida, M., Zahro, F., Hakim, R., dan Akbar, M. S. (2025). Pengujian black box testing pada sistem website pemesanan online Toko Ayam Krispy. *Jurnal Media Akademik (JMA)*, 3(5). https://doi.org/10.62281/v3i5.1908
 
-Maulida, M., Zahro, F., Hakim, R., dan Akbar, M. S. (2025). Pengujian black box testing pada sistem website pemesanan online Toko Ayam Krispy. _Jurnal Media Akademik (JMA)_, 3(5). https://doi.org/10.62281/v3i5.1908
+Muharam, Y., Anggara, M. B., dan Hanafi, T. J. (2023). Implementasi peta 3 dimensi menggunakan metode IMSDD (Interactive Multimedia System Design and Development) dan WebGL API berbasis web (Studi kasus di SMP Karya Pembangunan 2 Majalaya). *Jurnal Informatika-COMPUTING*, 10, 20–30. https://doi.org/10.55222/computing.v10i01.1155
 
-Muharam, Y., Anggara, M. B., dan Hanafi, T. J. (2023). Implementasi peta 3 dimensi menggunakan metode IMSDD (Interactive Multimedia System Design and Development) dan WebGL API berbasis web (Studi kasus di SMP Karya Pembangunan 2 Majalaya). _Jurnal Informatika-COMPUTING_, 10, 20–30. https://doi.org/10.55222/computing.v10i01.1155
+Pricillia, T., dan Zulfachmi (2021). Perbandingan metode pengembangan perangkat lunak (Waterfall, Prototype, RAD). *Jurnal Bangkit Indonesia*, 10(1), 6–12. https://doi.org/10.52771/bangkitindonesia.v10i1.153
 
-Pricillia, T., dan Zulfachmi (2021). Perbandingan metode pengembangan perangkat lunak (Waterfall, Prototype, RAD). _Jurnal Bangkit Indonesia_, 10(1), 6–12. https://doi.org/10.52771/bangkitindonesia.v10i1.153
+Putra, I. G. W. W., Dharma, E. M., dan Permana, P. T. H. (2026). Implementasi relational database dengan Row-Level Security (RLS) pada sistem inventory menggunakan Supabase dan React Native Expo (Studi kasus Bengkel Sari Merta). *JATI (Jurnal Mahasiswa Teknik Informatika)*, 10(2), 2443–2448. https://doi.org/10.36040/jati.v10i2.17551
 
-Putra, I. G. W. W., Dharma, E. M., dan Permana, P. T. H. (2026). Implementasi relational database dengan Row-Level Security (RLS) pada sistem inventory menggunakan Supabase dan React Native Expo (Studi kasus Bengkel Sari Merta). _JATI (Jurnal Mahasiswa Teknik Informatika)_, 10(2), 2443–2448. https://ejournal.itn.ac.id/index.php/jati/article/view/8282
+Syarif, S., dan Risdiansyah, D. (2024). Pemanfaatan metode prototype dalam perancangan sistem informasi penjualan berbasis website. *Jurnal Ekonomi Manajemen dan Bisnis (JEMB)*, 2(1), 12–25. https://doi.org/10.54895/jemb.v2i1.2312
 
-Siv, T. (2025). A framework for scalable digital twin deployment in smart campus building facility management. _arXiv_. https://doi.org/10.48550/arXiv.2512.12149
+Taurusta, C., Asiddiq, A. M., Suprianto, S., dan Setiawan, H. (2024). Visualisasi gedung kampus 1 Universitas Muhammadiyah Sidoarjo menggunakan augmented reality sebagai media informasi. *Journal of Technology and System Information*, 1(1), 55–70. https://doi.org/10.47134/jtsi.v1i1.2146
 
-Syarif, S., dan Risdiansyah, D. (2024). Pemanfaatan metode prototype dalam perancangan sistem informasi penjualan berbasis website. _Jurnal Ekonomi Manajemen dan Bisnis (JEMB)_, 2(1), 12–25. https://doi.org/10.54895/jemb.v2i1.2312
+UPNVJ. (2022). Lokasi kampus. https://www.upnvj.ac.id/id/tentang-upn/lokasi-kampus.html
 
-Taurusta, C., Asiddiq, A. M., Suprianto, S., dan Setiawan, H. (2024). Visualisasi gedung kampus 1 Universitas Muhammadiyah Sidoarjo menggunakan augmented reality sebagai media informasi. _Journal of Technology and System Information_, 1(1), 55–70. https://doi.org/10.47134/jtsi.v1i1.2146
+UPNVJ. (2025a). Kantin. https://www.upnvj.ac.id/id/fasilitas-layanan/kantin.html
+
+UPNVJ. (2025b). Sejarah. https://www.upnvj.ac.id/id/tentang-upn/sejarah.html
+
+UPNVJ. (2026a). Hubungi kami. *Penerimaan Mahasiswa Baru UPN Veteran Jakarta*. https://penmaru.upnvj.ac.id/id/contact.html
+
+UPNVJ. (2026b). Rapat koordinasi Humas UPNVJ 2026: Fokus strategi komunikasi digital dan media sosial perguruan tinggi. https://www.upnvj.ac.id/id/berita/2026/02/rapat-koordinasi-humas-upnvj-2026-fokus-strategi-komunikasi-digital-dan-media-sosial-perguruan-tinggi.html
 
 ---
 
@@ -1054,11 +969,11 @@ Program Studi : Informatika
 Fakultas : Ilmu Komputer
 Universitas : Universitas Pembangunan Nasional Veteran Jakarta
 
-Menyatakan dengan sesungguhnya bahwa laporan Tugas Akhir Proyek yang berjudul "Integrasi Denah Virtual Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu (Dashboard Profil)" adalah benar-benar hasil karya saya sendiri, bebas dari plagiat, dan tidak memuat bagian karya ilmiah orang lain kecuali yang secara formal disitasi dan dicantumkan dalam daftar pustaka sesuai dengan ketentuan akademik yang berlaku.
+Menyatakan dengan sesungguhnya bahwa laporan Tugas Akhir Proyek yang berjudul "Pengembangan Dashboard Web, Integrasi Unity WebGL, dan Deployment Sistem Denah Virtual UPNVJ Kampus Pondok Labu" adalah benar-benar hasil karya saya sendiri, bebas dari plagiat, dan tidak memuat bagian karya ilmiah orang lain kecuali yang secara formal disitasi dan dicantumkan dalam daftar pustaka sesuai dengan ketentuan akademik yang berlaku.
 
-Apabila di kemudian hari terbukti terdapat plagiarisme, manipulasi data, atau pelanggaran etika akademik lainnya dalam laporan ini, saya bersedia menerima sanksi akademis yang berat berupa pembatalan kelulusan dan gelar akademik dari Universitas Pembangunan Nasional Veteran Jakarta.
+Apabila di kemudian hari terbukti terdapat plagiarisme, manipulasi data, atau pelanggaran etika akademik lainnya dalam laporan ini, saya bersedia menerima sanksi sesuai ketentuan akademik yang berlaku di Universitas Pembangunan Nasional Veteran Jakarta.
 
-Jakarta, 15 Juni 2026
+Jakarta, ____ __________ 20__
 Yang menyatakan,
 
 (Meterai Rp10.000)
@@ -1068,504 +983,429 @@ NIM 2210511129
 
 ---
 
-# LAMPIRAN 2. Surat Keterangan Implementasi Proyek dari Mitra
+# LAMPIRAN 2. Dokumentasi Penyerahan Pakta Integritas kepada UPA TIK
 
-SURAT KETERANGAN IMPLEMENTASI PROYEK
-Nomor: 120/UN61.3/FIK/TA/2026
+Salinan pakta integritas yang telah diserahkan tidak berada dalam arsip penulis. Bukti yang tersedia berupa foto dokumentasi penyerahan dokumen kepada staf UPA TIK; lampiran ini tidak dimaksudkan sebagai pengganti scan dokumen bertanda tangan atau surat keterangan resmi dari institusi.
 
-Yang bertanda tangan di bawah ini, selaku perwakilan dari pihak Mitra Pengguna Sistem:
+Proses penyerahan yang terekam pada [FIGREF:foto_penyerahan_pakta_upa_tik] menunjukkan tim membawa dokumen pakta integritas dalam kegiatan koordinasi dengan UPA TIK. Caption dan narasi tidak menetapkan identitas staf, nomor surat, tanggal pengesahan, atau status persetujuan yang tidak dapat diverifikasi dari artefak.
 
-Nama : Asep Saeful Ridwan, S.Kom.
-Jabatan : Kepala Unit Penunjang Akademik Teknologi Informasi dan Komunikasi (UPA TIK)
-Instansi : Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu
-
-Menerangkan bahwa mahasiswa berikut:
-
-Nama : Muhammad Iman Nugraha
-NIM : 2210511129
-Program Studi : Informatika
-Fakultas : Ilmu Komputer
-
-Telah melaksanakan implementasi, integrasi, serta pengujian sistem dalam proyek kolaboratif Tugas Akhir yang berjudul "Integrasi Denah Virtual Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu (Dashboard Profil)" di lingkungan Kampus Pondok Labu. Modul sistem yang dikembangkan meliputi:
-
-1. Pembangunan database relasional PostgreSQL di Supabase Cloud dengan konfigurasi keamanan Row-Level Security (RLS) serta pencatatan logs perubahan (audit logs) otomatis.
-2. Pengembangan RESTful API berbasis Vercel Serverless Functions.
-3. Pengembangan antarmuka web reaktif (React SPA) berupa Public Dashboard dan Admin Panel.
-4. Integrasi reverse proxy collect metrik Umami Analytics untuk pemantauan lalu lintas web.
-
-Sistem tersebut telah terpasang, diuji coba secara fungsional melalui Black Box Testing, serta dievaluasi melalui User Acceptance Testing (UAT) dengan staf administrasi dan mahasiswa dengan tingkat keberhasilan dan penerimaan yang sangat baik. Surat keterangan ini dibuat untuk dipergunakan sebagai salah satu syarat kelulusan Tugas Akhir skema Proyek.
-
-Jakarta, 15 Juni 2026
-Pihak Mitra,
-
-Asep Saeful Ridwan, S.Kom.
-Kepala UPA TIK UPNVJ
+[FIGURE:foto_penyerahan_pakta_upa_tik]
+[FIGCAPTION:Dokumentasi Penyerahan Pakta Integritas kepada UPA TIK]
 
 ---
 
 # LAMPIRAN 3. Kode Sumber Utama
 
-1. Konfigurasi Row-Level Security (RLS) dan Triggers (Supabase Cloud PostgreSQL):
+Lampiran ini hanya memuat cuplikan yang berada dalam batas kontribusi Full Stack Web Developer, System Integrator, dan DevOps Engineer. Kode internal Unity, termasuk `DatabaseSyncChecker`, tidak dicantumkan karena dikembangkan oleh Engine Developer. Cuplikan dipilih untuk membuktikan autentikasi, CRUD, integrasi React–Unity, REST API, analitik, dan deployment tanpa memuat repository secara penuh atau menampilkan kredensial.
 
-```sql
-ALTER TABLE gedung ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public select" ON gedung FOR SELECT TO anon USING (true);
-CREATE POLICY "Allow admin write" ON gedung FOR ALL TO authenticated
-  USING (auth.role() = 'authenticated')
-  WITH CHECK (auth.role() = 'authenticated');
+Pemetaan pada [TABREF:lampiran_artefak_kode] menunjukkan delapan kelompok artefak yang menjadi dasar pemilihan cuplikan kode.
 
-CREATE OR REPLACE FUNCTION log_data_mutation()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO audit_logs (table_name, operation, record_id, changed_by, changed_at)
-  VALUES (TG_TABLE_NAME, TG_OP, COALESCE(NEW.id, OLD.id), auth.uid(), now());
-  RETURN COALESCE(NEW, OLD);
-END;
-$$ LANGUAGE plpgsql;
+[TABLE-ID:lampiran_artefak_kode]
+[TABLECAPTION:Pemetaan Cuplikan Kode terhadap Kontribusi Penulis]
 
-CREATE TRIGGER audit_gedung_trigger
-AFTER INSERT OR UPDATE OR DELETE ON gedung
-FOR EACH ROW EXECUTE FUNCTION log_data_mutation();
-```
+[TABLE]
+No. | Artefak | Lokasi Sumber | Kontribusi yang Dibuktikan
+1 | Supabase Auth dan protected route | `src/lib/supabase.ts`, `src/contexts/AuthContext.tsx`, `src/components/common/ProtectedRoute.tsx` | Sesi browser, autentikasi, dan pembatasan route admin
+2 | CRUD Admin Panel | `src/services/api/supabaseDataService.ts` | Validasi input, operasi data melalui Supabase SDK, cache, dan audit aplikasi
+3 | Preload adaptif | `src/utils/unityPreloader.ts` | Penghematan bandwidth sebelum pengguna memilih mode 3D
+4 | Loader dan perintah navigasi | `UnityCampusMap.tsx`, `SearchOverlay.tsx` | Pemuatan artefak WebGL dan bridge React ke Unity
+5 | Callback penyelesaian | `SearchOverlay.tsx` | Validasi JSON tujuan aktif sebelum popup tiba
+6 | REST API Unity | `api/unity/data.js`, `api/unity/names.js` | Kontrak runtime dan tooling editor
+7 | Analitik aplikasi | `src/services/analytics/trackingService.ts` | Pencatatan page view pada Supabase
+8 | Health dan deployment | `api/health.js`, `vercel.json` | Health check, header, kompresi, dan cache aset
+[/TABLE]
 
-2. Connection-Aware Preloading (React Frontend SPA):
+1. Supabase Client dan Protected Route (`src/lib/supabase.ts` dan `src/components/common/ProtectedRoute.tsx`):
 
 ```typescript
-const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
-const isConnectionSlow = connection dandan (connection.saveData || ['slow-2g', '2g', '3g'].includes(connection.effectiveType));
+import { createClient } from "@supabase/supabase-js";
+import { env } from "../utils/env";
 
-if (isConnectionSlow) {
-  setShowManualActivationButton(true);
-} else {
-  triggerWebGLPreload();
+export const supabase = createClient(
+  env.VITE_SUPABASE_URL,
+  env.VITE_SUPABASE_ANON_KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  },
+);
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#2C5F2D] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) return <Navigate to="/admin/login" replace />;
+  return <>{children}</>;
+};
+```
+
+2. Operasi CRUD Fasilitas melalui Supabase SDK (`src/services/api/supabaseDataService.ts`):
+
+```typescript
+export const createFacility = async (
+  facility: Omit<Fasilitas, "id">,
+): Promise<Fasilitas> => {
+  if (!facility.nama_fasilitas) throw new Error("Nama fasilitas wajib diisi.");
+  if (!facility.id_gedung) throw new Error("ID gedung wajib diisi.");
+  clearCache();
+
+  const { data, error } = await supabase
+    .from("fasilitas")
+    .insert({
+      nama_fasilitas: facility.nama_fasilitas,
+      deskripsi_fasilitas: facility.deskripsi_fasilitas,
+      tipe_fasilitas: facility.tipe_fasilitas,
+      id_gedung: facility.id_gedung,
+      color: facility.color || "gray",
+      lantai: facility.lantai ?? null,
+      foto_url: facility.foto_url ?? null,
+      unity_object_name: facility.unity_object_name ?? null,
+    })
+    .select()
+    .single();
+
+  if (error) throw new Error("Gagal membuat fasilitas.");
+  await logCreate("fasilitas", data.id.toString(), data);
+  return data as Fasilitas;
+};
+```
+
+3. Keputusan Preload Adaptif Aset Unity (`src/utils/unityPreloader.ts`):
+
+```typescript
+function shouldSkipPreload(): { skip: boolean; reason?: string } {
+  const isMobile =
+    /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    ) || window.innerWidth < 768;
+  if (isMobile) {
+    return { skip: true, reason: "Mobile device detected — Unity WebGL skipped" };
+  }
+
+  const connection = (navigator as any).connection;
+  if (connection?.saveData) {
+    return { skip: true, reason: "Save-Data mode enabled" };
+  }
+  if (connection?.effectiveType === "slow-2g" || connection?.effectiveType === "2g") {
+    return { skip: true, reason: `Slow connection: ${connection.effectiveType}` };
+  }
+  return { skip: false };
 }
 ```
 
-3. Communication Bridge React-Unity WebGL (React Component):
+Nilai `skip` pada cuplikan tersebut hanya melewati pengunduhan awal di latar belakang. Pengguna mobile atau pengguna dengan koneksi terbatas tetap dapat memilih Denah 3D secara sadar melalui pemilih mode; file WebGL baru dimuat ketika mode tersebut dibuka.
+
+4. Native Unity Loader dan Bridge Perintah Navigasi (`UnityCampusMap.tsx` dan `SearchOverlay.tsx`):
 
 ```typescript
-import { useUnityContext } from "react-unity-webgl";
+const unityConfig = {
+  dataUrl: `${basePath}unity-builds/v0.8.6.1/Build/v0.8.6.1.data.unityweb`,
+  frameworkUrl: `${basePath}unity-builds/v0.8.6.1/Build/v0.8.6.1.framework.js.unityweb`,
+  codeUrl: `${basePath}unity-builds/v0.8.6.1/Build/v0.8.6.1.wasm.unityweb`,
+  streamingAssetsUrl: "StreamingAssets",
+  productVersion: "v0.8.6.1",
+  matchWebGLToCanvasSize: true,
+  devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+};
 
-const { sendMessage, isLoaded } = useUnityContext({
-  loaderUrl: "build/UnityWebGL.loader.js",
-  dataUrl: "build/UnityWebGL.data",
-  frameworkUrl: "build/UnityWebGL.framework.js",
-  codeUrl: "build/UnityWebGL.wasm",
-});
+const configWithProgress = {
+  ...unityConfig,
+  onProgress: (progress: number) => {
+    const pct = Math.round(progress * 100);
+    setLoadingProgress((previous) => Math.max(previous, pct));
+  },
+};
 
-const handleNavigate = (unityObjectName: string) => {
-  if (isLoaded) {
-    sendMessage("NavigationReceiver", "NavigateTo", unityObjectName);
+const instance = await window.createUnityInstance(
+  canvas,
+  configWithProgress,
+  configWithProgress.onProgress,
+);
+window.unityInstance = instance;
+
+window.unityInstance.SendMessage(
+  "NavigationReceiver",
+  "NavigateTo",
+  item.unityObjectName,
+);
+```
+
+5. Validasi Callback Penyelesaian Navigasi (`SearchOverlay.tsx`):
+
+```typescript
+type NavigationCompletedPayload = {
+  unity_object_name: string;
+};
+
+const handleNavigationCompleted = (event: Event) => {
+  const detail = (event as CustomEvent<unknown>).detail;
+  if (typeof detail !== "string" || !detail.trim()) return;
+
+  let payload: NavigationCompletedPayload;
+  try {
+    payload = JSON.parse(detail) as NavigationCompletedPayload;
+  } catch {
+    console.warn("[SearchOverlay] Payload OnNavigationCompleted tidak valid.");
+    return;
+  }
+
+  const completedKey =
+    typeof payload?.unity_object_name === "string"
+      ? payload.unity_object_name.trim().toLowerCase()
+      : "";
+  const activeItem = activeNavigationRef.current;
+  const selectedKey = activeItem?.unityObjectName.trim().toLowerCase() ?? "";
+
+  if (!activeItem || !completedKey || completedKey !== selectedKey) return;
+  setSelectedItem(activeItem);
+  setIsNavigating(true);
+  setHasReachedDestination(true);
+};
+
+window.addEventListener(
+  "OnNavigationCompleted",
+  handleNavigationCompleted as EventListener,
+);
+```
+
+6. Vercel Serverless Functions untuk Kontrak Runtime dan Editor (`api/unity/data.js` dan `api/unity/names.js`):
+
+Endpoint runtime mengambil data gedung dan fasilitas melalui query paralel sebagai berikut:
+
+```javascript
+const [gedungResult, fasilitasResult] = await Promise.all([
+  supabase
+    .from("gedung")
+    .select("id, nama_gedung, deskripsi_gedung, lokasi, jumlah_lantai, unity_object_name")
+    .order("id", { ascending: true }),
+  supabase
+    .from("fasilitas")
+    .select("id, nama_fasilitas, deskripsi_fasilitas, tipe_fasilitas, id_gedung, lantai, foto_url, unity_object_name")
+    .order("id_gedung", { ascending: true })
+    .order("lantai", { ascending: true }),
+]);
+
+if (gedungResult.error) throw gedungResult.error;
+if (fasilitasResult.error) throw fasilitasResult.error;
+
+return res.status(200).json(result);
+```
+
+Endpoint tooling editor mengekstrak identifier tidak kosong dan mengembalikannya sebagai daftar terurut:
+
+```javascript
+const extractNames = (rows) =>
+  rows
+    ?.map((item) => item.unity_object_name)
+    .filter((name) => typeof name === "string" && name.trim().length > 0)
+    .sort((a, b) => a.localeCompare(b)) ?? [];
+
+const gedungNames = extractNames(gedungData);
+const fasilitasNames = extractNames(fasilitasData);
+let resultNames;
+const { type } = req.query;
+if (type === "gedung") {
+  resultNames = gedungNames;
+} else if (type === "fasilitas") {
+  resultNames = fasilitasNames;
+} else {
+  resultNames = [...gedungNames, ...fasilitasNames].sort((a, b) =>
+    a.localeCompare(b),
+  );
+}
+
+return res.status(200).json({ unityObjectNames: resultNames });
+```
+
+7. Pencatatan Analitik Aktif melalui Supabase (`src/services/analytics/trackingService.ts`):
+
+```typescript
+export const trackPageView = async (pagePath?: string): Promise<void> => {
+  const page = pagePath || window.location.pathname;
+  const { error } = await supabase.from("web_analytics_log").insert({
+    visitor_hash: getVisitorHash(),
+    page_path: page,
+    device_type: getDeviceType(),
+  });
+
+  if (error && import.meta.env.DEV) {
+    console.warn("Analytics tracking error:", error.message);
   }
 };
 ```
 
-4. Reverse Proxy Analytics Metrik collect (Express.js Proxy Route):
+8. Health Check serta Header dan Cache Deployment (`api/health.js` dan `vercel.json`):
 
 ```javascript
-const express = require("express");
-const { createProxyMiddleware } = require("http-proxy-middleware");
-const app = express();
-
-app.use(
-  "/api/collect",
-  createProxyMiddleware({
-    target: "http://localhost:3000/api/send",
-    changeOrigin: true,
-    pathRewrite: {
-      "^/api/collect": "",
-    },
-    onProxyReq: (proxyReq, req, res) => {
-      proxyReq.setHeader("X-Forwarded-For", req.ip);
-    },
-  }),
-);
-
-app.listen(3001, () => {
-  console.log("Proxy server running on port 3001");
-});
+export default async function handler(req, res) {
+  setCors(res);
+  if (req.method === "OPTIONS") return res.status(200).end();
+  return res.status(200).json(
+    createResponse({ status: "OK", message: "Server is running" }),
+  );
+}
 ```
 
-5. Alat Verifikasi Sinkronisasi Database Spasial di Unity Editor (Unity Editor C# Script):
-
-```csharp
-using UnityEngine;
-using UnityEditor;
-using UnityEngine.Networking;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.EditorCoroutines.Editor;
-
-namespace UPNVJ.Editor
+```json
 {
-    /// <summary>
-    /// Tool untuk mengecek sinkronisasi antara unity_object_name di database
-    /// dengan GameObject yang benar-benar ada di scene Unity.
-    /// Buka melalui: Tools > UPNVJ > Check Database Sync
-    /// </summary>
-    public class DatabaseSyncChecker : EditorWindow
+  "headers": [
     {
-        // URL sama persis dengan yang dipakai BuildingDatabase.cs
-        private const string API_URL = "https://dashboard-profile-upnvj.vercel.app/api/unity/names";
-
-        // Format response dari /api/unity/names
-        [System.Serializable]
-        private class UnityNamesResponse
-        {
-            public List<string> unityObjectNames;
-        }
-
-        private List<string> missingInScene   = new List<string>();
-        private List<string> foundInScene     = new List<string>();
-        private List<string> missingInDb      = new List<string>();
-
-        private bool isChecking  = false;
-        private bool hasDoneCheck = false;
-        private string statusMessage = "Klik tombol di bawah untuk memulai pengecekan.";
-
-        private Vector2 scrollMissing;
-        private Vector2 scrollFound;
-        private Vector2 scrollExtra;
-
-        // ──────────────────────────────────────────
-        [MenuItem("Tools/UPNVJ/Check Database Sync")]
-        public static void ShowWindow()
-        {
-            var window = GetWindow<DatabaseSyncChecker>("Database Sync Checker");
-            window.minSize = new Vector2(480, 600);
-        }
-
-        // ──────────────────────────────────────────
-        private void OnGUI()
-        {
-            // Header
-            EditorGUILayout.Space(10);
-            GUIStyle titleStyle = new GUIStyle(EditorStyles.boldLabel)
-            {
-                fontSize = 14,
-                alignment = TextAnchor.MiddleCenter
-            };
-            EditorGUILayout.LabelField("🔍 UPNVJ Database Sync Checker", titleStyle);
-            EditorGUILayout.LabelField("Mengecek apakah semua unity_object_name di database sudah ada di scene.",
-                EditorStyles.centeredGreyMiniLabel);
-            EditorGUILayout.Space(10);
-
-            // Status
-            EditorGUILayout.HelpBox(statusMessage, isChecking ? MessageType.Info : MessageType.None);
-            EditorGUILayout.Space(5);
-
-            // Tombol
-            EditorGUI.BeginDisabledGroup(isChecking);
-            if (GUILayout.Button(isChecking ? "Sedang mengecek..." : "▶  Mulai Pengecekan", GUILayout.Height(36)))
-            {
-                RunCheck();
-            }
-            EditorGUI.EndDisabledGroup();
-
-            if (!hasDoneCheck) return;
-
-            EditorGUILayout.Space(15);
-            DrawHorizontalLine();
-
-            // ─── Ringkasan ───
-            EditorGUILayout.Space(5);
-            EditorGUILayout.LabelField("📊 Ringkasan", EditorStyles.boldLabel);
-            EditorGUILayout.BeginHorizontal();
-            DrawStatBox($"✅ Ditemukan\n{foundInScene.Count}", new Color(0.2f, 0.8f, 0.4f));
-            DrawStatBox($"❌ Tidak Ada di Scene\n{missingInScene.Count}", new Color(0.9f, 0.3f, 0.3f));
-            DrawStatBox($"⚠️ Tidak Ada di DB\n{missingInDb.Count}", new Color(0.9f, 0.7f, 0.1f));
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.Space(10);
-
-            // ─── Missing in Scene (PALING PENTING) ───
-            if (missingInScene.Count > 0)
-            {
-                DrawSection(
-                    $"❌ TIDAK ADA DI SCENE ({missingInScene.Count})",
-                    "Object ini ada di database tapi BELUM dibuat / salah nama di Unity:",
-                    missingInScene,
-                    new Color(1f, 0.85f, 0.85f),
-                    ref scrollMissing
-                );
-            }
-
-            // ─── Found ───
-            if (foundInScene.Count > 0)
-            {
-                DrawSection(
-                    $"✅ SUDAH ADA DI SCENE ({foundInScene.Count})",
-                    "Object ini sudah cocok antara database dan scene Unity:",
-                    foundInScene,
-                    new Color(0.85f, 1f, 0.88f),
-                    ref scrollFound
-                );
-            }
-
-            // ─── Extra in Scene (not in DB) ───
-            if (missingInDb.Count > 0)
-            {
-                DrawSection(
-                    $"⚠️ ADA DI SCENE TAPI TIDAK DI DATABASE ({missingInDb.Count})",
-                    "Object ini ada di scene Unity tapi belum didaftarkan ke database:",
-                    missingInDb,
-                    new Color(1f, 0.97f, 0.8f),
-                    ref scrollExtra
-                );
-            }
-        }
-
-        // ──────────────────────────────────────────
-        private void RunCheck()
-        {
-            isChecking   = true;
-            hasDoneCheck = false;
-            statusMessage = "Mengambil data dari API...";
-            missingInScene.Clear();
-            foundInScene.Clear();
-            missingInDb.Clear();
-            Repaint();
-
-            EditorCoroutineUtility.StartCoroutine(FetchAndCheck(), this);
-        }
-
-        private IEnumerator FetchAndCheck()
-        {
-            using (UnityWebRequest req = UnityWebRequest.Get(API_URL))
-            {
-                yield return req.SendWebRequest();
-
-                if (req.result != UnityWebRequest.Result.Success)
-                {
-                    statusMessage = $"❌ Gagal mengambil data dari API: {req.error}";
-                    isChecking = false;
-                    Repaint();
-                    yield break;
-                }
-
-                // Parse JSON
-                UnityNamesResponse response = null;
-                string rawJson = req.downloadHandler.text;
-                string jsonPreview = rawJson.Length > 200 ? rawJson.Substring(0, 200) + "..." : rawJson;
-
-                try
-                {
-                    response = JsonUtility.FromJson<UnityNamesResponse>(rawJson);
-                }
-                catch (System.Exception ex)
-                {
-                    statusMessage = $"❌ Gagal parse JSON: {ex.Message}";
-                    isChecking = false;
-                    Repaint();
-                    yield break;
-                }
-
-                if (response == null || response.unityObjectNames == null || response.unityObjectNames.Count == 0)
-                {
-                    statusMessage = "❌ API mengembalikan data kosong.";
-                    isChecking = false;
-                    Repaint();
-                    yield break;
-                }
-
-                var dbNames = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
-                foreach (var name in response.unityObjectNames)
-                    if (!string.IsNullOrWhiteSpace(name))
-                        dbNames.Add(name.Trim());
-
-                statusMessage = $"Data diambil: {dbNames.Count} unity_object_name. Mengecek scene...";
-                Repaint();
-
-                var sceneNames = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
-                var activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-                var rootObjects = activeScene.GetRootGameObjects();
-
-                foreach (var root in rootObjects)
-                    CollectAllNames(root.transform, sceneNames);
-
-                foreach (var name in dbNames)
-                {
-                    if (sceneNames.Contains(name))
-                        foundInScene.Add(name);
-                    else
-                        missingInScene.Add(name);
-                }
-
-                foreach (var root in rootObjects)
-                    if (!dbNames.Contains(root.name.Trim()))
-                        missingInDb.Add(root.name.Trim());
-
-                missingInScene.Sort();
-                foundInScene.Sort();
-                missingInDb.Sort();
-
-                isChecking   = true;
-                hasDoneCheck = true;
-
-                if (missingInScene.Count == 0)
-                    statusMessage = $"✅ SEMPURNA! Semua {foundInScene.Count} object di database sudah ada di scene.";
-                else
-                    statusMessage = $"⚠️ Selesai! {missingInScene.Count} object BELUM ADA di scene.";
-
-                isChecking = false;
-                Repaint();
-            }
-        }
-
-        private void CollectAllNames(Transform t, HashSet<string> names)
-        {
-            names.Add(t.name.Trim());
-            foreach (Transform child in t)
-                CollectAllNames(child, names);
-        }
-
-        private void DrawSection(string title, string subtitle, List<string> items, Color bgColor, ref Vector2 scroll)
-        {
-            EditorGUILayout.Space(5);
-            EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
-            EditorGUILayout.LabelField(subtitle, EditorStyles.miniLabel);
-
-            var oldColor = GUI.backgroundColor;
-            GUI.backgroundColor = bgColor;
-
-            scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.MaxHeight(150));
-            foreach (var item in items)
-            {
-                EditorGUILayout.SelectableLabel(item, EditorStyles.textField, GUILayout.Height(18));
-            }
-            EditorGUILayout.EndScrollView();
-
-            GUI.backgroundColor = oldColor;
-
-            if (GUILayout.Button("📋 Copy semua ke Clipboard", GUILayout.Height(22)))
-                GUIUtility.systemCopyBuffer = string.Join("\n", items);
-
-            EditorGUILayout.Space(5);
-        }
-
-        private void DrawStatBox(string text, Color color)
-        {
-            var style = new GUIStyle(EditorStyles.helpBox)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = 12,
-                fontStyle = FontStyle.Bold
-            };
-            var oldBg = GUI.backgroundColor;
-            GUI.backgroundColor = color;
-            GUILayout.Box(text, style, GUILayout.ExpandWidth(true), GUILayout.Height(55));
-            GUI.backgroundColor = oldBg;
-        }
-
-        private void DrawHorizontalLine()
-        {
-            var rect = EditorGUILayout.GetControlRect(false, 1);
-            EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 0.5f));
-        }
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Methods", "value": "GET, OPTIONS" },
+        { "key": "Cache-Control", "value": "s-maxage=60, stale-while-revalidate=300" }
+      ]
+    },
+    {
+      "source": "/unity-builds/v0.8.6.1/Build/(.*)\\.wasm\\.unityweb",
+      "headers": [
+        { "key": "Content-Type", "value": "application/wasm" },
+        { "key": "Content-Encoding", "value": "br" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
     }
+  ]
 }
 ```
 
 ---
 
-# LAMPIRAN 4. Panduan Pengguna (User Manual)
+# LAMPIRAN 4. Panduan Pengguna dan Kontrak Operasional
 
-Dokumen panduan ini disusun untuk memberikan petunjuk operasional yang komprehensif bagi seluruh pengguna sistem terintegrasi Dashboard Profil dan Denah Virtual 3D UPNVJ Kampus Pondok Labu. Panduan ini dibagi menjadi tiga bagian utama yang ditujukan untuk administrator web, pengguna publik, serta pengembang/administrator Unity.
+Panduan ini menjelaskan langkah operasional yang sesuai dengan antarmuka terkini. Informasi kredensial, anon key, service role key, dan nilai environment variables tidak dicantumkan. Panduan internal Unity dibatasi pada tindakan yang terlihat oleh pengguna karena implementasi scene dan engine merupakan kontribusi Simulator dan Engine Developer.
 
-## 4.1 Panduan Administrator (Web Admin Panel)
+## A. Panduan Administrator
 
-Halaman Admin Panel berfungsi untuk mengelola seluruh konten dinamis yang tersimpan di dalam database PostgreSQL Supabase serta memantau log audit dan statistik analitik.
+Admin Panel digunakan untuk mengelola data yang dikonsumsi Public Dashboard, Denah 2D, dan kontrak integrasi Unity.
 
-1. Prosedur Masuk ke Halaman Admin Panel:
-   a. Buka browser dan arahkan alamat URL ke `/admin/login` atau `/login`.
-   b. Masukkan nama pengguna (_username_) dan kata sandi (_password_) administrator yang sah pada form yang disediakan.
-   c. Klik tombol "Masuk". Jika kredensial valid, sistem akan mengarahkan pengguna ke halaman utama Admin Panel (`/admin`) dan menyimpan token JWT terotentikasi.
-2. Pengelolaan Data Gedung:
-   a. Menu utama admin menyajikan daftar tabel salah satunya adalah tabel gedung yang menampilkan nama, deskripsi, lokasi, jumlah lantai, dan kolom `unity_object_name`.
-   b. Untuk menambah data gedung baru, klik tombol "Tambah Data Gedung" di sudut kanan atas tabel.
-   c. Isi formulir modal dengan parameter nama gedung, deskripsi, lokasi fisik, jumlah lantai, tautan foto gedung, serta kolom `unity_object_name`.
-   d. Parameter `unity_object_name` wajib diisi menggunakan format huruf kecil dan garis bawah (misalnya: `gedung_rektorat`, `gedung_fik`) dan harus sama persis dengan nama GameObject penunjuk utama gedung di Unity.
-   e. Untuk memperbarui atau menghapus data gedung, klik tombol ikon pensil (_Edit_) atau tempat sampah (_Hapus_) pada baris data gedung yang bersangkutan.
-3. Pengelolaan Data Fasilitas:
-   a. Pilih menu tabel fasilitas pada bilah navigasi admin.
-   b. Untuk menambahkan fasilitas baru, klik tombol "Tambah Data Fasilitas".
-   c. Pada formulir modal, masukkan nama fasilitas (misalnya: `Laboratorium Rekayasa Perangkat Lunak`), deskripsi, tipe fasilitas (misalnya: `Laboratorium`), letak lantai (berupa angka bulat, misalnya: `3`), warna representasi frontend (misalnya: `blue`), dan tautan foto.
-   d. Pilih gedung induk dari menu dropdown yang menampilkan daftar gedung yang terdaftar di database. Pilihan ini akan mengisi kolom `id_gedung` (Foreign Key) secara otomatis.
-   e. Isi kolom `unity_object_name` dengan nama GameObject fasilitas tersebut pada hierarki Unity scene (misalnya: `lab_rpl`). Kolom ini harus unik agar navigasi kamera Unity dapat menargetkan objek secara tepat.
-4. Pengelolaan Data Fakultas dan Program Studi:
-   a. Pilih menu fakultas atau program studi untuk melakukan pengelolaan administratif akademik.
-   b. Pada menu fakultas, admin dapat mengaitkan fakultas dengan gedung kantor utamanya melalui pilihan dropdown gedung utama (`id_gedung_utama`).
-   c. Pada menu program studi, admin dapat mengaitkan program studi ke fakultas naungannya melalui dropdown fakultas (`id_fakultas`). Kolom akreditasi juga dapat diperbarui sesuai dengan status akreditasi terkini.
-5. Peninjauan Riwayat Perubahan Data (Audit Logs):
-   a. Admin dapat memantau seluruh riwayat manipulasi data yang terjadi di dalam sistem melalui halaman khusus Audit Logs.
-   b. Setiap kali terjadi penambahan, pembaruan, atau penghapusan data, trigger basis data akan mencatat aksi tersebut beserta identitas admin pelaksana (_actor_email_), jenis aksi (INSERT/UPDATE/DELETE), nama tabel yang bermutasi, waktu mutasi (_created_at_), serta data lama (_old_data_) dan data baru (_new_data_) dalam format JSON.
-6. Pemantauan Statistik Lalu Lintas Pengunjung (Umami Analytics):
-   a. Untuk memantau aktivitas pengunjung website secara real-time, admin dapat membuka dashboard Umami Analytics yang diinangi secara terpisah.
-   b. Dashboard menyajikan metrik jumlah pengunjung unik, jumlah tayangan halaman (_page views_), durasi kunjungan rata-rata, jenis perangkat yang digunakan, lokasi geografis pengunjung, serta halaman terpopuler yang sering diakses.
+1. Masuk dan Keluar dari Admin Panel:
+   a. Buka `/admin/login` atau `/login` pada domain aplikasi.
+   b. Masukkan username dan kata sandi akun administrator yang sah, lalu pilih tombol "Masuk".
+   c. Supabase Auth membentuk sesi dan `ProtectedRoute` membuka `/admin` setelah autentikasi berhasil.
+   d. Gunakan tombol logout setelah pekerjaan selesai, terutama ketika menggunakan perangkat bersama. Kredensial pengujian tidak ditulis pada laporan atau repository.
+2. Memilih Modul Pengelolaan:
+   a. Admin Panel menyediakan tab Gedung, Fasilitas, Program Studi, Denah 2D, Analytics, dan Audit Log.
+   b. Gunakan pencarian, filter, dan paginasi pada tabel untuk mempersempit data sebelum melakukan perubahan.
+3. Mengelola Data Gedung dan Fasilitas:
+   a. Pilih tab Gedung atau Fasilitas, kemudian gunakan tombol "Tambah Gedung" atau "Tambah Fasilitas" untuk membuka formulir.
+   b. Isi field wajib dan field informasi yang tersedia, termasuk nama tampilan, deskripsi, lokasi atau lantai, gedung induk, tipe, serta foto apabila tersedia.
+   c. Gunakan aksi Edit untuk memperbarui data dan aksi Hapus untuk membuka konfirmasi sebelum penghapusan dilakukan.
+   d. `unity_object_name` merupakan identifier teknis, bukan nama yang ditampilkan kepada pengguna. Field ini diperlukan apabila data menjadi target navigasi 3D langsung dan harus sesuai dengan kontrak GameObject. Fasilitas yang tidak memiliki target langsung dapat dipetakan ke gedung induk sesuai aturan pencarian.
+   e. Setelah penyimpanan, periksa toast, data tabel, dan tampilan publik yang terkait. Jumlah data pada deployment tidak boleh disamakan secara otomatis dengan seed lokal sebelum proses sinkronisasi live diverifikasi.
+4. Mengelola Program Studi:
+   a. Pilih tab Program Studi untuk menambah, mengubah, mencari, atau menghapus data program studi.
+   b. Pilih fakultas naungan dan isi field akademik yang tersedia pada formulir. Admin Panel tidak menyediakan tab Fakultas terpisah pada antarmuka yang ditinjau.
+5. Mengelola Konfigurasi Denah 2D:
+   a. Pilih tab Denah 2D untuk mengelola peta aktif, marker gedung, entrance, node, dan edge graph.
+   b. Pastikan setiap gedung yang dapat menjadi titik awal atau tujuan mempunyai marker dan entrance yang terhubung ke graph.
+   c. Simpan perubahan secara bertahap dan periksa rute melalui mode 2D pada Public Dashboard. Perubahan graph yang tidak terhubung dapat menyebabkan garis rute tidak terbentuk.
+6. Meninjau Analytics dan Audit Log:
+   a. Tab Analytics menampilkan agregasi page view yang dibaca dari `web_analytics_log` pada Supabase.
+   b. Tab Audit Log menampilkan operasi yang dicatat service aplikasi setelah proses CRUD melalui Admin Panel.
+   c. Pencatatan dari aplikasi tidak digunakan untuk mengklaim bahwa seluruh mutasi di luar aplikasi otomatis dicatat oleh trigger database.
 
-## 4.2 Panduan Pengguna Publik (Public Dashboard dan Denah 3D)
+## B. Panduan Pengguna Publik
 
-Dashboard Publik ditujukan bagi mahasiswa, tamu, dan civitas akademika untuk menjelajahi profil universitas serta melakukan navigasi spasial 3D.
+Public Dashboard dapat digunakan oleh mahasiswa baru, orang tua atau wali, sivitas akademika, dan pengunjung eksternal untuk memperoleh informasi serta memilih pengalaman navigasi 2D atau 3D.
 
-1. Akses Dashboard Utama:
-   a. Akses halaman utama sistem melalui alamat root domain `/`.
-   b. Halaman depan menyajikan visualisasi statistik lalu lintas pengunjung (Website Traffic Statistics) dalam bentuk grafik garis (Line Chart) interaktif yang bersumber dari Umami Analytics, menampilkan metrik pengunjung harian dan tampilan halaman.
-   c. Selain itu, halaman utama juga memuat kartu indikator aset utama kampus (KPI Cards) untuk mempermudah akses ke detail data gedung dan berbagai jenis fasilitas.
-2. Penelusuran Detail Aset dan Profil Akademik:
-   a. Pengguna dapat mengeklik salah satu kartu aset kampus (seperti Gedung, Laboratorium, Perpustakaan, atau Ruang Kuliah) untuk membuka modal detail yang menampilkan daftar lengkap aset dalam kategori tersebut beserta deskripsi dan lokasinya.
-   b. Pengguna juga dapat meninjau data program studi melalui tabel akreditasi (Accreditation Table) yang menyajikan informasi jenjang, lembaga akreditasi, tanggal kedaluwarsa, dan status akreditasi dari masing-masing program studi secara langsung.
-3. Eksplorasi Bebas pada Canvas Denah Virtual 3D:
-   a. Viewport WebGL pada dashboard mula-mula menyajikan gambar statis penutup (cover placeholder) sebelum runtime WebGL aktif. Pengguna harus mengeklik tombol "Mulai Denah 3D" untuk memicu pengunduhan modul WebGL dan menginisialisasi model 3D lingkungan UPNVJ Kampus Pondok Labu secara interaktif.
-   b. Kontrol pergerakan pada PC/Laptop:
-   1. Tekan tombol `W`, `A`, `S`, `D` atau tombol panah arah pada keyboard untuk menggerakkan kamera maju, kiri, mundur, dan kanan di dalam scene 3D.
-   2. Gerakkan mouse sambil menekan klik kiri (_drag_) untuk memutar sudut pandang kamera (rotasi kamera).
-   3. Putar tombol scroll mouse ke depan atau ke belakang untuk melakukan zoom-in dan zoom-out kamera.
-   4. Klik dua kali pada area model untuk memasuki mode Pointer Lock first-person demi penelusuran tingkat mata manusia (_eye-level_). Tekan tombol `Esc` untuk keluar dari mode Pointer Lock.
-      c. Kontrol pergerakan pada Perangkat Mobile (Smartphone/Tablet):
-   5. Gunakan joystick virtual yang muncul di sisi kiri bawah layar untuk menggerakkan kamera ke segala arah.
-   6. Sentuh dan geser jari pada sisi kanan layar untuk memutar sudut pandang kamera.
-   7. Cubit layar ke dalam atau ke luar dengan dua jari (_pinch_) untuk mengatur jarak pandang zoom.
-4. Pencarian Aset dan Navigasi Rute Fasilitas:
-   a. Klik kotak pencarian (Search Bar) di bagian atas dashboard publik untuk membuka Search Overlay.
-   b. Ketik nama gedung atau fasilitas yang dicari (misalnya: `Perpustakaan` atau `Dewi Sartika`). Hasil pencarian campuran antara gedung dan fasilitas akan muncul secara real-time disertai dengan ikon pembeda.
-   c. Pilih salah satu hasil pencarian. Sistem React akan langsung mengirimkan pesan instruksi navigasi ke viewport Unity WebGL menggunakan parameter nama objek (`unity_object_name`).
-   d. Viewport Unity akan secara otomatis mengarahkan kamera ke lokasi objek sasaran dan memicu kalkulasi NavMesh pathfinding untuk menggambar garis rute navigasi visual 3D dari posisi titik awal pengguna ke ruangan tujuan.
+1. Membuka Dashboard dan Panduan Awal:
+   a. Buka root domain `/` melalui browser.
+   b. Gunakan pilihan bahasa Indonesia atau Inggris sesuai kebutuhan.
+   c. Baca bagian Tutorial dan FAQ Denah Kampus. Tutorial dapat dipilih berdasarkan mode 2D atau 3D dan perangkat desktop atau mobile.
+   d. Gunakan kartu serta bagian informasi yang tersedia untuk meninjau gedung, fasilitas, statistik kunjungan, dan informasi utama kampus sebelum membuka denah.
+2. Memilih Jenis Denah:
+   a. Pilih tombol "Buka Denah Kampus" untuk membuka pemilih mode.
+   b. Pilih Denah 2D untuk pencarian rute yang lebih ringan atau Denah 3D untuk pengalaman Unity WebGL.
+   c. Tombol "Ganti mode" dapat digunakan untuk kembali ke pemilih tanpa memuat ulang seluruh halaman.
+3. Menggunakan Denah 2D:
+   a. Pada dialog awal, pilih gedung tempat pengguna berada dan tekan "Gunakan sebagai titik awal".
+   b. Ketik nama gedung, ruangan, fasilitas, atau istilah yang familiar pada kolom pencarian, lalu pilih hasil yang sesuai.
+   c. Frontend memetakan hasil ke entrance gedung dan menampilkan garis rute hasil perhitungan A* pada denah.
+   d. Gunakan pilihan "Mulai dari gedung" untuk mengganti titik awal. Denah 2D mengarahkan pengguna ke entrance gedung tujuan dan tidak mensimulasikan pergerakan di dalam ruangan.
+4. Menggunakan Denah 3D:
+   a. Pilih Denah 3D dan tunggu progres pemuatan build Unity WebGL v0.8.6.1 selesai. Pada perangkat atau koneksi tertentu, aplikasi tidak melakukan preload otomatis agar halaman utama tetap ringan.
+   b. Pilih lokasi awal yang sesuai pada antarmuka spawn runtime.
+   c. Pada desktop, klik area permainan lalu gunakan `W`, `A`, `S`, dan `D` untuk bergerak, `Shift` untuk berlari, `Space` untuk melompat, mouse untuk mengarahkan kamera, serta `Esc` untuk melepaskan kursor.
+   d. Pada mobile, gunakan posisi landscape, joystick kiri untuk bergerak, gestur pada area kanan untuk mengarahkan kamera, serta tombol sprint dan lompat yang tersedia.
+5. Mencari Tujuan dan Menyelesaikan Navigasi:
+   a. Gunakan Search Overlay di bagian atas denah dan pilih hasil tujuan.
+   b. Pada mode 3D, React mengirim `unity_object_name` melalui `SendMessage`, kemudian runtime menampilkan petunjuk rute dan label tujuan.
+   c. Setelah player tiba secara normal, Unity mengirim `OnNavigationCompleted` dengan JSON `unity_object_name`. React hanya menampilkan popup "Tiba di Tujuan" apabila identifier tersebut cocok dengan tujuan aktif.
+   d. Pengguna dapat membatalkan navigasi atau memilih tujuan baru. Pembatalan tidak diperlakukan sebagai kondisi tiba.
+6. Memperoleh Bantuan:
+   a. Gunakan tombol bantuan pada canvas 3D untuk membuka panduan navigasi dan kontak layanan kampus.
+   b. Jika mode 3D gagal dimuat atau sulit digunakan, muat ulang halaman, periksa koneksi, atau beralih ke Denah 2D.
+   c. Nomor layanan yang ditampilkan aplikasi adalah `021-7699431` dan `021-7656971`, sesuai halaman resmi Penmaru UPNVJ (UPNVJ 2026a).
 
-## 4.3 Panduan Unity dan Alur Penggantian Nama Ruangan (Engine Developer)
+## C. Kontrak Handoff Data, Artefak Unity, dan Deployment
 
-Hubungan antara database PostgreSQL Supabase dengan GameObject visual di Unity scene dijembatani secara eksklusif oleh kolom `unity_object_name`. Apabila terjadi penggantian nama ruangan atau penambahan fasilitas baru di lingkungan fisik kampus, alur kerja sinkronisasi berikut wajib dilakukan agar sistem navigasi spasial tidak terputus.
+Bagian ini menjadi checklist operasional lintas komponen. Penulis mengelola antarmuka React, kontrak API, bridge, dan deployment, sedangkan Engine Developer mengelola scene, NavMesh, tooling, optimasi, dan proses build Unity.
 
-1. Pemahaman Konsep Hubungan Kunci:
-   a. Jembatan relasi bersifat case-insensitive di mana string penamaan objek pada kolom `unity_object_name` di database PostgreSQL Supabase harus sama persis dengan nama GameObject pada hierarki scene Unity.
-   b. Apabila nama GameObject di Unity berubah namun data database tidak diperbarui, maka saat runtime pesan navigasi yang dikirim oleh React melalui `SendMessage` tidak akan menemukan target di scene.
-2. Langkah-Langkah Penggantian Nama Ruangan di Unity Editor:
-   a. Buka proyek Unity denah kampus menggunakan Unity Editor.
-   b. Pada jendela _Hierarchy_, telusuri struktur objek di bawah folder _Pointers_ gedung yang bersangkutan (misalnya: `Gedung_Dewi_Sartika > Pointers`).
-   c. Pilih GameObject ruangan yang ingin diubah (misalnya: `dewi_sartika_301`).
-   d. Ubah nama GameObject tersebut menjadi nama baru (misalnya: `dewi_sartika_301_baru`). Gunakan konvensi penamaan huruf kecil dengan separator garis bawah.
-3. Langkah-Langkah Pembaruan Data di Database Supabase:
-   a. Masuk ke halaman Admin Panel web (`/admin`).
-   b. Pilih menu pengelolaan data _Fasilitas_ atau _Gedung_ (sesuai jenis objek yang diubah).
-   c. Temukan baris ruangan yang bersangkutan dan klik tombol _Edit_.
-   d. Pada formulir modal, ubah nilai pada kolom `unity_object_name` agar memiliki string penulisan yang sama persis dengan nama GameObject baru di Unity (yaitu: `dewi_sartika_301_baru`).
-   e. Klik "Simpan" untuk menulis perubahan ke Supabase Cloud.
-4. Validasi Otomatis Menggunakan Alat Editor Sync Checker:
-   a. Di dalam Unity Editor, klik menu navigasi atas `Tools > UPNVJ > Check Database Sync`. Aksi ini akan memicu pembukaan jendela _Database Sync Checker_ khusus.
-   b. Klik tombol `Check Synchronization` pada jendela editor tersebut.
-   c. Alat sync checker akan melakukan request HTTP asinkron ke API backend `/api/unity/names` untuk mengambil seluruh record `unityObjectNames` terdaftar.
-   d. Skrip editor secara rekursif menelusuri hierarki scene aktif untuk mencocokkan nama GameObject dengan data API secara case-insensitive.
-   e. Hasil verifikasi akan ditampilkan pada jendela antarmuka:
-   1. Objek yang namanya cocok di scene dan database akan terdaftar pada kategori hijau (_Synchronized_).
-   2. Objek yang terdaftar di database namun tidak ditemukan di scene akan masuk kategori merah (_Missing in Scene_).
-   3. Objek yang ada di scene namun belum didefinisikan kolom `unity_object_name` di database akan masuk kategori kuning (_Not Registered in Database_).
-      f. Lakukan perbaikan penamaan GameObject atau entitas database hingga seluruh ruangan sasaran berstatus hijau (_Synchronized_).
-5. Pembaruan Jalur Navigasi (Re-Bake NavMesh):
-   a. Apabila penggantian nama ruangan diikuti dengan perubahan posisi fisik pintu, penyekat ruangan, atau rintangan jalan baru di scene Unity, maka peta jalan navigasi harus diperbarui.
-   b. Buka jendela navigasi bawaan Unity melalui menu `Window > AI > Navigation`.
-   c. Pada tab _Bake_, atur tinggi dan radius agen penelusuran, lalu klik tombol `Bake` di sudut kanan bawah.
-   d. Unity akan memperbarui struktur data NavMesh di seluruh area kampus agar rute pathfinding rintangan jalan terbebas dari kesalahan visual tabrakan dinding.
-6. Kompilasi dan Penyebaran (Build dan Deploy WebGL):
-   a. Buka jendela pengatur build WebGL khusus melalui menu `Tools > UPNVJ > WebGL Build Settings`.
-   b. Atur optimasi build kompilasi (misalnya: WebGL2, kompresi Gzip/Brotli, dan culling distance) lalu klik `Build Project`.
-   c. Setelah proses kompilasi selesai, salin seluruh file hasil build WebGL dari direktori keluaran Unity ke dalam folder publik React di web server (`/public/build/`).
-   d. Jalankan perintah deploy web (`npm run build` dan push deploy) untuk menyebarkan pembaruan visual nama ruangan tersebut sehingga dapat diakses oleh publik secara langsung.
+1. Pembaruan Data dan Identifier:
+   a. Perubahan data dilakukan melalui Admin Panel sesuai sesi dan kebijakan akses yang tersedia.
+   b. Nama tampilan disimpan terpisah dari `unity_object_name`. Perubahan identifier harus disepakati bersama karena digunakan oleh API, React, dan GameObject Unity.
+   c. `/api/unity/data` menjadi kontrak runtime, sedangkan `/api/unity/names` melayani pemeriksaan identifier pada tooling editor.
+2. Penyerahan Artefak Unity WebGL:
+   a. Engine Developer menyerahkan loader, framework, WebAssembly, data, dan StreamingAssets dari satu build yang sama.
+   b. Penyerahan mencantumkan nomor versi dan catatan perubahan. Build aktif yang dikonfigurasi pada source saat peninjauan lampiran adalah v0.8.6.1.
+   c. Callback penyelesaian wajib menggunakan event `OnNavigationCompleted` dengan `CustomEvent.detail` berupa string JSON yang memuat `unity_object_name`.
+3. Deployment oleh Penulis:
+   a. Artefak ditempatkan pada path versi di `public/unity-builds/`, kemudian URL loader, preloader, dan `vercel.json` diselaraskan ke versi yang sama.
+   b. Vercel menetapkan content type, Brotli content encoding, cache immutable, header keamanan, dan fallback route SPA.
+   c. Smoke test mencakup `/api/health`, `/api/unity/data`, `/api/unity/names`, status aset build, progres pemuatan, `SendMessage`, dan kecocokan callback completion.
+4. Batas Perubahan:
+   a. Masalah kontrak React, API, header, cache, atau deployment diperbaiki oleh penulis.
+   b. Masalah scene, spawn, NavMesh, label runtime, minimap, `BuildingDatabase`, `NavigationReceiver`, atau kompilasi dikembalikan kepada Engine Developer untuk diperbaiki dan dibangun ulang.
+   c. Observasi Network v0.8.0 dan audit Lighthouse commit `bdeb5bc` merupakan bukti snapshot sebelumnya; nilainya tidak digunakan sebagai benchmark build v0.8.6.1 tanpa pengukuran ulang.
+
+---
+
+# LAMPIRAN 5. Instrumen UAT dan Indeks Bukti Pengujian
+
+<!-- PIPELINE:INCLUDE content/shared/testing/appendix-instruments.md -->
+
+---
+
+# LAMPIRAN 6. Matriks Artefak dan Reproduksi Pengujian
+
+Lampiran ini memetakan klaim kontribusi Full Stack Web Developer, System Integrator, dan DevOps Engineer kepada artefak yang dapat diperiksa. Matriks tidak menggantikan pembahasan hasil pada BAB III dan tidak memperluas klaim ke implementasi database atau Unity yang dimiliki anggota tim lain.
+
+Hubungan antara area kontribusi, bukti, snapshot, dan batas interpretasi ditunjukkan pada [TABREF:lampiran_matriks_artefak_iman].
+
+[TABLE-ID:lampiran_matriks_artefak_iman]
+[TABLECAPTION:Matriks Artefak dan Bukti Kontribusi Penulis]
+
+[TABLE]
+Area | Artefak atau Lokasi | Snapshot atau Commit | Hasil yang Dibuktikan | Batas Interpretasi
+Frontend publik dan admin | Empat gambar UI utama pada BAB III; `src/components/dashboard/`, `src/components/admin/` | Tangkapan layar deployment 21 Juli 2026 | Public Dashboard, pencarian, canvas 3D, dan Admin Panel tersedia | Tangkapan layar tidak membuktikan seluruh state modal atau sinkronisasi seed live
+Autentikasi dan CRUD | `AuthContext.tsx`, `ProtectedRoute.tsx`, `supabaseDataService.ts` | Kode sumber web aktif `08ebc06` | Sesi, route terproteksi, validasi formulir, dan CRUD melalui Supabase SDK | Rancangan RLS dan skema database bukan kontribusi penulis
+Pengujian React | `SearchOverlay.test.tsx` dan suite Vitest | Kode sumber aktif `08ebc06`; awal `b572a48`; lanjutan `d2e8fdb` | 13 file dan 129 pengujian lulus, termasuk 11 pengujian callback completion | Angka merupakan snapshot kode sumber aktif; sembilan pengujian diperkenalkan pada commit awal dan dua ditambahkan pada commit lanjutan
+REST API dan kontrol akses | `api/health.js`, `api/unity/data.js`, `api/unity/names.js`; empat gambar TEST API | Pemeriksaan 21 Juli 2026 | Tiga GET memperoleh HTTP 200 dan mutasi tanpa otorisasi ditolak RLS | Smoke test manual tidak menggantikan browser end-to-end atau authorized CRUD test
+Integrasi React–Unity | `SearchOverlay.tsx`, event `OnNavigationCompleted`, tangkapan layar notifikasi tiba | React aktif `08ebc06`; Unity `1845c65` | Payload tujuan pada `activeNavigationRef` diterima, sedangkan payload kosong, rusak, berbeda, atau setelah pembatalan diabaikan | Completion runtime dan build Unity dimiliki Engine Developer
+Deployment WebGL | `UnityCampusMap.tsx`, `unityPreloader.ts`, `vercel.json`, `api/health.js` | Konfigurasi build v0.8.6.1 dari `d30f7d1`; kode sumber web aktif `08ebc06` | Loader, path versi, health check, Brotli, content type, dan cache dikonfigurasi | Belum terdapat pengukuran Network baru yang menggantikan observasi v0.8.0
+Lighthouse | `reports/lighthouse/latest-summary.md` | `bdeb5bc` | Performance mobile 86 dan desktop 99; tiga kategori lain 100 | Data lab lokal pada snapshot audit, bukan data pengguna nyata atau benchmark build v0.8.6.1
+Tindak lanjut pengujian pengguna | Subbab 3.5, `content/shared/testing/results.json`, dan folder dokumentasi revisi | Verifikasi 21 Juli 2026 | Basis visual, audit kode sumber, pengujian otomatis, dan sumber resmi terdokumentasi | Tangkapan layar revisi bukan kuesioner UAT kedua
+[/TABLE]
+
+Perintah reproduksi untuk repository web adalah sebagai berikut:
+
+1. `npm test` menjalankan suite Vitest satu kali.
+2. `npm run lint` menjalankan pemeriksaan ESLint.
+3. `npm run build` menjalankan TypeScript build dan production build Vite.
+4. `npm run lighthouse` membangun aplikasi, menjalankan preview lokal, dan memperbarui audit mobile serta desktop.
+5. Pemeriksaan deployment dilakukan melalui `GET /api/health`, `GET /api/unity/data`, dan `GET /api/unity/names`, lalu dilengkapi skenario negatif mutasi Supabase tanpa sesi yang sah.
+
+Reproduksi memerlukan environment variables yang valid pada lingkungan pemeriksa. Nilai rahasia, kata sandi administrator, service role key, dan kredensial layanan tidak disertakan dalam lampiran atau perintah reproduksi.

@@ -292,7 +292,11 @@ def _media_before_caption(entries: dict, caption_text: str):
     for i, p in enumerate(children):
         if p.tag != f"{{{W}}}p" or para_style(p) != "Caption":
             continue
-        if caption_text not in para_text(p):
+        text = para_text(p)
+        if caption_text not in text:
+            continue
+        remainder = text.replace(caption_text, "").strip()
+        if not re.match(r"^(Gambar|Tabel)\s+[0-9\.]+$", remainder, re.IGNORECASE):
             continue
         j = i - 1
         while j >= 0:
@@ -382,14 +386,40 @@ def _reconcile_with_surveys() -> dict:
 
 @pytest.fixture(scope="module")
 def reconciled_project(tmp_path_factory):
-    """An isolated project dir holding a copy of images/ (manifest + curated
-    files), a reconcile file with the survey_* ids allow-listed, and a copy of
-    the captured doc. No real repo file is mutated."""
+    """Create an isolated captured-doc fixture compatible with the live manifest.
+
+    The repository manifest can advance before a new DOCX is intentionally built
+    (for example when Markdown-first UI figures are added).  Keep only entries
+    represented by the captured document and mirror their packed media bytes into
+    the isolated ``images/`` directory.  This tests injector/validator behavior
+    without treating a stale generated DOCX as the source of truth or mutating it.
+    """
     proj = tmp_path_factory.mktemp("reconciled_proj")
     shutil.copytree(ROOT / "images", proj / "images")
-    (proj / "images" / "manifest_reconcile.json").write_text(
-        json.dumps(_reconcile_with_surveys()), encoding="utf-8")
     shutil.copy2(CAPTURED_DOCX, proj / "captured.docx")
+
+    entries = read_all(proj / "captured.docx")
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    represented = []
+    for item in manifest["images"]:
+        caption = item["caption_match"]
+        if caption_match_count(parse_doc(entries), caption) != 1:
+            continue
+        media_name = _media_before_caption(entries, caption)
+        if media_name is None:
+            continue
+        represented.append(item)
+        image_path = proj / "images" / item["file"]
+        image_path.parent.mkdir(parents=True, exist_ok=True)
+        image_path.write_bytes(entries[media_name])
+
+    (proj / "images" / "manifest.json").write_text(
+        json.dumps({"images": represented}, indent=2), encoding="utf-8"
+    )
+    (proj / "images" / "manifest_reconcile.json").write_text(
+        json.dumps({"duplicate_content_allow": [], "unresolved_allow": []}),
+        encoding="utf-8",
+    )
     return proj
 
 
@@ -675,7 +705,7 @@ def test_validator_c2_wrong_resolution_count_rejected(reconciled_project):
     """C2: an entry that no longer resolves to exactly one caption is rejected."""
     entries = read_all(reconciled_project / "captured.docx")
     doc = parse_doc(entries)
-    target = "Entity-Relationship Diagram"  # manifest entry diagram_erd
+    target = "Tahap Pengembangan"  # manifest entry diagram_tahap_pengembangan
     assert caption_match_count(doc, target) == 1
     _edit_caption_descriptor(doc, target, "Bagan Yang Sudah Tidak Cocok")
     assert caption_match_count(doc, target) == 0
@@ -692,8 +722,8 @@ def test_validator_c3_content_mismatch_rejected(reconciled_project):
     """C3: a packed media whose bytes no longer match its injected images/<file>
     (simulated recompression) is rejected."""
     entries = read_all(reconciled_project / "captured.docx")
-    victim = _media_before_caption(entries, "Entity-Relationship Diagram")
-    assert victim is not None, "expected a packed media preceding the ERD caption"
+    victim = _media_before_caption(entries, "Tahap Pengembangan")
+    assert victim is not None, "expected a packed media preceding the development-stage caption"
     original = _md5_bytes(entries[victim])
     entries[victim] = entries[victim] + b"\x00recompressed-drift"
     assert _md5_bytes(entries[victim]) != original
@@ -756,7 +786,7 @@ def test_integration_negative_all_four_defects(reconciled_project):
 
     # Document-level defects: C2 (zero match) + C4 (tall, no pageBreakBefore).
     doc = parse_doc(entries)
-    _edit_caption_descriptor(doc, "Entity-Relationship Diagram", "Bagan Rusak Tak Cocok")
+    _edit_caption_descriptor(doc, "Tahap Pengembangan", "Bagan Rusak Tak Cocok")
     threshold = _printable_height(doc)
     tall_p = _drawing_p_before_caption(doc, "Sequence Diagram: Autentikasi Administrator")
     assert tall_p is not None

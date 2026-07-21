@@ -25,15 +25,16 @@ skinparam actor {
   BorderColor #555555
 }
 
-title Gambar 2.9 — Diagram Arsitektur Sistem
+title Gambar 2.9 - Diagram Arsitektur Sistem
 
 actor "Pengguna Publik" as User
 actor "Administrator" as Admin
 
 rectangle "Browser (Klien)" as Browser {
-  component "React SPA\n(Vite)\n- Dashboard Publik\n- Admin Panel\n- Panel Pencarian\n- Multi-bahasa" as React
+  component "React SPA\n(Vite)\n- Dashboard Publik\n- Admin Panel\n- Denah 2D + Pencarian\n- Multi-bahasa" as React
   component "Unity WebGL Canvas\n- Scene 3D Kampus\n- NavMesh Pathfinding\n- First-person Control" as UnityCanvas
-  React -right-> UnityCanvas : SendMessage\n(\"NavigationReceiver\",\n\"NavigateTo\") — satu arah
+  React -right-> UnityCanvas : SendMessage\n(NavigationReceiver, NavigateTo)\n+ unity_object_name
+  UnityCanvas -left-> React : OnNavigationCompleted\nJSON unity_object_name\n(validasi tujuan aktif)
 }
 
 rectangle "Vercel" as Vercel {
@@ -41,10 +42,10 @@ rectangle "Vercel" as Vercel {
   component "Serverless Functions\n/api/unity/data\n/api/unity/names\n/api/buildings, /api/rooms\n/api/health" as Serverless
 }
 
-rectangle "Server Kampus" as Kampus {
-  component "Express.js (:3001)\n- Proxy Umami\n- Rate limiter" as Express
-  component "Umami Analytics\n(Docker :3000)" as Umami
-  Express -right-> Umami : proxy
+rectangle "Layanan Operasional Opsional" as OptionalServices {
+  component "Express.js (:3001)\n- Proxy API Umami\n- Rate limiter" as Express
+  component "Umami Analytics\n(Self-hosted Docker)" as Umami
+  Express -right-> Umami : proxy analitik
 }
 
 database "Supabase Cloud\n- PostgreSQL\n- Auth (JWT)\n- Row Level Security" as Supabase
@@ -55,14 +56,15 @@ Admin --> React : Login & CRUD data
 
 ' Frontend ke layanan
 React --> Static : Muat aset (SPA + WebGL)
-React --> Serverless : REST API (data gedung/fasilitas)
-React --> Supabase : Auth & query (RLS)
-React --> Express : Statistik analitik
+React --> Supabase : Auth, query, CRUD, analitik\n(dibatasi RLS)
 
 ' Unity menarik data sendiri (runtime)
 UnityCanvas --> Serverless : HTTP GET /api/unity/data
 
 ' Serverless ke database
 Serverless --> Supabase : Query data
+
+' Jalur analitik alternatif, bukan dependensi UI aktif
+React ..> Express : jalur analitik opsional\n(jika diaktifkan)
 
 @enduml

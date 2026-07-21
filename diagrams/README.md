@@ -1,6 +1,6 @@
 # Diagram-as-Code — Laporan Tugas Akhir
 
-Folder ini berisi 6 diagram dalam format **PlantUML** (`.puml`). Penomoran mengikuti **DAFTAR GAMBAR pada DOCX final**.
+Folder ini berisi diagram dalam format **PlantUML** (`.puml`). Penomoran mengikuti **DAFTAR GAMBAR pada DOCX final**.
 
 | Berkas | Nomor (DOCX) | Jenis | Judul |
 |---|---|---|---|
@@ -9,7 +9,7 @@ Folder ini berisi 6 diagram dalam format **PlantUML** (`.puml`). Penomoran mengi
 | `gambar-2.11-legenda-use-case.puml` | Gambar 2.11 | Legenda | Legenda Use Case Diagram |
 | `gambar-2.12-use-case-diagram.puml` | Gambar 2.12 | Use Case | Use Case Diagram |
 | `gambar-2.13-activity-pengelolaan-data-admin.puml` | Gambar 2.13 | Activity | Pengelolaan Data oleh Admin |
-| `gambar-2.14-activity-integrasi-data-denah.puml` | Gambar 2.14 | Activity | Integrasi Data Denah (Skenario A/B/C) |
+| `gambar-2.14-activity-integrasi-data-denah.puml` | Gambar 2.14 | Activity | Integrasi Data Denah 2D dan 3D |
 | `gambar-2.15-sequence-autentikasi-admin.puml` | Gambar 2.15 | Sequence | Autentikasi Administrator |
 | `gambar-2.16-sequence-sinkronisasi-data-unity.puml` | Gambar 2.16 | Sequence | Sinkronisasi Data Gedung dan Unity |
 | `gambar-2.17-erd.puml` | Gambar 2.17 | ERD | Entity-Relationship Diagram (sesuai PRD) |
@@ -19,8 +19,11 @@ Folder ini berisi 6 diagram dalam format **PlantUML** (`.puml`). Penomoran mengi
 
 ## Diagram yang Diregenerasi karena Deprecated
 Mengacu PRD terkini, beberapa diagram lama tidak lagi sesuai sistem sekarang dan telah diperbarui:
-- **Arsitektur Sistem (2.9):** versi lama memakai alur kirim JSON `SendMessage` ke Unity dan interaksi klik Unity→React. Versi baru: Unity menarik data sendiri via `GET /api/unity/data`, komunikasi **satu arah** React→Unity (`NavigateTo`).
-- **File `../diagram_alur_sistem.md` (Mermaid) DEPRECATED:** masih memuat modul lama `BuildingDataReceiver`, `BuildingClickHandler`, `ReceiveBuildingsData`, dan callback Unity→React (kini *out of scope*). Gunakan diagram pada folder ini sebagai gantinya.
+- **Arsitektur Sistem (2.9):** versi lama memakai alur kirim JSON data gedung melalui `SendMessage` dan callback klik objek. Versi aktif: Unity menarik data sendiri melalui `GET /api/unity/data`; React mengirim `NavigateTo`, sedangkan Unity mengembalikan completion JSON `unity_object_name` setelah tiba normal. Express hanya mengarah ke Umami sebagai jalur analitik opsional dan tidak menjadi perantara Supabase.
+- **Use Case (2.12):** versi aktif hanya memuat fitur antarmuka yang terverifikasi. Tabel akreditasi publik dan CRUD fakultas telah dihapus; runtime dan tooling editor dipisahkan menurut endpoint masing-masing.
+- **Activity Admin (2.13):** autentikasi serta CRUD mengalir langsung dari React ke Supabase. Audit dicatat oleh service aplikasi, bukan diklaim berasal dari trigger basis data.
+- **Activity Integrasi (2.14):** skenario A/B/C data akademik eksternal telah diganti dengan alur Denah 2D A*, pemuatan Unity WebGL, `SendMessage`, dan callback `OnNavigationCompleted`.
+- **File `../diagram_alur_sistem.md` (Mermaid) DEPRECATED:** masih memuat modul lama `BuildingDataReceiver`, `BuildingClickHandler`, dan `ReceiveBuildingsData`. Gunakan diagram pada folder ini sebagai gantinya.
 
 ## Cara Render ke PNG/SVG
 
@@ -51,6 +54,6 @@ java -jar plantuml.jar -tsvg *.puml
 Semua diagram memakai palet warna seragam (navy `#0B2A4A` + aksen emas `#F4B400`) agar selaras saat disisipkan ke laporan. Ubah blok `skinparam` di tiap berkas bila ingin menyesuaikan warna/brand.
 
 ## Hal yang Perlu Diverifikasi
-- **Gambar 2.14 (Integrasi Data Denah):** label cabang **Skenario A/B/C** disusun berdasarkan konteks "mitigasi ketersediaan data akademik eksternal". Sesuaikan teks tiap cabang dengan narasi A/B/C persis di laporan kamu.
-- **Gambar 2.12 (Use Case):** aktor "Engine Unity" ditambahkan sebagai konsumen API (`/api/unity/data`, `/api/unity/names`). Hapus bila ingin fokus hanya pada User & Admin.
-- Nama endpoint, partisipan, dan field disesuaikan dengan PRD & draf BAB II.
+- Gambar 2.12 membedakan Unity Runtime sebagai konsumen `/api/unity/data` dan tooling Unity Editor sebagai konsumen `/api/unity/names`.
+- Gambar 2.14 harus tetap selaras dengan kontrak callback JSON dan validasi `activeNavigationRef` pada source React aktif.
+- Nama endpoint, partisipan, dan field disesuaikan dengan fakta proyek serta draf BAB II.

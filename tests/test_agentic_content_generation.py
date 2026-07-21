@@ -35,7 +35,7 @@ Isi front-end.
 
 # DAFTAR PUSTAKA
 
-Aliyah, A., Hartono, N., & Muin, A. A. (2024). Penggunaan User Acceptance Testing.
+Aliyah, A., Hartono, N., & Muin, A. A. (2025). Penggunaan User Acceptance Testing.
 
 ---
 """
@@ -260,8 +260,8 @@ def test_missing_fact_is_allowed_only_as_declared_tbd():
 def test_citation_must_exist_in_bibliography_and_match_declaration():
     valid = GenerationCandidate(
         section_id="3.2.1",
-        markdown="UAT mendukung evaluasi penerimaan pengguna (Aliyah et al. 2024).",
-        citations_used=("(Aliyah et al. 2024)",),
+        markdown="UAT mendukung evaluasi penerimaan pengguna (Aliyah et al. 2025).",
+        citations_used=("(Aliyah et al. 2025)",),
     )
     invalid = GenerationCandidate(
         section_id="3.2.1",

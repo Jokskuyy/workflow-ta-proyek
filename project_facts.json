@@ -1,6 +1,6 @@
 {
     "project_metadata": {
-        "title": "Integrasi Denah Virtual Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu (Dashboard Profil)",
+        "title": "Pengembangan Dashboard Web, Integrasi Unity WebGL, dan Deployment Sistem Denah Virtual UPNVJ Kampus Pondok Labu",
         "author": "Muhammad Iman Nugraha",
         "nim": "2210511129",
         "program_study": "S1 Informatika",
@@ -12,15 +12,22 @@
             "pembimbing_2": "Novi Trisman Hadi, S.Pd., M.Kom."
         },
         "mitra": {
-            "name": "UPA TIK UPN Veteran Jakarta",
-            "representative": "Asep Saeful Ridwan, S.Kom.",
-            "role": "Kepala UPA TIK UPNVJ"
+            "name": "Humas UPNVJ",
+            "representative": "Perwakilan Humas UPNVJ",
+            "role": "Mitra pengguna dan peserta UAT"
+        },
+        "institutional_coordination": {
+            "upa_tik": {
+                "name": "Unit Penunjang Akademik Teknologi Informasi dan Komunikasi (UPA TIK) UPNVJ",
+                "representative": "Asep Saeful Ridwan, S.Kom.",
+                "role": "Koordinasi teknis, batas akses data, kemungkinan integrasi institusional, dan penyerahan pakta integritas"
+            }
         },
         "stakeholder_interviews": [
             {
                 "role": "Kepala UPA TIK UPNVJ",
                 "name": "Asep Saeful Ridwan, S.Kom",
-                "notes": "Membahas pembagian peran tim tugas akhir, merumuskan kebutuhan fungsional dan non-fungsional sistem."
+                "notes": "Membahas pembagian peran tim tugas akhir, batas akses data, dan kemungkinan integrasi teknis. Wawancara ini tidak digunakan sebagai bukti kebutuhan pengguna navigasi atau persetujuan institusional."
             },
             {
                 "role": "Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi UPNVJ",
@@ -30,8 +37,10 @@
         ],
         "documents": {
             "pakta_integritas_upa_tik": {
-                "status": "signed",
-                "evidence": "dokumentasi/ttd pakta integritas UPA TIK.jpeg"
+                "status": "submitted_original_copy_not_retained",
+                "evidence": "dokumentasi/ttd pakta integritas UPA TIK.jpeg",
+                "signed_scan_available": false,
+                "evidence_scope": "Foto mendokumentasikan penyerahan dokumen kepada staf UPA TIK; foto bukan pengganti scan dokumen bertanda tangan dan tidak digunakan untuk mengklaim nomor surat, tanggal pengesahan, identitas penandatangan, atau persetujuan formal."
             },
             "wawancara_warek_2": {
                 "status": "completed",
@@ -69,20 +78,23 @@
             "penguji_1": "Dr. Widya Cholil, M.I.T",
             "penguji_2": "Kharisma Wiati Gusti, M.T."
         },
-        "humas": "Humas UPNVJ (sebagai responden/user mahasiswa)"
+        "humas": "Humas UPNVJ sebagai mitra pengguna; satu perwakilan mengikuti UAT tanpa digunakan untuk mengklaim persetujuan formal atau representasi seluruh pengguna UPNVJ"
     },
     "team_members": [
         {
             "name": "Muhammad Iman Nugraha",
             "nim": "2210511129",
-            "role": "Peran 1: Full Stack Web Developer & System Integrator",
+            "role": "Peran 1: Full Stack Web Developer, System Integrator, dan DevOps Engineer",
             "focus": [
-                "React Frontend",
-                "Serverless API",
-                "Supabase Auth",
-                "Umami Analytics Proxy",
-                "System Integration",
-                "Vitest"
+                "React Frontend (Public Dashboard and Admin Panel)",
+                "React-based 2D campus map and Unity WebGL 3D tour host",
+                "Vercel Serverless API",
+                "Supabase Auth and application integration",
+                "Native Unity WebGL loader and React-Unity bridge",
+                "Vercel deployment and environment configuration",
+                "Active Supabase analytics plus optional Umami Docker and Express path",
+                "Health monitoring",
+                "Web testing (Vitest and Lighthouse); Black Box/UAT for browser flows; Playwright not present in the verified snapshot"
             ]
         },
         {
@@ -107,7 +119,7 @@
                 "3D modeling and layout directly in Unity Editor",
                 "PostgreSQL database schema design in Supabase Cloud",
                 "RLS policies",
-                "audit logs triggers",
+                "audit trigger design/ownership (not verified active in the 2026-07-21 web snapshot)",
                 "data mapping/integrity"
             ]
         }
@@ -117,37 +129,161 @@
             "completed": true,
             "date_conducted": null,
             "total_scenarios": 24,
-            "passed_scenarios": 24,
-            "failed_scenarios": [],
-            "success_rate": "100.00%",
-            "initial_result": {
-                "passed_scenarios": 23,
-                "failed_scenarios": [
-                    "BB-20"
-                ],
-                "success_rate": "95.83%"
-            },
+            "passed_scenarios": 23,
+            "failed_scenarios": [
+                "BB-20"
+            ],
+            "success_rate": "95.83%",
             "retest": {
                 "completed": true,
                 "scenario": "BB-20",
                 "result": "passed",
-                "evidence_status": "confirmed_by_project_owner; formal attachment pending"
+                "evidence_status": "verified_by_two_sequential_screenshots",
+                "evidence": [
+                    "Hasil UAT/dokumentasi revisi/BB20_1.png",
+                    "Hasil UAT/dokumentasi revisi/BB20_2.png"
+                ]
+            },
+            "final_verification": {
+                "passed_scenarios": 24,
+                "failed_scenarios": [],
+                "success_rate": "100.00%"
             },
             "evidence": [
-                "Hasil UAT/Hasil_BlackBox.docx"
+                "Hasil UAT/Hasil_BlackBox.docx",
+                "Hasil UAT/dokumentasi revisi/BB20_1.png",
+                "Hasil UAT/dokumentasi revisi/BB20_2.png"
             ],
-            "details": "Hasil awal mencatat BB-20 tidak lulus karena label tujuan menampilkan unity_object_name. Akar masalahnya adalah script testing Unity ikut masuk ke build WebGL. Setelah script testing dipisahkan dari build produksi dan nama tampilan fasilitas dipulihkan, BB-20 dikonfirmasi lulus pada pengujian ulang sehingga hasil akhir menjadi 24 dari 24 skenario."
+            "details": "Pengujian awal mencatat 23 dari 24 skenario lulus. BB-20 awalnya tidak lulus karena label tujuan menampilkan unity_object_name akibat script testing Unity ikut masuk ke build WebGL. Setelah tindakan korektif dan build ulang, dua frame retest menunjukkan label Gedung Dewi Sartika beserta garis rute sebelum completion, lalu garis rute hilang dan notifikasi tiba tampil setelah completion. Status akhir menjadi 24 dari 24 skenario terverifikasi lulus."
+        },
+        "api_deployment_smoke_testing": {
+            "completed": true,
+            "method": "manual API client inspection",
+            "evidence_date": "2026-07-21",
+            "cases": [
+                {
+                    "request": "GET /api/health",
+                    "expected": "HTTP 200 with readable service status",
+                    "actual": "HTTP 200 with success true, status OK, message, and timestamp",
+                    "result": "passed",
+                    "evidence": "dokumentasi/TEST API/GET_apihealth.png"
+                },
+                {
+                    "request": "GET /api/unity/data",
+                    "expected": "HTTP 200 with gedung and fasilitas runtime contract",
+                    "actual": "HTTP 200 with JSON data and unity_object_name",
+                    "result": "passed",
+                    "evidence": "dokumentasi/TEST API/GET_apiunitydata.png"
+                },
+                {
+                    "request": "GET /api/unity/names",
+                    "expected": "HTTP 200 with unityObjectNames array",
+                    "actual": "HTTP 200 with unityObjectNames array",
+                    "result": "passed",
+                    "evidence": "dokumentasi/TEST API/GET_apiunitynames.png"
+                },
+                {
+                    "request": "POST Supabase REST /fasilitas without authorized session",
+                    "expected": "Mutation rejected by row-level security",
+                    "actual": "HTTP 401 with PostgreSQL code 42501",
+                    "result": "passed",
+                    "evidence": "dokumentasi/TEST API/POST_aaysacqsibquiulpdzwzsupabasecorestv1fasilitas.png"
+                }
+            ],
+            "limitations": "Manual smoke tests do not replace automated browser/deployment tests for authorized CRUD, production headers, or Unity WebGL end-to-end behavior.",
+            "ownership_boundary": "Iman verifies API and Supabase integration behavior; the Database Schema Designer owns the RLS policy design."
         },
         "lighthouse_testing": {
             "completed": true,
-            "date_conducted": "2026-06-17",
-            "metrics": {
-                "performance": "56/100",
-                "accessibility": "93/100",
-                "best_practices": "100/100",
-                "seo": "92/100"
+            "date_conducted": "2026-07-21",
+            "time_conducted": "approximately 08:15 WIB (01:15 UTC)",
+            "commit": "bdeb5bc",
+            "command": "npm run lighthouse",
+            "environment": {
+                "url": "http://127.0.0.1:4173/",
+                "lighthouse_version": "12.8.2",
+                "chrome": "HeadlessChrome 150",
+                "throttling": "simulated",
+                "storage_reset": true,
+                "mobile_viewport": "412 x 823, DPR 1.75, RTT 150 ms, throughput 1638.4 Kbps, CPU slowdown 4x",
+                "desktop_viewport": "1350 x 940, DPR 1, RTT 40 ms, throughput 10240 Kbps, CPU slowdown 1x"
             },
-            "details": "Pengujian Lighthouse awal (baseline) dijalankan pada build produksi lokal menggunakan preview server Vite sebelum dilakukan optimasi performa lebih lanjut pada codebase."
+            "category_scores": {
+                "mobile": {
+                    "performance": 86,
+                    "accessibility": 100,
+                    "best_practices": 100,
+                    "seo": 100
+                },
+                "desktop": {
+                    "performance": 99,
+                    "accessibility": 100,
+                    "best_practices": 100,
+                    "seo": 100
+                }
+            },
+            "metrics": {
+                "mobile": {
+                    "first_contentful_paint_ms": 2444,
+                    "largest_contentful_paint_ms": 3681,
+                    "speed_index_ms": 2444,
+                    "total_blocking_time_ms": 89,
+                    "cumulative_layout_shift": 0,
+                    "time_to_interactive_ms": 3913,
+                    "max_potential_fid_ms": 221,
+                    "root_document_response_ms": 2.9,
+                    "total_byte_weight": 419577,
+                    "dom_elements": 355
+                },
+                "desktop": {
+                    "first_contentful_paint_ms": 541,
+                    "largest_contentful_paint_ms": 775,
+                    "speed_index_ms": 589,
+                    "total_blocking_time_ms": 6,
+                    "cumulative_layout_shift": 0,
+                    "time_to_interactive_ms": 781,
+                    "max_potential_fid_ms": 62,
+                    "root_document_response_ms": 2.2,
+                    "total_byte_weight": 566763,
+                    "dom_elements": 355
+                }
+            },
+            "lcp_analysis": {
+                "element": "first hero image with alt UPNVJ Campus 1",
+                "mobile_resource": "hero1-mobile.webp",
+                "mobile_transfer_size": "approximately 32.2 KiB",
+                "mobile_render_delay_ms": 3228,
+                "mobile_render_delay_share": "88%",
+                "resource_discovery": "eager, discoverable from the initial document, fetchpriority high"
+            },
+            "measured_opportunities": {
+                "unused_javascript": "approximately 75 KiB",
+                "hero_image": "compression and responsive-image optimization",
+                "render_blocking_stylesheet": "approximately 16 KiB"
+            },
+            "scope_limitations": "Local Lighthouse lab data, not Chrome UX Report or real-user field data. Accessibility has 19 applicable automated audits passed with 10 manual checks remaining; SEO has 9 automated audits passed with 1 manual check remaining; PWA was not tested.",
+            "evidence": [
+                "reports/lighthouse/latest-mobile.json",
+                "reports/lighthouse/latest-desktop.json",
+                "reports/lighthouse/latest-summary.md",
+                "AI Handoff - Latest Lighthouse Audit, 21 July 2026"
+            ],
+            "details": "Desktop performance reached 99 while mobile performance reached 86; Accessibility, Best Practices, and SEO were 100 in both modes. Mobile FCP and LCP remain the primary optimization targets, while CLS and TBT are already strong."
+        },
+        "web_repository_verification": {
+            "completed": true,
+            "date_conducted": "2026-07-21",
+            "commit": "08ebc06",
+            "results": {
+                "lint": "passed",
+                "vitest_test_files": 13,
+                "vitest_tests_passed": 129,
+                "navigation_completion_tests": 11,
+                "production_build": "passed",
+                "playwright_suite": "not_present"
+            },
+            "evidence": "Verifikasi repository web aktif dan handoff integrasi Navigation Completion Unity ke React, 21 Juli 2026",
+            "details": "Kode sumber aktif 08ebc06 mencatat npm lint, 13 file dan 129 pengujian Vitest/React Testing Library, serta tsc -b + Vite build lulus. Sembilan pengujian awal pada b572a48 dan dua pengujian lanjutan pada d2e8fdb memverifikasi kontrak OnNavigationCompleted pada React. Tidak ada rangkaian pengujian browser end-to-end/integrasi Unity yang dijalankan, sehingga tidak boleh mengklaim hasil Playwright."
         },
         "user_acceptance_test_uat": {
             "completed": true,
@@ -156,8 +292,12 @@
                 "total_unique": 5,
                 "public_questionnaire": 4,
                 "admin_questionnaire": 4,
-                "students": null,
-                "admin_staff": null
+                "participant_roles": {
+                    "dosen_penguji": 2,
+                    "dosen_pembimbing": 2,
+                    "perwakilan_humas_upnvj": 1
+                },
+                "selection_method": "purposive sampling"
             },
             "likert_scale_rating": "1-5",
             "results": {
@@ -183,7 +323,68 @@
                 "Hasil UAT/User_Humas.pdf",
                 "Hasil UAT/Widya_Cholil.pdf"
             ],
-            "details": "UAT menggunakan dua instrumen. Instrumen pengguna publik diisi oleh 4 responden dan memperoleh 77.78%; instrumen dashboard admin diisi oleh 4 responden dan memperoleh 84.55%. Terdapat 5 responden unik karena sebagian responden mengisi kedua instrumen."
+            "details": "UAT diikuti oleh 5 peserta unik yang terdiri atas 2 dosen penguji, 2 dosen pembimbing, dan 1 perwakilan Humas UPNVJ. Instrumen pengguna publik diisi oleh 4 peserta dan memperoleh 77.78%; instrumen dashboard admin diisi oleh 4 peserta dan memperoleh 84.55%. Sebagian peserta mengisi kedua instrumen sehingga persentase gabungan berdasarkan seluruh jawaban adalah 81.50%."
+        },
+        "uat_revision_implementation": {
+            "date_verified": "2026-07-21",
+            "revision_ids": [
+                "UAT-R01",
+                "UAT-R02",
+                "UAT-R03",
+                "UAT-R04",
+                "UAT-R05",
+                "UAT-R06",
+                "UAT-R07",
+                "UAT-R08",
+                "UAT-R09",
+                "UAT-R10"
+            ],
+            "verification_scope": "Kombinasi audit kode sumber, pengujian otomatis, sumber resmi, dan tangkapan layar deployment. Tangkapan layar bukan kuesioner UAT kedua.",
+            "data_revision": {
+                "initial_records": 339,
+                "standardized_names": 119,
+                "updated_descriptions": 189,
+                "removed_out_of_scope_records": 27,
+                "records_after_mapping_cleanup": 312,
+                "resolved_duplicates": 1,
+                "final_seed_records": 311,
+                "live_supabase_reseed_verified": false
+            },
+            "navigation_completion": {
+                "unity_commit": "1845c65",
+                "react_commit": "b572a48",
+                "react_followup_commit": "d2e8fdb",
+                "verified_web_commit": "08ebc06",
+                "event": "OnNavigationCompleted",
+                "payload": "JSON string containing unity_object_name",
+                "react_tests": 11,
+                "deployed": true,
+                "popup_screenshot_available": true,
+                "popup_screenshot": "Hasil UAT/dokumentasi revisi/RR10_notif_sampai.png"
+            },
+            "official_contact": {
+                "phone_numbers": [
+                    "021-7699431",
+                    "021-7656971"
+                ],
+                "source": "https://penmaru.upnvj.ac.id/id/contact.html",
+                "source_owner": "UPNVJ"
+            },
+            "official_humas_source": {
+                "title": "Rapat Koordinasi Humas UPNVJ 2026: Fokus Strategi Komunikasi Digital dan Media Sosial Perguruan Tinggi",
+                "source": "https://www.upnvj.ac.id/id/berita/2026/02/rapat-koordinasi-humas-upnvj-2026-fokus-strategi-komunikasi-digital-dan-media-sosial-perguruan-tinggi.html",
+                "source_owner": "UPNVJ",
+                "use": "Konteks peran Humas dalam komunikasi informasi kepada publik; bukan bukti persetujuan formal atau penerimaan sistem"
+            },
+            "black_box_retest": {
+                "scenario": "BB-20",
+                "completed": true,
+                "result": "passed",
+                "evidence": [
+                    "Hasil UAT/dokumentasi revisi/BB20_1.png",
+                    "Hasil UAT/dokumentasi revisi/BB20_2.png"
+                ]
+            }
         }
     },
     "reference_documents": {
@@ -195,12 +396,12 @@
     },
     "integration_pointer_and_sync": {
         "pointer_mechanism": {
-            "description": "Sebagai integrator, Muhammad Iman Nugraha membuat unity object name di dalam Unity (seperti prefab dewi sartika) yang memiliki child empty object pointer dengan nama yang sesuai dengan unity_object_name di database Supabase.",
+            "description": "Muhammad Dwikhi Deandra Purnianto menata hierarchy prefab dan child empty GameObject pointer di Unity agar namanya sesuai dengan unity_object_name pada database Supabase. Muhammad Iman Nugraha menggunakan kontrak unity_object_name tersebut pada Admin Dashboard, REST API, dan bridge React-Unity, sedangkan pemetaan runtime di Unity dikelola Muammar Faiz Khairul Anam.",
             "hierarchy_screenshot": "dokumentasi/contoh_pointer.png"
         },
         "database_sync_checker": {
             "script_path": "src/unity-scripts/Editor/DatabaseSyncChecker.cs",
-            "description": "Script editor Unity untuk memeriksa sinkronisasi antara objek-objek di Unity Hierarchy dengan data di database Supabase melalui API /api/unity/names.",
+            "description": "Script editor Unity yang dikembangkan Muammar Faiz Khairul Anam untuk memeriksa sinkronisasi antara objek-objek di Unity Hierarchy dan data di database Supabase melalui endpoint /api/unity/names yang disediakan Muhammad Iman Nugraha.",
             "ui_screenshot": "dokumentasi/contoh_sync_db.png"
         }
     },
@@ -287,14 +488,113 @@
                     "device_type",
                     "visited_at"
                 ],
-                "status": "legacy"
+                "status": "active_for_frontend_analytics_in_2026-07-21_snapshot"
+            },
+            {
+                "name": "campus_maps",
+                "columns": [
+                    "id",
+                    "nama",
+                    "image_url",
+                    "image_width",
+                    "image_height",
+                    "is_active"
+                ]
+            },
+            {
+                "name": "campus_map_nodes",
+                "columns": [
+                    "id",
+                    "map_id",
+                    "label",
+                    "node_type",
+                    "x",
+                    "y"
+                ]
+            },
+            {
+                "name": "campus_map_edges",
+                "columns": [
+                    "id",
+                    "map_id",
+                    "from_node_id",
+                    "to_node_id",
+                    "bidirectional",
+                    "accessible",
+                    "weight"
+                ]
+            },
+            {
+                "name": "campus_map_building_points",
+                "columns": [
+                    "id",
+                    "map_id",
+                    "gedung_id",
+                    "marker_x",
+                    "marker_y",
+                    "entrance_node_id"
+                ]
             }
         ],
         "crud_entities": [
             "gedung",
             "fasilitas",
             "fakultas",
-            "program_studi"
+            "program_studi",
+            "campus map configuration"
+        ]
+    },
+    "web_implementation_snapshot": {
+        "date": "2026-07-21",
+        "web_commit": "08ebc06",
+        "current_web_commit": "08ebc06",
+        "initial_navigation_completion_commit": "b572a48",
+        "navigation_completion_followup_commit": "d2e8fdb",
+        "architecture_handoff_commit": "2eafda0851f256e85c7a6e07e4a88f33c42287a8",
+        "latest_lighthouse_commit": "bdeb5bc",
+        "unity_commit": "1845c65",
+        "active_unity_build": "v0.8.6.1",
+        "active_unity_build_source_commit": "d30f7d1",
+        "unity_loader": "native Unity WebGL loader; react-unity-webgl is not installed",
+        "frontend_data_path": "React queries Supabase directly for UI data, auth, and CRUD",
+        "unity_runtime_data_path": "BuildingDatabase GET /api/unity/data",
+        "navigation_command": "window.unityInstance.SendMessage('NavigationReceiver', 'NavigateTo', unityObjectName)",
+        "callback_status": "Unity dispatches OnNavigationCompleted only from normal completion with a JSON unity_object_name payload; React validates it against activeNavigationRef before showing the arrival popup",
+        "frontend_visual_evidence": {
+            "captured_from": "https://dashboard-profile-upnvj.vercel.app/",
+            "captured_on": "2026-07-21",
+            "screenshots": [
+                "dokumentasi/frontend-terbaru/section-denah-kampus.png",
+                "dokumentasi/frontend-terbaru/search-overlay-2d.png",
+                "dokumentasi/frontend-terbaru/canvas-webgl-3d.png",
+                "dokumentasi/frontend-terbaru/admin-fasilitas.png"
+            ],
+            "live_admin_facility_count": 331,
+            "final_seed_facility_count": 311,
+            "live_supabase_reseed_verified": false,
+            "interpretation": "Deployment screenshots verify the active frontend UI, but do not prove that the final cleanup seed or new search aliases have been applied to Supabase live."
+        },
+        "analytics_status": "Frontend actively writes and aggregates web_analytics_log in Supabase; Express/Umami remains optional/legacy",
+        "webgl_network_observation_scope": "Historical browser Network observation for build v0.8.0; the measurements are not extrapolated to the active v0.8.6.1 build.",
+        "webgl_network_observation": [
+            {
+                "asset": "v0.8.0.framework.js.unityweb",
+                "status": 200,
+                "displayed_size": "72.5 kB",
+                "displayed_time": "351 ms"
+            },
+            {
+                "asset": "v0.8.0.wasm.unityweb",
+                "status": 200,
+                "displayed_size": "6,528 kB",
+                "displayed_time": "1.95 s"
+            },
+            {
+                "asset": "v0.8.0.data.unityweb",
+                "status": 200,
+                "displayed_size": "76,864 kB",
+                "displayed_time": "15.92 s"
+            }
         ]
     }
 }

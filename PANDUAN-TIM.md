@@ -7,7 +7,7 @@ Repo ini (`workflow-ta-proyek`) dipakai bersama oleh **3 anggota**, namun **seti
 | Branch | Isi `Tugas_Akhir_Draft.md` | Pemilik |
 |---|---|---|
 | `master` | Template/kerangka kosong + seluruh toolkit & aset bersama | Bersama |
-| `laporan/iman` | Draf lengkap peran Full Stack & Integrator | Iman |
+| `laporan/iman` | Draf lengkap peran Full Stack Web Developer, System Integrator, dan DevOps Engineer | Iman |
 | `laporan/dwikhi` | Kerangka peran 3D Asset & Database | Dwikhi |
 | `laporan/faiz` | Kerangka peran Simulator & Engine | Faiz |
 

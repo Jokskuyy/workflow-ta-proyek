@@ -83,11 +83,12 @@ To automate the formatting of your `.docx` document:
    - Setiap lampiran wajib diawali pada halaman baru terpisah (Page Isolation/Page Split menggunakan `---` di Markdown) untuk meminimalkan kegagalan pemformatan dokumen.
    - Daftar lampiran wajib tercantum pada bagian awal dokumen setelah Daftar Tabel.
    - Daftar lampiran harus terisolasi terpisah dari Daftar Isi, di mana lampiran individu (LAMPIRAN 1-4) dilarang muncul di Daftar Isi dengan menerapkan gaya paragraf kustom tanpa outline level.
-   - Lampiran wajib menyertakan minimal:
+   - Lampiran wajib menyertakan bukti yang benar-benar tersedia. Judul minimal dapat berupa:
      * LAMPIRAN 1. Surat Pernyataan Keaslian
-     * LAMPIRAN 2. Surat Keterangan Implementasi Proyek dari Mitra
-     * LAMPIRAN 3. Kode Sumber Utama (Source Code)
-     * LAMPIRAN 4. Panduan Pengguna (User Manual) (disiapkan sebagai placeholder jika belum selesai)
+     * LAMPIRAN 2. Bukti mitra yang tersedia dan terverifikasi, misalnya dokumentasi penyerahan pakta integritas
+     * LAMPIRAN 3. Kode Sumber Utama (Source Code) sesuai ownership penulis
+     * LAMPIRAN 4. Panduan Pengguna (User Manual)
+   - Jangan membuat surat, nomor, tanggal, identitas penandatangan, status persetujuan, atau scan pengganti apabila artefak formalnya tidak tersedia.
 
 10. **Fact Verification & Registry Audit**:
     - The agent MUST verify the existence of `project_facts.json` before drafting or modifying any report chapters.
@@ -129,8 +130,8 @@ The writing process uses the following files in the workspace parent directory (
 
 ### Team Members & Roles
 - **Muhammad Iman Nugraha** (NIM 2210511129)
-  - **Role**: *Peran 1: Full Stack Web Developer & System Integrator*
-  - **Focus Areas**: React Frontend, Serverless API, Supabase Auth, Umami Analytics Proxy, System Integration, Vitest.
+  - **Role**: *Peran 1: Full Stack Web Developer, System Integrator, dan DevOps Engineer*
+  - **Focus Areas**: React Frontend, Vercel Serverless API, Supabase Auth/CRUD integration, native React–Unity bridge, Vercel deployment, header/cache, health monitoring, analitik Supabase aktif, jalur Express/Umami opsional, dan pengujian web.
 - **Muammar Faiz Khairul Anam**
   - **Role**: *Peran 2: 3D Simulator & Engine Developer*
   - **Focus Areas**: Unity WebGL Engine, NavMesh pathfinding, Catmull-Rom Centripetal curve, Building Culling, Pointer Lock, Virtual mobile joystick, Editor tools (WebGL Settings Optimizer, Database Sync Checker).
@@ -140,5 +141,5 @@ The writing process uses the following files in the workspace parent directory (
 
 ### Technical & Environment Constraints
 - **3D Modeling & Layout**: Executed directly in **Unity Editor** instead of external software like Blender.
-- **Database**: PostgreSQL hosted on **Supabase Cloud**, utilizing database triggers for `audit_logs` and Row Level Security (RLS) for data protection.
-- **Analytics**: **Umami Analytics** self-hosted (port 3000) with Express.js proxy server (port 3001).
+- **Database**: PostgreSQL hosted on **Supabase Cloud**. Skema, RLS, dan rancangan trigger dimiliki Database Schema Designer; status aktif trigger harus diverifikasi dari snapshot implementasi.
+- **Analytics**: Jalur UI aktif menggunakan `web_analytics_log` melalui Supabase. Umami self-hosted (port 3000) dan Express proxy/rate limiter (port 3001) merupakan jalur operasional opsional pada snapshot laporan Iman.

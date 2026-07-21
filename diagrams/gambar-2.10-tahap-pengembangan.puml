@@ -14,13 +14,13 @@ skinparam ActivityDiamondBorderColor #555555
 skinparam NoteBackgroundColor #FAFAFA
 skinparam NoteBorderColor #BBBBBB
 
-title Gambar 2.10 — Tahap Pengembangan (Model Prototyping)
+title Gambar 2.10 - Tahap Pengembangan (Model Prototyping)
 
 start
 
 :1. Pengumpulan Kebutuhan\n(Requirement Gathering);
 note right
-  Wawancara stakeholder & survei awal
+  Wawancara pemangku kepentingan & survei awal
   untuk memetakan fungsionalitas
   Full Stack API dan dashboard.
 end note
@@ -28,9 +28,9 @@ end note
 repeat
   :2. Membangun Prototyping Awal\n(Quick Design);
   note right
-    Desain skema database (ERD)
-    dan mockup antarmuka
-    dashboard admin & publik.
+    Kontrak antarmuka dan API dari
+    rancangan data bersama, serta
+    mockup dashboard admin & publik.
   end note
 
   :3. Evaluasi Prototipe\n(Evaluation & Testing);
@@ -40,16 +40,16 @@ repeat
     validasi internal.
   end note
 
-  if (Prototipe diterima?) then (Belum)
+  if (Kriteria evaluasi terpenuhi?) then (Belum)
     :4. Iterasi Perbaikan\n(Iteration);
     note right
-      Perbaikan bug fungsionalitas
-      CRUD, RLS database, atau
-      koneksi API.
+      Perbaikan antarmuka, API,
+      operasi CRUD, atau koneksi
+      integrasi berdasarkan evaluasi.
     end note
   endif
 repeat while (Perlu perbaikan?) is (Ya) not (Tidak)
-->Prototipe disetujui;
+->Kriteria evaluasi terpenuhi;
 
 :Sistem siap rilis;
 

@@ -1,5 +1,5 @@
 @startuml gambar-2-13-activity-pengelolaan-data-admin
-' Gambar 2.13 - Activity Diagram: Pengelolaan Data oleh Admin (CRUD)
+' Gambar 2.13 - Activity Diagram: Pengelolaan Data oleh Admin
 ' Sumber: BAB II - 2.3.3 Activity Diagram
 
 skinparam backgroundColor #FFFFFF
@@ -14,60 +14,58 @@ skinparam ActivityDiamondBorderColor #555555
 skinparam SwimlaneTitleFontColor #333333
 skinparam SwimlaneBorderColor #999999
 
-title Gambar 2.13 — Activity Diagram: Pengelolaan Data oleh Admin
+title Gambar 2.13 - Activity Diagram: Pengelolaan Data oleh Admin
 
 |Administrator|
 start
 :Membuka halaman Login Admin;
 :Memasukkan kredensial;
 
-|Sistem (Backend + Supabase)|
-:Verifikasi kredensial (Supabase Auth);
+|React SPA|
+:Kirim kredensial langsung ke Supabase Auth;
+
+|Supabase|
+:Verifikasi kredensial;
 if (Kredensial valid?) then (Tidak)
-  :Tampilkan pesan error;
+  |React SPA|
+  :Tampilkan pesan kesalahan;
   stop
 else (Ya)
+  |React SPA|
   :Buka akses Admin Dashboard;
 endif
 
 |Administrator|
-:Memilih operasi pengelolaan data;
-switch (Jenis operasi CRUD)
-case (Create)
-  :Mengisi formulir tambah data;
-  |Sistem (Backend + Supabase)|
-  :Validasi input;
-  if (Input valid?) then (Tidak)
-    |Administrator|
-    :Perbaiki input;
-    detach
-  else (Ya)
-    :Simpan data baru ke database;
-  endif
-case (Read)
-  |Sistem (Backend + Supabase)|
-  :Ambil & tampilkan data;
-case (Update)
-  |Administrator|
-  :Mengubah data pada formulir edit;
-  |Sistem (Backend + Supabase)|
-  :Validasi & perbarui data;
-case (Delete)
-  |Administrator|
-  :Menekan tombol hapus;
-  :Menampilkan modal konfirmasi;
-  if (Konfirmasi hapus?) then (Batal)
-    :Tutup modal;
-    detach
-  else (Ya)
-    |Sistem (Backend + Supabase)|
-    :Hapus data dari database;
-  endif
-endswitch
+:Memilih modul dan operasi data;
+:Mengisi formulir atau mengonfirmasi penghapusan;
 
-|Sistem (Backend + Supabase)|
-:Trigger menulis Audit Log\n(actor, aksi, tabel, data);
-:Tampilkan notifikasi berhasil;
+|React SPA|
+:Validasi input dan konfirmasi;
+if (Input valid dan operasi dikonfirmasi?) then (Tidak)
+  :Tampilkan validasi atau batalkan operasi;
+  stop
+else (Ya)
+  :Jalankan query/CRUD melalui Supabase SDK;
+endif
+
+|Supabase|
+:Terapkan sesi Auth dan kebijakan RLS;
+:Jalankan operasi database;
+if (Operasi berhasil?) then (Tidak)
+  |React SPA|
+  :Tampilkan respons kesalahan;
+  stop
+else (Ya)
+  |React SPA|
+  if (Operasi mengubah data?) then (Ya)
+    :Panggil service pencatatan audit aplikasi;
+    |Supabase|
+    :Simpan audit log sesuai akses yang tersedia;
+    |React SPA|
+  endif
+  :Perbarui cache dan tabel;
+  :Tampilkan notifikasi berhasil;
+endif
 
 stop
 

@@ -19,7 +19,16 @@
     "entity relationship diagram": "Entity Relationship Diagram",
     "erd": "ERD",
     "pointer": "pointer",
-    "prefab": "prefab"
+    "prefab": "prefab",
+    "devops": "DevOps",
+    "session": "sesi",
+    "screenshot": "tangkapan layar",
+    "source code": "kode sumber",
+    "automated test": "pengujian otomatis",
+    "response": "respons",
+    "credential": "kredensial",
+    "stakeholder": "pemangku kepentingan",
+    "consumer": "konsumen"
   },
   "catatan": "Registry ini menjaga konsistensi istilah di seluruh laporan TA."
 }

@@ -51,6 +51,7 @@ Perintah tersebut hanya memperluas include, mem-parse Markdown, dan memeriksa ma
 | 3.5.1 Black Box Testing | `content/shared/testing/blackbox.md` |
 | 3.5.3 User Acceptance Test | `content/shared/testing/uat.md` |
 | 3.5.4 Implementasi Hasil UAT | `content/shared/testing/uat-revisions.md` |
+| Lampiran instrumen dan indeks bukti pengujian | `content/shared/testing/appendix-instruments.md` |
 
 Angka dan status terstruktur yang mendasari fragment pengujian berada di `content/shared/testing/results.json`. `project_facts.json` pada setiap branch boleh memuat salinan yang diperlukan generator per-role, tetapi tidak boleh bertentangan dengan hasil bersama tersebut.
 

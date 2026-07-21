@@ -2653,6 +2653,12 @@ def format_document_xmls(unpacked_dir):
                 text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text])
                 if 'Aliyah Aliyah' in text:
                     cleaned_text = text.replace(
+                        'Aliyah Aliyah et al., 2025',
+                        'Aliyah et al. 2025',
+                    ).replace(
+                        'Aliyah Aliyah et al. 2025',
+                        'Aliyah et al. 2025',
+                    ).replace(
                         'Aliyah Aliyah et al., 2024',
                         'Aliyah et al. 2024',
                     ).replace(

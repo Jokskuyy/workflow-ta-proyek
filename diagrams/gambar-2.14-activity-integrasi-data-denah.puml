@@ -1,8 +1,7 @@
 @startuml gambar-2-14-activity-integrasi-data-denah
 ' Gambar 2.14 - Activity Diagram: Integrasi Data Denah
-' Logika mitigasi ketersediaan data akademik eksternal (Skenario A, B, C)
-' Sumber: BAB II - 2.1.3 & 2.3.3 Activity Diagram
-' CATATAN: Label cabang Skenario A/B/C disesuaikan dengan narasi laporan.
+' Alur aktual pemilihan Denah 2D/3D dan integrasi React-Unity
+' Sumber: BAB II - 2.2 & 2.3.3 Activity Diagram
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -13,42 +12,47 @@ skinparam ActivityBorderColor #555555
 skinparam ActivityBackgroundColor #F2F2F2
 skinparam ActivityDiamondBackgroundColor #ECECEC
 skinparam ActivityDiamondBorderColor #555555
-skinparam NoteBackgroundColor #FAFAFA
-skinparam NoteBorderColor #BBBBBB
+skinparam SwimlaneTitleFontColor #333333
+skinparam SwimlaneBorderColor #999999
 
-title Gambar 2.14 — Activity Diagram: Integrasi Data Denah\n(Mitigasi Ketersediaan Data Akademik Eksternal)
+title Gambar 2.14 - Activity Diagram: Integrasi Data Denah 2D dan 3D
 
+|Pengguna|
 start
-:Pengguna mengakses Public Dashboard / Denah Virtual;
-:Sistem meminta data profil & akademik kampus;
+:Mengakses Public Dashboard;
 
-if (Sumber data yang dibutuhkan?) then (Data internal\n(gedung, fasilitas, prodi))
-  :Ambil data dari Backend API\n(Supabase PostgreSQL);
-  :Sajikan data dinamis ke\ndashboard & Denah Virtual;
-else (Data akademik eksternal\n(statistik, akreditasi - UPA TIK))
+|React SPA|
+:Muat antarmuka dan data publik dari Supabase;
 
-  if (Status ketersediaan data eksternal?) then (Tersedia & dapat di-embed)
-    :**Skenario A**\nData eksternal tersedia;
-    :Konsumsi / embed data dari\nsistem UPA TIK secara langsung;
-  elseif (Tersedia terbatas\n(kebijakan RLS / parsial)) then
-    :**Skenario B**\nData eksternal terbatas;
-    :Gunakan data internal Supabase\nyang dikelola Admin sebagai sumber;
-  else (Tidak tersedia)
-    :**Skenario C**\nData eksternal tidak tersedia;
-    :Tampilkan data fallback /\nplaceholder & catat log;
+|Pengguna|
+:Membuka pemilih mode denah;
+if (Mode yang dipilih?) then (Denah 2D)
+  :Pilih gedung awal dan tujuan;
+  |React SPA|
+  :Muat node, edge, marker, dan entrance;
+  :Hitung rute A*;
+  :Tampilkan garis rute 2D;
+else (Denah 3D)
+  |React SPA|
+  :Muat artefak Unity WebGL dari Vercel;
+  |Unity Runtime|
+  :GET /api/unity/data;
+  :Petakan unity_object_name ke GameObject;
+  |Pengguna|
+  :Pilih lokasi awal dan tujuan;
+  |React SPA|
+  :SendMessage NavigationReceiver.NavigateTo;
+  |Unity Runtime|
+  :Jalankan navigasi menuju target;
+  if (Tiba melalui completion normal?) then (Ya)
+    :CompleteNavigation mengirim\nOnNavigationCompleted JSON;
+    |React SPA|
+    :Validasi unity_object_name terhadap\nactiveNavigationRef;
+    :Tampilkan notifikasi tiba;
+  else (Dibatalkan atau target berubah)
+    :Hentikan atau ganti navigasi\ntanpa callback tiba;
   endif
-
-  :Gabungkan data ke dalam\ntampilan terpadu;
 endif
-
-:Render informasi pada antarmuka pengguna;
-note right
-  Strategi tiga skenario (A/B/C)
-  menjaga reliabilitas sistem
-  di tengah ketidakpastian
-  ketersediaan data akademik
-  eksternal.
-end note
 
 stop
 
