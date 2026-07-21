@@ -15,13 +15,6 @@
       "inject_method": "post_com"
     },
     {
-      "id": "diagram_erd",
-      "file": "diagram_erd.png",
-      "caption_match": "Entity-Relationship Diagram",
-      "source": "dokumentasi/erd_schema.png",
-      "inject_method": "post_com"
-    },
-    {
       "id": "diagram_use_case_legenda",
       "file": "diagram_use_case_legenda.png",
       "caption_match": "Legenda Use Case Diagram",
@@ -36,13 +29,6 @@
       "inject_method": "post_com"
     },
     {
-      "id": "diagram_activity_kelola_data",
-      "file": "diagram_activity_kelola_data.png",
-      "caption_match": "Activity Diagram: Pengelolaan Data oleh Admin",
-      "source": "unpacked_ta/word/media/image27.png",
-      "inject_method": "post_com"
-    },
-    {
       "id": "diagram_activity_integrasi",
       "file": "diagram_activity_integrasi.png",
       "caption_match": "Activity Diagram: Integrasi Data Denah",
@@ -50,101 +36,10 @@
       "inject_method": "post_com"
     },
     {
-      "id": "diagram_sequence_autentikasi",
-      "file": "diagram_sequence_autentikasi.png",
-      "caption_match": "Sequence Diagram: Autentikasi Administrator",
-      "source": "dokumentasi/sequence_autentikasi.png",
-      "inject_method": "post_com"
-    },
-    {
       "id": "diagram_sequence_sinkronisasi",
       "file": "diagram_sequence_sinkronisasi.png",
       "caption_match": "Sequence Diagram: Sinkronisasi Data Gedung dan Unity",
       "source": "dokumentasi/sequence_sinkronisasi.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_login_admin",
-      "file": "mockup_login_admin.png",
-      "caption_match": "Halaman Login Admin",
-      "source": "dokumentasi/login-page.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_dashboard_admin",
-      "file": "mockup_dashboard_admin.png",
-      "caption_match": "Halaman Dashboard Admin",
-      "source": "dokumentasi/header+gedung-view.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_modal_tambah_gedung",
-      "file": "mockup_modal_tambah_gedung.png",
-      "caption_match": "Modal Tambah Data Gedung",
-      "source": "dokumentasi/modal-create-gedung.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_modal_edit_gedung",
-      "file": "mockup_modal_edit_gedung.png",
-      "caption_match": "Modal Update Data Gedung",
-      "source": "dokumentasi/modal-edit-gedung.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_modal_hapus_gedung",
-      "file": "mockup_modal_hapus_gedung.png",
-      "caption_match": "Modal Konfirmasi Hapus Data Gedung",
-      "source": "dokumentasi/modal-konfirmasi-delete-gedung.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_admin_traffic",
-      "file": "mockup_admin_traffic.png",
-      "caption_match": "Traffic Website Admin",
-      "source": "dokumentasi/section-admin-traffic-view.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_hero_section",
-      "file": "mockup_hero_section.png",
-      "caption_match": "Hero Section",
-      "source": "dokumentasi/section-header+hero.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_public_traffic",
-      "file": "mockup_public_traffic.png",
-      "caption_match": "Public Traffic Statistics Website",
-      "source": "dokumentasi/traffic-web-public.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_fasilitas_aset",
-      "file": "mockup_fasilitas_aset.png",
-      "caption_match": "Bagian Fasilitas dan Aset",
-      "source": "dokumentasi/section fasilitas-asset(dan gedung).png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_modal_list_fasilitas",
-      "file": "mockup_modal_list_fasilitas.png",
-      "caption_match": "Modal List Fasilitas dan Aset",
-      "source": "dokumentasi/modal-fasilitas-aset.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_modal_detail_fasilitas",
-      "file": "mockup_modal_detail_fasilitas.png",
-      "caption_match": "Modal Fasilitas dan Aset",
-      "source": "dokumentasi/modal-fasilitas-aset.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_footer",
-      "file": "mockup_footer.png",
-      "caption_match": "Bagian Footer",
-      "source": "dokumentasi/section-footer.png",
       "inject_method": "post_com"
     },
     {
@@ -169,50 +64,274 @@
       "inject_method": "post_com"
     },
     {
+      "id": "unity_version_editor",
+      "file": "faiz/versi_unity_editor.png",
+      "caption_match": "Versi Unity Editor 6000.4.1f1",
+      "source": "Images_faiz/versi_unity_editor.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "unity_scene_hierarchy",
+      "file": "faiz/scene_utama_hierarki_engine.png",
+      "caption_match": "SceneUtama dan Hierarki Komponen Engine",
+      "source": "Images_faiz/scene_utama_hierarki_engine.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "navmesh_bake_config",
+      "file": "faiz/konfigurasi_dan_bake_navmesh.png",
+      "caption_match": "Konfigurasi NavMeshSurface dan Hasil Bake",
+      "source": "Images_faiz/konfigurasi_dan_bake_navmesh.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "navigation_guide_config",
+      "file": "faiz/konfigurasi_navigation_guide.png",
+      "caption_match": "Konfigurasi NavigationGuide pada Scene Final",
+      "source": "Images_faiz/konfigurasi_navigation_guide.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "path_line_config",
+      "file": "faiz/konfigurasi_path_line.png",
+      "caption_match": "Konfigurasi PathLine untuk Rendering Rute",
+      "source": "Images_faiz/konfigurasi_path_line.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "building_database_runtime_log",
+      "file": "faiz/log_runtime_building_database.png",
+      "caption_match": "Log Runtime BuildingDatabase dan Cache NavigationReceiver",
+      "source": "Images_faiz/log_runtime_building_database.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "active_navigation_route",
+      "file": "faiz/rute_navigasi_aktif.png",
+      "caption_match": "Rute Navigasi Aktif pada Game View",
+      "source": "Images_faiz/rute_navigasi_aktif.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "route_elevation",
+      "file": "faiz/rute_perubahan_elevasi.png",
+      "caption_match": "Rute pada Perubahan Elevasi Scene",
+      "source": "Images_faiz/rute_perubahan_elevasi.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "spawn_selection_overview",
+      "file": "faiz/pemilihan_titik_awal.png",
+      "caption_match": "Tampilan Pemilihan Titik Awal",
+      "source": "Images_faiz/pemilihan_titik_awal.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "minimap_destination",
+      "file": "faiz/minimap_pemain_dan_tujuan.png",
+      "caption_match": "Minimap dengan Marker Pemain dan Tujuan",
+      "source": "Images_faiz/minimap_pemain_dan_tujuan.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "destination_highlight",
+      "file": "faiz/highlight_tujuan_navigasi.png",
+      "caption_match": "Highlight Visual pada Tujuan Navigasi",
+      "source": "Images_faiz/highlight_tujuan_navigasi.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "spawn_registry_config",
+      "file": "faiz/konfigurasi_spawn_registry_umum.png",
+      "caption_match": "Konfigurasi Umum SpawnPointRegistry",
+      "source": "Images_faiz/konfigurasi_spawn_registry_umum.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "spawn_registry_override",
+      "file": "faiz/konfigurasi_spawn_registry_override.png",
+      "caption_match": "Konfigurasi Radius Override pada SpawnPointRegistry",
+      "source": "Images_faiz/konfigurasi_spawn_registry_override.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "building_culling_config",
+      "file": "faiz/konfigurasi_building_culling.png",
+      "caption_match": "Konfigurasi Building Culling Berbasis Jarak dan Frustum",
+      "source": "Images_faiz/konfigurasi_building_culling.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "runtime_stats_culling_enabled",
+      "file": "faiz/statistik_runtime_culling_aktif.png",
+      "caption_match": "Statistik Runtime pada Capture Building Culling Aktif",
+      "source": "Images_faiz/profiler_culling_aktif.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "runtime_stats_culling_disabled",
+      "file": "faiz/statistik_runtime_culling_nonaktif.png",
+      "caption_match": "Statistik Runtime pada Capture Building Culling Nonaktif",
+      "source": "Images_faiz/profiler_culling_nonaktif.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "occlusion_area_config",
+      "file": "faiz/occlusion_area.png",
+      "caption_match": "Konfigurasi Campus Gameplay Occlusion Area",
+      "source": "Images_faiz/occlusion_area.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "occlusion_data_asset",
+      "file": "faiz/occlusion_data_asset.png",
+      "caption_match": "Data Bake Occlusion Culling SceneUtama",
+      "source": "Images_faiz/occlusion_data_asset.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "occlusion_main_camera",
+      "file": "faiz/occlusion_main_camera.png",
+      "caption_match": "Occlusion Culling Aktif pada MainCamera",
+      "source": "Images_faiz/occlusion_main_camera.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "occlusion_minimap_camera",
+      "file": "faiz/occlusion_minimap_camera.png",
+      "caption_match": "Occlusion Culling Nonaktif pada MinimapCamera",
+      "source": "Images_faiz/occlusion_minimap_camera.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "webgl_build_profile",
+      "file": "faiz/webgl_build_profile.png",
+      "caption_match": "Build Profile Web Aktif dan SceneUtama",
+      "source": "Images_faiz/webgl_build_profile.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "webgl_player_settings_publishing",
+      "file": "faiz/webgl_player_settings_publishing.png",
+      "caption_match": "Publishing Settings WebGL",
+      "source": "Images_faiz/webgl_player_settings_publishing.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "webgl_player_settings_other",
+      "file": "faiz/webgl_player_settings_other.png",
+      "caption_match": "Konfigurasi Kompilasi dan Stripping WebGL",
+      "source": "Images_faiz/webgl_player_settings_other.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "webgl_optimizer_console",
+      "file": "faiz/webgl_optimizer_console.png",
+      "caption_match": "Log Penerapan WebGL Release Settings",
+      "source": "Images_faiz/webgl_optimizer_console.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "database_sync_checker_result",
+      "file": "faiz/hasil_database_sync_checker.png",
+      "caption_match": "Hasil Pemeriksaan DatabaseSyncChecker",
+      "source": "Images_faiz/hasil_database_sync_checker.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "desktop_control",
+      "file": "faiz/kontrol_desktop.png",
+      "caption_match": "Tampilan Kontrol Desktop pada Build WebGL",
+      "source": "Images_faiz/kontrol_desktop.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "mobile_control",
+      "file": "faiz/kontrol_mobile.png",
+      "caption_match": "Tampilan Kontrol Mobile pada Build WebGL",
+      "source": "Images_faiz/kontrol_mobile.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "tutorial_desktop_lookaround",
+      "file": "faiz/tutorial_desktop_lihat_sekeliling.png",
+      "caption_match": "Tutorial Lihat Sekeliling pada Mode Desktop",
+      "source": "Images_faiz/tutorial_desktop_lihat_sekeliling.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "tutorial_mobile_lookaround",
+      "file": "faiz/tutorial_mobile_lihat_sekeliling.jpg",
+      "caption_match": "Tutorial Lihat Sekeliling pada Mode Mobile",
+      "source": "Images_faiz/tutorial_mobile_lihat_sekeliling.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "webgl_network_data",
+      "file": "faiz/jaringan_webgl_data.png",
+      "caption_match": "Network Build WebGL untuk Berkas Data",
+      "source": "Images_faiz/jaringan_webgl_data.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "webgl_network_wasm",
+      "file": "faiz/jaringan_webgl_wasm.png",
+      "caption_match": "Network Build WebGL untuk Berkas Wasm",
+      "source": "Images_faiz/jaringan_webgl_wasm.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "webgl_wasm_mime_headers",
+      "file": "faiz/header_mime_webgl_wasm.png",
+      "caption_match": "Header MIME dan Encoding Berkas Wasm",
+      "source": "Images_faiz/header_mime_webgl_wasm.png",
+      "inject_method": "post_com"
+    },
+    {
       "id": "survey_01_profil",
-      "file": "survey_01_profil.png",
+      "file": "surveys/survey_01_profil.png",
       "caption_match": "Hasil Kuesioner: Profil Status Akademik",
       "source": "unpacked_ta/word/media/image4.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_02_efektivitas",
-      "file": "survey_02_efektivitas.png",
+      "file": "surveys/survey_02_efektivitas.png",
       "caption_match": "Hasil Kuesioner: Efektivitas Informasi",
       "source": "unpacked_ta/word/media/image5.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_03_frekuensi",
-      "file": "survey_03_frekuensi.png",
+      "file": "surveys/survey_03_frekuensi.png",
       "caption_match": "Hasil Kuesioner: Frekuensi Akses Denah",
       "source": "unpacked_ta/word/media/image6.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_04_perilaku",
-      "file": "survey_04_perilaku.png",
+      "file": "surveys/survey_04_perilaku.png",
       "caption_match": "Hasil Kuesioner: Perilaku Pencarian Lokasi",
       "source": "unpacked_ta/word/media/image7.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_05_urgensi",
-      "file": "survey_05_urgensi.png",
+      "file": "surveys/survey_05_urgensi.png",
       "caption_match": "Hasil Kuesioner: Urgensi Kebutuhan Denah",
       "source": "unpacked_ta/word/media/image8.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_06_adopsi",
-      "file": "survey_06_adopsi.png",
+      "file": "surveys/survey_06_adopsi.png",
       "caption_match": "Hasil Kuesioner: Tingkat Adopsi Potensial",
       "source": "unpacked_ta/word/media/image9.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_07_prioritas",
-      "file": "survey_07_prioritas.png",
+      "file": "surveys/survey_07_prioritas.png",
       "caption_match": "Hasil Kuesioner: Prioritas Fitur",
       "source": "unpacked_ta/word/media/image10.png",
       "inject_method": "post_com"

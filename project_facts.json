@@ -1,8 +1,8 @@
 {
     "project_metadata": {
-        "title": "Integrasi Denah Virtual Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu (Dashboard Profil)",
-        "author": "Muhammad Iman Nugraha",
-        "nim": "2210511129",
+        "title": "Pengembangan Sistem Navigasi Spasial dan Optimasi Engine Unity WebGL pada Denah Virtual UPNVJ Kampus Pondok Labu",
+        "author": "Muammar Faiz Khairul Anam",
+        "nim": "2210511138",
         "program_study": "S1 Informatika",
         "faculty": "Fakultas Ilmu Komputer",
         "institution": "Universitas Pembangunan Nasional Veteran Jakarta",
@@ -87,15 +87,17 @@
         },
         {
             "name": "Muammar Faiz Khairul Anam",
-            "nim": "TBD",
+            "nim": "2210511138",
             "role": "Peran 2: 3D Simulator & Engine Developer",
             "focus": [
                 "Unity WebGL Engine",
                 "NavMesh pathfinding",
-                "Catmull-Rom Centripetal curve",
+                "Linear route subdivision, vertical raycast, and moving-average smoothing",
                 "Building Culling",
                 "Pointer Lock",
                 "Virtual mobile joystick",
+                "Spawn selection and minimap",
+                "Destination highlighting and adaptive tutorial",
                 "Editor tools"
             ]
         },
@@ -153,14 +155,141 @@
     },
     "integration_pointer_and_sync": {
         "pointer_mechanism": {
-            "description": "Sebagai integrator, Muhammad Iman Nugraha membuat unity object name di dalam Unity (seperti prefab dewi sartika) yang memiliki child empty object pointer dengan nama yang sesuai dengan unity_object_name di database Supabase.",
+            "description": "Hierarki scene menyediakan GameObject target yang namanya mengikuti unity_object_name. Struktur tersebut merupakan kontrak integrasi dan prasyarat scene; kontribusi engine Faiz dimulai pada konsumsi data, pencarian Transform target, dan penggunaan target untuk navigasi.",
             "hierarchy_screenshot": "dokumentasi/contoh_pointer.png"
         },
         "database_sync_checker": {
-            "script_path": "src/unity-scripts/Editor/DatabaseSyncChecker.cs",
-            "description": "Script editor Unity untuk memeriksa sinkronisasi antara objek-objek di Unity Hierarchy dengan data di database Supabase melalui API /api/unity/names.",
+            "owner": "Muammar Faiz Khairul Anam — 3D Simulator & Engine Developer",
+            "script_path": "Assets/Scripts/Editor/DatabaseSyncChecker.cs pada repository Unity T_A---Copy",
+            "description": "Editor tool Unity untuk memeriksa sinkronisasi unity_object_name dari /api/unity/names terhadap nama GameObject pada scene aktif. Pencarian padanan API memindai hierarki secara rekursif, sedangkan daftar objek scene yang belum terdaftar di database dibatasi pada root object.",
             "ui_screenshot": "dokumentasi/contoh_sync_db.png"
         }
+    },
+    "unity_final_implementation": {
+        "project_path": "C:\\Users\\Faiz\\Proposal\\T_A---Copy",
+        "unity_version": "6000.4.1f1",
+        "unity_revision": "336a400b9ea2",
+        "scene": "Assets/Scene/SceneUtama.unity",
+        "final_commit": "5f575c0",
+        "previous_scene_baseline_commit": "284e1e5",
+        "active_route_algorithm": [
+            "NavMesh.SamplePosition",
+            "NavMesh.CalculatePath",
+            "linear subdivision",
+            "vertical raycast",
+            "moving average",
+            "LineRenderer"
+        ],
+        "navigation_parameters": {
+            "serialized_stop_distance_m": 5,
+            "effective_arrival_distance_max_m": 2,
+            "path_update_distance_m": 1,
+            "point_spacing_m": 0.4,
+            "smoothing_window": 4,
+            "line_height_offset_m": 0.6,
+            "line_width_m": 0.2,
+            "player_navmesh_sample_radius_m": 2,
+            "destination_fallback_radius_m": 5,
+            "maximum_vertical_navmesh_offset_m": 2,
+            "surface_probe_height_m": 1.5,
+            "surface_projection_tolerance_m": 0.75,
+            "path_retry_interval_s": 1,
+            "partial_or_invalid_path_replaces_active_route": false
+        },
+        "completion_contract": {
+            "arrival_condition": "path status is complete, remaining path distance <= min(stopDistance, 2 m), and player-to-endpoint distance <= min(stopDistance, 2 m)",
+            "event": "OnNavigationCompleted",
+            "payload_key": "unity_object_name",
+            "manual_stop_dispatches_event": false
+        },
+        "culling_configuration": {
+            "min_render_distance_m": 200,
+            "max_render_distance_m": 200,
+            "starting_render_distance_m": 500,
+            "adaptation_mode": "Combined",
+            "distance_check_interval_s": 1,
+            "camera_check_interval_s": 0.1,
+            "frustum_padding_m": 10,
+            "offscreen_grace_period_s": 0.35,
+            "pause_during_map_selection": true,
+            "preserve_minimap_visibility": true,
+            "performance_result": "TBD"
+        },
+        "occlusion_configuration": {
+            "installer": "Assets/Scripts/Editor/CampusOcclusionInstaller.cs",
+            "data_asset": "Assets/Scene/SceneUtama/OcclusionCullingData.asset",
+            "minimum_occluder_size_m": 5,
+            "occlusion_area_padding_m": [20, 10, 20],
+            "smallest_occluder_m": 5,
+            "smallest_hole_m": 0.5,
+            "backface_threshold": 100,
+            "baked_static_renderers_shown": 14315,
+            "main_camera_occlusion_culling": true,
+            "minimap_camera_occlusion_culling": false,
+            "performance_result": "TBD"
+        },
+        "spawn_configuration": {
+            "registered_points": 16,
+            "navmesh_sample_radius_m": 5,
+            "ground_offset_m": 0.05,
+            "require_initial_selection": true,
+            "radius_overrides_m": {
+                "cipto_mangunkusumo": 120,
+                "gerbang_belakang": 40,
+                "gerbang_belakang2": 40
+            },
+            "override_evidence": "Images_faiz/konfigurasi_spawn_registry_override.png and serialized SpawnPointRegistry entries in Assets/Scene/SceneUtama.unity"
+        },
+        "tutorial_evidence": {
+            "desktop_screenshot": "Images_faiz/tutorial_desktop_lihat_sekeliling.png",
+            "mobile_screenshot": "Images_faiz/tutorial_mobile_lihat_sekeliling.jpg",
+            "matched_step": "Lihat Sekeliling, step 2 of 5",
+            "desktop_instruction": "Gerakkan mouse untuk melihat kanan dan kiri",
+            "mobile_instruction": "Geser area kamera untuk melihat kanan dan kiri",
+            "dynamic_device_sync_status": "TBD"
+        },
+        "webgl_configuration_evidence": {
+            "active_build_target": "Web",
+            "active_scene": "Scene/SceneUtama",
+            "development_build": false,
+            "code_optimization": "Disk Size",
+            "compression_format": "Brotli",
+            "data_caching": true,
+            "decompression_fallback": true,
+            "webassembly_2023": true,
+            "il2cpp_code_generation": "Optimize for code size and build time",
+            "compiler_configuration": "Master",
+            "managed_stripping_level": "High",
+            "exception_support": "Explicitly Thrown Exceptions Only"
+        },
+        "database_sync_evidence": {
+            "found_in_scene": 320,
+            "missing_in_scene": 3,
+            "root_objects_not_in_database": 14,
+            "screenshot": "Images_faiz/hasil_database_sync_checker.png",
+            "dedicated_fixture_status": "TBD"
+        },
+        "performance_evidence": {
+            "received_files": [
+                "Images_faiz/profiler_culling_aktif.png",
+                "Images_faiz/profiler_culling_nonaktif.png"
+            ],
+            "capture_type": "NVIDIA Statistics Overlay shown beside Unity Game View",
+            "camera_view_comparability": "approximately the same gameplay view",
+            "accepted_as_runtime_visual_evidence": true,
+            "accepted_as_benchmark": false,
+            "reason": "Captures do not provide Unity Profiler, draw calls, active renderer counts, sampling duration, device identity, or a visible state indicator that independently proves culling enabled versus disabled",
+            "performance_result": "TBD; inconclusive from instantaneous overlay captures"
+        },
+        "overview_transition": {
+            "overview_start_time": 9,
+            "overview_fog_density": 0,
+            "gameplay_fog_density": 0.01
+        },
+        "editor_tools": [
+            "Assets/Scripts/Editor/DatabaseSyncChecker.cs",
+            "Assets/Scripts/Editor/CampusOcclusionInstaller.cs"
+        ]
     },
     "database_schema": {
         "tables": [

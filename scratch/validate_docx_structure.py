@@ -4,6 +4,7 @@ import zipfile
 import re
 import json
 import hashlib
+import posixpath
 import xml.etree.ElementTree as ET
 
 # Namespaces / constants shared by the content-level checks (C1-C4).
@@ -11,8 +12,408 @@ W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 R_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
 A_NS = 'http://schemas.openxmlformats.org/drawingml/2006/main'
 WP_NS = 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing'
+PACKAGE_REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships'
+CONTENT_TYPES_NS = 'http://schemas.openxmlformats.org/package/2006/content-types'
 MAX_WIDTH_EMU = 5400000
 EMU_PER_TWIP = 635  # printable page-height threshold uses twips * 635 (matches injector)
+FIGURE_CAPTION_RESERVE_EMU = 1080000  # 3 cm; must match inject_all_images.py
+
+# Canonical UPNVJ FIK page geometry (OOXML twips): A4 portrait with a 4 cm
+# binding margin on the left and 3 cm on the top, right, and bottom.
+EXPECTED_PAGE_SIZE_DXA = {'w': 11906, 'h': 16838}
+EXPECTED_MARGINS_DXA = {
+    'top': 1701,
+    'right': 1701,
+    'bottom': 1701,
+    'left': 2268,
+}
+
+# w:spacing@line uses 240ths of a line when lineRule="auto". The corrected
+# campus rule is 1.15 lines for body, headings, lists, and automatic lists.
+EXPECTED_MAIN_LINE_SPACING_AUTO = '276'
+LEGACY_CITATION_COMMA_RE = re.compile(
+    r'\([^()]*,\s*(?:19|20)\d{2}[a-z]?[^()]*\)',
+    re.IGNORECASE,
+)
+REQUIRED_MAIN_LINE_SPACING_STYLES = (
+    'Normal',
+    'ListParagraph',
+    'Heading1',
+    'Heading2',
+    'Heading3',
+    'TOC1',
+    'TOC2',
+    'TOC3',
+    'TOC9',
+    'TableofFigures',
+)
+UNRESOLVED_SOURCE_TOKEN_RE = re.compile(
+    r'\[(?:FIGREF|TABREF|FIGCAPTION|TABLECAPTION|TABLE-ID):[^\]]*\]'
+)
+SEMANTIC_BOOKMARK_RE = re.compile(r'^(?:fig|tbl)_[a-z0-9_]+$')
+REF_FIELD_RE = re.compile(r'\bREF\s+([A-Za-z][A-Za-z0-9_]*)\b', re.IGNORECASE)
+
+
+def validate_page_layout(doc_root):
+    """Return fatal findings for any section that violates campus geometry."""
+    body = doc_root.find(f'{{{W_NS}}}body')
+    if body is None:
+        return ["[layout] document body is missing; page layout cannot be validated."]
+
+    sections = list(body.iter(f'{{{W_NS}}}sectPr'))
+    if not sections:
+        return ["[layout] no w:sectPr found; A4 size and margins are undefined."]
+
+    findings = []
+    for section_number, sect_pr in enumerate(sections, start=1):
+        pg_sz = sect_pr.find(f'{{{W_NS}}}pgSz')
+        pg_mar = sect_pr.find(f'{{{W_NS}}}pgMar')
+        if pg_sz is None:
+            findings.append(f"[layout] section {section_number} is missing w:pgSz.")
+        else:
+            for name, expected in EXPECTED_PAGE_SIZE_DXA.items():
+                raw = pg_sz.get(f'{{{W_NS}}}{name}')
+                if raw != str(expected):
+                    findings.append(
+                        f"[layout] section {section_number} pgSz@{name}={raw!r}; "
+                        f"expected {expected} twips (A4 portrait)."
+                    )
+            orientation = pg_sz.get(f'{{{W_NS}}}orient')
+            if orientation not in (None, 'portrait'):
+                findings.append(
+                    f"[layout] section {section_number} orientation={orientation!r}; "
+                    "expected portrait."
+                )
+
+        if pg_mar is None:
+            findings.append(f"[layout] section {section_number} is missing w:pgMar.")
+        else:
+            for name, expected in EXPECTED_MARGINS_DXA.items():
+                raw = pg_mar.get(f'{{{W_NS}}}{name}')
+                if raw != str(expected):
+                    cm = 4 if name == 'left' else 3
+                    findings.append(
+                        f"[layout] section {section_number} margin {name}={raw!r}; "
+                        f"expected {expected} twips ({cm} cm)."
+                    )
+    return findings
+
+
+def validate_main_line_spacing(styles_root):
+    """Return fatal findings when main paragraph styles do not resolve to 1.15.
+
+    Word may normalize a DOCX during COM field updates by moving the common
+    line value into ``docDefaults`` and removing redundant values from each
+    style. Resolve the ``basedOn`` chain plus paragraph defaults so validation
+    checks effective formatting instead of requiring one exact XML layout.
+    """
+    style_tag = f'{{{W_NS}}}style'
+    style_id_attr = f'{{{W_NS}}}styleId'
+    type_attr = f'{{{W_NS}}}type'
+    p_pr_tag = f'{{{W_NS}}}pPr'
+    spacing_tag = f'{{{W_NS}}}spacing'
+    based_on_tag = f'{{{W_NS}}}basedOn'
+    val_attr = f'{{{W_NS}}}val'
+    line_attr = f'{{{W_NS}}}line'
+    line_rule_attr = f'{{{W_NS}}}lineRule'
+
+    styles = {
+        style.get(style_id_attr): style
+        for style in styles_root.findall(style_tag)
+        if style.get(type_attr) == 'paragraph'
+    }
+    findings = []
+    style_ids = list(REQUIRED_MAIN_LINE_SPACING_STYLES)
+    style_ids.extend(
+        style_id for style_id in styles
+        if style_id and style_id.startswith('Heading') and style_id not in style_ids
+    )
+
+    default_spacing = styles_root.find(
+        f'{{{W_NS}}}docDefaults/'
+        f'{{{W_NS}}}pPrDefault/'
+        f'{{{W_NS}}}pPr/'
+        f'{{{W_NS}}}spacing'
+    )
+    default_line = default_spacing.get(line_attr) if default_spacing is not None else None
+    default_line_rule = (
+        default_spacing.get(line_rule_attr) if default_spacing is not None else None
+    )
+
+    def effective_spacing(style_id, seen=None):
+        seen = set() if seen is None else set(seen)
+        if style_id in seen:
+            return default_line, default_line_rule
+        seen.add(style_id)
+        style = styles.get(style_id)
+        if style is None:
+            return default_line, default_line_rule
+
+        p_pr = style.find(p_pr_tag)
+        spacing = p_pr.find(spacing_tag) if p_pr is not None else None
+        own_line = spacing.get(line_attr) if spacing is not None else None
+        own_line_rule = spacing.get(line_rule_attr) if spacing is not None else None
+
+        based_on = style.find(based_on_tag)
+        parent_id = based_on.get(val_attr) if based_on is not None else None
+        parent_line, parent_rule = (
+            effective_spacing(parent_id, seen)
+            if parent_id
+            else (default_line, default_line_rule)
+        )
+        return own_line or parent_line, own_line_rule or parent_rule
+
+    for style_id in style_ids:
+        style = styles.get(style_id)
+        if style is None:
+            if style_id in REQUIRED_MAIN_LINE_SPACING_STYLES:
+                findings.append(
+                    f"[spacing] required paragraph style '{style_id}' is missing."
+                )
+            continue
+        line, line_rule = effective_spacing(style_id)
+        if line != EXPECTED_MAIN_LINE_SPACING_AUTO or line_rule != 'auto':
+            findings.append(
+                f"[spacing] style '{style_id}' resolves to line={line!r}, "
+                f"lineRule={line_rule!r}; expected line='276', lineRule='auto' "
+                "(1.15 lines)."
+            )
+    return findings
+
+
+def validate_semantic_cross_references(doc_root):
+    """Validate source-token removal and Word bookmark/REF integrity."""
+    body = doc_root.find(f'{{{W_NS}}}body')
+    if body is None:
+        return ['[crossref] document body is missing.']
+
+    findings = []
+    bookmark_rows = {}
+    referenced_names = []
+    for paragraph_index, paragraph in enumerate(body.iter(f'{{{W_NS}}}p')):
+        visible_text = ''.join(
+            node.text or '' for node in paragraph.iter(f'{{{W_NS}}}t')
+        )
+        for token in UNRESOLVED_SOURCE_TOKEN_RE.findall(visible_text):
+            findings.append(
+                f"[crossref] paragraph {paragraph_index} contains unresolved "
+                f"source token {token!r}."
+            )
+
+        paragraph_instructions = ' '.join(
+            node.text or '' for node in paragraph.iter(f'{{{W_NS}}}instrText')
+        )
+        for match in REF_FIELD_RE.finditer(paragraph_instructions):
+            referenced_names.append(match.group(1))
+
+        end_ids = {
+            node.get(f'{{{W_NS}}}id')
+            for node in paragraph.iter(f'{{{W_NS}}}bookmarkEnd')
+        }
+        for start in paragraph.iter(f'{{{W_NS}}}bookmarkStart'):
+            name = start.get(f'{{{W_NS}}}name', '')
+            if not SEMANTIC_BOOKMARK_RE.fullmatch(name):
+                continue
+            bookmark_id = start.get(f'{{{W_NS}}}id')
+            bookmark_rows.setdefault(name, []).append(paragraph_index)
+            expected_label = 'Gambar' if name.startswith('fig_') else 'Tabel'
+            if bookmark_id not in end_ids:
+                findings.append(
+                    f"[crossref] semantic bookmark {name!r} at paragraph "
+                    f"{paragraph_index} has no matching bookmarkEnd."
+                )
+            if not visible_text.startswith(expected_label + ' '):
+                findings.append(
+                    f"[crossref] semantic bookmark {name!r} is not attached "
+                    f"to a visible {expected_label} caption."
+                )
+            if f'SEQ {expected_label}' not in paragraph_instructions:
+                findings.append(
+                    f"[crossref] semantic bookmark {name!r} caption is missing "
+                    f"the SEQ {expected_label} field."
+                )
+
+    for name, positions in sorted(bookmark_rows.items()):
+        if len(positions) != 1:
+            findings.append(
+                f"[crossref] semantic bookmark {name!r} occurs "
+                f"{len(positions)} times at paragraphs {positions}; expected once."
+            )
+        if name not in referenced_names:
+            findings.append(
+                f"[crossref] semantic bookmark {name!r} has no REF field."
+            )
+    for name in sorted(set(referenced_names)):
+        if SEMANTIC_BOOKMARK_RE.fullmatch(name) and name not in bookmark_rows:
+            findings.append(
+                f"[crossref] REF field targets missing semantic bookmark {name!r}."
+            )
+    return findings
+
+
+def _page_field_alignment(part_root):
+    """Return PAGE-field paragraph alignment, or None when no PAGE field exists."""
+    if part_root is None:
+        return None
+    for paragraph in part_root.iter(f'{{{W_NS}}}p'):
+        instructions = [
+            node.text or '' for node in paragraph.iter(f'{{{W_NS}}}instrText')
+        ]
+        instructions.extend(
+            node.get(f'{{{W_NS}}}instr', '')
+            for node in paragraph.iter(f'{{{W_NS}}}fldSimple')
+        )
+        if not re.search(r'\bPAGE\b', ' '.join(instructions), re.IGNORECASE):
+            continue
+        p_pr = paragraph.find(f'{{{W_NS}}}pPr')
+        jc = p_pr.find(f'{{{W_NS}}}jc') if p_pr is not None else None
+        return jc.get(f'{{{W_NS}}}val') if jc is not None else ''
+    return None
+
+
+def validate_page_numbering(doc_root, rels_root, page_parts):
+    """Validate Roman/Arabic numbering, reset, and header/footer placement."""
+    body = doc_root.find(f'{{{W_NS}}}body')
+    if body is None:
+        return ['[page-number] document body is missing.']
+
+    numbered_chapters = 0
+    for paragraph in body.findall(f'{{{W_NS}}}p'):
+        p_pr = paragraph.find(f'{{{W_NS}}}pPr')
+        if p_pr is None:
+            continue
+        p_style = p_pr.find(f'{{{W_NS}}}pStyle')
+        num_pr = p_pr.find(f'{{{W_NS}}}numPr')
+        if (
+            p_style is not None
+            and p_style.get(f'{{{W_NS}}}val', '').lower() == 'heading1'
+            and num_pr is not None
+        ):
+            numbered_chapters += 1
+
+    # Unit-test fixtures and partial documents do not necessarily model a full
+    # report. Enforce this contract only when numbered BAB headings are present.
+    if numbered_chapters == 0:
+        return []
+
+    sections = list(body.iter(f'{{{W_NS}}}sectPr'))
+    if len(sections) < 2:
+        return [
+            '[page-number] expected front matter plus at least one BAB section; '
+            f'found {len(sections)} section(s).'
+        ]
+
+    rel_targets = {}
+    if rels_root is not None:
+        for relationship in rels_root:
+            rid = relationship.get('Id')
+            target = relationship.get('Target')
+            if rid and target:
+                rel_targets[rid] = posixpath.normpath(
+                    posixpath.join('word', target)
+                )
+
+    findings = []
+
+    def page_part(section, tag_name, ref_type, label):
+        ref = next(
+            (
+                item for item in section.findall(f'{{{W_NS}}}{tag_name}')
+                if item.get(f'{{{W_NS}}}type') == ref_type
+            ),
+            None,
+        )
+        if ref is None:
+            findings.append(
+                f"[page-number] {label} is missing {ref_type} {tag_name}."
+            )
+            return None
+        rid = ref.get(f'{{{R_NS}}}id')
+        target = rel_targets.get(rid)
+        if target is None or target not in page_parts:
+            findings.append(
+                f"[page-number] {label} {ref_type} {tag_name} cannot be resolved "
+                f"from relationship {rid!r}."
+            )
+            return None
+        return page_parts[target]
+
+    def require_page(part, alignment, label):
+        actual = _page_field_alignment(part)
+        accepted = {'right', 'end'} if alignment == 'right' else {alignment}
+        if actual not in accepted:
+            findings.append(
+                f"[page-number] {label} PAGE field alignment={actual!r}; "
+                f"expected {alignment!r}."
+            )
+
+    def require_blank(part, label):
+        actual = _page_field_alignment(part)
+        if actual is not None:
+            findings.append(
+                f"[page-number] {label} must not contain a PAGE field."
+            )
+
+    if len(sections) != numbered_chapters + 1:
+        findings.append(
+            f'[page-number] found {numbered_chapters} numbered BAB heading(s) but '
+            f'{len(sections)} section(s); expected one front section plus one per BAB.'
+        )
+
+    front = sections[0]
+    front_num = front.find(f'{{{W_NS}}}pgNumType')
+    front_fmt = front_num.get(f'{{{W_NS}}}fmt') if front_num is not None else None
+    front_start = front_num.get(f'{{{W_NS}}}start') if front_num is not None else None
+    if front_fmt != 'lowerRoman' or front_start != '1':
+        findings.append(
+            f"[page-number] front matter has fmt={front_fmt!r}, start={front_start!r}; "
+            "expected lowerRoman starting at 1."
+        )
+    if front.find(f'{{{W_NS}}}titlePg') is None:
+        findings.append('[page-number] front matter is missing w:titlePg for the cover page.')
+
+    front_default_header = page_part(front, 'headerReference', 'default', 'front matter')
+    front_first_header = page_part(front, 'headerReference', 'first', 'front matter')
+    front_default_footer = page_part(front, 'footerReference', 'default', 'front matter')
+    front_first_footer = page_part(front, 'footerReference', 'first', 'front matter')
+    require_blank(front_default_header, 'front-matter default header')
+    require_blank(front_first_header, 'front-matter first-page header')
+    require_page(front_default_footer, 'right', 'front-matter default footer')
+    require_blank(front_first_footer, 'front-matter first-page footer')
+
+    for body_index, section in enumerate(sections[1:], start=1):
+        label = f'BAB section {body_index}'
+        pg_num = section.find(f'{{{W_NS}}}pgNumType')
+        fmt = pg_num.get(f'{{{W_NS}}}fmt') if pg_num is not None else None
+        start = pg_num.get(f'{{{W_NS}}}start') if pg_num is not None else None
+        if fmt not in (None, 'decimal'):
+            findings.append(
+                f"[page-number] {label} has fmt={fmt!r}; expected decimal."
+            )
+        if body_index == 1 and start != '1':
+            findings.append(
+                f"[page-number] BAB I must restart Arabic numbering at 1; start={start!r}."
+            )
+        if body_index > 1 and start is not None:
+            findings.append(
+                f"[page-number] {label} unexpectedly restarts at {start!r}; "
+                "numbering must continue from the previous BAB."
+            )
+        if section.find(f'{{{W_NS}}}titlePg') is None:
+            findings.append(
+                f'[page-number] {label} is missing w:titlePg for its opening page.'
+            )
+
+        default_header = page_part(section, 'headerReference', 'default', label)
+        first_header = page_part(section, 'headerReference', 'first', label)
+        default_footer = page_part(section, 'footerReference', 'default', label)
+        first_footer = page_part(section, 'footerReference', 'first', label)
+        require_page(default_header, 'right', f'{label} continuation header')
+        require_blank(first_header, f'{label} opening-page header')
+        require_blank(default_footer, f'{label} continuation footer')
+        require_page(first_footer, 'center', f'{label} opening-page footer')
+
+    return findings
 
 
 def _md5_bytes(b):
@@ -40,6 +441,124 @@ def _content_style(p):
     if pStyle is None:
         return ""
     return pStyle.get(f'{{{W_NS}}}val') or ""
+
+
+def collect_figure_narration_errors(p_list, bab1_idx=-1):
+    """Return fatal findings for figures without an explicit narrative mention.
+
+    Every ``Gambar X.Y`` caption in the report body must be referenced by an
+    ordinary paragraph in the same chapter.  The reference must occur in the
+    middle of a sentence, rather than starting a paragraph/sentence with the
+    figure label.  This mirrors the canonical UPNVJ writing rule and keeps the
+    check independent from visual placement of the drawing/caption pair.
+    """
+
+    heading1_idxs = [
+        i for i, paragraph in enumerate(p_list)
+        if _content_style(paragraph).lower() == 'heading1'
+    ]
+
+    def chapter_range(caption_idx):
+        start = 0
+        for heading_idx in heading1_idxs:
+            if heading_idx <= caption_idx:
+                start = heading_idx
+            else:
+                break
+        end = len(p_list)
+        for heading_idx in heading1_idxs:
+            if heading_idx > caption_idx:
+                end = heading_idx
+                break
+        return start, end
+
+    findings = []
+    for caption_idx, paragraph in enumerate(p_list):
+        if bab1_idx != -1 and caption_idx < bab1_idx:
+            continue
+
+        style = _content_style(paragraph)
+        text = _content_text(paragraph)
+        is_figure_caption = (
+            style.lower() == 'caption'
+            and re.match(r'^Gambar\s+[0-9]', text, re.IGNORECASE)
+        )
+        if not is_figure_caption:
+            continue
+
+        caption_match = re.match(r'^Gambar\s+([0-9]+\.[0-9]+)', text, re.IGNORECASE)
+        if not caption_match:
+            continue
+
+        figure_number = caption_match.group(1)
+        reference_re = re.compile(
+            r'\bGambar\s+' + re.escape(figure_number) + r'\b',
+            re.IGNORECASE,
+        )
+        chapter_start, chapter_end = chapter_range(caption_idx)
+        has_reference = False
+        has_valid_reference = False
+
+        for narrative_idx in range(chapter_start, chapter_end):
+            if narrative_idx == caption_idx:
+                continue
+            narrative = p_list[narrative_idx]
+            narrative_style = _content_style(narrative)
+            if narrative_style == 'Caption':
+                continue
+            if narrative_style.lower().startswith('heading'):
+                continue
+            if narrative_style.lower() in ('tableoffigures', 'table of figures'):
+                continue
+            if narrative.find(f'.//{{{W_NS}}}drawing') is not None:
+                continue
+
+            narrative_text = _content_text(narrative)
+            if not narrative_text:
+                continue
+            for reference_match in reference_re.finditer(narrative_text):
+                has_reference = True
+                # Empty prefix means the label starts the paragraph.  A terminal
+                # punctuation mark means it starts a later sentence.
+                prefix = narrative_text[:reference_match.start()].rstrip()
+                if prefix and not re.search(r'[.!?]\s*$', prefix):
+                    has_valid_reference = True
+                    break
+            if has_valid_reference:
+                break
+
+        if not has_reference:
+            findings.append(
+                f'[narration] Gambar {figure_number} tidak memiliki paragraf '
+                f'narasi yang menyebut "Gambar {figure_number}" dalam bab yang sama.'
+            )
+        elif not has_valid_reference:
+            findings.append(
+                f'[narration] Rujukan Gambar {figure_number} mengawali kalimat; '
+                'rujukan harus ditempatkan di tengah kalimat narasi.'
+            )
+
+    return findings
+
+
+def collect_citation_punctuation_errors(p_list, bab1_idx=-1):
+    """Reject legacy ``(Author, Year)`` commas in report-body citations."""
+    findings = []
+    for paragraph_index, paragraph in enumerate(p_list):
+        if bab1_idx != -1 and paragraph_index < bab1_idx:
+            continue
+        text = _content_text(paragraph)
+        style = _content_style(paragraph).lower()
+        if style == 'heading1' and 'DAFTAR PUSTAKA' in text.upper():
+            break
+        if not text or style == 'caption' or paragraph.find(f'.//{{{W_NS}}}drawing') is not None:
+            continue
+        for match in LEGACY_CITATION_COMMA_RE.finditer(text):
+            findings.append(
+                f"[citation-format] Paragraph {paragraph_index} uses legacy citation "
+                f"{match.group(0)!r}; remove the comma before the year."
+            )
+    return findings
 
 
 def _resolve_caption_indices_content(body, caption_match):
@@ -87,6 +606,29 @@ def _preceding_drawing_media(children, caption_idx, rel_target):
     return None, None
 
 
+def _resolve_figure_identity_content(body, figure_id):
+    """Find direct-body drawing paragraphs carrying the exact manifest id."""
+    children = list(body)
+    expected = f"FIGURE:{figure_id}"
+    matches = []
+    for idx, child in enumerate(children):
+        if child.tag != f'{{{W_NS}}}p':
+            continue
+        doc_pr = child.find(f'.//{{{WP_NS}}}docPr')
+        if doc_pr is not None and doc_pr.get('name') == expected:
+            matches.append(idx)
+    return children, matches
+
+
+def _drawing_media(drawing_p, rel_target):
+    """Resolve one drawing paragraph to its packed ``word/media`` part."""
+    blip = drawing_p.find(f'.//{{{A_NS}}}blip')
+    if blip is None:
+        return None
+    target = rel_target.get(blip.get(f'{{{R_NS}}}embed'))
+    return 'word/' + target if target else None
+
+
 def _printable_height_emu_content(doc_root):
     """Printable page height in EMU from the body sectPr:
     (pgSz.h - pgMar.top - pgMar.bottom) twips * 635. Must match the injector's
@@ -105,6 +647,98 @@ def _printable_height_emu_content(doc_root):
     except (TypeError, ValueError):
         return MAX_WIDTH_EMU
     return (h - top - bottom) * EMU_PER_TWIP
+
+
+def collect_figure_same_page_errors(body, printable_height_emu):
+    """Return fatal C4 findings for broken drawing/caption page contracts.
+
+    Word keeps two adjacent paragraphs on one page when the drawing paragraph
+    has ``keepNext`` and both paragraphs have ``keepLines``, provided the pair
+    can fit in the printable height.  The injector reserves 3 cm for the
+    caption when scaling; this validator checks the same structural contract.
+    """
+    findings = []
+    children = list(body) if body is not None else []
+    for idx, drawing_p in enumerate(children):
+        if drawing_p.tag != f'{{{W_NS}}}p':
+            continue
+        drawing = drawing_p.find(f'.//{{{W_NS}}}drawing')
+        if drawing is None:
+            continue
+
+        ext = drawing.find(f'.//{{{WP_NS}}}extent')
+        try:
+            rendered_height = int(ext.get('cy')) if ext is not None else None
+        except (TypeError, ValueError):
+            rendered_height = None
+        drawing_p_pr = drawing_p.find(f'{{{W_NS}}}pPr')
+        has_page_break_before = bool(
+            drawing_p_pr is not None
+            and drawing_p_pr.find(f'{{{W_NS}}}pageBreakBefore') is not None
+        )
+        if (rendered_height is not None
+                and rendered_height > printable_height_emu
+                and not has_page_break_before):
+            findings.append(
+                f"[C4] drawing paragraph {idx} is too tall (image height "
+                f"{rendered_height} EMU > printable page height "
+                f"{printable_height_emu} EMU) but lacks w:pageBreakBefore."
+            )
+
+        doc_pr = drawing.find(f'.//{{{WP_NS}}}docPr')
+        identity = doc_pr.get('name', '') if doc_pr is not None else ''
+        next_p = children[idx + 1] if idx + 1 < len(children) else None
+        next_text = (
+            _content_text(next_p)
+            if next_p is not None and next_p.tag == f'{{{W_NS}}}p'
+            else ''
+        )
+        next_is_caption = bool(
+            next_p is not None
+            and next_p.tag == f'{{{W_NS}}}p'
+            and _content_style(next_p) == 'Caption'
+            and re.match(r'^Gambar\s+[0-9]+\.[0-9]+\b', next_text, re.IGNORECASE)
+        )
+        is_report_figure = identity.startswith('FIGURE:') or next_is_caption
+        if not is_report_figure:
+            continue
+
+        figure_name = identity or next_text or f'paragraph {idx}'
+        if not next_is_caption:
+            findings.append(
+                f"[C4] {figure_name!r} is not immediately followed by its Gambar "
+                "caption; the pair cannot be guaranteed on one page."
+            )
+            continue
+
+        caption_p_pr = next_p.find(f'{{{W_NS}}}pPr')
+        for prop in ('keepNext', 'keepLines'):
+            if (drawing_p_pr is None
+                    or drawing_p_pr.find(f'{{{W_NS}}}{prop}') is None):
+                findings.append(
+                    f"[C4] {figure_name!r} drawing is missing w:{prop}; "
+                    "drawing and caption may be split across pages."
+                )
+        for prop in ('keepNext', 'keepLines'):
+            if (caption_p_pr is None
+                    or caption_p_pr.find(f'{{{W_NS}}}{prop}') is None):
+                findings.append(
+                    f"[C4] caption {next_text!r} is missing w:{prop}; the "
+                    "drawing/caption same-page chain is incomplete."
+                )
+
+        if rendered_height is None:
+            findings.append(
+                f"[C4] {figure_name!r} has no valid rendered height; same-page "
+                "fit with its caption cannot be validated."
+            )
+        elif rendered_height + FIGURE_CAPTION_RESERVE_EMU > printable_height_emu:
+            findings.append(
+                f"[C4] {figure_name!r} plus the 3 cm caption reserve requires "
+                f"{rendered_height + FIGURE_CAPTION_RESERVE_EMU} EMU, exceeding "
+                f"the printable page height {printable_height_emu} EMU."
+            )
+    return findings
 
 
 # ============================================================ #
@@ -211,9 +845,12 @@ def _run_writing_guards(errors_found):
         print("  note: draft 'Tugas_Akhir_Draft.md' not found; writing guards skipped.")
         return
     try:
-        with open(draft_path, encoding="utf-8") as f:
-            draft_text = f.read()
-    except OSError as e:
+        if hasattr(mrg, "_load_draft_text"):
+            draft_text = mrg._load_draft_text(draft_path)
+        else:
+            with open(draft_path, encoding="utf-8") as f:
+                draft_text = f.read()
+    except (OSError, ValueError) as e:
         print(f"  note: could not read draft '{draft_path}': {e}; writing guards skipped.")
         return
     draft_lines = draft_text.splitlines()
@@ -291,12 +928,24 @@ def main():
         with zipfile.ZipFile(docx_path) as z:
             doc_xml = z.read("word/document.xml")
             styles_xml = z.read("word/styles.xml")
+            document_rels_xml = z.read("word/_rels/document.xml.rels")
+            page_parts = {
+                name: ET.fromstring(z.read(name))
+                for name in z.namelist()
+                if name.startswith((
+                    'word/header',
+                    'word/footer',
+                    'word/ta-header',
+                    'word/ta-footer',
+                ))
+            }
     except Exception as e:
         print(f"Error: Failed to open zip or read XML from {docx_path}: {e}")
         sys.exit(1)
         
     doc_root = ET.fromstring(doc_xml)
     styles_root = ET.fromstring(styles_xml)
+    document_rels_root = ET.fromstring(document_rels_xml)
     
     # 1. Validate taappendixheading style in styles.xml
     print("Checking styles.xml for taappendixheading...")
@@ -364,6 +1013,36 @@ def main():
     print("Iterating paragraphs for structure validation...")
     
     errors_found = []
+    print("Checking A4 page size and campus margins on every section...")
+    layout_errors = validate_page_layout(doc_root)
+    errors_found.extend(layout_errors)
+    if not layout_errors:
+        print(
+            "SUCCESS: All sections use A4 portrait with left=4 cm and "
+            "top/right/bottom=3 cm."
+        )
+    print("Checking Roman/Arabic page numbering and first-page placement...")
+    page_number_errors = validate_page_numbering(
+        doc_root,
+        document_rels_root,
+        page_parts,
+    )
+    errors_found.extend(page_number_errors)
+    if not page_number_errors:
+        print(
+            "SUCCESS: Roman pages are bottom-right; BAB opening pages are "
+            "bottom-center; continuation pages are top-right; BAB I restarts at 1."
+        )
+    print("Checking main paragraph styles for 1.15 line spacing...")
+    spacing_errors = validate_main_line_spacing(styles_root)
+    errors_found.extend(spacing_errors)
+    if not spacing_errors:
+        print("SUCCESS: Body, heading, list, and automatic-list styles use 1.15 spacing.")
+    print("Checking stable figure/table bookmarks and REF fields...")
+    crossref_errors = validate_semantic_cross_references(doc_root)
+    errors_found.extend(crossref_errors)
+    if not crossref_errors:
+        print("SUCCESS: Stable caption bookmarks and semantic REF fields are valid.")
     first_gambar_checked = False
     gambar_count = 0
     tabel_count = 0
@@ -613,6 +1292,8 @@ def main():
     # Read packed media bytes + the document relationship targets.
     media_bytes = {}
     rel_target = {}
+    content_type_defaults = {}
+    content_type_overrides = {}
     rels_xml = None
     try:
         with zipfile.ZipFile(docx_path) as z:
@@ -623,6 +1304,21 @@ def main():
                 rels_xml = z.read("word/_rels/document.xml.rels")
             except KeyError:
                 rels_xml = None
+            try:
+                content_types_root = ET.fromstring(z.read("[Content_Types].xml"))
+                for node in content_types_root:
+                    if node.tag == f'{{{CONTENT_TYPES_NS}}}Default':
+                        content_type_defaults[(node.get('Extension') or '').lower()] = (
+                            node.get('ContentType') or ''
+                        )
+                    elif node.tag == f'{{{CONTENT_TYPES_NS}}}Override':
+                        content_type_overrides[node.get('PartName') or ''] = (
+                            node.get('ContentType') or ''
+                        )
+            except KeyError:
+                errors_found.append(
+                    "[C3/package] [Content_Types].xml is missing; Word cannot open the package."
+                )
     except Exception as e:
         errors_found.append(f"[content] failed to read media/rels from package: {e}")
     if rels_xml is not None:
@@ -635,7 +1331,7 @@ def main():
 
     body_el = doc_root.find(f'{{{W_NS}}}body')
 
-    # Per-entry resolution feeds C2 (count) and C3 (packed-vs-injected), and
+    # Per-entry exact-id resolution feeds C2 and C3, and
     # records the figure<->media mapping consumed by the C1 allow-list logic.
     target_to_figure = {}  # packed media name -> figure id (for allow-list mapping)
     for item in post_com_items:
@@ -644,28 +1340,42 @@ def main():
         img_file = item.get("file", "")
         src_path = os.path.join("images", img_file)
 
-        children, matches = _resolve_caption_indices_content(body_el, caption_match)
-        count = len(matches)
+        children, identity_matches = _resolve_figure_identity_content(body_el, item_id)
+        _caption_children, caption_matches = _resolve_caption_indices_content(
+            body_el, caption_match
+        )
+        count = len(identity_matches)
 
-        # --- C2: exactly-one caption resolution --------------------------- #
-        if count != 1:
-            if item_id in unresolved_allow and count == 0:
-                print(f"  note: [C2] entry '{item_id}' resolves to 0 captions but is "
+        # --- C2: one exact drawing id, one caption, and strict adjacency --- #
+        if count != 1 or len(caption_matches) != 1:
+            if (item_id in unresolved_allow and count == 0
+                    and len(caption_matches) == 0):
+                print(f"  note: [C2] entry '{item_id}' resolves to 0 figures/captions but is "
                       f"reconciled (unresolved_allow); intentionally skipped.")
                 continue
             errors_found.append(
-                f"[C2] entry '{item_id}' caption_match '{caption_match}' resolved to {count} "
-                f"caption paragraph(s); expected exactly 1 (ambiguous/unresolved caption "
-                f"resolution; not exactly one match)."
+                f"[C2] entry '{item_id}' exact drawing identity 'FIGURE:{item_id}' resolved "
+                f"to {count} drawing(s) and caption_match '{caption_match}' resolved to "
+                f"{len(caption_matches)} caption(s); expected exactly one of each."
             )
             continue
 
-        # Map the resolved caption to its preceding drawing's packed media.
-        media_name, _drawing_p = _preceding_drawing_media(children, matches[0], rel_target)
+        drawing_idx = identity_matches[0]
+        caption_idx = caption_matches[0]
+        if caption_idx != drawing_idx + 1:
+            errors_found.append(
+                f"[C2] entry '{item_id}' exact drawing 'FIGURE:{item_id}' is not "
+                f"immediately followed by its caption '{caption_match}'."
+            )
+            continue
+
+        # Map the exact-id drawing to its packed media.
+        drawing_p = children[drawing_idx]
+        media_name = _drawing_media(drawing_p, rel_target)
         if media_name is None:
             errors_found.append(
-                f"[C3] entry '{item_id}' resolves to a caption but no preceding drawing/media "
-                f"could be located for content integrity verification."
+                f"[C3] entry '{item_id}' exact drawing resolves but its packed media "
+                f"could not be located for content integrity verification."
             )
             continue
         target_to_figure[media_name] = item_id
@@ -678,6 +1388,18 @@ def main():
             )
             continue
         packed_md5 = _md5_bytes(packed)
+
+        media_extension = posixpath.splitext(media_name)[1].lstrip('.').lower()
+        media_part_name = '/' + media_name
+        declared_media_type = (
+            content_type_overrides.get(media_part_name)
+            or content_type_defaults.get(media_extension)
+        )
+        if not declared_media_type or not declared_media_type.startswith('image/'):
+            errors_found.append(
+                f"[C3/package] entry '{item_id}' media '{media_name}' has no valid image "
+                f"content type in [Content_Types].xml; Microsoft Word will reject the DOCX."
+            )
 
         # --- C3: packed media MD5 == injected images/<file> MD5 ----------- #
         if os.path.exists(src_path):
@@ -733,107 +1455,51 @@ def main():
                 f"Reconcile legitimate reuse via duplicate_content_allow."
             )
 
-    # --- C4: oversized image lacking pageBreakBefore (page-split safety) --- #
+    # --- C4: drawing and caption must remain on the same page. --- #
     page_height_threshold = _printable_height_emu_content(doc_root)
-    print(f"Checking page-split safety (printable page-height threshold {page_height_threshold} EMU)...")
-    if body_el is not None:
-        for fig_idx, p in enumerate(body_el.findall(f'{{{W_NS}}}p')):
-            drawing = p.find(f'.//{{{W_NS}}}drawing')
-            if drawing is None:
-                continue
-            ext = drawing.find(f'.//{{{WP_NS}}}extent')
-            if ext is None or ext.get('cy') is None:
-                continue
-            try:
-                cy = int(ext.get('cy'))
-            except ValueError:
-                continue
-            if cy > page_height_threshold:
-                pPr = p.find(f'{{{W_NS}}}pPr')
-                has_pbb = pPr is not None and pPr.find(f'{{{W_NS}}}pageBreakBefore') is not None
-                if not has_pbb:
-                    errors_found.append(
-                        f"[C4] drawing paragraph {fig_idx} is too tall (image height {cy} EMU > "
-                        f"printable page height {page_height_threshold} EMU) but lacks "
-                        f"w:pageBreakBefore; the image and its caption can split across a page break."
-                    )
+    print(
+        "Checking page-split safety: drawing/caption same-page contract "
+        f"(printable height {page_height_threshold} EMU, caption reserve "
+        f"{FIGURE_CAPTION_RESERVE_EMU} EMU)..."
+    )
+    same_page_errors = collect_figure_same_page_errors(
+        body_el, page_height_threshold
+    )
+    errors_found.extend(same_page_errors)
+    if same_page_errors:
+        for finding in same_page_errors:
+            print(finding)
+    else:
+        print("SUCCESS: Every drawing and Gambar caption pair is constrained to one page.")
 
     # ============================================================ #
-    # Narration guard (WARNING ONLY -- never fatal).
+    # Figure narration guard (FATAL).
     #
-    # For every figure caption ("Gambar X.Y ...") confirm that, within the SAME
-    # chapter (Heading1 .. next Heading1), at least one ordinary body paragraph
-    # (Normal style, NOT a Caption, NOT a drawing paragraph) references the
-    # figure via \bGambar\s+X\.Y\b. If none does, print a clearly-labelled
-    # [WARN][narration] line. This DOES NOT append to errors_found and DOES NOT
-    # change the exit code.
+    # Each figure must be explicitly mentioned by an ordinary narrative
+    # paragraph in the same chapter, with the label placed mid-sentence.  A
+    # missing/invalid mention is a campus-format violation and therefore blocks
+    # the build instead of being silently tolerated as a warning.
     # ============================================================ #
-    print("Checking figure narration references (non-fatal warnings)...")
+    print("Checking figure narration references (fatal)...")
+    narration_errors = collect_figure_narration_errors(p_list, bab1_idx)
+    errors_found.extend(narration_errors)
+    for finding in narration_errors:
+        print(finding)
+    if narration_errors:
+        print(
+            f"Narration check: {len(narration_errors)} figure(s) violate the "
+            "mandatory narrative-reference rule."
+        )
+    else:
+        print("SUCCESS: Every figure has an explicit mid-sentence narrative reference.")
 
-    def _h1_val(pp):
-        ppr = pp.find('w:pPr', namespaces)
-        ps = ppr.find('w:pStyle', namespaces) if ppr is not None else None
-        return ps.get(f'{{{W_NS}}}val') if ps is not None else ""
-
-    # Heading1 boundaries (chapter starts) within the document body.
-    heading1_idxs = [i for i, pp in enumerate(p_list)
-                     if _h1_val(pp) in ('Heading1', 'heading1')]
-
-    def _chapter_range(cap_idx):
-        start = 0
-        for hi in heading1_idxs:
-            if hi <= cap_idx:
-                start = hi
-            else:
-                break
-        end = len(p_list)
-        for hi in heading1_idxs:
-            if hi > cap_idx:
-                end = hi
-                break
-        return start, end
-
-    narration_warnings = []
-    for idx, p in enumerate(p_list):
-        is_in_body = (bab1_idx == -1 or idx >= bab1_idx)
-        if not is_in_body:
-            continue
-        pStyle_val = _content_style(p)
-        text = _content_text(p)
-        is_gambar_caption = (re.match(r'^Gambar\s+[0-9]', text, re.IGNORECASE)
-                             or (pStyle_val == 'Caption' and text.lower().startswith('gambar')))
-        if not is_gambar_caption:
-            continue
-        m = re.match(r'^Gambar\s+([0-9]+\.[0-9]+)', text, re.IGNORECASE)
-        if not m:
-            continue
-        fig_num = m.group(1)
-        ref_re = re.compile(r'\bGambar\s+' + re.escape(fig_num) + r'\b', re.IGNORECASE)
-        c_start, c_end = _chapter_range(idx)
-        found_ref = False
-        for j in range(c_start, c_end):
-            if j == idx:
-                continue
-            q = p_list[j]
-            q_style = _content_style(q)
-            if q_style == 'Caption':
-                continue
-            if q.find(f'.//{{{W_NS}}}drawing') is not None:
-                continue
-            # Treat empty/un-styled body text as Normal narrative; exclude only
-            # explicit Caption/drawing paragraphs above.
-            q_text = _content_text(q)
-            if not q_text:
-                continue
-            if ref_re.search(q_text):
-                found_ref = True
-                break
-        if not found_ref:
-            narration_warnings.append(f"[WARN][narration] Gambar {fig_num} has no referencing narrative paragraph")
-
-    for w in narration_warnings:
-        print(w)
-    print(f"Narration check: {len(narration_warnings)} figure(s) without a narrative reference (non-fatal).")
+    print("Checking citation punctuation (author and year without a comma)...")
+    citation_format_errors = collect_citation_punctuation_errors(p_list, bab1_idx)
+    errors_found.extend(citation_format_errors)
+    for finding in citation_format_errors:
+        print(finding)
+    if not citation_format_errors:
+        print("SUCCESS: In-text citations omit the comma before the year.")
 
     # ============================================================ #
     # Citation guard for Latar Belakang (WARNING ONLY -- never fatal).
