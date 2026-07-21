@@ -73,7 +73,7 @@ Membangun **Platform Web UPNVJ** yang menyatukan empat komponen terintegrasi:
 
 ### 2.3 Batasan Masalah (Ringkas)
 
-Lihat **Bagian 9** untuk daftar *Out of Scope* lengkap. Secara ringkas: sistem berupa simulasi 3D di peramban (bukan AR), target platform WebGL (bukan aplikasi native), komunikasi bersifat satu arah React→Unity, dan navigasi hanya berlaku pada area NavMesh yang telah di-*bake*.
+Lihat **Bagian 9** untuk daftar *Out of Scope* lengkap. Secara ringkas: sistem berupa simulasi 3D di peramban (bukan AR), target platform WebGL (bukan aplikasi native), React mengirim perintah ke Unity melalui `SendMessage`, Unity mengirim callback penyelesaian normal melalui `OnNavigationCompleted`, dan navigasi hanya berlaku pada area NavMesh yang telah di-*bake*.
 
 ---
 
@@ -436,7 +436,7 @@ Skenario *User Acceptance Testing* terdokumentasi pada berkas `uat_scenarios.md`
 |---|---|---|
 | Survei navigasi | `Survei Evaluasi Pengalaman Navigasi ... (Responses).xlsx` | Data latar belakang & rumusan masalah. |
 | ERD | `ERD-Mermaid.png`, `dokumentasi/erd_schema.png` | Diagram perancangan basis data. |
-| Diagram alur sistem | `diagram_alur_sistem.md`, `Alur Implementasi sistem.png` | Diagram BAB III/IV. |
+| Diagram alur sistem | `diagrams/*.puml` | Sumber PlantUML kanonik untuk diagram laporan. |
 | Diagram CRUD Admin | `Diagram Crud Admin.png` | Perancangan modul admin. |
 | Diagram deployment | `Deployment.png` | Arsitektur deployment. |
 | Skenario UAT | `uat_scenarios.md` | Pengujian penerimaan. |

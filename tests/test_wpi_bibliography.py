@@ -10,10 +10,9 @@ Covers design Properties 1, 2, 3 plus R1.8 / R1.9 unit cases against:
   - ``skills/scripts/format_ta_proyek.py``: clean_bibliography_sdt (draft-sourced
     SDT renderer, R1.3 style invariant + R1.8 missing-section guard).
 
-Draft is the single source of truth (no hardcoded references). The snapshot test
-asserts the 8 current draft entries parse to the same text + italic spans as the
-captured baseline ``tests/fixtures/wpi_baseline_bibliography.xml`` (Option B
-format/style preservation, R1.9).
+Draft is the single source of truth (no hardcoded report output). The current
+draft regression verifies that all entries remain parseable, ordered, and
+matchable by author and year, including organization authors and year suffixes.
 """
 import sys
 from pathlib import Path
@@ -224,29 +223,36 @@ def _baseline_entry_spans():
     return out
 
 
-def test_unit_snapshot_draft_entries_match_baseline_spans():
+def test_unit_current_draft_entries_are_parseable_and_ordered():
     assert DRAFT.exists(), "draft missing"
-    assert BASELINE_BIB.exists(), "baseline fixture missing"
 
     result = mrg.parse_bibliography_entries(str(DRAFT))
     assert result.section_found is True
-
-    baseline = _baseline_entry_spans()
-    assert len(result) == len(baseline) == 8
-
-    for entry, base_spans in zip(result, baseline):
-        # Text + italic-span structure must match the captured baseline.
-        assert list(entry.spans) == base_spans
-        # Exactly one italic span per APA entry (the journal/source name).
-        assert sum(1 for _, ital in entry.spans if ital) == 1
+    assert len(result) == 14
+    assert result[0].raw.startswith("Aliyah")
+    assert result[-1].raw.startswith("Unity Technologies. (2026c)")
+    assert all(entry.authors and entry.year for entry in result)
+    assert all(
+        "".join(text for text, _ in entry.spans) == entry.raw.replace("*", "")
+        for entry in result
+    )
 
 
 def test_unit_reference_key_surname_and_year():
     result = mrg.parse_bibliography_entries(str(DRAFT))
     keys = [mrg.reference_key(e) for e in result]
-    assert keys[0] == ('aliyah', '2024')
-    assert ('siv', '2025') in keys
-    assert ('putra', '2026') in keys
+    assert keys[0] == ('aliyah', '2025')
+    assert ('upnvj', '2025a') in keys
+    assert ('unity technologies', '2026c') in keys
+
+
+def test_citation_keys_support_indonesian_two_authors_and_year_suffixes():
+    body = "(Jamaludin dan Saepuloh 2024; UPNVJ 2025a; Unity Technologies 2026c)"
+    assert mrg._extract_citation_keys(body) == [
+        ('jamaludin', '2024', 'Jamaludin'),
+        ('upnvj', '2025a', 'UPNVJ'),
+        ('unity technologies', '2026c', 'Unity Technologies'),
+    ]
 
 
 if __name__ == "__main__":

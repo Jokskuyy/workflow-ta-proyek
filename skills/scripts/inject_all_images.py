@@ -111,6 +111,35 @@ def scaled_dimensions(cx, cy, max_height_emu=None):
     return int(cx * scale), int(cy * scale)
 
 
+def normalize_post_com_fonts(doc_root):
+    """Remove theme-font drift introduced by Word's field update pass.
+
+    Word may reapply theme attributes to field runs even when every authored
+    style is Times New Roman. The post-COM injector is the final XML-writing
+    stage, so normalize those attributes here before the package is rebuilt.
+    Symbol fonts used by Word numbering remain untouched.
+    """
+    theme_names = ("asciiTheme", "hAnsiTheme", "eastAsiaTheme", "cstheme")
+    explicit_names = ("ascii", "hAnsi", "eastAsia", "cs")
+    changed = 0
+    for fonts in doc_root.iter(f"{{{WORD_NS}}}rFonts"):
+        had_theme = False
+        for name in theme_names:
+            attribute = f"{{{WORD_NS}}}{name}"
+            if attribute in fonts.attrib:
+                del fonts.attrib[attribute]
+                had_theme = True
+                changed += 1
+        if not had_theme:
+            continue
+        for name in explicit_names:
+            attribute = f"{{{WORD_NS}}}{name}"
+            value = (fonts.get(attribute) or "").strip().lower()
+            if not value or value not in {"symbol", "wingdings", "wingdings 2", "wingdings 3"}:
+                fonts.set(attribute, "Times New Roman")
+    return changed
+
+
 def printable_height_emu(doc_root, namespaces):
     """Printable page height in EMU from the body sectPr:
     (pgSz.h - pgMar.top - pgMar.bottom) twips * 635. Falls back to MAX_WIDTH if
@@ -603,6 +632,12 @@ def inject_all_images(docx_path):
         if changed:
             cap_fixed += 1
     print(f"Post-COM keep-props pass: ensured keepNext/keepLines on {cap_fixed} caption paragraph(s).")
+
+    theme_fonts_removed = normalize_post_com_fonts(doc_root)
+    print(
+        "Post-COM font pass: removed "
+        f"{theme_fonts_removed} theme-font attribute(s) and restored Times New Roman."
+    )
 
     # Keep the visible Daftar Isi heading outside the TOC content control in
     # the final package.  Word/LibreOffice can otherwise split the heading

@@ -1,0 +1,1 @@
+Analisis kebutuhan awal menggunakan tiga sumber bukti, yaitu kuesioner pengalaman navigasi, tinjauan terhadap jalur informasi yang tersedia bagi pengguna, serta wawancara dan koordinasi dengan pemangku kepentingan. Pembahasan dibatasi pada bukti yang tersedia untuk proyek ini dan tidak dimaksudkan sebagai audit menyeluruh terhadap seluruh sistem informasi UPNVJ.

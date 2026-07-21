@@ -5,6 +5,8 @@ import sys
 import xml.etree.ElementTree as ET
 
 import lxml.etree as LET
+from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,6 +14,10 @@ SCRIPTS = ROOT / "skills" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 import format_ta_proyek as formatter  # noqa: E402
+import create_faiz_base_docx as faiz_base  # noqa: E402
+import merge_draft_to_docx as merger  # noqa: E402
+import inject_all_images as image_injector  # noqa: E402
+import update_fields_com as fields_com  # noqa: E402
 import validate_docx_structure as validator  # noqa: E402
 
 
@@ -22,6 +28,208 @@ PR = "http://schemas.openxmlformats.org/package/2006/relationships"
 
 def qn(name):
     return f"{{{W}}}{name}"
+
+
+def test_report_heading_caption_and_toc_styles_are_forced_to_black():
+    styles = LET.Element(qn("styles"))
+    for style_id in formatter.REPORT_BLACK_STYLE_IDS:
+        style = LET.SubElement(styles, qn("style"))
+        style.set(qn("type"), "paragraph")
+        style.set(qn("styleId"), style_id)
+        r_pr = LET.SubElement(style, qn("rPr"))
+        color = LET.SubElement(r_pr, qn("color"))
+        color.set(qn("val"), "2F5496")
+        color.set(qn("themeColor"), "accent1")
+        color.set(qn("themeShade"), "BF")
+
+    formatter.ensure_report_style_colors(styles)
+
+    for style in styles.findall(qn("style")):
+        color = style.find(f"{qn('rPr')}/{qn('color')}")
+        assert color is not None
+        assert color.get(qn("val")) == "000000"
+        assert color.get(qn("themeColor")) is None
+        assert color.get(qn("themeTint")) is None
+        assert color.get(qn("themeShade")) is None
+
+
+def test_faiz_base_caption_style_is_explicit_tnr_12_regular():
+    doc = Document()
+    normal = doc.styles["Normal"]
+    caption = doc.styles["Caption"]
+
+    faiz_base._configure_caption_style(caption, normal)
+
+    assert caption.base_style == normal
+    assert caption.font.name == "Times New Roman"
+    assert caption.font.size.pt == 12
+    assert caption.font.bold is False
+    assert caption.font.italic is False
+    assert str(caption.font.color.rgb) == "000000"
+    assert caption._element.rPr.find(qn("szCs")).get(qn("val")) == "24"
+    assert caption.paragraph_format.alignment == WD_ALIGN_PARAGRAPH.CENTER
+    assert caption.paragraph_format.line_spacing == 1.0
+    assert caption.paragraph_format.space_before.pt == 6
+    assert caption.paragraph_format.space_after.pt == 6
+
+
+def test_caption_seq_result_matches_label_typography():
+    paragraph = LET.Element(qn("p"))
+    formatter.format_caption_paragraph_clean(
+        paragraph,
+        "Gambar",
+        "2.",
+        "Gambar",
+        1,
+        "Arsitektur Sistem",
+        {"w": W},
+        semantic_bookmark="fig_arsitektur",
+        semantic_bookmark_id=42,
+    )
+
+    runs_by_text = {
+        "".join(run.itertext()): run
+        for run in paragraph.findall(qn("r"))
+        if "".join(run.itertext())
+    }
+    prefix = runs_by_text["Gambar 2."]
+    seq_result = runs_by_text["1"]
+    description = runs_by_text[" Arsitektur Sistem"]
+
+    for run, expected_bold in (
+        (prefix, True),
+        (seq_result, True),
+        (description, False),
+    ):
+        r_pr = run.find(qn("rPr"))
+        assert r_pr is not None
+        fonts = r_pr.find(qn("rFonts"))
+        assert fonts is not None
+        for attribute in ("ascii", "hAnsi", "eastAsia", "cs"):
+            assert fonts.get(qn(attribute)) == "Times New Roman"
+        assert r_pr.find(qn("sz")).get(qn("val")) == "24"
+        assert r_pr.find(qn("szCs")).get(qn("val")) == "24"
+        assert r_pr.find(qn("color")).get(qn("val")) == "000000"
+        assert r_pr.find(qn("i")).get(qn("val")) == "0"
+        assert r_pr.find(qn("iCs")).get(qn("val")) == "0"
+        assert r_pr.find(qn("position")) is None
+        assert r_pr.find(qn("vertAlign")) is None
+        bold = r_pr.find(qn("b"))
+        assert bold is not None
+        assert (bold.get(qn("val")) != "0") is expected_bold
+
+
+def test_caption_label_span_matches_visible_word_field_result():
+    assert fields_com.caption_label_span("Gambar 2.1 Arsitektur Sistem") == (0, 10)
+    assert fields_com.caption_label_span("Tabel 3.24 Hasil Pengujian") == (0, 10)
+    assert fields_com.caption_label_span("Daftar Gambar") is None
+    assert fields_com.caption_label_span("Gambar tanpa nomor") is None
+
+
+def test_semantic_ref_com_formatting_is_regular_tnr_12():
+    class Dummy:
+        pass
+
+    semantic_font = Dummy()
+    ordinary_font = Dummy()
+    semantic_field = Dummy()
+    semantic_field.Code = Dummy()
+    semantic_field.Code.Text = " REF fig_arsitektur \\h \\* CHARFORMAT "
+    semantic_field.Result = Dummy()
+    semantic_field.Result.Font = semantic_font
+    ordinary_field = Dummy()
+    ordinary_field.Code = Dummy()
+    ordinary_field.Code.Text = " PAGE "
+    ordinary_field.Result = Dummy()
+    ordinary_field.Result.Font = ordinary_font
+    document = Dummy()
+    document.Fields = [semantic_field, ordinary_field]
+
+    assert fields_com.format_semantic_reference_fields(document) == 1
+    assert semantic_font.Name == "Times New Roman"
+    assert semantic_font.NameAscii == "Times New Roman"
+    assert semantic_font.NameFarEast == "Times New Roman"
+    assert semantic_font.NameBi == "Times New Roman"
+    assert semantic_font.Size == 12
+    assert semantic_font.SizeBi == 12
+    assert semantic_font.Bold == 0
+    assert semantic_font.BoldBi == 0
+    assert semantic_font.Italic == 0
+    assert semantic_font.ItalicBi == 0
+    assert semantic_font.Superscript == 0
+    assert semantic_font.Subscript == 0
+    assert semantic_font.Position == 0
+    assert not hasattr(ordinary_font, "Name")
+
+
+def test_inline_and_block_code_use_times_new_roman():
+    paragraph = LET.Element(qn("p"))
+    merger.add_formatted_text(paragraph, "Gunakan `NavigateTo`.")
+    inline_code = next(
+        run for run in paragraph.findall(qn("r"))
+        if "NavigateTo" in "".join(run.itertext())
+    )
+    inline_fonts = inline_code.find(f"{qn('rPr')}/{qn('rFonts')}")
+    assert inline_fonts.get(qn("ascii")) == "Times New Roman"
+    assert inline_fonts.get(qn("hAnsi")) == "Times New Roman"
+
+    block = merger.build_code_block_elements({"lines": ["NavigateTo(target)"]})[0]
+    block_fonts = block.find(f"{qn('r')}/{qn('rPr')}/{qn('rFonts')}")
+    for attribute in ("ascii", "hAnsi", "eastAsia", "cs"):
+        assert block_fonts.get(qn(attribute)) == "Times New Roman"
+
+
+def test_font_audit_rejects_theme_and_non_tnr_fonts():
+    root = ET.Element(qn("document"))
+    run = ET.SubElement(root, qn("r"))
+    r_pr = ET.SubElement(run, qn("rPr"))
+    fonts = ET.SubElement(r_pr, qn("rFonts"))
+    fonts.set(qn("ascii"), "Calibri")
+    fonts.set(qn("hAnsiTheme"), "minorHAnsi")
+    findings = validator.validate_times_new_roman_fonts({
+        "word/document.xml": ET.tostring(root),
+    })
+    assert any("Calibri" in finding for finding in findings)
+    assert any("theme fonts are not allowed" in finding for finding in findings)
+
+
+def test_post_com_font_normalizer_removes_theme_attributes():
+    document = LET.Element(qn("document"))
+    run = LET.SubElement(document, qn("r"))
+    run_pr = LET.SubElement(run, qn("rPr"))
+    fonts = LET.SubElement(run_pr, qn("rFonts"))
+    fonts.set(qn("asciiTheme"), "minorHAnsi")
+    fonts.set(qn("hAnsiTheme"), "minorHAnsi")
+
+    assert image_injector.normalize_post_com_fonts(document) == 2
+    for attribute in ("asciiTheme", "hAnsiTheme", "eastAsiaTheme", "cstheme"):
+        assert fonts.get(qn(attribute)) is None
+    for attribute in ("ascii", "hAnsi", "eastAsia", "cs"):
+        assert fonts.get(qn(attribute)) == "Times New Roman"
+
+
+def test_bold_audit_rejects_body_bold_but_allows_heading():
+    document = ET.Element(qn("document"))
+    body = ET.SubElement(document, qn("body"))
+
+    chapter = ET.SubElement(body, qn("p"))
+    chapter_pr = ET.SubElement(chapter, qn("pPr"))
+    chapter_style = ET.SubElement(chapter_pr, qn("pStyle"))
+    chapter_style.set(qn("val"), "Heading1")
+    chapter_run = ET.SubElement(chapter, qn("r"))
+    chapter_run_pr = ET.SubElement(chapter_run, qn("rPr"))
+    ET.SubElement(chapter_run_pr, qn("b"))
+    ET.SubElement(chapter_run, qn("t")).text = "BAB I PENDAHULUAN"
+
+    body_paragraph = ET.SubElement(body, qn("p"))
+    body_run = ET.SubElement(body_paragraph, qn("r"))
+    body_run_pr = ET.SubElement(body_run, qn("rPr"))
+    ET.SubElement(body_run_pr, qn("b"))
+    ET.SubElement(body_run, qn("t")).text = "Gambar 2.1"
+
+    findings = validator.validate_body_bold_usage(document)
+    assert len(findings) == 1
+    assert "Gambar 2.1" in findings[0]
 
 
 def test_layout_formatter_overwrites_bad_geometry_and_preserves_references():

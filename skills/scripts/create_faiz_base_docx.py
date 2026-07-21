@@ -20,7 +20,7 @@ from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Cm, Pt
+from docx.shared import Cm, Pt, RGBColor
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -53,6 +53,33 @@ def _set_run_font(run, size_pt: float = 12, bold: bool = False) -> None:
         r_pr.insert(0, r_fonts)
     for attr in ("ascii", "hAnsi", "eastAsia", "cs"):
         r_fonts.set(qn(f"w:{attr}"), "Times New Roman")
+
+
+def _configure_caption_style(caption_style, normal_style) -> None:
+    """Align the clean Faiz base caption with the UPNVJ report typography."""
+    caption_style.base_style = normal_style
+    caption_style.font.name = "Times New Roman"
+    caption_style.font.size = Pt(12)
+    # Word rebuilds SEQ result runs during field updates and removes their
+    # direct formatting. Keep the style bold so the complete label/number
+    # remains bold; the description run explicitly overrides bold to false.
+    caption_style.font.bold = False
+    caption_style.font.italic = False
+    caption_style.font.color.rgb = RGBColor(0, 0, 0)
+    caption_style._element.rPr.rFonts.set(qn("w:ascii"), "Times New Roman")
+    caption_style._element.rPr.rFonts.set(qn("w:hAnsi"), "Times New Roman")
+    caption_style._element.rPr.rFonts.set(qn("w:eastAsia"), "Times New Roman")
+    caption_style._element.rPr.rFonts.set(qn("w:cs"), "Times New Roman")
+    caption_size_cs = caption_style._element.rPr.find(qn("w:szCs"))
+    if caption_size_cs is None:
+        caption_size_cs = OxmlElement("w:szCs")
+        caption_style._element.rPr.append(caption_size_cs)
+    caption_size_cs.set(qn("w:val"), "24")
+    caption_style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    caption_style.paragraph_format.first_line_indent = Cm(0)
+    caption_style.paragraph_format.space_before = Pt(6)
+    caption_style.paragraph_format.space_after = Pt(6)
+    caption_style.paragraph_format.line_spacing = 1.0
 
 
 def _add_centered_paragraph(
@@ -195,12 +222,35 @@ def create_base_docx(output_path: Path = DEFAULT_OUTPUT) -> Path:
         style.font.name = "Times New Roman"
         style.font.size = Pt(14 if style_name == "Heading 1" else 12)
         style.font.bold = True
+        style.font.color.rgb = RGBColor(0, 0, 0)
         style._element.rPr.rFonts.set(qn("w:ascii"), "Times New Roman")
         style._element.rPr.rFonts.set(qn("w:hAnsi"), "Times New Roman")
+
+    # Word menggunakan style ID TOC1–TOC3 ketika memperbarui daftar isi.
+    # Dokumen dasar yang dibuat dari nol tidak selalu menyertakan style ini.
+    existing_style_names = {style.name for style in doc.styles}
+    for level in range(1, 4):
+        style_name = f"TOC {level}"
+        if style_name in existing_style_names:
+            toc_style = doc.styles[style_name]
+        else:
+            toc_style = doc.styles.add_style(style_name, WD_STYLE_TYPE.PARAGRAPH)
+        toc_style.base_style = normal
+        toc_style.font.name = "Times New Roman"
+        toc_style.font.size = Pt(12)
+        toc_style.font.color.rgb = RGBColor(0, 0, 0)
+        toc_style._element.rPr.rFonts.set(qn("w:ascii"), "Times New Roman")
+        toc_style._element.rPr.rFonts.set(qn("w:hAnsi"), "Times New Roman")
+        toc_style._element.rPr.rFonts.set(qn("w:eastAsia"), "Times New Roman")
 
     if "Table of Figures" not in [style.name for style in doc.styles]:
         tof_style = doc.styles.add_style("Table of Figures", WD_STYLE_TYPE.PARAGRAPH)
         tof_style.base_style = normal
+    else:
+        tof_style = doc.styles["Table of Figures"]
+    tof_style.font.color.rgb = RGBColor(0, 0, 0)
+
+    _configure_caption_style(doc.styles["Caption"], normal)
 
     _add_centered_paragraph(
         doc,
@@ -253,7 +303,7 @@ def create_base_docx(output_path: Path = DEFAULT_OUTPUT) -> Path:
 
     props = doc.core_properties
     props.title = metadata["title"]
-    props.subject = "Tugas Akhir Proyek - 3D Simulator & Engine Developer"
+    props.subject = "Tugas Akhir Proyek - 3D Simulator dan Engine Developer"
     props.author = metadata["author"]
     props.last_modified_by = metadata["author"]
     props.keywords = "Unity WebGL, NavMesh, navigasi spasial, UPNVJ"

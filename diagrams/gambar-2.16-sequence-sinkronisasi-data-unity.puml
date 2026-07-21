@@ -1,60 +1,63 @@
-@startuml gambar-2-16-sequence-sinkronisasi-data-unity
-' Gambar 2.16 - Sequence Diagram: Sinkronisasi Data Gedung dan Unity
-' Sumber: BAB II - 2.3.3 Sequence Diagram (b) + PRD (alur unity_object_name)
-
-skinparam backgroundColor #FFFFFF
+@startuml
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
-skinparam defaultFontSize 13
-skinparam sequenceArrowColor #444444
-skinparam sequenceLifeLineBorderColor #555555
-skinparam sequenceLifeLineBackgroundColor #F2F2F2
+skinparam ArrowColor #475569
 skinparam participant {
-  BackgroundColor #F2F2F2
-  BorderColor #555555
+  FontName "Times New Roman"
+  FontStyle plain
+  BackgroundColor #F8FAFC
+  BorderColor #475569
 }
-skinparam actor {
-  BackgroundColor #ECECEC
-  BorderColor #555555
+skinparam sequence {
+  LifeLineBorderColor #64748B
+  LifeLineBackgroundColor #FFFFFF
+  GroupHeaderFontName "Times New Roman"
+  GroupHeaderFontStyle plain
+  GroupFontName "Times New Roman"
+  GroupFontStyle plain
 }
 
-title Gambar 2.16 — Sequence Diagram: Sinkronisasi Data Gedung dan Unity
+actor Pengguna as user
+participant "Dashboard React" as react
+participant "Unity WebGL\nBuildingDatabase" as unity
+participant "Vercel API" as api
+database "Supabase" as supabase
+participant "NavigationReceiver" as receiver
+participant "NavigationGuide" as guide
+participant "Browser Bridge" as bridge
 
-actor "Administrator" as Admin
-participant "Admin Dashboard\n(React)" as FE
-participant "Backend API\n(/api/unity/data)" as API
-database "Supabase\n(PostgreSQL)" as DB
-participant "Unity WebGL\nBuildingDatabase" as Unity
-participant "Scene 3D\n(GameObject)" as Scene
+== Persiapan data runtime ==
+unity -> api : GET /api/unity/data
+api -> supabase : Membaca gedung dan fasilitas
+supabase --> api : Data integrasi
+api --> unity : Respons JSON
+unity -> unity : Membentuk cache unity_object_name
 
-== Tahap 1: Pembaruan Data oleh Admin ==
-Admin -> FE : Memperbarui field unity_object_name\n(data gedung/fasilitas)
-activate FE
-FE -> DB : Simpan perubahan (UPDATE)
-activate DB
-DB -->> FE : Konfirmasi tersimpan
-deactivate DB
-FE -->> Admin : Notifikasi berhasil
-deactivate FE
-
-== Tahap 2: Penarikan Data oleh Unity (saat game start) ==
-Unity -> API : HTTP GET /api/unity/data
-activate Unity
-activate API
-API -> DB : Query data gedung & fasilitas\n(+ unity_object_name)
-activate DB
-DB -->> API : Result set
-deactivate DB
-API -->> Unity : Response JSON\n{ gedung[], fasilitas[] }
-deactivate API
-Unity -> Unity : Cache realNames &\nunityObjectNames (isLoaded = true)
-
-== Tahap 3: Pencocokan GameObject di Scene ==
-Unity -> Scene : Lookup Transform berdasarkan\nunity_object_name (case-insensitive)
-activate Scene
-Scene -->> Unity : Referensi GameObject target
-deactivate Scene
-Unity -> Unity : Siap untuk navigasi\n(NavigationReceiver)
-deactivate Unity
-
+== Perintah navigasi ==
+user -> react : Memilih tujuan
+react -> receiver : SendMessage NavigateTo(target)
+receiver -> unity : Mencari target pada cache
+alt Target ditemukan
+  receiver -> guide : Memulai rute NavMesh
+  guide -> guide : Menghitung dan memperbarui rute
+  alt Pengguna tiba secara normal
+    guide -> receiver : CompleteNavigation(target)
+    receiver -> bridge : OnNavigationCompleted(JSON target)
+    bridge -> react : CustomEvent OnNavigationCompleted
+    react -> react : Memvalidasi tujuan aktif
+    react --> user : Menampilkan notifikasi tiba
+  else Pengguna membatalkan
+    react -> receiver : SendMessage StopNavigation()
+    receiver -> guide : Menghapus rute
+    note right of receiver
+    Tidak mengirim callback kedatangan
+    end note
+  end
+else Target tidak ditemukan
+  receiver --> react : Navigasi tidak dimulai
+  note right of receiver
+  Tidak mengirim callback kedatangan
+  end note
+end
 @enduml

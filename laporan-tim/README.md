@@ -22,7 +22,7 @@ Folder ini berisi **panduan & kerangka laporan** untuk tiap anggota tim. Penulis
 - **Fragment laporan yang identik:** `../content/shared/`
 - **PRD (acuan kebutuhan):** `../PRD_Konsolidasi_TA.md`
 - **Diagram (PlantUML + PNG/SVG):** `../diagrams/`
-- **Diagram alur (Mermaid):** `../diagram_alur_sistem.md`
+- **Diagram kanonik (PlantUML):** `../diagrams/`
 - **Screenshot antarmuka:** `../dokumentasi/`
 - **Toolkit penulisan & format:** `../skills/`, `../scratch/`, `../tests/`
 

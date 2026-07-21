@@ -58,9 +58,9 @@ def test_blackbox_fragment_matches_structured_facts():
     assert result["final_verification"]["success_rate"] == "100.00%"
     assert "23 dari 24" in text
     assert "95,83 persen" in text
-    assert "script testing Unity" in text
-    assert "BB-20 dinyatakan lulus pada retest" in text
-    assert "24 dari 24 skenario terverifikasi lulus" in text
+    assert "skrip pengujian Unity" in text
+    assert "BB-20 dinyatakan lulus pada pengujian ulang" in text
+    assert "24 dari 24 skenario lulus" in text
 
 
 def test_uat_fragment_matches_structured_scores():

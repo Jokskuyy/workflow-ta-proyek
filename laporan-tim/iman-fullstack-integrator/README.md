@@ -7,7 +7,7 @@ Peran **Full Stack Developer & System Integrator**:
 1. **Backend** — RESTful API (Node.js/Express) di Vercel Serverless Functions; endpoint `/api/unity/data`, `/api/unity/names`, `/api/buildings`, `/api/rooms`, `/api/health`.
 2. **Database & Auth (sisi integrasi)** — integrasi Supabase Auth (JWT) dan konsumsi RLS (skema & policy dirancang Dwikhi).
 3. **Frontend** — React SPA (Vite): Public Dashboard, Admin Panel (CRUD), multi-bahasa, panel pencarian.
-4. **Integrasi React–Unity** — jembatan satu arah `SendMessage("NavigationReceiver","NavigateTo", unity_object_name)`, loading overlay, preloading.
+4. **Integrasi React–Unity** — perintah melalui `SendMessage`, listener callback `OnNavigationCompleted`, loading overlay, dan preloading.
 5. **Analitik** — proxy Umami via Express.js (port 3001).
 6. **Pengujian** — unit test (Vitest), integration test endpoint, audit Lighthouse.
 

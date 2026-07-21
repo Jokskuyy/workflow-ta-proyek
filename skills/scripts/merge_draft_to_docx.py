@@ -144,6 +144,11 @@ def _resolve_include_path(raw_path, workspace_root):
 def infer_workspace_root(md_path):
     """Infer a repository root for direct parsing of a draft or wrapper file."""
     source = Path(md_path).resolve()
+    # A self-contained draft fixture or copied report can expose its canonical
+    # fragment directory without having Git metadata. Prefer that nearest root
+    # before walking into an unrelated parent repository.
+    if (source.parent / "content" / "shared").is_dir():
+        return source.parent
     for candidate in (source.parent, *source.parents):
         if (candidate / ".git").exists() or (candidate / "AGENTS.md").is_file():
             return candidate
@@ -915,7 +920,7 @@ class BibliographyResult(list):
 
 
 _DAFTAR_PUSTAKA_RE = re.compile(r'^\s*#\s+DAFTAR\s+PUSTAKA\s*$', re.IGNORECASE)
-_YEAR_RE = re.compile(r'\((\d{4})[a-z]?\)')
+_YEAR_RE = re.compile(r'\((\d{4}[a-z]?)\)', re.IGNORECASE)
 
 
 def _load_draft_text(draft_path_or_text):
@@ -975,7 +980,7 @@ def _parse_authors(raw):
     head = (raw[:m.start()] if m else raw).strip()
     if not head:
         return ()
-    first = head.split(',', 1)[0].strip()
+    first = head.split(',', 1)[0].strip().rstrip('.').strip()
     surnames = [first] if first else []
     if '&' in head:
         tail = head.rsplit('&', 1)[1].strip()
@@ -993,6 +998,7 @@ def reference_key(entry):
     """
     surname = entry.authors[0].lower() if entry.authors else ""
     surname = surname.lstrip("'\"`’‘").strip()
+    surname = surname.rstrip('.').strip()
     return (surname, entry.year or "")
 
 
@@ -1044,7 +1050,7 @@ _BAB_RE = re.compile(r'^BAB\s+([IVXLCDM]+|\d+)\b', re.IGNORECASE)
 _ROMAN_MAP = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
 # In-text citation: a parenthesised group that contains at least one 4-digit year.
 _CITATION_PAREN_RE = re.compile(r'\(([^)]*\d{4}[a-z]?[^)]*)\)')
-_INNER_YEAR_RE = re.compile(r'(\d{4})[a-z]?')
+_INNER_YEAR_RE = re.compile(r'(\d{4}[a-z]?)', re.IGNORECASE)
 _ET_AL_RE = re.compile(r'\bet\s+al\.?', re.IGNORECASE)
 
 
@@ -1235,8 +1241,9 @@ def _extract_citation_keys(body_text):
     """Extract in-text APA citation keys from ``body_text``.
 
     Returns a list of ``(surname_lower, year, display_name)`` tuples. Handles
-    ``(Nama Tahun)``, ``(Nama et al. Tahun)``, ``(Nama & Lain Tahun)`` and
-    multiple sources in one parenthesis separated by ';'.
+    ``(Nama Tahun)``, ``(Nama et al. Tahun)``, ``(Nama & Lain Tahun)``,
+    ``(Nama dan Lain Tahun)``, year suffixes, and multiple sources in one
+    parenthesis separated by ';'.
     """
     keys = []
     for m in _CITATION_PAREN_RE.finditer(body_text or ""):
@@ -1246,14 +1253,18 @@ def _extract_citation_keys(body_text):
             ym = _INNER_YEAR_RE.search(part)
             if not ym:
                 continue
-            year = ym.group(1)
+            year = ym.group(1).lower()
             # Only a plausible publication year (1900-2099) is a citation year;
             # this rejects code-block noise such as port numbers (3000/3001).
-            if not (year.isdigit() and 1900 <= int(year) <= 2099):
+            base_year = year[:4]
+            if not (base_year.isdigit() and 1900 <= int(base_year) <= 2099):
                 continue
             name_part = part[:ym.start()].strip().rstrip(',').strip()
             name_part = _ET_AL_RE.sub('', name_part).strip()
             name_part = name_part.split('&', 1)[0].strip()
+            name_part = re.split(
+                r'\s+dan\s+', name_part, maxsplit=1, flags=re.IGNORECASE
+            )[0].strip()
             # Strip leading transliteration quotes so the citation key matches
             # the normalized reference key (see reference_key()).
             name_part = name_part.lstrip("'\"`’‘").strip()
@@ -1351,7 +1362,7 @@ def emit_runs(p_elem, tokens, default_rPr=None, rel_manager=None):
 
     TEXT tokens replicate the baseline rPr byte-for-byte (Times New Roman,
     sz/szCs 24, optional w:b/bCs and w:i/iCs) so balanced/plain text is
-    identical to the frozen oracle. CODE tokens use Consolas. LINK tokens wrap a
+    identical to the frozen oracle. CODE tokens also use Times New Roman. LINK tokens wrap a
     run inside a ``w:hyperlink`` carrying an r:id allocated by ``rel_manager``
     (falls back to a plain run when no rel_manager is supplied).
     """
@@ -1375,8 +1386,10 @@ def emit_runs(p_elem, tokens, default_rPr=None, rel_manager=None):
             r = lxml.etree.Element(f'{{{ns_uri}}}r')
             rPr = lxml.etree.SubElement(r, f'{{{ns_uri}}}rPr')
             lxml.etree.SubElement(rPr, f'{{{ns_uri}}}rFonts', {
-                f'{{{ns_uri}}}ascii': 'Consolas',
-                f'{{{ns_uri}}}hAnsi': 'Consolas'
+                f'{{{ns_uri}}}ascii': 'Times New Roman',
+                f'{{{ns_uri}}}hAnsi': 'Times New Roman',
+                f'{{{ns_uri}}}eastAsia': 'Times New Roman',
+                f'{{{ns_uri}}}cs': 'Times New Roman'
             })
             lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '18'})
             lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '18'})
@@ -1620,8 +1633,10 @@ def build_code_block_elements(item):
         rPr = lxml.etree.SubElement(r, f'{{{ns_uri}}}rPr')
         
         lxml.etree.SubElement(rPr, f'{{{ns_uri}}}rFonts', {
-            f'{{{ns_uri}}}ascii': 'Consolas',
-            f'{{{ns_uri}}}hAnsi': 'Consolas'
+            f'{{{ns_uri}}}ascii': 'Times New Roman',
+            f'{{{ns_uri}}}hAnsi': 'Times New Roman',
+            f'{{{ns_uri}}}eastAsia': 'Times New Roman',
+            f'{{{ns_uri}}}cs': 'Times New Roman'
         })
         lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '18'})
         lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '18'})

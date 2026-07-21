@@ -12,15 +12,15 @@
             "pembimbing_2": "Novi Trisman Hadi, S.Pd., M.Kom."
         },
         "mitra": {
-            "name": "UPA TIK UPN Veteran Jakarta",
-            "representative": "Asep Saeful Ridwan, S.Kom.",
-            "role": "Kepala UPA TIK UPNVJ"
+            "name": "Humas UPNVJ",
+            "representative": "Perwakilan Humas UPNVJ",
+            "role": "Mitra pengguna dan peserta UAT"
         },
         "stakeholder_interviews": [
             {
                 "role": "Kepala UPA TIK UPNVJ",
                 "name": "Asep Saeful Ridwan, S.Kom",
-                "notes": "Membahas pembagian peran tim tugas akhir, merumuskan kebutuhan fungsional dan non-fungsional sistem."
+                "notes": "Membahas pembagian peran tim tugas akhir, batas akses data, dan kemungkinan integrasi teknis. Wawancara ini tidak digunakan sebagai bukti kebutuhan pengguna navigasi atau persetujuan institusional."
             },
             {
                 "role": "Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi UPNVJ",
@@ -30,8 +30,10 @@
         ],
         "documents": {
             "pakta_integritas_upa_tik": {
-                "status": "signed",
-                "evidence": "dokumentasi/ttd pakta integritas UPA TIK.jpeg"
+                "status": "submitted_original_copy_not_retained",
+                "evidence": "dokumentasi/ttd pakta integritas UPA TIK.jpeg",
+                "signed_scan_available": false,
+                "evidence_scope": "Foto mendokumentasikan penyerahan dokumen kepada staf UPA TIK; foto bukan pengganti scan dokumen bertanda tangan dan tidak digunakan untuk mengklaim nomor surat, tanggal pengesahan, identitas penandatangan, atau persetujuan formal."
             },
             "wawancara_warek_2": {
                 "status": "completed",
@@ -69,13 +71,32 @@
             "penguji_1": "Dr. Widya Cholil, M.I.T",
             "penguji_2": "Kharisma Wiati Gusti, M.T."
         },
-        "humas": "Humas UPNVJ (sebagai responden/user mahasiswa)"
+        "humas": "Humas UPNVJ sebagai mitra pengguna; satu perwakilan mengikuti UAT tanpa digunakan untuk mengklaim persetujuan formal atau representasi seluruh pengguna UPNVJ",
+        "report_year": 2026,
+        "schedule": {
+            "duration_months": 6,
+            "phases": {
+                "desain_arsitektur_dan_ui": "Bulan 1",
+                "pengembangan_backend": "Bulan 2-3",
+                "pengembangan_frontend": "Bulan 3-4",
+                "integrasi_dan_pengujian_sistem": "Bulan 4-5",
+                "revisi_final_dan_penulisan_laporan": "Bulan 5-6",
+                "dokumentasi": "Bulan 1-6"
+            }
+        },
+        "institutional_coordination": {
+            "upa_tik": {
+                "name": "Unit Penunjang Akademik Teknologi Informasi dan Komunikasi (UPA TIK) UPNVJ",
+                "representative": "Asep Saeful Ridwan, S.Kom.",
+                "role": "Koordinasi teknis, batas akses data, kemungkinan integrasi institusional, dan penyerahan pakta integritas"
+            }
+        }
     },
     "team_members": [
         {
             "name": "Muhammad Iman Nugraha",
             "nim": "2210511129",
-            "role": "Peran 1: Full Stack Web Developer & System Integrator",
+            "role": "Peran 1: Full Stack Web Developer, System Integrator, dan DevOps Engineer",
             "focus": [
                 "React Frontend",
                 "Serverless API",
@@ -88,7 +109,7 @@
         {
             "name": "Muammar Faiz Khairul Anam",
             "nim": "2210511138",
-            "role": "Peran 2: 3D Simulator & Engine Developer",
+            "role": "Peran 2: 3D Simulator dan Engine Developer",
             "focus": [
                 "Unity WebGL Engine",
                 "NavMesh pathfinding",
@@ -104,7 +125,7 @@
         {
             "name": "Muhammad Dwikhi Deandra Purnianto",
             "nim": "TBD",
-            "role": "Peran 3: 3D Asset Designer & Database/Asset Manager",
+            "role": "Peran 3: 3D Asset Designer dan Database Schema Designer",
             "focus": [
                 "3D modeling and layout directly in Unity Editor",
                 "PostgreSQL database schema design in Supabase Cloud",
@@ -144,7 +165,7 @@
                 "Hasil UAT/dokumentasi revisi/BB20_1.png",
                 "Hasil UAT/dokumentasi revisi/BB20_2.png"
             ],
-            "details": "Pengujian awal mencatat 23 dari 24 skenario lulus. BB-20 awalnya tidak lulus karena label tujuan menampilkan unity_object_name akibat script testing Unity ikut masuk ke build WebGL. Setelah tindakan korektif dan build ulang, dua frame retest menunjukkan label Gedung Dewi Sartika beserta garis rute sebelum completion, lalu garis rute hilang dan notifikasi tiba tampil setelah completion. Status akhir menjadi 24 dari 24 skenario terverifikasi lulus."
+            "details": "Pengujian awal mencatat 23 dari 24 skenario lulus. BB-20 awalnya tidak lulus karena skrip pengujian Unity ikut masuk ke build WebGL dan membuat label tujuan menampilkan unity_object_name. Setelah skrip dipisahkan dan aplikasi dibangun ulang, dua tangkapan layar menunjukkan label Gedung Dewi Sartika beserta garis rute sebelum pengguna tiba. Setelah pengguna tiba, garis rute hilang dan notifikasi kedatangan tampil. Hasil akhir menjadi 24 dari 24 skenario lulus."
         },
         "lighthouse_testing": {
             "completed": true,
@@ -161,9 +182,11 @@
             "completed": true,
             "date_conducted": null,
             "respondents": {
+                "session_type": "closed",
                 "total_unique": 5,
-                "public_questionnaire": 4,
-                "admin_questionnaire": 4,
+                "public_dashboard_questionnaire": 4,
+                "admin_dashboard_questionnaire": 4,
+                "general_public_participants": 0,
                 "participant_roles": {
                     "dosen_penguji": 2,
                     "dosen_pembimbing": 2,
@@ -195,7 +218,68 @@
                 "Hasil UAT/User_Humas.pdf",
                 "Hasil UAT/Widya_Cholil.pdf"
             ],
-            "details": "UAT diikuti oleh 5 peserta unik yang terdiri atas 2 dosen penguji, 2 dosen pembimbing, dan 1 perwakilan Humas UPNVJ. Instrumen pengguna publik diisi oleh 4 peserta dan memperoleh 77.78%; instrumen dashboard admin diisi oleh 4 peserta dan memperoleh 84.55%. Sebagian peserta mengisi kedua instrumen sehingga persentase gabungan berdasarkan seluruh jawaban adalah 81.50%."
+            "details": "UAT dilaksanakan secara tertutup dan diikuti oleh 5 peserta unik yang terdiri atas 2 dosen penguji, 2 dosen pembimbing, dan 1 perwakilan Humas UPNVJ; tidak terdapat peserta dari sampel pengguna publik. Instrumen evaluasi Dashboard Publik diisi oleh 4 peserta dan memperoleh 77.78%, sedangkan instrumen evaluasi Dashboard Admin diisi oleh 4 peserta dan memperoleh 84.55%. Sebagian peserta mengisi kedua instrumen sehingga persentase gabungan berdasarkan seluruh jawaban adalah 81.50%."
+        },
+        "uat_revision_implementation": {
+            "date_verified": "2026-07-21",
+            "revision_ids": [
+                "UAT-R01",
+                "UAT-R02",
+                "UAT-R03",
+                "UAT-R04",
+                "UAT-R05",
+                "UAT-R06",
+                "UAT-R07",
+                "UAT-R08",
+                "UAT-R09",
+                "UAT-R10"
+            ],
+            "verification_scope": "Kombinasi audit kode sumber, pengujian otomatis, sumber resmi, dan tangkapan layar deployment. Tangkapan layar bukan kuesioner UAT kedua.",
+            "data_revision": {
+                "initial_records": 339,
+                "standardized_names": 119,
+                "updated_descriptions": 189,
+                "removed_out_of_scope_records": 27,
+                "records_after_mapping_cleanup": 312,
+                "resolved_duplicates": 1,
+                "final_seed_records": 311,
+                "live_supabase_reseed_verified": false
+            },
+            "navigation_completion": {
+                "unity_commit": "1845c65",
+                "react_commit": "b572a48",
+                "react_followup_commit": "d2e8fdb",
+                "verified_web_commit": "08ebc06",
+                "event": "OnNavigationCompleted",
+                "payload": "JSON string containing unity_object_name",
+                "react_tests": 11,
+                "deployed": true,
+                "popup_screenshot_available": true,
+                "popup_screenshot": "Hasil UAT/dokumentasi revisi/RR10_notif_sampai.png"
+            },
+            "official_contact": {
+                "phone_numbers": [
+                    "021-7699431",
+                    "021-7656971"
+                ],
+                "source": "https://penmaru.upnvj.ac.id/id/contact.html",
+                "source_owner": "UPNVJ"
+            },
+            "official_humas_source": {
+                "title": "Rapat Koordinasi Humas UPNVJ 2026: Fokus Strategi Komunikasi Digital dan Media Sosial Perguruan Tinggi",
+                "source": "https://www.upnvj.ac.id/id/berita/2026/02/rapat-koordinasi-humas-upnvj-2026-fokus-strategi-komunikasi-digital-dan-media-sosial-perguruan-tinggi.html",
+                "source_owner": "UPNVJ",
+                "use": "Konteks peran Humas dalam komunikasi informasi kepada publik; bukan bukti persetujuan formal atau penerimaan sistem"
+            },
+            "black_box_retest": {
+                "scenario": "BB-20",
+                "completed": true,
+                "result": "passed",
+                "evidence": [
+                    "Hasil UAT/dokumentasi revisi/BB20_1.png",
+                    "Hasil UAT/dokumentasi revisi/BB20_2.png"
+                ]
+            }
         }
     },
     "reference_documents": {
@@ -211,7 +295,7 @@
             "hierarchy_screenshot": "dokumentasi/contoh_pointer.png"
         },
         "database_sync_checker": {
-            "owner": "Muammar Faiz Khairul Anam — 3D Simulator & Engine Developer",
+            "owner": "Muammar Faiz Khairul Anam — 3D Simulator dan Engine Developer",
             "script_path": "Assets/Scripts/Editor/DatabaseSyncChecker.cs pada repository Unity T_A---Copy",
             "description": "Editor tool Unity untuk memeriksa sinkronisasi unity_object_name dari /api/unity/names terhadap nama GameObject pada scene aktif. Pencarian padanan API memindai hierarki secara rekursif, sedangkan daftar objek scene yang belum terdaftar di database dibatasi pada root object.",
             "ui_screenshot": "dokumentasi/contoh_sync_db.png"
@@ -271,7 +355,11 @@
             "installer": "Assets/Scripts/Editor/CampusOcclusionInstaller.cs",
             "data_asset": "Assets/Scene/SceneUtama/OcclusionCullingData.asset",
             "minimum_occluder_size_m": 5,
-            "occlusion_area_padding_m": [20, 10, 20],
+            "occlusion_area_padding_m": [
+                20,
+                10,
+                20
+            ],
             "smallest_occluder_m": 5,
             "smallest_hole_m": 0.5,
             "backface_threshold": 100,
@@ -315,6 +403,8 @@
             "exception_support": "Explicitly Thrown Exceptions Only"
         },
         "database_sync_evidence": {
+            "snapshot_status": "historical_before_final_seed_cleanup",
+            "snapshot_note": "Angka pemeriksaan scene ini berasal dari snapshot lama dan tidak merepresentasikan seed final 311 fasilitas.",
             "found_in_scene": 320,
             "missing_in_scene": 3,
             "root_objects_not_in_database": 14,
@@ -393,6 +483,51 @@
                 ]
             },
             {
+                "name": "campus_maps",
+                "columns": [
+                    "id",
+                    "nama",
+                    "image_url",
+                    "image_width",
+                    "image_height",
+                    "is_active"
+                ]
+            },
+            {
+                "name": "campus_map_nodes",
+                "columns": [
+                    "id",
+                    "map_id",
+                    "label",
+                    "node_type",
+                    "x",
+                    "y"
+                ]
+            },
+            {
+                "name": "campus_map_edges",
+                "columns": [
+                    "id",
+                    "map_id",
+                    "from_node_id",
+                    "to_node_id",
+                    "bidirectional",
+                    "accessible",
+                    "weight"
+                ]
+            },
+            {
+                "name": "campus_map_building_points",
+                "columns": [
+                    "id",
+                    "map_id",
+                    "gedung_id",
+                    "marker_x",
+                    "marker_y",
+                    "entrance_node_id"
+                ]
+            },
+            {
                 "name": "admin_users",
                 "columns": [
                     "id",
@@ -432,8 +567,8 @@
         "crud_entities": [
             "gedung",
             "fasilitas",
-            "fakultas",
-            "program_studi"
+            "program_studi",
+            "campus map configuration"
         ]
     }
 }

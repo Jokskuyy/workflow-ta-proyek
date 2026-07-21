@@ -990,6 +990,44 @@ def ensure_hyperlink_style(styles_root):
         set_child_element(rPr, 'u', {'val': 'none'})
 
 
+REPORT_BLACK_STYLE_IDS = {
+    'Heading1',
+    'Heading2',
+    'Heading3',
+    'Caption',
+    'FrontMatterHeading',
+    'taappendixheading',
+    'TOC1',
+    'TOC2',
+    'TOC3',
+    'TOC9',
+    'TableofFigures',
+}
+
+
+def ensure_report_style_colors(styles_root):
+    """Paksa hierarki akademik dan caption menggunakan teks hitam.
+
+    Style bawaan Word membawa warna tema biru pada Heading dan Caption.
+    Atribut tema harus dihapus juga agar ``w:val=000000`` tidak dikalahkan
+    oleh ``themeColor`` saat dokumen dibuka atau field diperbarui di Word.
+    """
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    namespaces = {'w': ns_uri}
+    for style in styles_root.findall('w:style', namespaces):
+        style_id = style.get(f'{{{ns_uri}}}styleId')
+        if style_id not in REPORT_BLACK_STYLE_IDS:
+            continue
+        r_pr = style.find('w:rPr', namespaces)
+        if r_pr is None:
+            r_pr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+            style.append(r_pr)
+        color = set_child_element(r_pr, 'color', {'val': '000000'})
+        for attribute in ('themeColor', 'themeTint', 'themeShade'):
+            color.attrib.pop(f'{{{ns_uri}}}{attribute}', None)
+        sort_element_children(style, STYLE_ORDER)
+
+
 def clean_heading_text_and_add_num(p, level, num_id):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     namespaces = {'w': ns_uri}
@@ -1717,6 +1755,26 @@ def build_toc_entry(caption_text, page_num, bookmark_name):
 def replace_mentions_in_paragraph(text):
     return text
 
+
+def caption_run_properties(ns_uri, *, bold=False):
+    """Return deterministic Times New Roman 12 pt properties for a caption run."""
+    r_pr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+    set_child_element(r_pr, 'rFonts', {
+        'ascii': 'Times New Roman',
+        'hAnsi': 'Times New Roman',
+        'eastAsia': 'Times New Roman',
+        'cs': 'Times New Roman',
+    })
+    set_child_element(r_pr, 'b', {} if bold else {'val': '0'})
+    set_child_element(r_pr, 'bCs', {} if bold else {'val': '0'})
+    set_child_element(r_pr, 'i', {'val': '0'})
+    set_child_element(r_pr, 'iCs', {'val': '0'})
+    set_child_element(r_pr, 'color', {'val': '000000'})
+    set_child_element(r_pr, 'sz', {'val': '24'})
+    set_child_element(r_pr, 'szCs', {'val': '24'})
+    return r_pr
+
+
 def format_caption_paragraph_clean(
         p, label, prefix, seq_name, default_val, desc, namespaces,
         semantic_bookmark=None, semantic_bookmark_id=None):
@@ -1780,13 +1838,7 @@ def format_caption_paragraph_clean(
             
     # Label prefix, e.g. "Gambar 2."
     r1 = lxml.etree.Element(f'{{{ns_uri}}}r')
-    rPr1 = lxml.etree.Element(f'{{{ns_uri}}}rPr')
-    set_child_element(rPr1, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
-    set_child_element(rPr1, 'b', {})
-    set_child_element(rPr1, 'bCs', {})
-    set_child_element(rPr1, 'sz', {'val': '24'})
-    set_child_element(rPr1, 'szCs', {'val': '24'})
-    r1.append(rPr1)
+    r1.append(caption_run_properties(ns_uri, bold=True))
     
     t1 = lxml.etree.Element(f'{{{ns_uri}}}t')
     t1.text = f"{label} {prefix}"
@@ -1797,11 +1849,13 @@ def format_caption_paragraph_clean(
     
     # SEQ field
     r2 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    r2.append(caption_run_properties(ns_uri, bold=True))
     fld2 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "begin"})
     r2.append(fld2)
     p.append(r2)
     
     r3 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    r3.append(caption_run_properties(ns_uri, bold=True))
     ins3 = lxml.etree.Element(f'{{{ns_uri}}}instrText')
     if default_val == 1:
         ins3.text = f" SEQ {seq_name} \\r 1 \\* ARABIC "
@@ -1812,17 +1866,20 @@ def format_caption_paragraph_clean(
     p.append(r3)
     
     r4 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    r4.append(caption_run_properties(ns_uri, bold=True))
     fld4 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "separate"})
     r4.append(fld4)
     p.append(r4)
     
     r5 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    r5.append(caption_run_properties(ns_uri, bold=True))
     t5 = lxml.etree.Element(f'{{{ns_uri}}}t')
     t5.text = str(default_val)
     r5.append(t5)
     p.append(r5)
     
     r6 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    r6.append(caption_run_properties(ns_uri, bold=True))
     fld6 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "end"})
     r6.append(fld6)
     p.append(r6)
@@ -1837,11 +1894,7 @@ def format_caption_paragraph_clean(
     
     # Description
     r7 = lxml.etree.Element(f'{{{ns_uri}}}r')
-    rPr7 = lxml.etree.Element(f'{{{ns_uri}}}rPr')
-    set_child_element(rPr7, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
-    set_child_element(rPr7, 'sz', {'val': '24'})
-    set_child_element(rPr7, 'szCs', {'val': '24'})
-    r7.append(rPr7)
+    r7.append(caption_run_properties(ns_uri, bold=False))
     
     t7 = lxml.etree.Element(f'{{{ns_uri}}}t')
     t7.text = f" {desc.strip()}"
@@ -1889,6 +1942,23 @@ def replace_semantic_references_in_paragraph(p, targets, namespaces):
         if source_rpr is not None:
             run.append(copy.deepcopy(source_rpr))
 
+    def _append_reference_rpr(run):
+        """Force semantic REF fields to remain regular after Word updates."""
+        r_pr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+        set_child_element(r_pr, 'rFonts', {
+            'ascii': 'Times New Roman',
+            'hAnsi': 'Times New Roman',
+            'eastAsia': 'Times New Roman',
+            'cs': 'Times New Roman',
+        })
+        set_child_element(r_pr, 'b', {'val': '0'})
+        set_child_element(r_pr, 'bCs', {'val': '0'})
+        set_child_element(r_pr, 'i', {'val': '0'})
+        set_child_element(r_pr, 'iCs', {'val': '0'})
+        set_child_element(r_pr, 'sz', {'val': '24'})
+        set_child_element(r_pr, 'szCs', {'val': '24'})
+        run.append(r_pr)
+
     def _text_run(value, source_rpr):
         run = lxml.etree.Element(f'{{{ns_uri}}}r')
         _append_rpr(run, source_rpr)
@@ -1900,31 +1970,36 @@ def replace_semantic_references_in_paragraph(p, targets, namespaces):
 
     def _field_runs(bookmark, visible, source_rpr):
         begin_run = lxml.etree.Element(f'{{{ns_uri}}}r')
-        _append_rpr(begin_run, source_rpr)
+        _append_reference_rpr(begin_run)
         lxml.etree.SubElement(
             begin_run, f'{{{ns_uri}}}fldChar',
             {f'{{{ns_uri}}}fldCharType': 'begin'},
         )
 
         instruction_run = lxml.etree.Element(f'{{{ns_uri}}}r')
-        _append_rpr(instruction_run, source_rpr)
+        _append_reference_rpr(instruction_run)
         instruction = lxml.etree.SubElement(
             instruction_run, f'{{{ns_uri}}}instrText'
         )
-        instruction.text = f' REF {bookmark} \\h '
+        instruction.text = f' REF {bookmark} \\h \\* CHARFORMAT '
         instruction.set(xml_space, 'preserve')
 
         separate_run = lxml.etree.Element(f'{{{ns_uri}}}r')
-        _append_rpr(separate_run, source_rpr)
+        _append_reference_rpr(separate_run)
         lxml.etree.SubElement(
             separate_run, f'{{{ns_uri}}}fldChar',
             {f'{{{ns_uri}}}fldCharType': 'separate'},
         )
 
-        result_run = _text_run(visible, source_rpr)
+        result_run = lxml.etree.Element(f'{{{ns_uri}}}r')
+        _append_reference_rpr(result_run)
+        result_text = lxml.etree.SubElement(result_run, f'{{{ns_uri}}}t')
+        result_text.text = visible
+        if visible.startswith(' ') or visible.endswith(' '):
+            result_text.set(xml_space, 'preserve')
 
         end_run = lxml.etree.Element(f'{{{ns_uri}}}r')
-        _append_rpr(end_run, source_rpr)
+        _append_reference_rpr(end_run)
         lxml.etree.SubElement(
             end_run, f'{{{ns_uri}}}fldChar',
             {f'{{{ns_uri}}}fldCharType': 'end'},
@@ -2035,6 +2110,7 @@ def format_document_xmls(unpacked_dir):
         ensure_front_matter_heading_style(root)
         ensure_appendix_heading_style(root)
         ensure_toc9_style(root)
+        ensure_report_style_colors(root)
         # ensure_hyperlink_style(root)
         for style in root.findall('w:style', namespaces):
             style_id = style.get(f'{{{ns_uri}}}styleId')
@@ -2240,76 +2316,17 @@ def format_document_xmls(unpacked_dir):
             
         def create_caption_paragraph_local(label, prefix, seq_name, default_val, desc, bookmark_id, bookmark_name):
             p = lxml.etree.Element(f'{{{ns_uri}}}p')
-            pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-            set_child_element(pPr, 'pStyle', {'val': 'Caption'})
-            # Keep the caption with its image and prevent it splitting across pages.
-            set_child_element(pPr, 'keepNext', {})
-            set_child_element(pPr, 'keepLines', {})
-            set_child_element(pPr, 'spacing', {'before': '120', 'after': '120', 'line': '240', 'lineRule': 'auto'})
-            set_child_element(pPr, 'jc', {'val': 'center'})
-            set_child_element(pPr, 'ind', {'firstLine': '0', 'left': '0'})
-            sort_element_children(pPr, PPR_ORDER)
-            p.append(pPr)
-            
-            bms = lxml.etree.Element(f'{{{ns_uri}}}bookmarkStart', id=str(bookmark_id), name=bookmark_name)
-            p.append(bms)
-
-            # Label and prefix, e.g. "Gambar 2."
-            r1 = lxml.etree.Element(f'{{{ns_uri}}}r')
-            t1 = lxml.etree.Element(f'{{{ns_uri}}}t')
-            t1.text = f"{label} {prefix}"
-            if t1.text.startswith(' ') or t1.text.endswith(' '):
-                t1.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-            r1.append(t1)
-            p.append(r1)
-            
-            # fldChar begin
-            r2 = lxml.etree.Element(f'{{{ns_uri}}}r')
-            fld2 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "begin"})
-            r2.append(fld2)
-            p.append(r2)
-            
-            # instrText
-            r3 = lxml.etree.Element(f'{{{ns_uri}}}r')
-            ins3 = lxml.etree.Element(f'{{{ns_uri}}}instrText')
-            if default_val == 1:
-                ins3.text = f" SEQ {seq_name} \\r 1 \\* ARABIC "
-            else:
-                ins3.text = f" SEQ {seq_name} \\* ARABIC "
-            ins3.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-            r3.append(ins3)
-            p.append(r3)
-            
-            # fldChar separate
-            r4 = lxml.etree.Element(f'{{{ns_uri}}}r')
-            fld4 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "separate"})
-            r4.append(fld4)
-            p.append(r4)
-            
-            # default value run
-            r5 = lxml.etree.Element(f'{{{ns_uri}}}r')
-            t5 = lxml.etree.Element(f'{{{ns_uri}}}t')
-            t5.text = str(default_val)
-            r5.append(t5)
-            p.append(r5)
-            
-            # fldChar end
-            r6 = lxml.etree.Element(f'{{{ns_uri}}}r')
-            fld6 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "end"})
-            r6.append(fld6)
-            p.append(r6)
-            
-            # description run
-            r7 = lxml.etree.Element(f'{{{ns_uri}}}r')
-            t7 = lxml.etree.Element(f'{{{ns_uri}}}t')
-            t7.text = f" {desc}"
-            t7.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-            r7.append(t7)
-            p.append(r7)
-            
-            bme = lxml.etree.Element(f'{{{ns_uri}}}bookmarkEnd', id=str(bookmark_id))
-            p.append(bme)
-            
+            format_caption_paragraph_clean(
+                p,
+                label,
+                prefix,
+                seq_name,
+                default_val,
+                desc,
+                namespaces,
+                semantic_bookmark=bookmark_name,
+                semantic_bookmark_id=bookmark_id,
+            )
             return p
 
         # Find cover page end index (last paragraph before the SECOND drawing, which is Lembar Pengesahan)
@@ -3008,7 +3025,7 @@ def fix_all_fonts_lxml(directory):
                     for attr in ['ascii', 'hAnsi', 'eastAsia', 'cs']:
                         full_attr = f'{{{W_NS}}}{attr}'
                         val = elem.get(full_attr)
-                        if val and val not in ['Symbol', 'Wingdings', 'Courier New', 'Times New Roman']:
+                        if val and val not in ['Symbol', 'Wingdings', 'Times New Roman']:
                             elem.set(full_attr, 'Times New Roman')
                             modified = True
                     theme_attrs = ['asciiTheme', 'hAnsiTheme', 'eastAsiaTheme', 'cstheme']
@@ -3023,17 +3040,17 @@ def fix_all_fonts_lxml(directory):
                         for attr in ['ascii', 'hAnsi', 'eastAsia', 'cs']:
                             full_attr = f'{{{W_NS}}}{attr}'
                             val = elem.get(full_attr)
-                            if not val or val not in ['Symbol', 'Wingdings', 'Courier New']:
+                            if not val or val not in ['Symbol', 'Wingdings']:
                                 elem.set(full_attr, 'Times New Roman')
                                 modified = True
                 elif tag_local in ['latin', 'ea', 'cs'] and elem.tag.startswith(f'{{{A_NS}}}'):
                     val = elem.get('typeface')
-                    if val and val not in ['Symbol', 'Wingdings', 'Courier New', 'Times New Roman']:
+                    if val and val not in ['Symbol', 'Wingdings', 'Times New Roman']:
                         elem.set('typeface', 'Times New Roman')
                         modified = True
                 elif 'typeface' in elem.attrib:
                     val = elem.attrib['typeface']
-                    if val and val not in ['Symbol', 'Wingdings', 'Courier New', 'Times New Roman']:
+                    if val and val not in ['Symbol', 'Wingdings', 'Times New Roman']:
                         elem.attrib['typeface'] = 'Times New Roman'
                         modified = True
                         

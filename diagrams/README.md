@@ -1,56 +1,41 @@
-# Diagram-as-Code — Laporan Tugas Akhir
+# Diagram PlantUML Laporan Faiz
 
-Folder ini berisi 6 diagram dalam format **PlantUML** (`.puml`). Penomoran mengikuti **DAFTAR GAMBAR pada DOCX final**.
+PlantUML pada folder ini merupakan sumber kanonik diagram laporan. Judul dan nomor gambar tidak ditulis di dalam kanvas karena keduanya dibentuk oleh caption Word.
 
-| Berkas | Nomor (DOCX) | Jenis | Judul |
-|---|---|---|---|
-| `gambar-2.09-arsitektur-sistem.puml` | Gambar 2.9 | Component | Diagram Arsitektur Sistem (regenerasi, sesuai PRD) |
-| `gambar-2.10-tahap-pengembangan.puml` | Gambar 2.10 | Activity | Tahap Pengembangan (Model Prototyping) |
-| `gambar-2.11-legenda-use-case.puml` | Gambar 2.11 | Legenda | Legenda Use Case Diagram |
-| `gambar-2.12-use-case-diagram.puml` | Gambar 2.12 | Use Case | Use Case Diagram |
-| `gambar-2.13-activity-pengelolaan-data-admin.puml` | Gambar 2.13 | Activity | Pengelolaan Data oleh Admin |
-| `gambar-2.14-activity-integrasi-data-denah.puml` | Gambar 2.14 | Activity | Integrasi Data Denah (Skenario A/B/C) |
-| `gambar-2.15-sequence-autentikasi-admin.puml` | Gambar 2.15 | Sequence | Autentikasi Administrator |
-| `gambar-2.16-sequence-sinkronisasi-data-unity.puml` | Gambar 2.16 | Sequence | Sinkronisasi Data Gedung dan Unity |
-| `gambar-2.17-erd.puml` | Gambar 2.17 | ERD | Entity-Relationship Diagram (sesuai PRD) |
-| `gambar-3.1-hierarki-prefab-unity.puml` | Gambar 3.1 | WBS | Hierarki Prefab Gedung dengan Child Pointer |
+## Enam diagram aktif
 
-> Semua diagram memakai **palet netral** (abu-abu muda + garis abu gelap), tanpa warna brand.
+| Sumber | Jenis | Caption laporan |
+|---|---|---|
+| `gambar-2.10-tahap-pengembangan.puml` | Activity | Tahap Pengembangan Modul Simulator dan Engine |
+| `gambar-2.09-arsitektur-sistem.puml` | Arsitektur | Arsitektur Integrasi Sistem dan Unity WebGL |
+| `gambar-2.12-use-case-diagram.puml` | Use Case | Use Case Modul Unity WebGL |
+| `gambar-2.14-activity-integrasi-data-denah.puml` | Activity | Activity Diagram Integrasi Denah 2D dan 3D |
+| `gambar-2.16-sequence-sinkronisasi-data-unity.puml` | Sequence | Sequence Diagram Integrasi Data dan Penyelesaian Navigasi |
+| `gambar-2.18-alur-navmesh-rendering.puml` | Activity | Activity Diagram Navigasi NavMesh dan Rendering Rute |
 
-## Diagram yang Diregenerasi karena Deprecated
-Mengacu PRD terkini, beberapa diagram lama tidak lagi sesuai sistem sekarang dan telah diperbarui:
-- **Arsitektur Sistem (2.9):** versi lama memakai alur kirim JSON `SendMessage` ke Unity dan interaksi klik Unity→React. Versi baru: Unity menarik data sendiri via `GET /api/unity/data`, komunikasi **satu arah** React→Unity (`NavigateTo`).
-- **File `../diagram_alur_sistem.md` (Mermaid) DEPRECATED:** masih memuat modul lama `BuildingDataReceiver`, `BuildingClickHandler`, `ReceiveBuildingsData`, dan callback Unity→React (kini *out of scope*). Gunakan diagram pada folder ini sebagai gantinya.
+Diagram lain pada folder ini merupakan sumber historis atau digunakan oleh laporan anggota tim lain. Diagram legenda use case telah dihapus karena tidak menambah bukti rancangan modul Faiz.
 
-## Cara Render ke PNG/SVG
+## Kontrak sistem aktif
 
-### Opsi 1 — Tanpa instalasi (paling cepat)
-1. Buka https://www.plantuml.com/plantuml/uml
-2. Salin isi salah satu berkas `.puml`, tempel, lalu unduh PNG/SVG.
+1. React mengakses Supabase Auth dan CRUD secara langsung.
+2. Denah 2D menggunakan jaringan graf dan algoritma A*.
+3. Unity runtime mengambil data melalui `GET /api/unity/data`.
+4. `DatabaseSyncChecker` pada Unity Editor menggunakan `GET /api/unity/names`.
+5. React mengirim `NavigateTo`, `StopNavigation`, `SetSpawn`, dan `SetDevice` melalui `SendMessage`.
+6. Unity mengirim `OnNavigationCompleted` hanya setelah navigasi selesai secara normal. Pembatalan dan target yang tidak ditemukan tidak menghasilkan callback kedatangan.
+7. Express dan Umami hanya membentuk jalur analitik opsional.
 
-### Opsi 2 — VS Code (rekomendasi, sekalian preview)
-1. Install extension **"PlantUML"** (jebbs.plantuml).
-2. Buka berkas `.puml`, tekan `Alt + D` untuk preview.
-3. `Ctrl + Shift + P` → **PlantUML: Export Current Diagram** → pilih PNG/SVG.
-4. Memerlukan **Java** terpasang (atau set server render di setting extension).
+## Aturan visual
 
-### Opsi 3 — Command line (batch, semua sekaligus)
-`plantuml.jar` **sudah tersedia di folder ini** dan PNG/SVG hasil render juga sudah dibuat. Untuk render ulang setelah mengedit, di folder ini jalankan:
+Semua teks diagram menggunakan Times New Roman. Kanvas tidak boleh memuat nomor gambar, hash commit, path lokal, API SIK, data dosen/mahasiswa, akreditasi publik, CRUD fakultas, atau alur login React melalui backend.
 
-```cmd
-java -jar plantuml.jar -tpng *.puml
+## Render
+
+Jalankan dari folder `diagrams/`:
+
+```powershell
+java -jar plantuml.jar -charset UTF-8 -tpng *.puml
+java -jar plantuml.jar -charset UTF-8 -tsvg *.puml
 ```
 
-Untuk SVG (kualitas vektor, terbaik untuk dicetak di laporan):
-
-```cmd
-java -jar plantuml.jar -tsvg *.puml
-```
-
-## Konsistensi Visual
-Semua diagram memakai palet warna seragam (navy `#0B2A4A` + aksen emas `#F4B400`) agar selaras saat disisipkan ke laporan. Ubah blok `skinparam` di tiap berkas bila ingin menyesuaikan warna/brand.
-
-## Hal yang Perlu Diverifikasi
-- **Gambar 2.14 (Integrasi Data Denah):** label cabang **Skenario A/B/C** disusun berdasarkan konteks "mitigasi ketersediaan data akademik eksternal". Sesuaikan teks tiap cabang dengan narasi A/B/C persis di laporan kamu.
-- **Gambar 2.12 (Use Case):** aktor "Engine Unity" ditambahkan sebagai konsumen API (`/api/unity/data`, `/api/unity/names`). Hapus bila ingin fokus hanya pada User & Admin.
-- Nama endpoint, partisipan, dan field disesuaikan dengan PRD & draf BAB II.
+Setelah render, salin PNG enam diagram aktif ke nama aset yang ditentukan oleh `images/manifest.json`. SVG tetap disimpan bersama sumber PlantUML untuk pemeriksaan kualitas vektor.

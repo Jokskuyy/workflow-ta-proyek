@@ -1,88 +1,56 @@
-@startuml gambar-2-12-use-case-diagram
-' Gambar 2.12 - Use Case Diagram
-' Sumber: BAB II - 2.2.1 Kebutuhan Fungsional & 2.3.3 Use Case
-
-skinparam backgroundColor #FFFFFF
-skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
+@startuml
+skinparam defaultFontName "Times New Roman"
 skinparam defaultFontSize 13
-skinparam ArrowColor #444444
-skinparam actorStyle awesome
-skinparam usecase {
-  BackgroundColor #F2F2F2
-  BorderColor #555555
-  ArrowColor #444444
-}
+skinparam shadowing false
+skinparam ArrowColor #475569
 skinparam actor {
-  BackgroundColor #ECECEC
-  BorderColor #555555
+  FontName "Times New Roman"
+  FontStyle plain
 }
-
-title Gambar 2.12 — Use Case Diagram Sistem Integrasi Denah Virtual UPNVJ
+skinparam usecase {
+  FontName "Times New Roman"
+  FontStyle plain
+  BackgroundColor #F8FAFC
+  BorderColor #475569
+}
+skinparam rectangle {
+  FontName "Times New Roman"
+  FontStyle plain
+  BackgroundColor #FFFFFF
+  BorderColor #475569
+}
 
 left to right direction
+actor "Pengguna" as user
+actor "Dashboard React" as react
+actor "Pengembang Unity" as developer
+actor "Vercel API" as api
 
-actor "Pengguna Publik\n(User)" as User
-actor "Administrator" as Admin
-actor "Engine Unity\n(Denah Virtual 3D)" as Unity
-
-rectangle "Sistem Integrasi Denah Virtual UPNVJ" {
-
-  ' ----- Use case Pengguna Publik (read-only) -----
-  usecase "Melihat Statistik\nTraffic Website" as UC1
-  usecase "Melihat Profil Kampus\n(Akreditasi, Fasilitas, Aset)" as UC2
-  usecase "Melihat Detail\nAset / Fasilitas" as UC3
-  usecase "Melihat Denah\nVirtual 3D" as UC4
-  usecase "Mengganti Bahasa\n(ID / EN)" as UC5
-
-  ' ----- Use case Administrator -----
-  usecase "Login Admin\n(Autentikasi JWT)" as UC6
-  usecase "Melihat Widget\nAnalitik Kunjungan" as UC7
-  usecase "Kelola Data Gedung\n(CRUD)" as UC8
-  usecase "Kelola Data Fasilitas\n(CRUD)" as UC9
-  usecase "Kelola Data Fakultas\n(CRUD)" as UC10
-  usecase "Kelola Data\nProgram Studi (CRUD)" as UC11
-  usecase "Konfirmasi\nHapus Data" as UC12
-  usecase "Melihat Audit Logs\n(read-only)" as UC13
-
-  ' ----- Use case Integrasi API (3D Engine) -----
-  usecase "Menyediakan Data\n(GET /api/unity/data)" as UC14
-  usecase "Menyediakan Daftar Nama\n(GET /api/unity/names)" as UC15
+rectangle "Modul Unity WebGL" {
+  usecase "Memuat data runtime" as UC1
+  usecase "Menerima perintah\ndari React" as UC2
+  usecase "Memilih titik awal" as UC3
+  usecase "Menjelajahi kampus 3D" as UC4
+  usecase "Menghitung dan\nmenampilkan rute NavMesh" as UC5
+  usecase "Menampilkan minimap\ndan tutorial" as UC6
+  usecase "Menyelesaikan navigasi" as UC7
+  usecase "Membatalkan navigasi" as UC8
+  usecase "Memvalidasi identifier\ndi Unity Editor" as UC9
+  usecase "Mengonfigurasi dan\nmembangun WebGL" as UC10
 }
 
-' Asosiasi Pengguna Publik
-User --> UC1
-User --> UC2
-User --> UC3
-User --> UC4
-User --> UC5
-
-' Asosiasi Administrator
-Admin --> UC6
-Admin --> UC7
-Admin --> UC8
-Admin --> UC9
-Admin --> UC10
-Admin --> UC11
-Admin --> UC13
-
-' Admin juga dapat mengakses fungsi publik
-Admin --> UC2
-
-' Relasi include / extend
-UC7 ..> UC6 : <<include>>
-UC8 ..> UC6 : <<include>>
-UC9 ..> UC6 : <<include>>
-UC10 ..> UC6 : <<include>>
-UC11 ..> UC6 : <<include>>
-UC13 ..> UC6 : <<include>>
-UC12 ..> UC8 : <<extend>>
-UC12 ..> UC9 : <<extend>>
-UC12 ..> UC10 : <<extend>>
-UC12 ..> UC11 : <<extend>>
-
-' Asosiasi Engine Unity (sistem-ke-sistem)
-Unity --> UC14
-Unity --> UC15
-
+user --> UC3
+user --> UC4
+user --> UC6
+user --> UC8
+react --> UC2
+react --> UC3
+api --> UC1
+developer --> UC9
+developer --> UC10
+UC2 ..> UC5 : <<include>>
+UC5 ..> UC7 : <<include>>
+UC1 ..> UC5 : menyiapkan target
+UC3 ..> UC4 : <<include>>
+UC4 ..> UC6 : <<include>>
 @enduml

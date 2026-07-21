@@ -116,7 +116,7 @@ Render ulang (mis. setelah mengedit `.puml`):
 java -jar plantuml.jar -charset UTF-8 -tpng *.puml
 java -jar plantuml.jar -charset UTF-8 -tsvg *.puml
 ```
-Alternatif tanpa instalasi: tempel isi `.puml` ke https://www.plantuml.com/plantuml/uml. Diagram alur tambahan (Mermaid) ada di `diagram_alur_sistem.md` (render di https://mermaid.live).
+Alternatif tanpa instalasi: tempel isi `.puml` ke https://www.plantuml.com/plantuml/uml. Berkas PlantUML pada folder `diagrams/` adalah sumber kanonik; `diagram_alur_sistem.md` hanya menjadi penanda deprecasi Mermaid lama.
 
 ---
 

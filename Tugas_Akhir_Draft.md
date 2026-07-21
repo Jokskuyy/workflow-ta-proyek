@@ -10,7 +10,7 @@ FAKULTAS ILMU KOMPUTER
 
 UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAKARTA
 
-2025/2026
+2026
 
 # DAFTAR GAMBAR
 
@@ -34,11 +34,11 @@ UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAKARTA
 
 Visualisasi lingkungan kampus dalam bentuk tiga dimensi dapat membantu pengguna memahami hubungan spasial antarlokasi melalui representasi yang lebih interaktif daripada denah statis. Penelitian mengenai visualisasi kampus berbasis WebGL dan media kampus digital menunjukkan bahwa teknologi tiga dimensi dapat digunakan sebagai sarana penyajian informasi serta orientasi ruang berbasis web (Muharam et al. 2023; Taurusta et al. 2024). Dalam konteks Smart Campus, denah virtual tidak cukup hanya menampilkan bentuk bangunan, tetapi juga perlu menyediakan mekanisme navigasi yang dapat mengarahkan pengguna menuju gedung atau fasilitas yang dipilih.
 
-Sistem integrasi denah virtual UPNVJ menggabungkan dashboard publik berbasis React, layanan API berbasis Vercel Serverless Functions, database Supabase, dan modul Unity WebGL. Dashboard berfungsi sebagai titik interaksi pencarian, sedangkan Unity menampilkan lingkungan kampus dan menjalankan navigasi spasial. Komunikasi dari React menuju Unity berlangsung satu arah melalui `SendMessage`, sementara Unity mengambil data gedung dan fasilitas secara mandiri melalui `HTTP GET /api/unity/data`. Field `unity_object_name` menjadi penghubung antara data pada database dan GameObject sasaran di dalam scene Unity.
+Sistem integrasi denah virtual UPNVJ menggabungkan dashboard publik berbasis React, layanan API berbasis Vercel Serverless Functions, database Supabase, dan modul Unity WebGL. Dashboard berfungsi sebagai titik interaksi pencarian, sedangkan Unity menampilkan lingkungan kampus dan menjalankan navigasi spasial. Integrasi membentuk dua alur: React mengirim perintah ke Unity melalui `SendMessage`, sedangkan Unity mengirim callback `OnNavigationCompleted` hanya setelah navigasi selesai secara normal. Unity juga mengambil data gedung dan fasilitas secara mandiri melalui `HTTP GET /api/unity/data`. Field `unity_object_name` menjadi penghubung antara data pada database, GameObject sasaran, dan callback tujuan di React.
 
 Keberadaan model tiga dimensi belum secara langsung menjamin pengalaman navigasi yang baik. Engine perlu menghitung jalur pada area yang dapat dilalui, menampilkan rute yang mengikuti kontur lantai dan tangga, menyajikan nama tujuan yang mudah dipahami, serta menghentikan navigasi ketika pengguna telah mencapai sasaran. Pada sisi interaksi, pengguna desktop membutuhkan kendali pandangan yang tidak terhambat batas layar, sedangkan pengguna perangkat bergerak membutuhkan kontrol sentuh yang sesuai. Pada sisi distribusi, build Unity harus dikonfigurasi agar dapat dijalankan melalui peramban dengan ukuran dan perilaku pemuatan yang dapat dievaluasi.
 
-Berdasarkan kebutuhan tersebut, laporan ini berfokus pada kontribusi penulis sebagai **3D Simulator & Engine Developer**. Kontribusi tersebut mencakup pengembangan modul `BuildingDatabase`, `NavigationReceiver`, dan `NavigationGuide`; pembentukan rute melalui subdivisi linear, raycast vertikal, dan moving average; optimasi renderer melalui `BuildingCulling`; konfigurasi build melalui `WebGLOptimizer`; kontrol Pointer Lock dan joystick virtual; pemilihan titik awal, minimap, penanda tujuan, tutorial adaptif; serta alat editor `DatabaseSyncChecker`. Pembuatan aset tiga dimensi merupakan lingkup 3D Asset Designer, sedangkan pengembangan dashboard, API, dan jembatan integrasi web merupakan lingkup Full Stack Developer & System Integrator.
+Berdasarkan kebutuhan tersebut, laporan ini berfokus pada kontribusi penulis sebagai 3D Simulator dan Engine Developer. Kontribusi tersebut mencakup pengembangan modul `BuildingDatabase`, `NavigationReceiver`, dan `NavigationGuide`; pembentukan rute melalui subdivisi linear, raycast vertikal, dan *moving average*; optimasi *renderer* melalui `BuildingCulling`; konfigurasi *build* melalui `WebGLOptimizer`; kontrol *Pointer Lock* dan *joystick* virtual; pemilihan titik awal, minimap, penanda tujuan, tutorial adaptif; serta alat editor `DatabaseSyncChecker`. Pembuatan aset tiga dimensi merupakan lingkup 3D Asset Designer dan Database Schema Designer, sedangkan pengembangan dashboard, API, dan jembatan integrasi web merupakan lingkup Full Stack Web Developer, System Integrator, dan DevOps Engineer.
 
 Dengan fokus tersebut, penelitian ini diarahkan untuk menghasilkan modul simulator yang dapat mengubah data tujuan dari sistem web menjadi panduan navigasi di dalam lingkungan tiga dimensi. Laporan tidak hanya membahas hasil akhir visual, tetapi juga menelusuri rancangan alur data, logika pencarian dan rendering rute, pengendalian pengguna lintas perangkat, optimasi build WebGL, serta mekanisme pemeriksaan konsistensi antara database dan scene Unity.
 
@@ -59,12 +59,24 @@ Untuk menjaga pembahasan tetap sesuai dengan kontribusi penulis, batasan masalah
 1. Area yang direpresentasikan dibatasi pada lingkungan UPNVJ Kampus Pondok Labu yang tersedia di dalam scene Unity proyek.
 2. Target distribusi simulator adalah WebGL yang dijalankan melalui peramban modern, bukan aplikasi native Android, iOS, atau desktop.
 3. Navigasi hanya berlaku pada area yang telah tercakup oleh NavMesh hasil bake dan tidak mencakup pathfinding di luar area tersebut.
-4. Sistem menggunakan karakter dan kamera third-person untuk satu pengguna dan tidak mencakup multiplayer, berbagi lokasi real-time, atau navigasi berbasis GPS.
-5. React memanggil method Unity melalui `SendMessage`, sedangkan runtime Unity menyediakan event browser `OnNavigationCompleted`. Implementasi antarmuka dan listener React merupakan lingkup Full Stack Developer & System Integrator.
+4. Sistem menggunakan karakter dan kamera sudut pandang orang ketiga untuk satu pengguna dan tidak mencakup *multiplayer*, berbagi lokasi waktu nyata, atau navigasi berbasis GPS.
+5. React memanggil metode Unity melalui `SendMessage`, sedangkan *runtime* Unity menyediakan event browser `OnNavigationCompleted`. Implementasi antarmuka dan listener React merupakan lingkup Full Stack Web Developer, System Integrator, dan DevOps Engineer.
 6. Unity mengambil data runtime melalui endpoint `/api/unity/data`, tetapi implementasi endpoint, autentikasi admin, serta dashboard web tidak dibahas sebagai kontribusi penulis.
-7. Pembuatan model gedung, tekstur, dan tata letak aset tiga dimensi merupakan lingkup 3D Asset Designer; laporan ini membahas pemanfaatan aset tersebut oleh engine.
+7. Pembuatan model gedung, tekstur, dan tata letak aset tiga dimensi merupakan lingkup 3D Asset Designer dan Database Schema Designer; laporan ini membahas pemanfaatan aset tersebut oleh *engine*.
 8. Optimasi yang dibahas meliputi Building Culling serta konfigurasi build WebGL berupa Brotli, decompression fallback, IL2CPP, dan managed stripping. Klaim peningkatan performa kuantitatif hanya dinyatakan apabila bukti pengukuran tersedia.
-9. Evaluasi dedicated terhadap waktu komputasi rute, frame rate, ukuran build, dan waktu muat tetap ditandai `[TBD: ...]` apabila artefak pengujiannya belum tersedia pada repository laporan.
+9. Evaluasi khusus terhadap waktu komputasi rute, *frame rate*, ukuran *build*, dan waktu muat hanya dinyatakan berhasil apabila didukung artefak pengujian yang dapat diverifikasi.
+
+Pembagian peran dan tanggung jawab pada proyek sistem dijelaskan lebih detail dalam [TABREF:peran_tanggung_jawab].
+
+[TABLE-ID:peran_tanggung_jawab]
+[TABLECAPTION:Peran dan Tanggung Jawab]
+
+[TABLE]
+Role | Tugas dan Tanggung Jawab
+3D Asset Designer dan Database Schema Designer | Merancang aset visual 3D dan hierarki prefab beserta `Pointer`, serta merancang skema database Supabase PostgreSQL, ERD, kebijakan RLS, dan rancangan trigger basis data.
+3D Simulator dan Engine Developer | Mengembangkan *runtime* Unity WebGL, termasuk `BuildingDatabase`, `NavigationReceiver`, `DatabaseSyncChecker`, navigasi NavMesh, interaksi pengguna, optimasi performa, dan proses *build* WebGL.
+Full Stack Web Developer, System Integrator, dan DevOps Engineer | Mengembangkan Public Dashboard dan Admin Panel React, REST API pada Vercel Serverless Functions, integrasi Supabase Auth dan CRUD, *bridge* React ke Unity, pencatatan analitik aplikasi, pengujian web, serta deployment dan operasional layanan web; Express dan Umami dikelola sebagai jalur opsional.
+[/TABLE]
 
 ## 1.4 Tujuan dan Manfaat
 
@@ -91,29 +103,28 @@ Manfaat yang diharapkan dari pengembangan ini adalah sebagai berikut:
 
 ## 1.5 Jadwal Kegiatan
 
-Usulan jadwal kegiatan untuk penyelesaian proyek ini dirinci dalam bentuk Gantt Chart yang menyajikan alokasi waktu pengerjaan secara bertahap, sebagaimana disajikan pada [TABREF:jadwal_kegiatan]. Keseluruhan proyek direncanakan selesai dalam kurun waktu enam bulan atau 24 minggu. Setiap bulan terdiri atas empat minggu; tanda `X` menunjukkan periode pelaksanaan utama, sedangkan tanda `–` menunjukkan tidak ada kegiatan utama pada periode tersebut. Waktu aktual tiap kegiatan perlu disesuaikan dengan logbook dan bukti pelaksanaan yang telah disahkan.
+Pelaksanaan proyek berlangsung selama enam bulan dan dirangkum pada [TABREF:jadwal_kegiatan]. Tanda `X` menunjukkan bulan pelaksanaan utama setiap kegiatan. Tabel ini menggambarkan tahapan proyek yang telah dilaksanakan oleh tim, bukan rencana pekerjaan mendatang.
 
 [TABLE-ID:jadwal_kegiatan]
 [TABLECAPTION:Jadwal Kegiatan]
 [TABLE gantt]
 Aktivitas | Bulan 1 | Bulan 2 | Bulan 3 | Bulan 4 | Bulan 5 | Bulan 6
-Minggu | 1  2  3  4 | 1  2  3  4 | 1  2  3  4 | 1  2  3  4 | 1  2  3  4 | 1  2  3  4
-Analisis kebutuhan dan desain arsitektur engine | X  X  X  X | –  –  –  – | –  –  –  – | –  –  –  – | –  –  –  – | –  –  –  –
-Pengembangan modul inti engine Unity | –  –  –  – | X  X  X  X | X  X  –  – | –  –  –  – | –  –  –  – | –  –  –  –
-Pengembangan fitur orientasi, kontrol, dan optimasi | –  –  –  – | –  –  –  – | X  X  X  X | X  X  X  X | –  –  –  – | –  –  –  –
-Integrasi Unity WebGL dan pengujian sistem | –  –  –  – | –  –  –  – | –  –  –  – | X  X  X  X | X  X  X  X | –  –  –  –
-Revisi, retest, dan penulisan laporan | –  –  –  – | –  –  –  – | –  –  –  – | –  –  –  – | X  X  X  X | X  X  X  X
-Dokumentasi | X  X  X  X | X  X  X  X | X  X  X  X | X  X  X  X | X  X  X  X | X  X  X  X
+Desain Arsitektur dan UI | X | | | | |
+Pengembangan Backend | | X | X | | |
+Pengembangan Frontend | | | X | X | |
+Integrasi dan Pengujian Sistem | | | | X | X |
+Revisi Final dan Penulisan Laporan | | | | | X | X
+Dokumentasi | X | X | X | X | X | X
 [/TABLE]
 
-Alur pengerjaan dirancang secara sekuensial dan bertahap, dengan beberapa aktivitas yang berjalan tumpang tindih untuk menjaga kesinambungan integrasi. Tahapan-tahapan tersebut adalah:
+Jadwal pada [TABREF:jadwal_kegiatan] merupakan jadwal tim. Kontribusi Faiz pada setiap fase tetap dibatasi pada pengembangan *runtime* Unity dan tidak mencakup implementasi *backend*, *frontend*, basis data, atau pembuatan aset tiga dimensi. Pelaksanaannya dijabarkan sebagai berikut:
 
-1. **Analisis Kebutuhan dan Desain Arsitektur Engine (Bulan 1):** tahap fondasi yang berfokus pada posisi Unity dalam arsitektur sistem, kontrak `unity_object_name`, alur `SendMessage`, kebutuhan navigasi, rancangan scene, Use Case Diagram, serta rancangan NavMesh dan rendering rute. Perancangan dashboard, API, dan skema database tetap menjadi tanggung jawab anggota tim terkait.
-2. **Pengembangan Modul Inti Engine Unity (Bulan 2 sampai pertengahan Bulan 3):** tahap implementasi `BuildingDatabase`, `NavigationReceiver`, `NavigationGuide`, perhitungan jalur NavMesh, serta rendering rute berbasis subdivisi linear, raycast, dan moving average. Endpoint dan data diperlakukan sebagai kontrak integrasi, bukan implementasi backend oleh penulis.
-3. **Pengembangan Fitur Orientasi, Kontrol, dan Optimasi (Bulan 3–4):** tahap implementasi kontrol desktop dan mobile, pemilihan spawn, minimap, penanda tujuan, tutorial adaptif, Building Culling, Occlusion Culling, WebGL optimizer, serta `DatabaseSyncChecker`.
-4. **Integrasi Unity WebGL dan Pengujian Sistem (Bulan 4–5):** tahap penyatuan build Unity dengan dashboard melalui method `NavigateTo`, `StopNavigation`, `SetSpawn`, dan `SetDevice`, dilanjutkan pengujian konsumsi data, navigasi, kontrol lintas perangkat, sinkronisasi nama, build WebGL, Black Box, dan modul khusus engine. Implementasi React dan listener browser tetap dikelola anggota integrasi.
-5. **Revisi, Retest, dan Penulisan Laporan (Bulan 5–6):** alokasi waktu untuk perbaikan bug berdasarkan hasil pengujian, retest pada build yang sama, pemutakhiran screenshot atau log, pengukuran performa dengan kondisi sebanding, dan penyusunan laporan final.
-6. **Dokumentasi (Bulan 1–6):** aktivitas paralel sepanjang proyek untuk memastikan rancangan, konfigurasi, script, commit, hasil pengujian, dan bukti visual terdokumentasi secara konsisten.
+1. Pada fase desain arsitektur dan antarmuka, Faiz merancang posisi Unity dalam arsitektur sistem, kontrak `unity_object_name`, alur `SendMessage`, hierarki *scene*, NavMesh, dan penyajian rute.
+2. Pada fase pengembangan *backend*, Faiz menyiapkan `BuildingDatabase` sebagai konsumen kontrak `/api/unity/data`. Endpoint dan pengelolaan basis data tetap menjadi tanggung jawab anggota tim terkait.
+3. Pada fase pengembangan *frontend*, Faiz menyiapkan metode publik Unity, yaitu `NavigateTo`, `StopNavigation`, `SetSpawn`, dan `SetDevice`, agar dapat dipanggil melalui jembatan web tanpa mengklaim implementasi React.
+4. Pada fase integrasi dan pengujian, Faiz mengembangkan navigasi NavMesh, rute visual, kontrol lintas perangkat, pemilihan titik awal, minimap, tutorial, *completion event*, optimasi, dan *build* WebGL, kemudian menguji perilaku modul tersebut bersama alur sistem.
+5. Pada fase revisi dan penulisan, Faiz memperbaiki temuan yang berkaitan dengan *runtime* Unity, melakukan pengujian ulang pada versi yang sama, serta menyusun bukti dan pembahasan teknis.
+6. Dokumentasi dilakukan selama enam bulan untuk menjaga keterlacakan rancangan, konfigurasi, kode sumber, hasil pengujian, dan bukti visual.
 
 ## 1.6 Sistematika Penulisan
 
@@ -128,63 +139,21 @@ Laporan ini disusun dalam empat bab dengan sistematika sebagai berikut:
 
 # BAB II RANCANGAN PROYEK
 
-## 2.1 Observasi
+## 2.1 Observasi dan Analisis Kebutuhan Awal
 
-Observasi proyek dilakukan untuk memahami kondisi navigasi kampus, kebutuhan pengguna, batas kebijakan data, dan pembagian tanggung jawab teknis di dalam tim. Bagian ini menggunakan temuan bersama sebagai konteks, kemudian mengarahkannya pada kebutuhan simulator dan engine yang menjadi lingkup penulis.
+<!-- PIPELINE:INCLUDE content/shared/bab2/observasi-dan-analisis-kebutuhan.md -->
 
-### 2.1.1 Observasi Lapangan
+### 2.1.1 Sumber Data dan Batas Observasi
 
-Observasi lapangan berfokus pada hubungan spasial antargedung, jalur pejalan kaki, pintu masuk, koridor, lantai, tangga, dan hambatan yang perlu direpresentasikan di dalam scene. Informasi tersebut menjadi dasar untuk menentukan area yang dapat dilalui oleh agen NavMesh serta lokasi target navigasi. Karena repository laporan belum memuat catatan pengukuran spasial terperinci, ukuran agen, kemiringan, tinggi langkah, dan konfigurasi bake perlu dicocokkan kembali dengan scene Unity aktual sebelum dinyatakan sebagai nilai final. [TBD: lampirkan catatan observasi dan konfigurasi NavMesh hasil verifikasi]
+<!-- PIPELINE:INCLUDE content/shared/bab2/sumber-data-dan-batas-observasi.md -->
 
-Observasi juga mempertimbangkan perangkat yang digunakan oleh pengguna. Simulator ditargetkan berjalan di peramban, dengan perangkat bergerak sebagai kebutuhan penting proyek. Oleh karena itu, rancangan engine tidak dapat hanya mengandalkan input tetikus dan papan ketik, tetapi perlu menyediakan kontrol sentuh serta tata letak antarmuka yang tidak menutupi area navigasi utama.
+### 2.1.2 Analisis Kebutuhan Pengguna dan Sistem yang Berjalan
 
-### 2.1.2 Analisis Kebutuhan Pengguna
+<!-- PIPELINE:INCLUDE content/shared/bab2/analisis-kebutuhan-dan-sistem-berjalan.md -->
 
-Kuesioner awal digunakan oleh tim untuk mengenali profil responden, pengalaman menggunakan media navigasi, frekuensi kesulitan mencari lokasi, perilaku ketika tersesat, urgensi denah virtual, potensi penggunaan, dan prioritas informasi. Profil responden disajikan pada [FIGREF:survey_01_profil], sedangkan persepsi efektivitas informasi navigasi ditampilkan pada [FIGREF:survey_02_efektivitas].
+### 2.1.3 Hasil Wawancara Pemangku Kepentingan dan Implikasi Kebutuhan
 
-[FIGURE:survey_01_profil]
-[FIGCAPTION:Hasil Kuesioner: Profil Status Akademik]
-
-[FIGURE:survey_02_efektivitas]
-[FIGCAPTION:Hasil Kuesioner: Efektivitas Informasi]
-
-Frekuensi pengalaman pengguna saat mengakses atau membutuhkan denah dirangkum pada [FIGREF:survey_03_frekuensi], sementara perilaku pencarian lokasi ketika informasi belum mencukupi diperlihatkan pada [FIGREF:survey_04_perilaku]. Pembacaan angka rinci pada kedua gambar perlu mengikuti data kuesioner sumber dan tidak disalin dari laporan anggota lain tanpa pemeriksaan ulang.
-
-[FIGURE:survey_03_frekuensi]
-[FIGCAPTION:Hasil Kuesioner: Frekuensi Akses Denah]
-
-[FIGURE:survey_04_perilaku]
-[FIGCAPTION:Hasil Kuesioner: Perilaku Pencarian Lokasi]
-
-Kebutuhan terhadap denah virtual ditunjukkan pada [FIGREF:survey_05_urgensi], potensi adopsinya disajikan pada [FIGREF:survey_06_adopsi], dan prioritas informasi fasilitas dirangkum pada [FIGREF:survey_07_prioritas]. Bagi peran penulis, rangkaian temuan tersebut diterjemahkan menjadi kebutuhan navigasi terpandu, label tujuan yang mudah dibaca, kontrol yang dapat dipahami, serta performa pemuatan yang perlu diukur pada build WebGL.
-
-[FIGURE:survey_05_urgensi]
-[FIGCAPTION:Hasil Kuesioner: Urgensi Kebutuhan Denah]
-
-[FIGURE:survey_06_adopsi]
-[FIGCAPTION:Hasil Kuesioner: Tingkat Adopsi Potensial]
-
-[FIGURE:survey_07_prioritas]
-[FIGCAPTION:Hasil Kuesioner: Prioritas Fitur]
-
-### 2.1.3 Analisis Sistem yang Sedang Berjalan
-
-Media navigasi yang tersedia sebelum pengembangan proyek terutama berupa papan penunjuk arah dan denah statis. Media tersebut tetap berguna sebagai informasi dasar, tetapi tidak menghitung rute dari posisi pengguna, tidak menyesuaikan tampilan berdasarkan tujuan, dan tidak menghubungkan informasi fasilitas dengan representasi ruang tiga dimensi. Studi mengenai peta tiga dimensi berbasis WebGL menunjukkan bahwa penyajian lingkungan secara interaktif dapat menjadi pendekatan untuk memperluas fungsi media informasi konvensional (Muharam et al. 2023).
-
-Pada sisi digital, data profil dan fasilitas berada pada komponen yang berbeda dari scene Unity. Tanpa kontrak identitas yang sama, perubahan nama pada database dapat menyebabkan target navigasi tidak ditemukan di dalam scene. Permasalahan ini mendasari penggunaan `unity_object_name` sebagai identitas teknis dan kebutuhan terhadap pemeriksaan sinkronisasi sebelum build dipublikasikan.
-
-### 2.1.4 Wawancara dengan Stakeholder
-
-Wawancara dengan Kepala UPA TIK UPNVJ membahas pembagian peran tim dan kebutuhan fungsional maupun non-fungsional sistem. Wawancara dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi membahas ketersediaan serta kebijakan pembagian data sarana prasarana. Dokumentasi kegiatan tersebut diperlihatkan pada [FIGREF:foto_wawancara_warek] sebagai bukti konteks koordinasi institusional proyek.
-
-[FIGURE:foto_wawancara_warek]
-[FIGCAPTION:Dokumentasi Wawancara dan Penandatanganan Pakta Integritas]
-
-Pembagian peran yang digunakan dalam laporan ini adalah sebagai berikut:
-
-1. Muammar Faiz Khairul Anam berperan sebagai 3D Simulator & Engine Developer dengan tanggung jawab pada logika runtime Unity, navigasi, rendering rute, optimasi WebGL, kontrol pengguna, konsumsi data engine, dan editor tool.
-2. Muhammad Dwikhi Deandra Purnianto berperan sebagai 3D Asset Designer & Database/Asset Manager dengan tanggung jawab pada pembuatan aset, penataan scene, skema database, RLS, audit log, dan integritas pemetaan data.
-3. Muhammad Iman Nugraha berperan sebagai Full Stack Developer & System Integrator dengan tanggung jawab pada dashboard React, Vercel Serverless Functions, integrasi Supabase Auth, proxy Umami, jembatan React–Unity, dan pengujian web.
+<!-- PIPELINE:INCLUDE content/shared/bab2/wawancara-dan-implikasi-kebutuhan.md -->
 
 ## 2.2 Usulan Solusi
 
@@ -214,19 +183,19 @@ Kebutuhan fungsional modul simulator dirumuskan sebagai berikut:
 
 ### 2.2.2 Identifikasi Kebutuhan Teknis
 
-NavMesh merupakan representasi area yang dapat dilalui dan digunakan oleh komponen navigasi untuk mendukung pencarian jalur pada scene. Paket AI Navigation Unity menyediakan komponen untuk membangun dan menggunakan NavMesh pada waktu edit maupun runtime (Unity Technologies 2026). Proyek menggunakan Unity 6 dengan Universal Render Pipeline, AI Navigation, New Input System, TextMeshPro, dan target build WebGL.
+NavMesh merupakan representasi area yang dapat dilalui dan digunakan oleh komponen navigasi untuk mendukung pencarian jalur pada *scene*. Paket AI Navigation Unity menyediakan komponen untuk membangun dan menggunakan NavMesh pada waktu edit maupun *runtime* (Unity Technologies 2026a). Proyek menggunakan Unity 6 dengan Universal Render Pipeline, AI Navigation, New Input System, TextMeshPro, dan target *build* WebGL.
 
 Titik sudut hasil `NavMeshPath` digunakan sebagai dasar pembentukan garis navigasi. Implementasi final membagi setiap segmen secara linear berdasarkan jarak sampling, memproyeksikan setiap titik ke permukaan melalui raycast vertikal, lalu menerapkan moving average agar perubahan posisi antartitik tidak bergerigi. Pendekatan ini mengikuti kode aktif pada scene final dan menggantikan rancangan interpolasi kurva yang tidak lagi dipanggil oleh alur runtime.
 
-Pointer Lock API menyediakan perubahan posisi relatif tetikus, mempertahankan input meskipun pergerakan melewati batas layar, dan menyembunyikan kursor selama penguncian. Karakteristik tersebut digunakan untuk mengendalikan pandangan kamera third-person di peramban (MDN Web Docs 2025). Untuk perangkat sentuh, New Input System menyediakan konsep on-screen control yang dapat memetakan widget antarmuka ke kontrol perangkat virtual (Unity Technologies 2026).
+Pointer Lock API menyediakan perubahan posisi relatif tetikus, mempertahankan input meskipun pergerakan melewati batas layar, dan menyembunyikan kursor selama penguncian. Karakteristik tersebut digunakan untuk mengendalikan kamera sudut pandang orang ketiga di peramban (MDN Web Docs 2025). Untuk perangkat sentuh, New Input System menyediakan konsep *on-screen control* yang dapat memetakan widget antarmuka ke kontrol perangkat virtual (Unity Technologies 2026c).
 
-Distribusi WebGL menggunakan build Unity yang dikompresi. Dokumentasi Unity menjelaskan bahwa Brotli menghasilkan berkas yang lebih kecil daripada gzip dengan konsekuensi waktu kompresi build yang lebih panjang, dan server perlu mengirim header yang sesuai agar peramban memproses berkas terkompresi dengan benar (Unity Technologies 2026). Konfigurasi teknis proyek mencakup Brotli, decompression fallback, IL2CPP, dan managed stripping, dengan validasi runtime diperlukan untuk memastikan kode yang digunakan tidak ikut terhapus oleh proses stripping.
+Distribusi WebGL menggunakan *build* Unity yang dikompresi. Dokumentasi Unity menjelaskan bahwa Brotli menghasilkan berkas yang lebih kecil daripada gzip dengan konsekuensi waktu kompresi *build* yang lebih panjang, dan server perlu mengirim header yang sesuai agar peramban memproses berkas terkompresi dengan benar (Unity Technologies 2026b). Konfigurasi teknis proyek mencakup Brotli, *decompression fallback*, IL2CPP, dan *managed stripping*, dengan validasi *runtime* untuk memastikan kode yang digunakan tidak ikut terhapus oleh proses *stripping*.
 
 ### 2.2.3 Identifikasi Kebutuhan Non-Fungsional
 
 Kebutuhan non-fungsional modul simulator dirumuskan sebagai berikut:
 
-1. Performa: halaman yang memuat model tiga dimensi ditargetkan dapat digunakan dalam waktu kurang dari 10 detik sesuai requirement proyek; pencapaian target harus dibuktikan melalui pengukuran pada perangkat, jaringan, dan build yang terdokumentasi.
+1. Performa: pemuatan model tiga dimensi harus memberikan umpan balik yang jelas, memanfaatkan kompresi dan *cache*, serta dievaluasi melalui pengukuran pada perangkat, jaringan, dan *build* yang terdokumentasi. Laporan tidak menetapkan target waktu muat tanpa dasar pengukuran.
 2. Efisiensi: perhitungan ulang rute dilakukan ketika perpindahan pengguna melewati ambang `pathUpdateDistance`, bukan pada setiap frame.
 3. Kompatibilitas: simulator mendukung peramban desktop modern dan memprioritaskan Chrome Android sebagai kebutuhan perangkat bergerak.
 4. Usabilitas: sistem menampilkan status pemuatan, nama tujuan, jarak tersisa, serta kontrol yang sesuai dengan jenis perangkat.
@@ -243,7 +212,7 @@ Metode prototyping merupakan pendekatan pengembangan yang membentuk versi awal s
 Tahap pengembangan dirangkum pada [FIGREF:diagram_tahap_pengembangan] yang menggambarkan hubungan antara analisis kebutuhan, perancangan, pembuatan prototipe, evaluasi, perbaikan, integrasi, dan pengujian.
 
 [FIGURE:diagram_tahap_pengembangan]
-[FIGCAPTION:Tahap Pengembangan]
+[FIGCAPTION:Tahap Pengembangan Modul Simulator dan Engine]
 
 Iterasi pengembangan modul Unity dirancang melalui tahapan berikut:
 
@@ -254,14 +223,14 @@ Iterasi pengembangan modul Unity dirancang melalui tahapan berikut:
 5. Menambahkan kontrol desktop dan perangkat bergerak.
 6. Menambahkan Building Culling, WebGL optimizer, dan Database Sync Checker.
 7. Mengintegrasikan build Unity pada alur sistem melalui kontrak `NavigateTo`, `StopNavigation`, `SetSpawn`, `SetDevice`, dan event `OnNavigationCompleted`; implementasi dashboard React dan endpoint serverless tetap dikerjakan anggota integrasi.
-8. Menjalankan pengujian fungsional, pengujian modul, pengukuran performa, perbaikan, dan retest.
+8. Menjalankan pengujian fungsional, pengujian modul, pengukuran performa, perbaikan, dan pengujian ulang.
 
 ### 2.3.2 Perancangan Arsitektur Sistem
 
-Arsitektur sistem menjelaskan pembagian tanggung jawab antara dashboard, engine, API, database, dan layanan analitik. Hubungan antarkomponen diperlihatkan pada [FIGREF:diagram_arsitektur], dengan Unity WebGL ditempatkan sebagai modul visualisasi yang berjalan di dalam peramban.
+Arsitektur sistem menjelaskan pembagian tanggung jawab antara dashboard, denah dua dimensi, Unity WebGL, API, database, dan layanan analitik. Hubungan antarkomponen diperlihatkan pada [FIGREF:diagram_arsitektur], dengan Unity WebGL ditempatkan sebagai modul visualisasi tiga dimensi yang berjalan di dalam peramban.
 
 [FIGURE:diagram_arsitektur]
-[FIGCAPTION:Diagram Arsitektur Sistem]
+[FIGCAPTION:Arsitektur Integrasi Sistem dan Unity WebGL]
 
 Alur utama yang berkaitan dengan peran penulis dirancang sebagai berikut:
 
@@ -270,7 +239,8 @@ Alur utama yang berkaitan dengan peran penulis dirancang sebagai berikut:
 3. `NavigationReceiver` mencari Transform sasaran yang sesuai di dalam scene.
 4. `NavigationGuide` menghitung jalur pada NavMesh dan menampilkan garis rute, nama tujuan, serta jarak tersisa.
 5. Secara terpisah, `BuildingDatabase` menarik data dari `/api/unity/data` untuk membentuk cache `unityObjectNames` dan `realNames`.
-6. Ketika pengguna mencapai `stopDistance` atau memilih berhenti, garis dan label navigasi dibersihkan.
+6. Ketika pengguna tiba secara normal, `CompleteNavigation()` membersihkan garis dan label, kemudian Unity mengirim `OnNavigationCompleted` dengan `unity_object_name` tujuan.
+7. Ketika pengguna membatalkan navigasi melalui `StopNavigation()` atau target tidak ditemukan, rute dibersihkan tanpa mengirim callback kedatangan.
 
 Pemetaan komponen arsitektur pada [TABREF:pemetaan_arsitektur_engine] digunakan untuk membedakan bagian yang menjadi kontribusi penulis dan bagian yang hanya menjadi kontrak integrasi bersama.
 
@@ -281,33 +251,30 @@ Komponen | Fungsi pada Sistem | Hubungan dengan Modul Faiz | Batas Klaim
 Dashboard React | Menampilkan pencarian, pemilihan tujuan, dan canvas Unity | Mengirim `NavigateTo`, `StopNavigation`, `SetSpawn`, serta `SetDevice` | Implementasi antarmuka dan listener bukan kontribusi penulis
 Vercel Serverless Functions | Menyediakan endpoint data Unity dan endpoint daftar nama | Dikonsumsi oleh `BuildingDatabase` dan `DatabaseSyncChecker` | Pembuatan endpoint bukan kontribusi penulis
 Supabase Database | Menyimpan data gedung, fasilitas, dan kunci `unity_object_name` | Menjadi sumber identitas teknis target scene | Skema, RLS, dan audit log bukan kontribusi penulis
-Unity WebGL | Menjalankan scene, kontrol, navigasi, rendering rute, dan tool editor | Menjadi ruang kontribusi utama penulis | Klaim dibatasi pada script, konfigurasi, dan bukti Unity
-Browser dan Hosting | Menjalankan build WebGL serta menyajikan `.data` dan `.wasm` | Menjadi tempat validasi build, MIME, encoding, dan event browser | Infrastruktur hosting dijelaskan sebagai konteks integrasi
+Unity WebGL | Menjalankan scene, kontrol, navigasi, rendering rute, dan tool editor | Menjadi ruang kontribusi utama penulis | Klaim dibatasi pada skrip, konfigurasi, dan bukti Unity
+Browser dan Hosting | Menjalankan build WebGL serta menyajikan `.data` dan `.wasm` | Meneruskan callback `OnNavigationCompleted` dari Unity ke listener React | Infrastruktur hosting dan listener React dijelaskan sebagai konteks integrasi
 [/TABLE]
 
 ### 2.3.3 Perancangan Aktor dan Batas Interaksi
 
-Use case merupakan model yang menjelaskan interaksi aktor dengan fungsi sistem dari sudut pandang kebutuhan pengguna (Kurniawan 2018). Legenda simbol yang digunakan ditampilkan pada [FIGREF:diagram_use_case_legenda], sedangkan hubungan pengguna publik, administrator, developer, dashboard, dan denah virtual disajikan pada [FIGREF:diagram_use_case].
-
-[FIGURE:diagram_use_case_legenda]
-[FIGCAPTION:Legenda Use Case Diagram]
+Use case merupakan model yang menjelaskan interaksi aktor dengan fungsi sistem dari sudut pandang kebutuhan pengguna (Kurniawan 2018). Hubungan pengguna, dashboard React, Vercel API, dan pengembang Unity dengan fungsi modul Unity WebGL disajikan pada [FIGREF:diagram_use_case].
 
 [FIGURE:diagram_use_case]
-[FIGCAPTION:Use Case Diagram]
+[FIGCAPTION:Use Case Modul Unity WebGL]
 
-Pada lingkup engine, pengguna publik berinteraksi dengan kontrol eksplorasi, pemilihan tujuan yang diteruskan oleh dashboard, garis rute, label tujuan, dan penghentian navigasi. Developer menggunakan WebGL optimizer dan Database Sync Checker. Administrator tidak berinteraksi langsung dengan kode engine; perubahan data dilakukan melalui dashboard dan diteruskan melalui database serta API yang dikelola anggota tim lain.
+Pada lingkup engine, pengguna berinteraksi dengan pemilihan titik awal, kontrol eksplorasi, rute, minimap, tutorial, dan penghentian navigasi. Dashboard React mengirim perintah ke Unity, sedangkan Vercel API menyediakan data runtime. Pengembang Unity mengonfigurasi scene, memeriksa kesesuaian identifier melalui `DatabaseSyncChecker`, dan membuat build WebGL. Administrator tidak berinteraksi langsung dengan kode engine; perubahan data dilakukan melalui dashboard yang dikelola anggota tim lain.
 
 ### 2.3.4 Perancangan Alur Data dan Sinkronisasi
 
-Proses pengambilan dan penggunaan data oleh Unity diperlihatkan pada [FIGREF:diagram_activity_integrasi]. Alur tersebut menegaskan batas bahwa engine merupakan konsumen data dan tidak melakukan operasi CRUD terhadap database.
+Pemilihan pengalaman Denah 2D atau 3D diperlihatkan pada [FIGREF:diagram_activity_integrasi]. Denah 2D menghitung rute pada jaringan graf dengan algoritma A-star, sedangkan Unity mengambil data runtime, menerima perintah React, dan mengirim callback hanya setelah navigasi tiga dimensi selesai secara normal. Alur tersebut menegaskan bahwa engine merupakan konsumen data dan tidak melakukan operasi CRUD terhadap database.
 
 [FIGURE:diagram_activity_integrasi]
-[FIGCAPTION:Activity Diagram: Integrasi Data Denah]
+[FIGCAPTION:Activity Diagram Integrasi Denah 2D dan 3D]
 
-Urutan sinkronisasi data hingga pencocokan GameObject ditunjukkan pada [FIGREF:diagram_sequence_sinkronisasi]. Peran penulis dimulai ketika Unity meminta data, membentuk cache, mencocokkan nama, dan menyiapkan objek untuk navigasi.
+Urutan integrasi data, penerimaan tujuan, dan penyelesaian navigasi ditunjukkan pada [FIGREF:diagram_sequence_sinkronisasi]. Peran penulis dimulai ketika Unity meminta data, membentuk cache, mencocokkan nama, menghitung rute, dan memancarkan callback penyelesaian normal. Validasi callback dan notifikasi pada dashboard tetap menjadi implementasi anggota integrasi.
 
 [FIGURE:diagram_sequence_sinkronisasi]
-[FIGCAPTION:Sequence Diagram: Sinkronisasi Data Gedung dan Unity]
+[FIGCAPTION:Sequence Diagram Integrasi Data dan Penyelesaian Navigasi]
 
 Rangkuman penggunaan diagram rancangan pada [TABREF:pemetaan_diagram_rancangan] menjaga agar diagram UML dan arsitektur dibaca sesuai batas kontribusi penulis. Diagram perancangan skema database tidak digunakan dalam laporan ini karena berada pada lingkup Database Developer; penulis hanya mendokumentasikan kontrak data yang dikonsumsi Unity.
 
@@ -315,10 +282,11 @@ Rangkuman penggunaan diagram rancangan pada [TABREF:pemetaan_diagram_rancangan] 
 [TABLECAPTION:Pemetaan Diagram Rancangan terhadap Kebutuhan Laporan Faiz]
 [TABLE]
 Artefak Rancangan | Informasi yang Dipakai | Relevansi untuk Role Faiz | Catatan Batas Kontribusi
-Diagram arsitektur | Alur dashboard, API, database, Unity, dan browser | Menentukan posisi Unity sebagai runtime visualisasi | Komponen web dan API hanya konteks integrasi
-Use Case Diagram | Aktor pengguna, administrator, dan developer | Menentukan interaksi eksplorasi, navigasi, dan tool developer | Fitur admin tidak diklaim sebagai implementasi Faiz
-Activity Diagram Integrasi | Urutan data dari dashboard hingga Unity | Menjadi dasar lifecycle `BuildingDatabase` dan pencarian target | Operasi CRUD tetap berada di luar engine
-Sequence Diagram Sinkronisasi | Urutan API, cache, dan pencocokan GameObject | Menjadi dasar rancangan `NavigationReceiver` dan `DatabaseSyncChecker` | Listener React hanya disebut sebagai kontrak
+Diagram arsitektur | Jalur React, Denah 2D, Unity, API, Supabase, dan analitik opsional | Menentukan posisi Unity sebagai runtime visualisasi | Komponen web dan API hanya konteks integrasi
+Use Case Modul Unity WebGL | Interaksi pengguna, React, API, dan pengembang dengan modul Unity | Menentukan fungsi eksplorasi, navigasi, tooling, dan build | Fitur dashboard tidak diklaim sebagai implementasi Faiz
+Activity Diagram Integrasi | Pemilihan Denah 2D atau 3D sampai keluaran navigasi | Membedakan graf A-star dan runtime Unity NavMesh | Operasi CRUD dan Denah 2D tetap berada di luar engine
+Sequence Diagram Integrasi | Urutan pemuatan data, perintah navigasi, penyelesaian normal, dan pembatalan | Menjadi dasar `BuildingDatabase`, `NavigationReceiver`, `NavigationGuide`, serta callback runtime | Listener React hanya disebut sebagai kontrak
+Activity Diagram NavMesh | Validasi target, pembentukan path, rendering, pembaruan, kedatangan, dan pembatalan | Menjadi dasar algoritme navigasi serta rendering rute | Struktur data dan aset tiga dimensi mengikuti ownership anggota lain
 [/TABLE]
 
 ### 2.3.5 Perancangan Konsumsi Data dan Lifecycle Engine
@@ -329,12 +297,12 @@ Struktur minimum setiap entitas yang digunakan engine terdiri atas nama tampilan
 
 Lifecycle data engine dirancang melalui kondisi berikut:
 
-1. **Belum dimuat:** scene baru aktif dan belum menerima respons API; modul lain tidak boleh mengasumsikan cache telah tersedia.
-2. **Sedang dimuat:** permintaan API sedang berlangsung dan status pemuatan dipertahankan sampai respons selesai diproses.
-3. **Berhasil:** respons valid menghasilkan cache `unityObjectNames`, dictionary `realNames`, dan status `isLoaded` yang dapat dibaca modul lain.
-4. **Respons dengan koleksi kosong:** JSON valid dengan `gedung` dan `fasilitas` kosong tetap menyelesaikan parsing, mengaktifkan `isLoaded`, dan menghasilkan cache kosong; perilaku aktual ini perlu dibedakan dari respons null atau JSON tidak valid.
-5. **Permintaan atau parsing gagal:** pesan kesalahan dicatat untuk penelusuran tanpa menghentikan aplikasi secara tidak terkendali.
-6. **Nama tidak ditemukan:** `GetRealName()` mengembalikan input asli sebagai fallback agar label tidak kosong.
+1. Belum dimuat: scene baru aktif dan belum menerima respons API; modul lain tidak boleh mengasumsikan cache telah tersedia.
+2. Sedang dimuat: permintaan API sedang berlangsung dan status pemuatan dipertahankan sampai respons selesai diproses.
+3. Berhasil: respons valid menghasilkan cache `unityObjectNames`, dictionary `realNames`, dan status `isLoaded` yang dapat dibaca modul lain.
+4. Respons dengan koleksi kosong: JSON valid dengan `gedung` dan `fasilitas` kosong tetap menyelesaikan parsing, mengaktifkan `isLoaded`, dan menghasilkan cache kosong; perilaku aktual ini perlu dibedakan dari respons null atau JSON tidak valid.
+5. Permintaan atau parsing gagal: pesan kesalahan dicatat untuk penelusuran tanpa menghentikan aplikasi secara tidak terkendali.
+6. Nama tidak ditemukan: `GetRealName()` mengembalikan input asli sebagai fallback agar label tidak kosong.
 
 Hubungan data dengan scene dimulai ketika `unity_object_name` dari hasil pencarian React diterima oleh `NavigationReceiver`. Identitas tersebut dicocokkan dengan cache dan nama GameObject pada child `Pointer`. Transform hasil pencocokan menjadi tujuan `NavigationGuide`, sedangkan `realNames` digunakan hanya sebagai teks tampilan. Pemisahan ini menjaga agar perubahan label tidak mengubah identitas teknis navigasi.
 
@@ -353,7 +321,10 @@ Alur pencarian tujuan dirancang dengan tahapan berikut:
 7. Jalur dihitung ulang ketika pergerakan pengguna melewati `pathUpdateDistance` sebesar 1 m.
 8. Scene menyimpan `stopDistance` 5 m, tetapi kode runtime membatasi ambang kedatangan ke rentang 0,5–2 m. Navigasi hanya selesai ketika path berstatus lengkap, jarak jalur tersisa tidak melebihi 2 m, dan jarak pemain terhadap endpoint NavMesh juga tidak melebihi 2 m.
 
-Rancangan ketahanan jalur mempertahankan path lengkap terakhir ketika rekalkulasi gagal sesaat di batas polygon, tangga, atau NavMesh link. Path parsial atau invalid tidak menggantikan rute aktif dan tidak dianggap sebagai kedatangan. Sistem menjadwalkan percobaan ulang dengan interval 1 detik sampai path lengkap tersedia atau navigasi dibatalkan.
+Rancangan ketahanan jalur mempertahankan path lengkap terakhir ketika rekalkulasi gagal sesaat di batas polygon, tangga, atau NavMesh link. Path parsial atau invalid tidak menggantikan rute aktif dan tidak dianggap sebagai kedatangan. Sistem menjadwalkan percobaan ulang dengan interval 1 detik sampai path lengkap tersedia atau navigasi dibatalkan. Keseluruhan validasi target, pembentukan path, pembaruan rute, kedatangan, dan pembatalan dirangkum pada [FIGREF:diagram_alur_navmesh_rendering].
+
+[FIGURE:diagram_alur_navmesh_rendering]
+[FIGCAPTION:Activity Diagram Navigasi NavMesh dan Rendering Rute]
 
 Urutan tersebut diringkas pada [TABREF:alur_navigasi_engine] agar hubungan input, pemrosesan, dan keluaran setiap modul dapat ditelusuri tanpa mengklaim proses pencarian atau API sebagai implementasi Faiz.
 
@@ -370,7 +341,7 @@ Tahap | Komponen | Input | Keluaran
 
 ### 2.3.7 Perancangan Rendering Rute
 
-Titik `corners` dari hasil NavMesh dapat memiliki jarak antartitik yang besar dan perubahan arah yang tajam. Implementasi final tidak memanggil helper Catmull–Rom yang masih tersisa pada script. Setiap segmen aktif dibagi secara linear dengan `pointSpacing` 0,4 m, kemudian raycast diarahkan ke bawah agar posisi vertikal garis mengikuti permukaan lantai atau tangga. Moving average dengan `smoothingWindow` 4 diterapkan pada koordinat akhir, sedangkan titik awal dan akhir dipertahankan.
+Titik `corners` dari hasil NavMesh dapat memiliki jarak antartitik yang besar dan perubahan arah yang tajam. Implementasi final tidak memanggil helper Catmull–Rom yang masih tersisa pada skrip. Setiap segmen aktif dibagi secara linear dengan `pointSpacing` 0,4 m, kemudian raycast diarahkan ke bawah agar posisi vertikal garis mengikuti permukaan lantai atau tangga. Moving average dengan `smoothingWindow` 4 diterapkan pada koordinat akhir, sedangkan titik awal dan akhir dipertahankan.
 
 Alur rendering dirancang sebagai berikut:
 
@@ -383,7 +354,7 @@ Alur rendering dirancang sebagai berikut:
 7. Mengirim kumpulan titik akhir ke `LineRenderer` dengan lebar 0,2 m dan material putus-putus yang dibentuk saat runtime.
 8. Memperbarui label nama tujuan dan jarak jalur tersisa.
 
-Transformasi titik mentah menjadi garis yang dirender dirangkum pada [TABREF:alur_rendering_rute_rancangan]. Bukti visual hasil akhirnya diberikan melalui screenshot rute aktif dan perubahan elevasi pada BAB III; perbandingan titik internal sebelum dan sesudah pemrosesan tidak diklaim apabila log debug belum tersedia.
+Transformasi titik mentah menjadi garis yang dirender dirangkum pada [TABREF:alur_rendering_rute_rancangan]. Bukti visual hasil akhirnya diberikan melalui tangkapan layar rute aktif dan perubahan elevasi pada BAB III; perbandingan titik internal sebelum dan sesudah pemrosesan tidak diklaim apabila log debug belum tersedia.
 
 [TABLE-ID:alur_rendering_rute_rancangan]
 [TABLECAPTION:Alur Pemrosesan Titik Rute sebelum Rendering]
@@ -410,7 +381,7 @@ Rencana pembandingan Building Culling menggunakan posisi kamera, scene, lintasan
 
 Kontrol desktop menggunakan Pointer Lock setelah tindakan klik pengguna pada canvas. Pergerakan relatif tetikus digunakan untuk rotasi pandangan, sedangkan tombol ESC melepaskan kunci kursor. Rancangan harus tetap mengikuti kebijakan keamanan peramban yang mensyaratkan aktivasi melalui interaksi pengguna.
 
-Kontrol perangkat bergerak menggunakan prefab `UI_Virtual_Joystick` yang memetakan gerakan sentuh ke New Input System. `WebPlatformSync.SetDevice(string)` menerima nilai `mobile` atau `desktop`, mengubah visibilitas joystick, dan meneruskan mode perangkat kepada antarmuka spawn serta tutorial. Screenshot desktop, mobile, dan tutorial adaptif telah tersedia; respons Pointer Lock, joystick, serta perubahan mode tetap memerlukan rekaman pada build final.
+Kontrol perangkat bergerak menggunakan prefab `UI_Virtual_Joystick` yang memetakan gerakan sentuh ke New Input System. `WebPlatformSync.SetDevice(string)` menerima nilai `mobile` atau `desktop`, mengubah visibilitas joystick, dan meneruskan mode perangkat kepada antarmuka spawn serta tutorial. Tangkapan layar desktop, mobile, dan tutorial adaptif telah tersedia; respons Pointer Lock, joystick, serta perubahan mode tetap memerlukan rekaman pada build final.
 
 ### 2.3.10 Perancangan DatabaseSyncChecker
 
@@ -418,9 +389,9 @@ Kontrol perangkat bergerak menggunakan prefab `UI_Virtual_Joystick` yang memetak
 
 Hasil pemeriksaan dirancang dalam tiga kategori:
 
-1. **Synchronized:** nama tersedia pada API dan memiliki GameObject padanan di dalam scene.
-2. **Missing in Scene:** nama tersedia pada API, tetapi tidak ditemukan pada hierarki scene.
-3. **Not Registered in Database:** root GameObject tersedia pada scene, tetapi namanya tidak terdapat pada data API.
+1. Synchronized: nama tersedia pada API dan memiliki GameObject padanan di dalam scene.
+2. Missing in Scene: nama tersedia pada API, tetapi tidak ditemukan pada hierarki scene.
+3. Not Registered in Database: root GameObject tersedia pada scene, tetapi namanya tidak terdapat pada data API.
 
 Tool perlu menyediakan ringkasan jumlah setiap kategori, daftar nama yang dapat ditelusuri, dan tindakan untuk menyalin daftar ketidaksesuaian. Respons API kosong dibedakan dari kondisi seluruh data tersinkronisasi agar hasil tidak menyesatkan. Apabila permintaan gagal, format respons tidak sesuai, atau scene belum tersedia, tool menampilkan pesan kesalahan yang dapat ditindaklanjuti dan tidak mengubah hierarki scene secara otomatis.
 
@@ -440,13 +411,13 @@ Transisi mode overview dan gameplay menggunakan `DayNightCycle` agar selector sp
 
 Tutorial dirancang sebagai alur runtime yang dibentuk otomatis setelah scene dimuat. `GameTutorialController` menunggu sinkronisasi perangkat dan penyelesaian spawn, lalu menyediakan langkah bergerak, melihat sekeliling, berlari, melompat, serta pencarian tujuan. Instruksi dan sorotan kontrol dibedakan antara desktop dan mobile. Penyelesaian tutorial disimpan melalui `PlayerPrefs` per jenis perangkat, sementara tombol F8 dan F9 hanya menjadi fasilitas simulasi pada Editor.
 
-Ketika pemain mencapai `stopDistance`, plugin `ReactBridge.jslib` memungkinkan Unity mengirim event browser `OnNavigationCompleted` satu kali dengan payload `unity_object_name`. `StopNavigation()` manual dan pergantian tujuan hanya membersihkan state tanpa mengirim event kedatangan. Listener serta tampilan pemberitahuan pada React merupakan kontribusi Full Stack Developer & System Integrator dan tidak dijadikan gambar bukti Faiz. Kontribusi penulis dibatasi pada pengiriman event dari runtime Unity; bukti yang relevan untuk bagian ini adalah log dispatch Unity atau Console browser dan retest yang memastikan penghentian manual tidak mengirim event selesai.
+Ketika pemain mencapai `stopDistance`, plugin `ReactBridge.jslib` memungkinkan Unity mengirim event browser `OnNavigationCompleted` satu kali dengan payload `unity_object_name`. `StopNavigation()` manual dan pergantian tujuan hanya membersihkan status tanpa mengirim event kedatangan. Listener serta tampilan pemberitahuan pada React merupakan kontribusi Full Stack Web Developer, System Integrator, dan DevOps Engineer dan tidak dijadikan gambar bukti Faiz. Kontribusi penulis dibatasi pada pengiriman event dari *runtime* Unity; bukti yang relevan untuk bagian ini adalah log pengiriman Unity atau Console browser dan pengujian ulang yang memastikan penghentian manual tidak mengirim event selesai.
 
 ### 2.3.13 Perancangan Occlusion Culling dan Transisi Overview–Gameplay
 
 `CampusOcclusionInstaller` dirancang sebagai editor tool tambahan untuk menandai renderer gedung yang memenuhi syarat sebagai occluder atau occludee, mengecualikan renderer dinamis dan material transparan, mengatur `OcclusionArea`, serta menghasilkan `OcclusionCullingData.asset`. Rancangan memakai ukuran minimum occluder 5 m, padding area `(20, 10, 20)` m, `smallestOccluder` 5 m, `smallestHole` 0,5 m, dan `backfaceThreshold` 100. Kamera gameplay `MainCamera` menggunakan hasil bake, sedangkan `MinimapCamera` tidak menggunakannya agar seluruh area peta tetap tersedia.
 
-Transisi state dirancang agar `SpawnSelectionUI` menyimpan lalu menonaktifkan occlusion kamera gameplay ketika overview dibuka, kemudian memulihkannya setelah spawn berhasil atau selector ditutup. Perubahan tersebut berjalan bersama transisi waktu dan fog yang dirancang pada Subbab 2.3.11. Pemetaan state pada [TABREF:state_transisi_occlusion] menjadi acuan pengujian agar mode overview dan gameplay tidak dinilai hanya dari screenshot diam.
+Transisi state dirancang agar `SpawnSelectionUI` menyimpan lalu menonaktifkan occlusion kamera gameplay ketika overview dibuka, kemudian memulihkannya setelah spawn berhasil atau selector ditutup. Perubahan tersebut berjalan bersama transisi waktu dan fog yang dirancang pada Subbab 2.3.11. Pemetaan state pada [TABREF:state_transisi_occlusion] menjadi acuan pengujian agar mode overview dan gameplay tidak dinilai hanya dari tangkapan layar diam.
 
 [TABLE-ID:state_transisi_occlusion]
 [TABLECAPTION:Rancangan State Occlusion dan Fog pada Overview–Gameplay]
@@ -456,43 +427,35 @@ Selector spawn terbuka | Occlusion disimpan lalu dinonaktifkan | Occlusion tetap
 Spawn berhasil atau selector ditutup | Occlusion dipulihkan ke status scene final | Occlusion tetap nonaktif | 0,01 | Kamera gameplay kembali menggunakan data bake tanpa menghilangkan area minimap
 [/TABLE]
 
-Keberadaan data bake dan perubahan state dicatat sebagai implementasi engine, tetapi pengurangan renderer, draw call, atau frame time tetap `[TBD]` sampai diukur pada skenario yang sama.
+Keberadaan data *bake* dan perubahan status telah didokumentasikan sebagai implementasi *engine*. Dampaknya terhadap jumlah *renderer*, *draw call*, dan *frame time* berstatus Belum diverifikasi sampai diukur pada skenario yang sama.
 
 ## 2.4 Rencana Pengujian Proyek
 
-Pengujian dirancang untuk memeriksa perilaku eksternal modul, bukan hanya memastikan bahwa metode dapat dipanggil. Cakupan skenario pada [TABREF:rencana_pengujian_unity] meliputi kondisi berhasil, kondisi gagal, dan kondisi tepi yang relevan dengan navigasi, data, kontrol, optimasi, serta editor tool.
+Pengujian dirancang untuk memeriksa perilaku eksternal modul, bukan hanya memastikan bahwa metode dapat dipanggil. Cakupan skenario pada [TABREF:rencana_pengujian_unity] meliputi kondisi berhasil, gagal, dan tepi yang relevan dengan data, navigasi, interaksi, optimasi, serta distribusi WebGL.
 
-### 2.4.1 Rencana Pengujian BuildingDatabase
+### 2.4.1 Data dan Integrasi Runtime
 
-Pengujian `BuildingDatabase` menggunakan respons API valid, respons dengan koleksi kosong, respons tidak valid, kegagalan jaringan, dan pencarian nama yang tidak dikenal. Kondisi awal mencatat URL endpoint, fixture respons, serta status cache. Hasil yang diperiksa meliputi perubahan `isLoaded`, isi `unityObjectNames`, isi `realNames`, fallback `GetRealName()`, dan pesan log. Bukti minimum berupa fixture JSON, log Play Mode, dan screenshot Inspector atau test runner.
+Pengujian `BuildingDatabase` menggunakan respons API valid, koleksi kosong, format tidak valid, kegagalan jaringan, dan pencarian nama yang tidak dikenal. Kondisi awal mencatat endpoint, *fixture* respons, dan status *cache*. Hasil yang diperiksa meliputi perubahan `isLoaded`, isi `unityObjectNames`, isi `realNames`, *fallback* `GetRealName()`, dan pesan log.
 
-### 2.4.2 Rencana Pengujian Navigasi dan Rendering Rute
+Pengujian `DatabaseSyncChecker` menggunakan *fixture* yang memuat nama cocok, nama yang hanya ada pada API, dan objek yang hanya ada pada *scene*. Skenario tambahan mencakup *child* `Pointer`, variasi kapitalisasi, respons kosong, format tidak valid, dan kegagalan jaringan. Alat editor harus memberikan diagnosis yang jelas tanpa mengubah *scene* secara otomatis.
 
-Pengujian navigasi mencakup target yang tersedia pada cache, perbedaan kapitalisasi, target tidak ditemukan, tujuan pada area NavMesh, tujuan di luar area NavMesh, pemilihan tujuan baru ketika navigasi aktif, penghentian manual, dan penghentian otomatis pada `stopDistance`. Pengujian rendering mencakup jalur lurus, tikungan, perubahan elevasi, serta tangga. Bukti minimum berupa setup scene, rekaman Play Mode, log status jalur, dan screenshot garis serta label tujuan.
+### 2.4.2 Navigasi, Rute, dan Penyelesaian Navigasi
 
-### 2.4.3 Rencana Pengujian Kontrol Desktop dan Mobile
+Pengujian navigasi mencakup target yang tersedia pada *cache*, perbedaan kapitalisasi, target tidak ditemukan, tujuan pada dan di luar NavMesh, pergantian tujuan, penghentian manual, serta penghentian otomatis pada `stopDistance`. Pengujian rute mencakup jalur lurus, tikungan, perubahan elevasi, dan tangga. Highlighter juga diperiksa ketika tujuan dipilih, diganti, atau dibersihkan.
 
-Pengujian desktop memeriksa aktivasi Pointer Lock setelah tindakan pengguna, pergerakan kamera menggunakan delta tetikus, pelepasan kursor melalui ESC, dan penanganan ketika penguncian gagal. Pengujian perangkat bergerak memeriksa visibilitas joystick, respons sumbu pergerakan, tata letak terhadap canvas, serta ketiadaan joystick pada desktop. Perangkat, sistem operasi, browser, resolusi, dan metode input dicatat pada setiap hasil.
+Event `OnNavigationCompleted` diuji pada *build* WebGL bersama listener React. Skenario mencapai `stopDistance` harus menghasilkan payload `unity_object_name` tepat satu kali, sedangkan `StopNavigation()` manual atau pergantian tujuan tidak boleh dianggap sebagai kedatangan. Implementasi listener dan notifikasi pada React tetap menjadi kontribusi Iman.
 
-### 2.4.4 Rencana Pengujian Building Culling dan Build WebGL
+### 2.4.3 Interaksi, Spawn, Minimap, dan Tutorial
 
-Pengujian Building Culling membandingkan scene, posisi pemain, rute kamera, dan status selector yang sama sebelum serta sesudah optimasi. Pengujian mencakup ambang jarak 200 m, frustum `MainCamera`, grace period, pengecualian target navigasi, pemeliharaan renderer untuk minimap, occlusion aktif pada `MainCamera`, dan occlusion nonaktif pada `MinimapCamera`. Metrik yang dicatat meliputi renderer aktif, draw call, frame time, frame rate, dan penggunaan memori. Pengujian build mencatat versi Unity, konfigurasi Player Settings, ukuran berkas, waktu muat, perangkat, browser, jaringan, serta header `Content-Encoding` dan `Content-Type`. Target kurang dari 10 detik diperlakukan sebagai requirement sampai bukti pengukuran menunjukkan hasil aktual.
+Pengujian desktop memeriksa aktivasi *Pointer Lock* setelah tindakan pengguna, gerak kamera, pelepasan kursor melalui ESC, dan kondisi kegagalan penguncian. Pengujian perangkat bergerak memeriksa visibilitas dan respons *joystick* tanpa mengganggu tampilan desktop. Perangkat, sistem operasi, peramban, resolusi, dan metode input dicatat pada setiap hasil.
 
-### 2.4.5 Rencana Pengujian DatabaseSyncChecker
+Pengujian spawn mencakup identitas terdaftar, identitas tidak dikenal, proyeksi NavMesh, radius *sampling*, dan pemulihan kontrol. Minimap diperiksa saat beralih dari tampilan awal ke mode mengikuti pemain, termasuk pembaruan penanda pemain dan tujuan. Tutorial diuji pada mode desktop dan perangkat bergerak untuk memeriksa langkah, progres, *skip*, penyimpanan status, dan sinkronisasi melalui `SetDevice`.
 
-Pengujian `DatabaseSyncChecker` menggunakan fixture yang sengaja memuat nama cocok, nama yang hanya ada pada API, dan root object yang hanya ada pada scene. Skenario tambahan mencakup child `Pointer`, variasi kapitalisasi, respons kosong, respons tidak valid, serta kegagalan jaringan. Hasil yang diharapkan adalah pengelompokan sesuai batas implementasi, daftar yang dapat disalin, pesan kesalahan yang jelas, dan tidak adanya perubahan otomatis pada scene.
+### 2.4.4 Optimasi, Occlusion Culling, dan Build WebGL
 
-### 2.4.6 Rencana Pengujian Spawn dan Minimap
+Pengujian `BuildingCulling` menggunakan *scene*, posisi pemain, rute kamera, durasi, dan perangkat yang sama. Pemeriksaan mencakup ambang jarak 200 m, *frustum* `MainCamera`, *grace period*, pengecualian target navigasi, dan pemeliharaan *renderer* minimap. `CampusOcclusionInstaller` diperiksa melalui konfigurasi *static occluder*, *static occludee*, `OcclusionArea`, data bake, serta perbedaan status occlusion pada kamera utama dan minimap. Transisi tampilan awal ke permainan juga memeriksa pemulihan occlusion dan nilai fog.
 
-Pengujian spawn mencakup identitas yang terdaftar, identitas yang tidak dikenal, titik di dekat NavMesh, titik di luar radius sampling, penggunaan radius override, penghentian navigasi lama, serta pemulihan kontrol karakter. Pengujian minimap memeriksa transisi overview ke mode mengikuti pemain, orientasi marker, marker tujuan, ukuran desktop dan mobile, serta pembaruan ketika resolusi layar berubah. Screenshot harus disertai log dan rekaman karena gambar diam tidak membuktikan perpindahan posisi.
-
-### 2.4.7 Rencana Pengujian Highlighter, Tutorial, Sinkronisasi Perangkat, dan Event Selesai Navigasi
-
-Pengujian highlighter memeriksa tampilan ketika tujuan dipilih, fallback portal, perubahan tujuan, dan pembersihan visual. Tutorial diuji pada mode desktop dan mobile untuk setiap langkah, penyimpanan progres, skip, serta restart Editor. `SetDevice` diuji dengan kedua nilai yang didukung dan nilai selain `mobile`. Event `OnNavigationCompleted` diuji pada build WebGL bersama listener React untuk membedakan pengiriman event Unity dari tampilan notifikasi pada dashboard. Skenario mencapai `stopDistance` harus menghasilkan payload tujuan tepat satu kali, sedangkan `StopNavigation()` manual atau pergantian tujuan tidak boleh dianggap sebagai kedatangan.
-
-### 2.4.8 Rencana Pengujian Occlusion dan Transisi Overview–Gameplay
-
-Pengujian `CampusOcclusionInstaller` memeriksa konfigurasi static occluder, static occludee, `OcclusionArea`, keberadaan `OcclusionCullingData.asset`, occlusion aktif pada `MainCamera`, dan occlusion nonaktif pada `MinimapCamera`. Pengujian transisi memeriksa bahwa selector spawn menonaktifkan occlusion gameplay dan mengatur fog overview menjadi 0, kemudian mengembalikan occlusion gameplay serta fog 0,01 setelah spawn berhasil. Hasil performa tetap `[TBD]` sampai profiler dilakukan pada scene, posisi, perangkat, dan durasi yang sama.
+Pengujian *build* mencatat versi Unity, Player Settings, ukuran berkas, waktu muat, perangkat, peramban, kondisi jaringan, serta header `Content-Encoding` dan `Content-Type`. Kebutuhan pemuatan dinilai secara adaptif melalui umpan balik pemuatan, konfigurasi kompresi, dan pengukuran aktual. Laporan tidak menetapkan target kurang dari 10 detik tanpa dasar pengukuran.
 
 [TABLE-ID:rencana_pengujian_unity]
 [TABLECAPTION:Rencana Pengujian Modul Simulator dan Engine]
@@ -505,48 +468,58 @@ UT-04 | NavigationReceiver | Nama tidak tersedia atau berbeda kapitalisasi | Fal
 UT-05 | NavigationGuide | Target berada pada area NavMesh | Jalur valid terbentuk dan `LineRenderer` aktif | Rekaman Play Mode
 UT-06 | NavigationGuide | Pengguna mencapai `stopDistance` | Rute dan label dibersihkan secara otomatis | Rekaman Play Mode
 UT-07 | NavigationGuide | Navigasi sedang aktif lalu pengguna menghentikan atau mengganti tujuan | Rute lama dibersihkan dan state baru tidak menghasilkan garis ganda | Rekaman Play Mode
-UT-08 | Route Rendering | Jalur melewati tikungan dan perubahan elevasi | Subdivisi linear, raycast, moving average, dan `LineRenderer` menghasilkan garis yang mengikuti permukaan | Screenshot dan rekaman
+UT-08 | Route Rendering | Jalur melewati tikungan dan perubahan elevasi | Subdivisi linear, raycast, moving average, dan `LineRenderer` menghasilkan garis yang mengikuti permukaan | Tangkapan layar dan rekaman
 UT-09 | Pointer Lock | Pengguna mengaktifkan dan melepas kontrol desktop | Kursor terkunci setelah klik dan terlepas melalui ESC | Uji peramban desktop
 UT-10 | Joystick Virtual | Build dibuka pada perangkat bergerak dan desktop | Joystick berfungsi pada mobile dan tidak mengganggu desktop | Uji lintas perangkat
 UT-11 | Building Culling | Pengguna bergerak melintasi ambang tetap 200 m | Renderer berubah sesuai aturan, target navigasi tetap aktif, dan metrik sebelum-sesudah dapat dibandingkan | Unity Profiler, konfigurasi scene, dan rekaman
-UT-12 | WebGLOptimizer | Menu konfigurasi dijalankan pada project final | Player Settings WebGL sesuai konfigurasi final yang terdokumentasi | Screenshot Player Settings dan log Console
+UT-12 | WebGLOptimizer | Menu konfigurasi dijalankan pada project final | Player Settings WebGL sesuai konfigurasi final yang terdokumentasi | Tangkapan layar Player Settings dan log Console
 UT-13 | WebGL Build | Build produksi dimuat melalui hosting yang ditetapkan | Berkas termuat tanpa kesalahan MIME atau compression header | DevTools Network dan log browser
-UT-14 | DatabaseSyncChecker | Data API dan scene memiliki nama cocok, hilang, dan berlebih | Kategori cocok dan hilang memakai hierarki rekursif, kategori scene belum terdaftar memakai root object, dan daftar dapat disalin | Screenshot editor dan fixture uji
-UT-15 | DatabaseSyncChecker | Endpoint kosong, tidak valid, atau gagal | Tool menampilkan pesan yang jelas dan tidak mengubah scene | Log dan screenshot error
-UT-16 | SpawnPointRegistry | Pengguna memilih titik spawn terdaftar yang berada dalam radius NavMesh | Karakter dipindahkan ke posisi valid dan kontrol dipulihkan | Log, screenshot, dan rekaman
+UT-14 | DatabaseSyncChecker | Data API dan scene memiliki nama cocok, hilang, dan berlebih | Kategori cocok dan hilang memakai hierarki rekursif, kategori scene belum terdaftar memakai root object, dan daftar dapat disalin | Tangkapan layar editor dan fixture uji
+UT-15 | DatabaseSyncChecker | Endpoint kosong, tidak valid, atau gagal | Tool menampilkan pesan yang jelas dan tidak mengubah scene | Log dan tangkapan layar error
+UT-16 | SpawnPointRegistry | Pengguna memilih titik spawn terdaftar yang berada dalam radius NavMesh | Karakter dipindahkan ke posisi valid dan kontrol dipulihkan | Log, tangkapan layar, dan rekaman
 UT-17 | SpawnPointRegistry | Nama tidak terdaftar atau posisi berada di luar radius sampling | Spawn ditolak dengan pesan diagnosis tanpa memindahkan karakter | Log Play Mode
-UT-18 | SpawnSelectionUI dan MinimapFollow | Spawn selesai dan navigasi menuju tujuan aktif | Overview berubah menjadi minimap serta marker pemain dan tujuan diperbarui | Screenshot dan rekaman desktop/mobile
-UT-19 | DestinationHighlighter | Tujuan dipilih, diganti, lalu navigasi dihentikan | Highlighter mengikuti tujuan aktif dan dibersihkan ketika selesai | Screenshot dan rekaman
-UT-20 | GameTutorialController | Tutorial dijalankan pada mode desktop dan mobile | Instruksi, progres, dan sorotan kontrol sesuai perangkat | Screenshot dan rekaman dua mode
-UT-21 | WebPlatformSync | React mengirim `SetDevice("mobile")` dan `SetDevice("desktop")` | Joystick, spawn UI, dan tutorial mengikuti mode perangkat | Log browser, screenshot, dan rekaman
-UT-22 | OnNavigationCompleted | Pengguna mencapai `stopDistance`, lalu diulangi dengan penghentian manual atau pergantian tujuan | Unity mengirim payload `unity_object_name` tepat satu kali hanya saat tiba; pembatalan manual tidak mengirim event kedatangan | Console browser, screenshot, dan rekaman retest
+UT-18 | SpawnSelectionUI dan MinimapFollow | Spawn selesai dan navigasi menuju tujuan aktif | Overview berubah menjadi minimap serta marker pemain dan tujuan diperbarui | Tangkapan layar dan rekaman desktop/mobile
+UT-19 | DestinationHighlighter | Tujuan dipilih, diganti, lalu navigasi dihentikan | Highlighter mengikuti tujuan aktif dan dibersihkan ketika selesai | Tangkapan layar dan rekaman
+UT-20 | GameTutorialController | Tutorial dijalankan pada mode desktop dan mobile | Instruksi, progres, dan sorotan kontrol sesuai perangkat | Tangkapan layar dan rekaman dua mode
+UT-21 | WebPlatformSync | React mengirim `SetDevice("mobile")` dan `SetDevice("desktop")` | Joystick, spawn UI, dan tutorial mengikuti mode perangkat | Log browser, tangkapan layar, dan rekaman
+UT-22 | OnNavigationCompleted | Pengguna mencapai `stopDistance`, lalu diulangi dengan penghentian manual atau pergantian tujuan | Unity mengirim payload `unity_object_name` tepat satu kali hanya saat tiba; pembatalan manual tidak mengirim event kedatangan | Console browser, tangkapan layar, dan rekaman pengujian ulang
 UT-23 | Camera Frustum dan Occlusion Culling | Jalankan scene gameplay, putar kamera, buka selector spawn, lalu kembali ke gameplay | Renderer di luar jarak/frustum ditangani sesuai grace period, target navigasi tetap aktif, minimap tidak kehilangan area, dan status occlusion kamera berubah sesuai mode | Profiler, log runtime, Inspector, dan rekaman
 UT-24 | Transisi Overview–Gameplay | Buka selector sebelum spawn, pilih spawn valid, lalu buka selector ulang | Fog overview bernilai 0, occlusion gameplay nonaktif saat selector, fog gameplay bernilai 0,01, dan occlusion gameplay pulih setelah spawn | Log runtime, Inspector, dan rekaman
 [/TABLE]
 
-Hasil pengujian baru dapat dinyatakan lulus setelah setiap bukti pada tabel tersedia. Skenario yang belum memiliki artefak akan tetap diberi status `[TBD: hasil pengujian dan bukti]` pada BAB III.
+Hasil hanya dinyatakan lulus apabila bukti yang diperlukan tersedia. Skenario tanpa artefak pendukung diberi status Belum diverifikasi pada BAB III dan disertai keterangan bukti yang masih diperlukan.
 
 ---
 
 # BAB III IMPLEMENTASI PROYEK
 
-## 3.1 Profil Mitra
+## 3.1 Profil Mitra dan Pemangku Kepentingan
 
 ### 3.1.1 Nama Organisasi atau Lembaga Mitra
 
-Mitra proyek adalah Unit Penunjang Akademik Teknologi Informasi dan Komunikasi Universitas Pembangunan Nasional Veteran Jakarta atau UPA TIK UPNVJ. Perwakilan mitra yang tercatat pada fakta proyek adalah Asep Saeful Ridwan, S.Kom. selaku Kepala UPA TIK UPNVJ.
+Humas Universitas Pembangunan Nasional “Veteran” Jakarta atau Humas UPNVJ.
 
 ### 3.1.2 Deskripsi Mitra
 
-UPA TIK UPNVJ merupakan unit yang berkaitan dengan penyelenggaraan serta dukungan teknologi informasi dan komunikasi di lingkungan universitas. Dalam proyek ini, mitra memberikan konteks kebutuhan layanan informasi kampus, masukan terhadap ruang lingkup, dan koordinasi mengenai integrasi sistem. Deskripsi kewenangan organisasi yang lebih rinci perlu diselaraskan dengan profil resmi universitas apabila akan ditambahkan ke laporan. [BUTUH SITASI]
+Humas UPNVJ menjadi mitra pengguna dalam proyek ini karena layanan navigasi ditujukan untuk membantu penyampaian informasi lokasi kepada mahasiswa baru, orang tua atau wali, sivitas akademika, dan pengunjung eksternal. Halaman resmi UPNVJ menjelaskan bahwa Humas UPNVJ mengoordinasikan strategi komunikasi digital bersama humas fakultas (UPNVJ 2026). Keterangan tersebut digunakan untuk menjelaskan hubungan Humas dengan penyampaian informasi kepada publik, bukan sebagai bukti bahwa sistem telah diterima sebagai layanan resmi institusi.
 
-### 3.1.3 Hubungan Mitra dengan Proyek
+### 3.1.3 Hubungan Pemangku Kepentingan dengan Proyek
 
-Mitra berhubungan dengan proyek sebagai pihak yang memberikan konteks kebutuhan dan validasi terhadap pengembangan sistem integrasi denah virtual. Pembagian tanggung jawab tim serta kebutuhan umum sistem dibahas melalui koordinasi dengan mitra, sedangkan implementasi teknis dilakukan oleh tiga anggota tim sesuai perannya masing-masing.
+Humas UPNVJ berperan sebagai mitra pengguna dan satu perwakilannya mengikuti UAT untuk memberikan perspektif evaluasi terhadap informasi serta navigasi. Keikutsertaan tersebut tidak digunakan untuk mengklaim persetujuan formal, serah terima sistem, atau representasi seluruh pengguna UPNVJ. UPA TIK dicatat secara terpisah sebagai pihak koordinasi teknis, kebijakan data, kemungkinan integrasi institusional, dan penyerahan pakta integritas. Hubungan setiap pihak dirangkum pada [TABREF:hubungan_mitra_proyek].
+
+[TABLE-ID:hubungan_mitra_proyek]
+[TABLECAPTION:Hubungan Pemangku Kepentingan dengan Proyek]
+[TABLE]
+Pemangku Kepentingan | Hubungan dengan Proyek | Batas Interpretasi
+Humas UPNVJ | Menjadi mitra pengguna; satu perwakilan mengikuti UAT dan memberikan perspektif evaluasi informasi serta navigasi | Masukan dibatasi pada peserta UAT dan tidak dianggap sebagai persetujuan institusional
+Pengguna layanan | Mahasiswa baru, orang tua atau wali, sivitas akademika, dan pengunjung eksternal menjadi kelompok penerima manfaat navigasi | Tidak seluruh kelompok tersebut menjadi peserta UAT tertutup
+UPA TIK UPNVJ | Memberikan konteks koordinasi teknis, kebijakan data, kemungkinan integrasi, wawancara, dan penyerahan pakta integritas | Bukan mitra pengguna dan tidak dinyatakan telah menerima implementasi sistem
+Tim pengembang | Mengembangkan sistem sesuai pembagian tanggung jawab setiap anggota | Faiz hanya mengklaim implementasi *runtime* Unity, tooling editor, optimasi, dan *build* WebGL
+[/TABLE]
 
 ## 3.2 Metode Implementasi
 
-Repository `C:\Users\Faiz\Proposal` dengan Unity 6000.2.6f1 digunakan sebagai baseline historis, sedangkan implementasi final diverifikasi pada `C:\Users\Faiz\Proposal\T_A---Copy` dengan Unity 6000.4.1f1, scene `Assets/Scene/SceneUtama.unity`, dan commit acuan `5f575c0`. Seluruh nilai konfigurasi serta bukti hasil pada subbab berikut harus berasal dari project final; baseline tidak digunakan sebagai bukti keberhasilan fitur.
+Implementasi dibangun menggunakan Unity 6000.4.1f1 pada `SceneUtama`. Seluruh nilai konfigurasi dan bukti hasil pada subbab berikut berasal dari versi proyek final yang sama. Identitas versi kode sumber dipusatkan pada logbook dan indeks bukti lampiran agar pembahasan utama tetap berfokus pada cara kerja sistem.
 
 ### 3.2.1 Implementasi BuildingDatabase
 
@@ -561,7 +534,7 @@ Hierarki prefab yang menjadi tujuan pemetaan data diperlihatkan pada [FIGREF:imp
 
 ### 3.2.2 Implementasi NavigationReceiver dan NavigationGuide
 
-`NavigationReceiver` menjadi titik masuk perintah dari JavaScript. Method publik `NavigateTo(string unityObjectName)` dipanggil melalui `SendMessage` dan bertanggung jawab menemukan Transform tujuan. Input kosong ditolak dengan warning. Lookup awal menggunakan cache agar pencarian berulang tidak memindai seluruh scene. Apabila target belum tersedia, fallback membangun ulang cache dan melakukan pencarian tambahan termasuk pada objek tidak aktif. Perbandingan nama dilakukan dengan `ToLowerInvariant()`, sedangkan kegagalan dicatat sebagai warning tanpa melempar exception yang menghentikan aplikasi.
+`NavigationReceiver` menjadi titik masuk perintah dari JavaScript. Metode publik `NavigateTo(string unityObjectName)` dipanggil melalui `SendMessage` dan bertanggung jawab menemukan Transform tujuan. Input kosong ditolak dengan peringatan. Pencarian awal menggunakan *cache* agar permintaan berulang tidak memindai seluruh *scene*. Apabila target belum tersedia, sistem membangun ulang *cache* dan melakukan pencarian tambahan, termasuk pada objek tidak aktif. Perbandingan nama dilakukan dengan `ToLowerInvariant()`, sedangkan kegagalan dicatat sebagai peringatan tanpa melempar pengecualian yang menghentikan aplikasi.
 
 Transform yang ditemukan diteruskan ke `NavigationGuide` bersama `destinationKey` teknis. Modul ini mengelola status tujuan aktif, menjalankan `NavMesh.CalculatePath()`, mengirim titik jalur ke renderer, serta memperbarui label nama dan jarak. `CompleteNavigation()` hanya dipanggil ketika path berstatus lengkap, jarak jalur tersisa dan jarak pemain ke endpoint sama-sama berada dalam ambang efektif maksimal 2 m. Method `StopNavigation()` membersihkan state ketika pengguna membatalkan rute atau memilih tujuan baru tanpa mengirim event kedatangan.
 
@@ -569,15 +542,15 @@ Implementasi final mempertahankan rute lengkap terakhir apabila rekalkulasi baru
 
 ### 3.2.3 Implementasi Rendering Rute
 
-Implementasi rendering menggunakan titik sudut dari `NavMeshPath` sebagai input. Setiap segmen dibagi secara linear dengan interval 0,4 m. `Physics.RaycastNonAlloc()` ditembakkan dari 1,5 m di atas setiap titik sejauh 3 m ke bawah. Sistem mengabaikan trigger serta collider pemain dan target, lalu memilih permukaan terdekat dalam toleransi vertikal 0,75 m. Koordinat permukaan diberi offset 0,6 m dan dihaluskan dengan moving average berjendela 4 sebelum dikirim ke `LineRenderer`. Fungsi helper Catmull–Rom yang masih terdapat pada script tidak dipanggil oleh alur tersebut dan tidak dianggap sebagai implementasi final.
+Implementasi rendering menggunakan titik sudut dari `NavMeshPath` sebagai input. Setiap segmen dibagi secara linear dengan interval 0,4 m. `Physics.RaycastNonAlloc()` ditembakkan dari 1,5 m di atas setiap titik sejauh 3 m ke bawah. Sistem mengabaikan trigger serta collider pemain dan target, lalu memilih permukaan terdekat dalam toleransi vertikal 0,75 m. Koordinat permukaan diberi offset 0,6 m dan dihaluskan dengan moving average berjendela 4 sebelum dikirim ke `LineRenderer`. Fungsi helper Catmull–Rom yang masih terdapat pada skrip tidak dipanggil oleh alur tersebut dan tidak dianggap sebagai implementasi final.
 
-Label tiga dimensi berbasis TextMeshPro menampilkan nama tujuan yang diperoleh melalui `BuildingDatabase` dan jarak tersisa yang dihitung dari posisi pengguna. Insiden awal pada skenario BB-20 menunjukkan bahwa label pernah menampilkan `unity_object_name` akibat script testing yang ikut terkompilasi. Tindakan korektif memisahkan script testing dari build produksi dan memulihkan nama tampilan fasilitas; hasil retest dicatat pada fragment Black Box bersama.
+Label tiga dimensi berbasis TextMeshPro menampilkan nama tujuan yang diperoleh melalui `BuildingDatabase` dan jarak tersisa yang dihitung dari posisi pengguna. Insiden awal pada skenario BB-20 menunjukkan bahwa label pernah menampilkan `unity_object_name` akibat skrip testing yang ikut terkompilasi. Tindakan korektif memisahkan skrip testing dari build produksi dan memulihkan nama tampilan fasilitas; hasil pengujian ulang dicatat pada fragment Black Box bersama.
 
 Bukti konfigurasi `LineRenderer`, hasil rute, dan elevasi ditempatkan pada Subbab 3.3.4, 3.4.2, dan 3.4.3 agar setiap gambar memiliki narasi serta rujukan yang jelas.
 
 ### 3.2.4 Implementasi Building Culling dan WebGL Settings Optimizer
 
-`BuildingCulling` diimplementasikan untuk mengubah status renderer bangunan berdasarkan jarak dan pandangan kamera terhadap pengguna. Modul memindai objek bertag `Cullable`, menyimpan status awal renderer, menggunakan `CullingPoint` bila tersedia, memeriksa jarak setiap 1 detik, menjalankan frustum check setiap 0,1 detik dengan padding 10 m dan grace period 0,35 detik, serta mempertahankan renderer target navigasi dan area yang diperlukan minimap. Frustum culling dijeda saat selector spawn terbuka. Scene final memakai batas minimum serta maksimum 200 m; akibatnya nilai awal 500 m dikunci menjadi 200 m dan mode `Combined` belum menghasilkan perubahan jarak adaptif. Konfigurasi editor dan data bake telah didokumentasikan, tetapi jumlah renderer aktif sebelum–sesudah, perubahan status occlusion saat runtime, dan hasil Unity Profiler masih `[TBD]`.
+`BuildingCulling` diimplementasikan untuk mengubah status *renderer* bangunan berdasarkan jarak dan pandangan kamera terhadap pengguna. Modul memindai objek bertag `Cullable`, menyimpan status awal *renderer*, menggunakan `CullingPoint` bila tersedia, memeriksa jarak setiap 1 detik, menjalankan pemeriksaan *frustum* setiap 0,1 detik dengan *padding* 10 m dan *grace period* 0,35 detik, serta mempertahankan *renderer* target navigasi dan area yang diperlukan minimap. *Frustum culling* dijeda saat pemilih spawn terbuka. *Scene* final memakai batas minimum serta maksimum 200 m; akibatnya nilai awal 500 m dikunci menjadi 200 m dan mode `Combined` belum menghasilkan perubahan jarak adaptif. Konfigurasi editor dan data *bake* telah didokumentasikan, tetapi jumlah *renderer* aktif sebelum–sesudah, perubahan status occlusion saat *runtime*, dan hasil Unity Profiler berstatus Belum diverifikasi.
 
 `CampusOcclusionInstaller` ditambahkan sebagai editor tool melalui menu `Tools > UPNVJ > Occlusion`. Tool mengonfigurasi static flags pada renderer gedung, membuat atau memperbarui `OcclusionArea`, mengaktifkan occlusion pada `MainCamera`, menonaktifkannya pada `MinimapCamera`, lalu menjalankan bake `OcclusionCullingData.asset`. Implementasi ini merupakan bagian dari optimasi engine; tidak ada klaim pengurangan draw call atau frame time sebelum profiler tersedia.
 
@@ -587,7 +560,7 @@ Bukti konfigurasi `LineRenderer`, hasil rute, dan elevasi ditempatkan pada Subba
 
 Pointer Lock diintegrasikan pada alur kontrol desktop agar rotasi pandangan menggunakan delta pergerakan tetikus dan tidak berhenti ketika kursor mencapai tepi layar. Penguncian dimulai setelah klik pengguna pada canvas dan dilepas melalui ESC. Implementasi perlu menangani perubahan status serta kegagalan penguncian agar pengguna tidak kehilangan kendali atas antarmuka peramban.
 
-Kontrol perangkat bergerak menggunakan prefab `UI_Virtual_Joystick` dan New Input System. `WebPlatformSync.SetDevice(string)` mengubah mode menjadi `mobile` hanya ketika nilai yang diterima cocok secara case-insensitive; nilai lain diperlakukan sebagai `desktop`. Mode tersebut mengatur visibilitas joystick dan diteruskan ke spawn UI serta tutorial. Screenshot desktop dan mobile telah mendokumentasikan perbedaan tampilan, sedangkan respons input serta perpindahan karakter masih memerlukan rekaman dua perangkat dan retest build yang sama.
+Kontrol perangkat bergerak menggunakan prefab `UI_Virtual_Joystick` dan New Input System. `WebPlatformSync.SetDevice(string)` mengubah mode menjadi `mobile` hanya ketika nilai yang diterima cocok secara case-insensitive; nilai lain diperlakukan sebagai `desktop`. Mode tersebut mengatur visibilitas joystick dan diteruskan ke spawn UI serta tutorial. Tangkapan layar desktop dan mobile telah mendokumentasikan perbedaan tampilan, sedangkan respons input serta perpindahan karakter masih memerlukan rekaman dua perangkat dan pengujian ulang build yang sama.
 
 ### 3.2.6 Implementasi DatabaseSyncChecker
 
@@ -602,11 +575,11 @@ Antarmuka tool diperlihatkan pada [FIGREF:impl_sync_db_checker] yang menyediakan
 
 `SpawnPointRegistry` mengelola 16 titik awal dan menyediakan receiver WebGL `SpawnReceiver.SetSpawn(string)`. Sebelum memindahkan karakter, sistem mencari entri secara case-insensitive dan memanggil `NavMesh.SamplePosition()` dengan radius umum 5 m atau override per titik. Navigasi lama dihentikan, input serta `CharacterController` dinonaktifkan sementara, posisi dan rotasi karakter diperbarui, kemudian kontrol dipulihkan dan event `SpawnCompleted` dikirim.
 
-`SpawnSelectionUI` membentuk canvas, overview, tombol marker, dan panel minimap secara runtime. Ketika pemilihan terbuka, kontrol karakter dan Pointer Lock dilepas. Setelah spawn berhasil, overview ditutup dan `MinimapFollow` memindahkan kamera ortografis agar mengikuti pemain. Marker tujuan hanya ditampilkan ketika navigasi aktif. Bukti tampilan spawn dan minimap ditempatkan pada Subbab 3.4.7, sedangkan konfigurasi `SpawnReceiver` ditempatkan pada Subbab 3.3.5. [TBD: log spawn dan rekaman perpindahan]
+`SpawnSelectionUI` membentuk *canvas*, tampilan awal, tombol penanda, dan panel minimap secara *runtime*. Ketika pemilihan terbuka, kontrol karakter dan *Pointer Lock* dilepas. Setelah spawn berhasil, tampilan awal ditutup dan `MinimapFollow` memindahkan kamera ortografis agar mengikuti pemain. Penanda tujuan hanya ditampilkan ketika navigasi aktif. Bukti tampilan spawn dan minimap ditempatkan pada Subbab 3.4.7, sedangkan konfigurasi `SpawnReceiver` ditempatkan pada Subbab 3.3.5. Log spawn dan rekaman perpindahan belum tersedia.
 
 ### 3.2.8 Implementasi DestinationHighlighter dan Event OnNavigationCompleted
 
-`NavigationGuide` mencari `DestinationHighlighter` pada GameObject yang sama dan membuatnya secara otomatis apabila belum tersedia. Ketika `StartNavigation()` dipanggil, highlighter memproses renderer tujuan atau fallback portal. Saat pengguna mencapai `stopDistance`, `CompleteNavigation()` membersihkan visual, memicu event C# `NavigationCompleted`, dan pada build WebGL mengirim `DispatchReactEvent("OnNavigationCompleted", payload)` melalui `ReactBridge.jslib`; payload JSON membawa kunci `unity_object_name`. Sebaliknya, `StopNavigation()` hanya membersihkan state dan mencatat pembatalan tanpa mengirim event selesai. Pemisahan ini mencegah event kedatangan terkirim ketika pengguna membatalkan rute atau mengganti tujuan. Bukti highlight ditempatkan pada Subbab 3.4.7, sedangkan pengiriman event masih memerlukan log dispatch dan retest terintegrasi. Tampilan notifikasi React tidak digunakan sebagai bukti kontribusi penulis.
+`NavigationGuide` mencari `DestinationHighlighter` pada GameObject yang sama dan membuatnya secara otomatis apabila belum tersedia. Ketika `StartNavigation()` dipanggil, highlighter memproses renderer tujuan atau fallback portal. Saat pengguna mencapai `stopDistance`, `CompleteNavigation()` membersihkan visual, memicu event C# `NavigationCompleted`, dan pada build WebGL mengirim `DispatchReactEvent("OnNavigationCompleted", payload)` melalui `ReactBridge.jslib`; payload JSON membawa kunci `unity_object_name`. Sebaliknya, `StopNavigation()` hanya membersihkan state dan mencatat pembatalan tanpa mengirim event selesai. Pemisahan ini mencegah event kedatangan terkirim ketika pengguna membatalkan rute atau mengganti tujuan. Bukti highlight ditempatkan pada Subbab 3.4.7, sedangkan pengiriman event masih memerlukan log dispatch dan pengujian ulang terintegrasi. Tampilan notifikasi React tidak digunakan sebagai bukti kontribusi penulis.
 
 ### 3.2.9 Implementasi GameTutorialController, GameTutorialUI, dan WebPlatformSync
 
@@ -616,7 +589,7 @@ Antarmuka tool diperlihatkan pada [FIGREF:impl_sync_db_checker] yang menyediakan
 
 ### 3.2.10 Implementasi CampusOcclusionInstaller dan Transisi Overview–Gameplay
 
-`CampusOcclusionInstaller` dijalankan dari menu editor untuk memindai root bertag `Cullable`, mengelompokkan renderer statis sebagai occluder atau occludee, mengabaikan renderer dinamis serta material transparan, mengatur area pandang kampus, dan menghasilkan data bake pada `Assets/Scene/SceneUtama/OcclusionCullingData.asset`. `MainCamera` diaktifkan untuk occlusion, sedangkan `MinimapCamera` tidak menggunakannya agar peta tidak kehilangan area.
+`CampusOcclusionInstaller` dijalankan dari menu editor untuk memindai root bertag `Cullable`, mengelompokkan renderer statis sebagai occluder atau occludee, mengabaikan renderer dinamis serta material transparan, mengatur area pandang kampus, dan menghasilkan data bake occlusion untuk `SceneUtama`. `MainCamera` diaktifkan untuk occlusion, sedangkan `MinimapCamera` tidak menggunakannya agar peta tidak kehilangan area.
 
 `SpawnSelectionUI` menyimpan status occlusion kamera gameplay ketika selector dibuka, menonaktifkannya selama overview, lalu mengembalikan status semula setelah spawn atau selector ditutup. `DayNightCycle` mengatur waktu overview ke 09.00 ketika pemilihan awal dibuka, memakai fog 0 pada overview, dan mengubah fog menjadi 0,01 pada mode gameplay. Konfigurasi occlusion editor telah didokumentasikan pada Subbab 3.3.6. Dampak performa serta transisi overview–gameplay tetap menunggu log runtime, rekaman, dan hasil Unity Profiler yang sebanding.
 
@@ -624,10 +597,10 @@ Antarmuka tool diperlihatkan pada [FIGREF:impl_sync_db_checker] yang menyediakan
 
 ### 3.3.1 Konfigurasi Build WebGL
 
-Konfigurasi build final pada project Unity 6000.4.1f1 dengan revision `336a400b9ea2` dan commit Unity `5f575c0` adalah sebagai berikut:
+Konfigurasi *build* final pada proyek Unity 6000.4.1f1 adalah sebagai berikut:
 
-1. Platform target menggunakan WebGL dan hanya `Assets/Scene/SceneUtama.unity` yang aktif pada `EditorBuildSettings`.
-2. Scripting backend menggunakan IL2CPP Master dengan mode Optimize Size.
+1. Platform target menggunakan WebGL dan hanya `SceneUtama` yang aktif pada konfigurasi build.
+2. Skriping backend menggunakan IL2CPP Master dengan mode Optimize Size.
 3. Compression Format menggunakan Brotli.
 4. Decompression Fallback, Data Caching, `runInBackground`, dan WebAssembly 2023 diaktifkan.
 5. Managed Stripping Level menggunakan High dan engine code stripping diaktifkan. `Enable Exceptions` menggunakan `Explicitly Thrown Exceptions Only`, sesuai konfigurasi aman pada `WebGLOptimizer` ketika WebAssembly 2023 aktif.
@@ -635,7 +608,7 @@ Konfigurasi build final pada project Unity 6000.4.1f1 dengan revision `336a400b9
 7. Berkas build ditempatkan pada jalur statis yang dikonsumsi dashboard React.
 8. Server perlu menyajikan berkas `.br` dan WebAssembly dengan header yang sesuai; pemeriksaan dilakukan melalui panel Network pada DevTools.
 
-Versi executable Unity Editor yang digunakan diperlihatkan pada [FIGREF:unity_version_editor]. Gambar tersebut mengonfirmasi versi 6000.4.1f1, sedangkan revision project `336a400b9ea2` bersumber dari `ProjectVersion.txt`. Target Web aktif dan penggunaan `SceneUtama` ditunjukkan pada [FIGREF:webgl_build_profile].
+Versi Unity Editor yang digunakan diperlihatkan pada [FIGREF:unity_version_editor]. Gambar tersebut mengonfirmasi versi 6000.4.1f1. Target Web aktif dan penggunaan `SceneUtama` ditunjukkan pada [FIGREF:webgl_build_profile], sedangkan identitas revisi kode sumber dicatat pada logbook dan indeks bukti lampiran.
 
 [FIGURE:unity_version_editor]
 [FIGCAPTION:Versi Unity Editor 6000.4.1f1]
@@ -666,20 +639,20 @@ NavMesh dibake melalui GameObject `NavMesh_Bake` dengan `NavMeshSurface` Agent T
 
 ### 3.3.4 Konfigurasi Komponen Engine
 
-Konfigurasi komponen engine dicatat dari scene `SceneUtama` pada commit acuan terbaru `5f575c0` agar implementasi dapat direproduksi. Tampilan editor pada [FIGREF:unity_scene_hierarchy] memperlihatkan environment kampus serta kelompok kamera, pemain, UI, receiver, spawn, dan minimap pada hierarki scene dengan target Web aktif dan scene tersimpan.
+Konfigurasi komponen *engine* dicatat dari `SceneUtama` pada versi kode sumber yang sama agar implementasi dapat direproduksi. Tampilan editor pada [FIGREF:unity_scene_hierarchy] memperlihatkan lingkungan kampus serta kelompok kamera, pemain, UI, *receiver*, spawn, dan minimap pada hierarki *scene* dengan target Web aktif dan *scene* tersimpan.
 
 [FIGURE:unity_scene_hierarchy]
 [FIGCAPTION:SceneUtama dan Hierarki Komponen Engine]
 
-1. **NavMeshSurface dan agen:** GameObject `NavMesh_Bake`, Agent Type 0, radius 0,5 m, tinggi 2 m, climb 0,75 m, maximum slope 45 derajat, layer mask seluruh layer, serta data bake `SceneUtama`.
-2. **Layer dan LayerMask raycast:** `groundMask` menggunakan seluruh layer; `surfaceProbeHeight` 1,5 m menghasilkan raycast total 3 m ke bawah, sedangkan `surfaceProjectionTolerance` 0,75 m mencegah garis memilih permukaan yang terlalu jauh dari titik NavMesh. Nilai Y titik dipertahankan ketika tidak ada permukaan valid.
-3. **LineRenderer:** lebar awal dan akhir 0,2 m, alignment `TransformZ`, texture mode Tile, tekstur putus-putus 50 persen transparan dibentuk saat runtime, dan offset vertikal 0,6 m.
-4. **Parameter navigasi:** posisi pemain memakai radius sampling maksimum 2 m, tujuan memakai radius dekat maksimum 2 m dengan fallback 5 m, dan selisih vertikal sampling dibatasi 2 m. Scene menyimpan `stopDistance` 5 m, tetapi kode membatasi ambang kedatangan efektif maksimum 2 m. `pathUpdateDistance` bernilai 1 m, interval retry 1 detik, `pointSpacing` 0,4 m, dan `smoothingWindow` 4.
-5. **Input Actions dan Pointer Lock:** catat action map, binding desktop, binding sentuh, tindakan aktivasi Pointer Lock, tombol pelepas, serta handler perubahan atau kegagalan status. [TBD: file `.inputactions`, script, dan screenshot]
-6. **Joystick virtual:** scene menyediakan joystick gerak dan pandang, tombol sprint, serta tombol lompat; visibilitas induk ditentukan oleh `WebPlatformSync`. [TBD: konfigurasi prefab dan bukti perangkat]
-7. **Building Culling:** tag `Cullable`, batas minimum 200 m, batas maksimum 200 m, nilai awal 500 m yang dikunci menjadi 200 m, step maksimum 50 m, target 60 fps, interval jarak 1 detik, mode `Combined`, frustum check 0,1 detik, padding bounds 10 m, grace period 0,35 detik, jeda saat selector map terbuka, dan pemeliharaan renderer yang terlihat minimap. Tidak terdapat hysteresis terpisah pada kode aktif.
+1. NavMeshSurface dan agen: GameObject `NavMesh_Bake`, Agent Type 0, radius 0,5 m, tinggi 2 m, climb 0,75 m, maximum slope 45 derajat, layer mask seluruh layer, serta data bake `SceneUtama`.
+2. Layer dan LayerMask raycast: `groundMask` menggunakan seluruh layer; `surfaceProbeHeight` 1,5 m menghasilkan raycast total 3 m ke bawah, sedangkan `surfaceProjectionTolerance` 0,75 m mencegah garis memilih permukaan yang terlalu jauh dari titik NavMesh. Nilai Y titik dipertahankan ketika tidak ada permukaan valid.
+3. LineRenderer: lebar awal dan akhir 0,2 m, alignment `TransformZ`, texture mode Tile, tekstur putus-putus 50 persen transparan dibentuk saat runtime, dan offset vertikal 0,6 m.
+4. Parameter navigasi: posisi pemain memakai radius sampling maksimum 2 m, tujuan memakai radius dekat maksimum 2 m dengan fallback 5 m, dan selisih vertikal sampling dibatasi 2 m. Scene menyimpan `stopDistance` 5 m, tetapi kode membatasi ambang kedatangan efektif maksimum 2 m. `pathUpdateDistance` bernilai 1 m, interval retry 1 detik, `pointSpacing` 0,4 m, dan `smoothingWindow` 4.
+5. Input Actions dan Pointer Lock: *action map*, *binding* desktop dan sentuh, tindakan aktivasi *Pointer Lock*, tombol pelepas, serta *handler* perubahan atau kegagalan status perlu dilengkapi dengan file `.inputactions`, kode sumber, dan tangkapan layar.
+6. Joystick virtual: *scene* menyediakan *joystick* gerak dan pandang, tombol sprint, serta tombol lompat; visibilitas induk ditentukan oleh `WebPlatformSync`. Konfigurasi *prefab* dan bukti perangkat belum tersedia.
+7. Building Culling: tag `Cullable`, batas minimum 200 m, batas maksimum 200 m, nilai awal 500 m yang dikunci menjadi 200 m, step maksimum 50 m, target 60 fps, interval jarak 1 detik, mode `Combined`, frustum check 0,1 detik, padding bounds 10 m, grace period 0,35 detik, jeda saat selector map terbuka, dan pemeliharaan renderer yang terlihat minimap. Tidak terdapat hysteresis terpisah pada kode aktif.
 
-Nilai serialized `NavigationGuide` yang mengatur jarak berhenti, interval pembaruan, subdivisi titik, smoothing, dan offset garis ditunjukkan pada [FIGREF:navigation_guide_config]. Komponen `PathLine` yang menjadi penerima hasil rute divisualkan pada [FIGREF:path_line_config], sehingga konfigurasi renderer tidak hanya dijelaskan dari script.
+Nilai serialized `NavigationGuide` yang mengatur jarak berhenti, interval pembaruan, subdivisi titik, smoothing, dan offset garis ditunjukkan pada [FIGREF:navigation_guide_config]. Komponen `PathLine` yang menjadi penerima hasil rute divisualkan pada [FIGREF:path_line_config], sehingga konfigurasi renderer tidak hanya dijelaskan dari skrip.
 
 [FIGURE:navigation_guide_config]
 [FIGCAPTION:Konfigurasi NavigationGuide pada Scene Final]
@@ -729,34 +702,34 @@ Ukuran `OcclusionArea` diperlihatkan pada [FIGREF:occlusion_area_config], sedang
 [FIGURE:occlusion_minimap_camera]
 [FIGCAPTION:Occlusion Culling Nonaktif pada MinimapCamera]
 
-Keempat gambar tersebut mendokumentasikan konfigurasi editor, bukan hasil benchmark performa. Perubahan status kamera selama transisi overview masih memerlukan log atau rekaman runtime. [TBD: log atau rekaman transisi overview–gameplay]
+Keempat gambar tersebut mendokumentasikan konfigurasi editor, bukan hasil *benchmark* performa. Perubahan status kamera selama transisi tampilan awal ke permainan berstatus Belum diverifikasi karena log atau rekaman *runtime* belum tersedia.
 
 ## 3.4 Laporan Implementasi Proyek
 
 ### 3.4.1 Logbook Implementasi Proyek
 
-Ringkasan logbook pada [TABREF:logbook_faiz] disusun berdasarkan fase kerja. Tanggal, tautan commit, screenshot, dan status perlu dilengkapi dari bukti aktual sebelum laporan dinyatakan final.
+Ringkasan logbook pada [TABREF:logbook_faiz] disusun berdasarkan fase kerja. Informasi versi kode sumber dipertahankan pada catatan internal, sedangkan laporan menampilkan keluaran dan bukti yang dapat dipahami secara langsung.
 
 [TABLE-ID:logbook_faiz]
 [TABLECAPTION:Logbook Implementasi Modul Simulator dan Engine]
 [TABLE]
 Fase | Kegiatan | Keluaran | Bukti dan Tanggal
-Analisis | Menetapkan kontrak `unity_object_name`, alur `SendMessage`, dan kebutuhan navigasi | Spesifikasi integrasi engine | [TBD: tautan dokumen, commit, dan tanggal]
-Perancangan | Menyusun hierarki scene, NavMesh, alur pathfinding, rute, dan kontrol | Rancangan modul Unity | [TBD: diagram, commit, dan tanggal]
-Implementasi Data | Mengembangkan `BuildingDatabase` dan cache nama | Modul konsumsi `/api/unity/data` | Commit final file `6378864`, 20 Juli 2026; [TBD: hasil uji]
-Implementasi Navigasi | Mengembangkan `NavigationReceiver` dan `NavigationGuide` | Navigasi tujuan berbasis NavMesh | Dasar implementasi `007d207`, pemisahan event `1845c65`, hardening routing `968d067`, dan perbaikan final `5f575c0`; [TBD: rekaman]
-Implementasi Rute | Menerapkan subdivisi linear, raycast, moving average, label, dan jarak | Rute visual mengikuti kontur | Commit `3af9d9f`; [TBD: screenshot]
-Implementasi Optimasi | Mengembangkan `BuildingCulling`, frustum culling, occlusion installer, dan `WebGLOptimizer` | Culling dan baseline build | Commit `0d90ecb`, `7c630f0`, dan `9fdf0fa`; [TBD: profiler]
-Implementasi Kontrol | Mengintegrasikan Pointer Lock, joystick virtual, dan sinkronisasi perangkat | Kontrol desktop dan mobile | Commit `f82f465` dan final `5f575c0`; [TBD: uji perangkat]
-Implementasi Tool | Mengembangkan `DatabaseSyncChecker` dan `CampusOcclusionInstaller` | Pemeriksaan sinkronisasi dan konfigurasi occlusion | Commit `4540686` dan `7c630f0`; [TBD: screenshot]
-Implementasi Orientasi | Menambahkan spawn, minimap, highlighter, tutorial adaptif, dan transisi overview | Orientasi dan onboarding pengguna | Commit `007d207`, `26643f6`, `7c630f0`, `968d067`, dan `f82f465`; screenshot tersedia, [TBD: rekaman dan retest]
-Integrasi | Menghasilkan build WebGL dan menghubungkannya dengan dashboard | Build terintegrasi | [TBD: URL build, commit, dan tanggal]
-Pengujian | Menjalankan skenario, memperbaiki BB-20, dan melakukan retest | Hasil uji dan catatan koreksi | [TBD: dokumen uji dan bukti retest]
+Analisis | Menetapkan kontrak `unity_object_name`, alur `SendMessage`, callback, dan kebutuhan navigasi | Spesifikasi integrasi engine | Kontrak tercermin pada diagram arsitektur dan sequence; tanggal analisis belum diverifikasi
+Perancangan | Menyusun hierarki scene, NavMesh, alur pathfinding, rute, dan kontrol | Rancangan modul Unity | Enam diagram rancangan dan tabel pemetaan tersedia; tanggal penyusunan belum diverifikasi
+Implementasi Data | Mengembangkan `BuildingDatabase` dan cache nama | Modul konsumsi `/api/unity/data` | Kode sumber dan log runtime tersedia; pengujian fixture terkontrol belum diverifikasi
+Implementasi Navigasi | Mengembangkan `NavigationReceiver` dan `NavigationGuide` | Navigasi tujuan berbasis NavMesh | Kode sumber, rute aktif, dan pengujian Black Box tersedia; rekaman skenario negatif belum diverifikasi
+Implementasi Rute | Menerapkan subdivisi linear, raycast, moving average, label, dan jarak | Rute visual mengikuti kontur | Tangkapan layar rute aktif dan perubahan elevasi tersedia
+Implementasi Optimasi | Mengembangkan `BuildingCulling`, frustum culling, occlusion installer, dan `WebGLOptimizer` | Culling dan baseline build | Konfigurasi editor dan tangkapan layar tersedia; Unity Profiler belum diverifikasi
+Implementasi Kontrol | Mengintegrasikan Pointer Lock, joystick virtual, dan sinkronisasi perangkat | Kontrol desktop dan mobile | Tangkapan layar kedua mode tersedia; rekaman respons input belum diverifikasi
+Implementasi Tool | Mengembangkan `DatabaseSyncChecker` dan `CampusOcclusionInstaller` | Pemeriksaan sinkronisasi dan konfigurasi occlusion | Tangkapan layar hasil pemeriksaan dan konfigurasi tersedia
+Implementasi Orientasi | Menambahkan spawn, minimap, highlighter, tutorial adaptif, dan transisi overview | Orientasi dan onboarding pengguna | Tangkapan layar tersedia; rekaman interaksi dan pengujian ulang khusus Unity belum diverifikasi
+Integrasi | Menghasilkan build WebGL dan menghubungkannya dengan dashboard | Build WebGL terintegrasi | Versi build aktif tercatat pada sumber fakta internal; bukti reproduksi build belum diverifikasi
+Pengujian | Menjalankan skenario, memperbaiki BB-20, dan melakukan pengujian ulang | Hasil uji dan catatan koreksi | Black Box bersama dan bukti pengujian ulang tersedia; test runner khusus Unity belum diverifikasi
 [/TABLE]
 
 ### 3.4.2 Hasil dan Bukti Implementasi Navigasi
 
-Implementasi menghasilkan alur yang menerima `unity_object_name`, menemukan Transform tujuan, memproyeksikan pemain dan target ke NavMesh, menghitung jalur, menampilkan rute, memperbarui nama serta jarak, dan membedakan penyelesaian otomatis dari pembatalan manual. Hasil Black Box bersama mencatat bahwa pemilihan tujuan, rute terpendek, penghentian otomatis, ketahanan terhadap variasi nama, dan interupsi navigasi telah diuji. Log runtime pada [FIGREF:building_database_runtime_log] menunjukkan bahwa `BuildingDatabase` mengambil `/api/unity/data`, memuat 19 gedung, 331 fasilitas, dan membentuk 323 `unityObjectNames` sebelum `NavigationReceiver` membangun cache scene.
+Implementasi menghasilkan alur yang menerima `unity_object_name`, menemukan Transform tujuan, memproyeksikan pemain dan target ke NavMesh, menghitung jalur, menampilkan rute, memperbarui nama serta jarak, dan membedakan penyelesaian otomatis dari pembatalan manual. Hasil Black Box bersama mencatat bahwa pemilihan tujuan, rute terpendek, penghentian otomatis, ketahanan terhadap variasi nama, dan interupsi navigasi telah diuji. Log runtime pada [FIGREF:building_database_runtime_log] menunjukkan snapshot lama sebelum pembersihan seed: `BuildingDatabase` mengambil `/api/unity/data`, memuat 19 gedung dan 331 fasilitas, lalu membentuk 323 `unityObjectNames` sebelum `NavigationReceiver` membangun cache scene. Angka tersebut membuktikan perilaku pemuatan pada saat tangkapan layar dibuat dan tidak dinyatakan sebagai kondisi seed final, yang memuat 311 fasilitas.
 
 [FIGURE:building_database_runtime_log]
 [FIGCAPTION:Log Runtime BuildingDatabase dan Cache NavigationReceiver]
@@ -766,7 +739,7 @@ Hasil navigasi aktif pada [FIGREF:active_navigation_route] memperlihatkan karakt
 [FIGURE:active_navigation_route]
 [FIGCAPTION:Rute Navigasi Aktif pada Game View]
 
-[TBD: rekaman Play Mode untuk perpindahan karakter, penghentian otomatis, dan interupsi navigasi]
+Bukti dinamis berupa rekaman Play Mode untuk perpindahan karakter, penghentian otomatis, dan interupsi navigasi belum tersedia.
 
 ### 3.4.3 Hasil dan Bukti Rendering Rute
 
@@ -775,7 +748,7 @@ Bagian ini membuktikan perubahan titik sudut `NavMeshPath` menjadi garis rute ya
 [FIGURE:route_elevation]
 [FIGCAPTION:Rute pada Perubahan Elevasi Scene]
 
-Alur rendering rute diringkas pada [TABREF:alur_rendering_rute] agar hubungan antara perhitungan NavMesh dan hasil visual dapat dibaca tanpa bergantung hanya pada screenshot.
+Alur rendering rute diringkas pada [TABREF:alur_rendering_rute] agar hubungan antara perhitungan NavMesh dan hasil visual dapat dibaca tanpa bergantung hanya pada tangkapan layar.
 
 [TABLE-ID:alur_rendering_rute]
 [TABLECAPTION:Alur Rendering Rute pada NavigationGuide]
@@ -789,11 +762,11 @@ Smoothing | Titik hasil raycast | Moving average berjendela 4 | Perubahan arah g
 Rendering | Titik akhir dan offset 0,6 m | Pengiriman posisi ke `LineRenderer` | Garis putus-putus tampil pada Game View
 [/TABLE]
 
-[TBD: rekaman rute pada tikungan atau tangga dan pembandingan corners mentah dengan titik akhir]
+Bukti berupa rekaman rute pada tikungan atau tangga serta perbandingan titik sudut mentah dengan titik akhir belum tersedia.
 
 ### 3.4.4 Hasil dan Bukti Implementasi Optimasi WebGL
 
-Implementasi optimasi mencakup pengendalian renderer melalui batas jarak, camera-frustum culling, occlusion culling berbasis `OcclusionCullingData.asset`, serta konfigurasi produksi melalui WebGL optimizer. Konfigurasi jarak scene final efektif tetap 200 m, sehingga kemampuan adaptasi jarak belum dapat dinilai sebagai hasil. Project facts mencatat skor Lighthouse baseline untuk dashboard secara keseluruhan, tetapi skor tersebut tidak dapat diklaim sebagai hasil optimasi engine saja. Ukuran build prototipe lama juga tidak digunakan sebagai hasil final. Ukuran berkas, waktu muat, frame rate, renderer aktif, draw call, dan memori harus diukur pada skenario yang sama sebelum dan sesudah perubahan.
+Implementasi optimasi mencakup pengendalian *renderer* melalui batas jarak, *camera-frustum culling*, *occlusion culling* berbasis `OcclusionCullingData.asset`, serta konfigurasi produksi melalui WebGL optimizer. Konfigurasi jarak *scene* final efektif tetap 200 m sehingga kemampuan adaptasi jarak belum dapat dinilai. Audit Lighthouse mengukur dashboard secara keseluruhan dan tidak digunakan sebagai bukti optimasi *engine* Faiz. Ukuran *build* prototipe lama juga tidak dipakai sebagai hasil final. Ukuran berkas, waktu muat, *frame rate*, *renderer* aktif, *draw call*, dan memori harus diukur pada skenario yang sama sebelum dan sesudah perubahan.
 
 Validasi Network pada [FIGREF:webgl_network_data] dan [FIGREF:webgl_network_wasm] memperlihatkan pemuatan berkas build WebGL dari browser. Detail header pada [FIGREF:webgl_wasm_mime_headers] menunjukkan `Content-Encoding: br` dan `Content-Type: application/wasm` untuk berkas Wasm, sehingga bukti ini mendukung klaim konfigurasi penyajian file, bukan klaim peningkatan performa.
 
@@ -819,7 +792,7 @@ Dua capture statistik runtime ditempatkan pada [FIGREF:runtime_stats_culling_ena
 [FIGURE:runtime_stats_culling_disabled]
 [FIGCAPTION:Statistik Runtime pada Capture Building Culling Nonaktif]
 
-Kedua gambar belum menjadi benchmark sebelum–sesudah yang konklusif karena menggunakan NVIDIA Statistics Overlay, bukan Unity Profiler; durasi sampling, identitas perangkat, draw call, renderer aktif, frame time Unity, dan indikator status aktif/nonaktif komponen juga belum tercatat di dalam capture. Angka sesaat pada overlay tidak digunakan untuk menyimpulkan peningkatan performa. Hasil kuantitatif tetap `[TBD: Unity Profiler dan tabel benchmark pada kondisi yang terdokumentasi]`.
+Kedua gambar belum menjadi *benchmark* sebelum–sesudah yang konklusif karena menggunakan NVIDIA Statistics Overlay, bukan Unity Profiler. Durasi *sampling*, identitas perangkat, *draw call*, *renderer* aktif, *frame time* Unity, dan indikator status komponen juga belum tercatat. Angka sesaat pada tampilan tersebut tidak digunakan untuk menyimpulkan peningkatan performa. Hasil kuantitatif berstatus Belum diverifikasi sampai tersedia Unity Profiler dan tabel *benchmark* pada kondisi yang terdokumentasi.
 
 ### 3.4.5 Hasil dan Bukti Kontrol Lintas Perangkat
 
@@ -831,20 +804,20 @@ Bagian ini membuktikan bahwa kontrol third-person desktop dan perangkat bergerak
 [FIGURE:mobile_control]
 [FIGCAPTION:Tampilan Kontrol Mobile pada Build WebGL]
 
-Kedua screenshot membuktikan perbedaan tampilan menurut mode perangkat, tetapi belum membuktikan respons input, Pointer Lock, atau perpindahan karakter. Bukti interaksi tetap memerlukan file `.inputactions`, identitas perangkat dan browser, serta rekaman 15–30 detik. [TBD: rekaman Pointer Lock dan kontrol mobile]
+Kedua tangkapan layar membuktikan perbedaan tampilan menurut mode perangkat, tetapi belum membuktikan respons input, *Pointer Lock*, atau perpindahan karakter. Verifikasi interaksi masih memerlukan file `.inputactions`, identitas perangkat dan peramban, serta rekaman 15–30 detik.
 
 ### 3.4.6 Hasil dan Bukti DatabaseSyncChecker
 
-Bagian ini membuktikan bahwa tool editor membandingkan data `/api/unity/names` dengan hierarki scene dan menampilkan kategori hasil sesuai batas implementasi. Hasil aktual pada [FIGREF:database_sync_checker_result] menampilkan 320 nama ditemukan, 3 nama dari API belum tersedia di scene, dan 14 root object scene belum terdaftar di database. Daftar contoh dan tombol penyalinan juga terlihat pada window hasil.
+Bagian ini membuktikan bahwa tool editor membandingkan data `/api/unity/names` dengan hierarki scene dan menampilkan kategori hasil sesuai batas implementasi. Snapshot pemeriksaan pada [FIGREF:database_sync_checker_result] menampilkan 320 nama ditemukan, 3 nama dari API belum tersedia di scene, dan 14 root object scene belum terdaftar di database. Daftar contoh dan tombol penyalinan juga terlihat pada window hasil.
 
 [FIGURE:database_sync_checker_result]
 [FIGCAPTION:Hasil Pemeriksaan DatabaseSyncChecker]
 
-Angka tersebut mendokumentasikan satu pemeriksaan terhadap scene dan endpoint aktif, bukan hasil fixture terkendali. Status pengujian UT-14 dan UT-15 tetap `[TBD]` sampai respons acuan, commit, kondisi API kosong/gagal, serta retest dicatat. Screenshot lama `impl_sync_db_checker` tetap diperlakukan sebagai ilustrasi antarmuka, sedangkan gambar baru menjadi bukti hasil pemeriksaan aktual.
+Angka tersebut merupakan snapshot lama yang mendokumentasikan satu pemeriksaan terhadap *scene* dan endpoint aktif sebelum seed dirapikan menjadi 311 fasilitas. Angka itu tidak dinyatakan sebagai kondisi sinkronisasi seed final. UT-14 dan UT-15 berstatus Belum diverifikasi sampai respons acuan, versi kode sumber, kondisi API kosong atau gagal, serta pengujian ulang dicatat. Tangkapan layar lama `impl_sync_db_checker` diperlakukan sebagai ilustrasi antarmuka, sedangkan gambar baru menjadi bukti hasil pemeriksaan pada saat snapshot dibuat.
 
 ### 3.4.7 Hasil Spawn, Minimap, Highlighter, dan Tutorial
 
-Implementasi final memuat pemilihan spawn yang tervalidasi terhadap NavMesh, minimap yang mengikuti pemain, marker tujuan, destination highlighter, tutorial adaptif, serta pengiriman event selesai navigasi. Keberadaan script, konfigurasi scene, dan screenshot tutorial membuktikan implementasi visual fitur, tetapi status tindak lanjut UAT tetap `[TBD]` sampai interaksi diuji ulang pada build terintegrasi yang sama.
+Implementasi final memuat pemilihan spawn yang tervalidasi terhadap NavMesh, minimap yang mengikuti pemain, penanda tujuan, *destination highlighter*, tutorial adaptif, serta pengiriman event selesai navigasi. Kode sumber, konfigurasi *scene*, dan tangkapan layar membuktikan keberadaan visual fitur. Pengujian dinamis khusus modul Unity berstatus Belum diverifikasi sampai interaksi diuji ulang pada *build* terintegrasi yang sama.
 
 Tampilan pemilihan titik awal pada [FIGREF:spawn_selection_overview] memperlihatkan overview kampus dengan marker spawn dan nama lokasi. Setelah spawn dan navigasi aktif, minimap pada [FIGREF:minimap_destination] memperlihatkan marker pemain, marker tujuan, dan garis arah sehingga pengguna tetap memiliki orientasi ketika kamera utama berada pada sudut third-person.
 
@@ -867,13 +840,13 @@ Perbedaan tutorial adaptif terlihat pada [FIGREF:tutorial_desktop_lookaround] da
 [FIGURE:tutorial_mobile_lookaround]
 [FIGCAPTION:Tutorial Lihat Sekeliling pada Mode Mobile]
 
-Screenshot tersebut membuktikan penyesuaian visual berdasarkan mode perangkat, tetapi belum membuktikan handshake `SetDevice`, respons input, atau penyimpanan progres. Bukti dinamis masih memerlukan log mode perangkat, log spawn, dan rekaman interaksi pada build yang sama. Tampilan notifikasi kedatangan pada React tidak disertakan karena berada di luar kontribusi penulis.
+Tangkapan layar tersebut membuktikan penyesuaian visual berdasarkan mode perangkat, tetapi belum membuktikan handshake `SetDevice`, respons input, atau penyimpanan progres. Bukti dinamis masih memerlukan log mode perangkat, log spawn, dan rekaman interaksi pada build yang sama. Tampilan notifikasi kedatangan pada React tidak disertakan karena berada di luar kontribusi penulis.
 
 ### 3.4.8 Hasil dan Bukti Occlusion Culling serta Transisi Overview–Gameplay
 
 Implementasi final menyertakan `OcclusionArea`, data bake, occlusion aktif pada `MainCamera`, dan occlusion nonaktif pada `MinimapCamera` sebagaimana dibuktikan pada Subbab 3.3.6. Saat overview aktif, kamera gameplay dirancang menonaktifkan occlusion sementara; setelah spawn berhasil, statusnya dipulihkan. `DayNightCycle` mengatur fog overview 0 dan fog gameplay 0,01.
 
-Bukti yang diterima membuktikan konfigurasi statis editor, tetapi belum membuktikan perubahan status selama transisi atau dampaknya terhadap renderer, draw call, dan frame time. Hasil performa serta transisi runtime tetap `[TBD: log CampusOcclusion, rekaman buka/tutup selector, Unity Profiler, dan benchmark sebanding]`.
+Bukti yang tersedia menunjukkan konfigurasi statis editor, tetapi belum membuktikan perubahan status selama transisi atau dampaknya terhadap *renderer*, *draw call*, dan *frame time*. Hasil performa serta transisi *runtime* berstatus Belum diverifikasi sampai tersedia log `CampusOcclusion`, rekaman pemilih spawn, Unity Profiler, dan *benchmark* sebanding.
 
 ### 3.4.9 Batas Kontribusi Penulis
 
@@ -883,15 +856,15 @@ Batas kontribusi pada [TABREF:batas_kontribusi_faiz] digunakan agar implementasi
 [TABLECAPTION:Batas Kontribusi Penulis dalam Sistem Terintegrasi]
 [TABLE]
 Komponen | Pemilik Utama | Keterlibatan Penulis
-Model dan aset tiga dimensi | 3D Asset Designer & Database/Asset Manager | Menggunakan aset yang tersedia di dalam scene serta menyampaikan kebutuhan collision, target navigasi, dan optimasi runtime
-Skema database, RLS, dan audit log | 3D Asset Designer & Database/Asset Manager | Menggunakan kontrak `unity_object_name` sebagai konsumen data
-Dashboard React dan pencarian | Full Stack Developer & System Integrator | Menetapkan format perintah tujuan yang diterima Unity
-Vercel Serverless Functions | Full Stack Developer & System Integrator | Mengonsumsi `/api/unity/data` dan `/api/unity/names`
-Jembatan React–Unity | Full Stack Developer & System Integrator | Menyepakati kontrak method dan event; receiver Unity serta dispatch event pada runtime dikerjakan penulis, sedangkan bridge, pemanggil, dan listener React berada di luar kontribusi penulis
-Navigasi, rendering rute, dan kontrol Unity | 3D Simulator & Engine Developer | Merancang, mengimplementasikan, dan menguji modul engine
-Building Culling dan WebGL optimizer | 3D Simulator & Engine Developer | Merancang, mengimplementasikan, dan mengevaluasi optimasi
-DatabaseSyncChecker | 3D Simulator & Engine Developer | Merancang, mengimplementasikan, dan menguji editor tool
-Spawn, minimap, highlighter, dan tutorial Unity | 3D Simulator & Engine Developer | Merancang, mengimplementasikan, dan menyiapkan pengujian fitur orientasi
+Model dan aset tiga dimensi | 3D Asset Designer dan Database Schema Designer | Menggunakan aset yang tersedia di dalam *scene* serta menyampaikan kebutuhan *collision*, target navigasi, dan optimasi *runtime*
+Skema database, RLS, trigger, dan pemetaan data | 3D Asset Designer dan Database Schema Designer | Menggunakan kontrak `unity_object_name` sebagai konsumen data
+Dashboard React dan pencarian | Full Stack Web Developer, System Integrator, dan DevOps Engineer | Menetapkan format perintah tujuan yang diterima Unity
+Vercel Serverless Functions | Full Stack Web Developer, System Integrator, dan DevOps Engineer | Menyediakan `/api/unity/data` dan `/api/unity/names` yang dikonsumsi komponen Unity
+Jembatan React–Unity | Full Stack Web Developer, System Integrator, dan DevOps Engineer | Menyepakati kontrak metode dan event; *receiver* serta pengiriman event pada *runtime* Unity dikerjakan Faiz, sedangkan *bridge*, pemanggil, dan listener React dikerjakan Iman
+Navigasi, rendering rute, dan kontrol Unity | 3D Simulator dan Engine Developer | Merancang, mengimplementasikan, dan menguji modul *engine*
+Building Culling dan WebGL optimizer | 3D Simulator dan Engine Developer | Merancang, mengimplementasikan, dan mengevaluasi optimasi
+DatabaseSyncChecker | 3D Simulator dan Engine Developer | Merancang, mengimplementasikan, dan menguji alat editor
+Spawn, minimap, highlighter, dan tutorial Unity | 3D Simulator dan Engine Developer | Merancang, mengimplementasikan, dan menyiapkan pengujian fitur orientasi
 [/TABLE]
 
 ## 3.5 Hasil Pengujian Proyek
@@ -902,81 +875,61 @@ Spawn, minimap, highlighter, dan tutorial Unity | 3D Simulator & Engine Develope
 
 ### 3.5.2 Pengujian Khusus Modul Unity
 
-Pengujian khusus memisahkan perilaku modul engine dari alur sistem melalui dashboard. Hasil Black Box pada [TABREF:hasil_black_box] tetap menjadi bukti integrasi bersama, sedangkan format hasil setiap skenario khusus dirangkum pada [TABREF:hasil_pengujian_modul_unity]. Semua nilai aktual, status, dan bukti dipertahankan sebagai `[TBD: ...]` sampai artefak yang dapat diverifikasi tersedia.
+Pengujian khusus memisahkan perilaku modul *engine* dari alur sistem melalui dashboard. Hasil Black Box pada [TABREF:hasil_black_box] menjadi bukti integrasi bersama, sedangkan [TABREF:hasil_pengujian_modul_unity] memuat 24 skenario khusus Unity. Status Belum diverifikasi digunakan apabila artefak yang tersedia belum cukup untuk menilai hasil; kolom bukti menyebutkan artefak yang masih diperlukan.
 
 [TABLE-ID:hasil_pengujian_modul_unity]
 [TABLECAPTION:Hasil Pengujian Khusus Modul Unity]
 [TABLE]
 ID | Kondisi Awal | Langkah Pengujian | Hasil yang Diharapkan | Hasil Aktual | Status | Bukti
-UT-01 | Scene uji aktif dan endpoint mengembalikan koleksi gedung serta fasilitas valid | Jalankan Play Mode dan tunggu proses pemuatan `BuildingDatabase` selesai | `isLoaded` aktif, cache terisi, dan nama tampilan dapat diambil | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: fixture, log, dan screenshot]
-UT-02 | Scene uji aktif dan sebuah nama tidak tersedia pada cache | Panggil `GetRealName()` menggunakan nama yang tidak dikenal | Method mengembalikan input asli dan tidak menghasilkan null | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: log atau test runner]
-UT-03 | Cache Transform memuat target yang valid | Panggil `NavigateTo()` menggunakan `unity_object_name` target | `NavigationReceiver` meneruskan Transform yang tepat ke `NavigationGuide` | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: log dan rekaman Play Mode]
-UT-04 | Target memiliki variasi kapitalisasi atau tidak tersedia pada cache awal | Panggil `NavigateTo()` dan amati fallback pencarian | Variasi kapitalisasi dikenali; target yang benar-benar hilang menghasilkan warning tanpa exception | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: log dan fixture scene]
-UT-05 | Pemain dan target valid berada pada area NavMesh | Mulai navigasi dan amati status jalur serta `LineRenderer` | Jalur valid dihitung, garis aktif, nama tujuan tampil, dan jarak diperbarui | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: screenshot dan rekaman]
-UT-06 | Navigasi aktif dan pemain berada di luar `stopDistance` | Gerakkan pemain hingga memasuki `stopDistance` | Navigasi berhenti serta garis dan label dibersihkan | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: rekaman dan log]
-UT-07 | Navigasi aktif menuju tujuan pertama | Panggil `StopNavigation()` atau pilih tujuan kedua | Rute lama dibersihkan dan state baru tidak menghasilkan garis ganda | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: rekaman Play Mode]
-UT-08 | Jalur uji memuat tikungan dan perubahan elevasi | Jalankan navigasi lalu bandingkan corners mentah dengan hasil renderer | Subdivisi linear memperapat titik, raycast menjaga garis mengikuti permukaan, dan moving average mengurangi perubahan titik yang tajam | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: screenshot sebelum-sesudah]
-UT-09 | Build dibuka pada browser desktop yang mendukung Pointer Lock | Klik canvas, gerakkan tetikus, lalu tekan ESC | Kursor terkunci setelah tindakan pengguna, kamera merespons delta, dan ESC melepaskan kursor | Tampilan desktop tanpa joystick dan navigasi aktif telah tersedia; respons Pointer Lock belum dibuktikan oleh screenshot diam | [TBD: menunggu rekaman] | `kontrol_desktop.png`; [TBD: perangkat, browser, dan rekaman]
-UT-10 | Build yang sama dibuka pada perangkat mobile dan desktop | Gunakan joystick pada mobile lalu periksa tampilan desktop | Joystick mengendalikan pemain pada mobile dan tidak mengganggu tampilan desktop | UI desktop dan mobile tampil berbeda sesuai mode; respons gerak, sprint, dan lompat belum dibuktikan | [TBD: menunggu rekaman] | `kontrol_desktop.png`, `kontrol_mobile.png`; [TBD: identitas perangkat]
-UT-11 | Scene, kamera, dan lintasan benchmark telah ditetapkan | Jalankan skenario yang sama sebelum dan sesudah Building Culling | Pada konfigurasi 200 m, renderer di luar ambang/frustum ditangani sesuai grace period, target navigasi tetap aktif, area minimap dipertahankan, dan metrik sebelum–sesudah dapat dibandingkan | Dua capture NVIDIA Statistics Overlay pada sudut gameplay yang hampir sama telah tersedia, tetapi tidak memuat Unity Profiler, draw call, renderer aktif, durasi sampling, identitas perangkat, atau indikator state aktif/nonaktif yang dapat diverifikasi | [TBD: belum dapat dinilai sebagai benchmark] | `statistik_runtime_culling_aktif.png` dan `statistik_runtime_culling_nonaktif.png`; [TBD: Unity Profiler]
+UT-01 | Scene uji aktif dan endpoint mengembalikan koleksi gedung serta fasilitas valid | Jalankan Play Mode dan tunggu proses pemuatan `BuildingDatabase` selesai | `isLoaded` aktif, cache terisi, dan nama tampilan dapat diambil | Belum diverifikasi | Belum diverifikasi | Masih memerlukan fixture, log, dan tangkapan layar
+UT-02 | Scene uji aktif dan sebuah nama tidak tersedia pada cache | Panggil `GetRealName()` menggunakan nama yang tidak dikenal | Method mengembalikan input asli dan tidak menghasilkan null | Belum diverifikasi | Belum diverifikasi | Masih memerlukan log atau hasil test runner
+UT-03 | Cache Transform memuat target yang valid | Panggil `NavigateTo()` menggunakan `unity_object_name` target | `NavigationReceiver` meneruskan Transform yang tepat ke `NavigationGuide` | Belum diverifikasi | Belum diverifikasi | Masih memerlukan log dan rekaman Play Mode
+UT-04 | Target memiliki variasi kapitalisasi atau tidak tersedia pada cache awal | Panggil `NavigateTo()` dan amati fallback pencarian | Variasi kapitalisasi dikenali; target yang benar-benar hilang menghasilkan warning tanpa exception | Belum diverifikasi | Belum diverifikasi | Masih memerlukan log dan fixture scene
+UT-05 | Pemain dan target valid berada pada area NavMesh | Mulai navigasi dan amati status jalur serta `LineRenderer` | Jalur valid dihitung, garis aktif, nama tujuan tampil, dan jarak diperbarui | Belum diverifikasi | Belum diverifikasi | Masih memerlukan tangkapan layar dan rekaman
+UT-06 | Navigasi aktif dan pemain berada di luar `stopDistance` | Gerakkan pemain hingga memasuki `stopDistance` | Navigasi berhenti serta garis dan label dibersihkan | Belum diverifikasi | Belum diverifikasi | Masih memerlukan rekaman dan log
+UT-07 | Navigasi aktif menuju tujuan pertama | Panggil `StopNavigation()` atau pilih tujuan kedua | Rute lama dibersihkan dan state baru tidak menghasilkan garis ganda | Belum diverifikasi | Belum diverifikasi | Masih memerlukan rekaman Play Mode
+UT-08 | Jalur uji memuat tikungan dan perubahan elevasi | Jalankan navigasi lalu bandingkan corners mentah dengan hasil renderer | Subdivisi linear memperapat titik, raycast menjaga garis mengikuti permukaan, dan moving average mengurangi perubahan titik yang tajam | Belum diverifikasi | Belum diverifikasi | Masih memerlukan tangkapan layar sebelum dan sesudah
+UT-09 | Build dibuka pada browser desktop yang mendukung Pointer Lock | Klik canvas, gerakkan tetikus, lalu tekan ESC | Kursor terkunci setelah tindakan pengguna, kamera merespons delta, dan ESC melepaskan kursor | Tampilan desktop tanpa joystick dan navigasi aktif telah tersedia; respons Pointer Lock belum dibuktikan oleh tangkapan layar diam | Belum diverifikasi | `kontrol_desktop.png`; masih memerlukan identitas perangkat, browser, dan rekaman
+UT-10 | Build yang sama dibuka pada perangkat mobile dan desktop | Gunakan joystick pada mobile lalu periksa tampilan desktop | Joystick mengendalikan pemain pada mobile dan tidak mengganggu tampilan desktop | UI desktop dan mobile tampil berbeda sesuai mode; respons gerak, sprint, dan lompat belum dibuktikan | Belum diverifikasi | `kontrol_desktop.png` dan `kontrol_mobile.png`; masih memerlukan identitas perangkat
+UT-11 | Scene, kamera, dan lintasan benchmark telah ditetapkan | Jalankan skenario yang sama sebelum dan sesudah Building Culling | Pada konfigurasi 200 m, renderer di luar ambang/frustum ditangani sesuai grace period, target navigasi tetap aktif, area minimap dipertahankan, dan metrik sebelum–sesudah dapat dibandingkan | Dua capture NVIDIA Statistics Overlay pada sudut gameplay yang hampir sama telah tersedia, tetapi tidak memuat Unity Profiler, draw call, renderer aktif, durasi sampling, identitas perangkat, atau indikator state aktif/nonaktif yang dapat diverifikasi | Belum diverifikasi | `statistik_runtime_culling_aktif.png` dan `statistik_runtime_culling_nonaktif.png`; masih memerlukan Unity Profiler
 UT-12 | Project menggunakan konfigurasi sebelum optimizer | Jalankan menu WebGL optimizer lalu periksa Player Settings | Brotli, decompression fallback, IL2CPP, stripping, WebAssembly 2023, dan exception support sesuai baseline proyek | Target Web aktif, SceneUtama terpilih, Brotli, fallback, caching, IL2CPP Master, optimasi ukuran, stripping High, WebAssembly 2023, dan `Explicitly Thrown Exceptions Only` terlihat | Lulus | Build Profile, Player Settings, dan log optimizer
-UT-13 | Build produksi tersedia pada hosting yang ditetapkan | Muat build dan periksa Network serta Console browser | Build termuat tanpa error dan header kompresi serta MIME sesuai konfigurasi | [TBD: hasil aktual, ukuran, dan waktu muat] | [TBD: Lulus atau Gagal] | [TBD: DevTools, perangkat, browser, dan jaringan]
-UT-14 | Fixture API dan scene memuat nama cocok, hilang, dan berlebih | Jalankan `DatabaseSyncChecker` lalu salin daftar ketidaksesuaian | Pencocokan dan nama yang hilang di scene memakai seluruh hierarki, kategori scene yang belum terdaftar memakai root object, dan daftar dapat disalin | Pemeriksaan aktual menampilkan 320 cocok, 3 tidak ada di scene, 14 root tidak ada di database, contoh nama, dan tombol salin | [TBD: fixture belum dicatat] | `hasil_database_sync_checker.png`; [TBD: fixture]
-UT-15 | Endpoint mengembalikan data kosong, tidak valid, atau gagal | Jalankan pemeriksaan untuk setiap kondisi kegagalan | Tool menampilkan pesan yang jelas, tidak menganggap data tersinkronisasi, dan tidak mengubah scene | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: log dan screenshot error]
-UT-16 | Registry memuat titik spawn valid dan pemain berada pada scene utama | Panggil `SetSpawn()` menggunakan nama yang terdaftar | Pemain berpindah ke NavMesh di sekitar titik spawn sesuai radius dan override yang aktif | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: log, screenshot posisi, dan rekaman]
-UT-17 | Registry aktif dan nama spawn tidak terdaftar atau tidak memiliki posisi NavMesh valid | Panggil `SetSpawn()` menggunakan nama tidak valid lalu menggunakan titik yang gagal diproyeksikan | Sistem menampilkan warning, tidak menghasilkan exception, dan tidak memindahkan pemain ke posisi yang tidak valid | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: log dan rekaman]
-UT-18 | Minimap, marker pemain, marker tujuan, dan navigasi aktif telah dikonfigurasi | Gerakkan pemain dan ubah tujuan navigasi | Minimap mengikuti pemain, marker pemain bergerak, dan marker tujuan mengarah ke tujuan aktif | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: screenshot dan rekaman]
-UT-19 | Tujuan navigasi memiliki renderer yang dapat disorot | Mulai navigasi, ganti tujuan, lalu selesaikan atau hentikan navigasi | Highlighter aktif hanya pada tujuan saat ini dan dibersihkan ketika tujuan berubah atau navigasi berakhir | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: screenshot dan rekaman]
-UT-20 | Tutorial pertama kali aktif dan build dapat menerima mode perangkat | Panggil `SetDevice()` untuk desktop dan mobile lalu jalankan langkah tutorial yang setara | Instruksi dan visual kontrol mengikuti mode perangkat tanpa menampilkan kontrol yang tidak relevan | Pada langkah 2 dari 5, mode desktop menampilkan instruksi mouse dan mode mobile menampilkan instruksi geser area kamera beserta kontrol sentuh | Lulus dengan catatan | Screenshot tutorial desktop dan mobile; [TBD: log `SetDevice` dan rekaman]
-UT-21 | Build WebGL telah dimuat dan bridge JavaScript dapat diamati | Panggil `WebPlatformSync.SetDevice()` dengan nilai valid serta nilai tak dikenal | Nilai valid menerapkan mode yang tepat; nilai tak dikenal ditangani tanpa exception dan menghasilkan fallback atau warning yang tercatat | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: Console browser dan rekaman]
-UT-22 | Navigasi aktif dan listener browser `OnNavigationCompleted` terpasang | Masuki `stopDistance`, lalu ulangi skenario penghentian manual atau pergantian tujuan | Unity mengirim event dengan payload tujuan tepat satu kali hanya saat tiba, sedangkan pembatalan manual tidak mengirim event selesai; state navigasi tetap dibersihkan | [TBD: hasil aktual dispatch event] | [TBD: Lulus atau Gagal] | [TBD: log Unity, Console browser, dan rekaman pembatalan]; tampilan notifikasi React di luar bukti kontribusi Faiz
-UT-23 | Camera Frustum dan Occlusion Culling | Jalankan scene gameplay, putar kamera, buka selector spawn, lalu kembali ke gameplay | Renderer di luar jarak/frustum ditangani sesuai grace period, target navigasi tetap aktif, minimap tidak kehilangan area, dan status occlusion kamera berubah sesuai mode | Konfigurasi jarak/frustum, `OcclusionArea`, data bake, MainCamera aktif, dan MinimapCamera nonaktif telah terbukti; perubahan renderer saat runtime belum terbukti | [TBD: menunggu rekaman dan profiler] | Screenshot konfigurasi Building Culling dan occlusion; [TBD: log runtime]
-UT-24 | Transisi Overview–Gameplay | Buka selector sebelum spawn, pilih spawn valid, lalu buka selector ulang | Fog overview bernilai 0, occlusion gameplay nonaktif saat selector, fog gameplay bernilai 0,01, dan occlusion gameplay pulih setelah spawn | [TBD: hasil aktual] | [TBD: Lulus atau Gagal] | [TBD: log runtime, Inspector, dan rekaman]
+UT-13 | Build produksi tersedia pada hosting yang ditetapkan | Muat build dan periksa Network serta Console browser | Build termuat tanpa error dan header kompresi serta MIME sesuai konfigurasi | Belum diverifikasi | Belum diverifikasi | Masih memerlukan DevTools, identitas perangkat, browser, dan kondisi jaringan
+UT-14 | Fixture API dan scene memuat nama cocok, hilang, dan berlebih | Jalankan `DatabaseSyncChecker` lalu salin daftar ketidaksesuaian | Pencocokan dan nama yang hilang di scene memakai seluruh hierarki, kategori scene yang belum terdaftar memakai root object, dan daftar dapat disalin | Snapshot pemeriksaan lama menampilkan 320 cocok, 3 tidak ada di scene, 14 root tidak ada di database, contoh nama, dan tombol salin | Belum diverifikasi | `hasil_database_sync_checker.png`; masih memerlukan fixture yang sesuai seed final
+UT-15 | Endpoint mengembalikan data kosong, tidak valid, atau gagal | Jalankan pemeriksaan untuk setiap kondisi kegagalan | Tool menampilkan pesan yang jelas, tidak menganggap data tersinkronisasi, dan tidak mengubah scene | Belum diverifikasi | Belum diverifikasi | Masih memerlukan log dan tangkapan layar kondisi gagal
+UT-16 | Registry memuat titik spawn valid dan pemain berada pada scene utama | Panggil `SetSpawn()` menggunakan nama yang terdaftar | Pemain berpindah ke NavMesh di sekitar titik spawn sesuai radius dan override yang aktif | Belum diverifikasi | Belum diverifikasi | Masih memerlukan log, tangkapan layar posisi, dan rekaman
+UT-17 | Registry aktif dan nama spawn tidak terdaftar atau tidak memiliki posisi NavMesh valid | Panggil `SetSpawn()` menggunakan nama tidak valid lalu menggunakan titik yang gagal diproyeksikan | Sistem menampilkan warning, tidak menghasilkan exception, dan tidak memindahkan pemain ke posisi yang tidak valid | Belum diverifikasi | Belum diverifikasi | Masih memerlukan log dan rekaman
+UT-18 | Minimap, marker pemain, marker tujuan, dan navigasi aktif telah dikonfigurasi | Gerakkan pemain dan ubah tujuan navigasi | Minimap mengikuti pemain, marker pemain bergerak, dan marker tujuan mengarah ke tujuan aktif | Belum diverifikasi | Belum diverifikasi | Masih memerlukan tangkapan layar dan rekaman
+UT-19 | Tujuan navigasi memiliki renderer yang dapat disorot | Mulai navigasi, ganti tujuan, lalu selesaikan atau hentikan navigasi | Highlighter aktif hanya pada tujuan saat ini dan dibersihkan ketika tujuan berubah atau navigasi berakhir | Belum diverifikasi | Belum diverifikasi | Masih memerlukan tangkapan layar dan rekaman
+UT-20 | Tutorial pertama kali aktif dan build dapat menerima mode perangkat | Panggil `SetDevice()` untuk desktop dan mobile lalu jalankan langkah tutorial yang setara | Instruksi dan visual kontrol mengikuti mode perangkat tanpa menampilkan kontrol yang tidak relevan | Pada langkah 2 dari 5, mode desktop menampilkan instruksi mouse dan mode mobile menampilkan instruksi geser area kamera beserta kontrol sentuh | Lulus dengan catatan | Tangkapan layar tutorial desktop dan mobile; masih memerlukan log `SetDevice` dan rekaman
+UT-21 | Build WebGL telah dimuat dan jembatan JavaScript dapat diamati | Panggil `WebPlatformSync.SetDevice()` dengan nilai valid serta nilai tak dikenal | Nilai valid menerapkan mode yang tepat; nilai tak dikenal ditangani tanpa pengecualian dan menghasilkan *fallback* atau peringatan yang tercatat | Belum diverifikasi | Belum diverifikasi | Masih memerlukan Console browser dan rekaman
+UT-22 | Navigasi aktif dan listener browser `OnNavigationCompleted` terpasang | Masuki `stopDistance`, lalu ulangi skenario penghentian manual atau pergantian tujuan | Unity mengirim event dengan payload tujuan tepat satu kali hanya saat tiba, sedangkan pembatalan manual tidak mengirim event selesai; state navigasi tetap dibersihkan | Belum diverifikasi | Belum diverifikasi | Masih memerlukan log Unity, Console browser, dan rekaman pembatalan; tampilan notifikasi React di luar bukti kontribusi Faiz
+UT-23 | Camera Frustum dan Occlusion Culling | Jalankan scene gameplay, putar kamera, buka selector spawn, lalu kembali ke gameplay | Renderer di luar jarak/frustum ditangani sesuai grace period, target navigasi tetap aktif, minimap tidak kehilangan area, dan status occlusion kamera berubah sesuai mode | Konfigurasi jarak/frustum, `OcclusionArea`, data bake, MainCamera aktif, dan MinimapCamera nonaktif telah terbukti; perubahan renderer saat runtime belum terbukti | Belum diverifikasi | Tangkapan layar konfigurasi Building Culling dan occlusion; masih memerlukan log runtime
+UT-24 | Transisi Overview–Gameplay | Buka selector sebelum spawn, pilih spawn valid, lalu buka selector ulang | Fog overview bernilai 0, occlusion gameplay nonaktif saat selector, fog gameplay bernilai 0,01, dan occlusion gameplay pulih setelah spawn | Belum diverifikasi | Belum diverifikasi | Masih memerlukan log runtime, Inspector, dan rekaman
 [/TABLE]
 
-#### 3.5.2.1 Pengujian BuildingDatabase
+#### 3.5.2.1 Data dan Integrasi Runtime
 
-Pengujian mencatat URL atau fixture tanpa membuka kredensial, kondisi awal cache, waktu mulai pemuatan, status `isLoaded`, jumlah entitas yang berhasil diproses, hasil `GetRealName()`, dan pesan ketika respons kosong atau tidak valid. Script, fixture, versi Unity, dan screenshot log menjadi bukti minimum untuk UT-01 dan UT-02.
+Pengujian UT-01 dan UT-02 mencatat endpoint atau *fixture* tanpa membuka kredensial, kondisi awal *cache*, status `isLoaded`, jumlah entitas yang diproses, hasil `GetRealName()`, dan pesan ketika respons kosong atau tidak valid. Kode sumber, *fixture*, versi Unity, dan tangkapan layar log menjadi bukti minimum.
 
-#### 3.5.2.2 Pengujian NavigationReceiver
+Pengujian UT-14 dan UT-15 memakai *fixture* terkendali agar kategori nama cocok, hilang dari *scene*, dan belum terdaftar dapat dibandingkan dengan data acuan. Pencarian dua kategori pertama mencakup seluruh hierarki, sedangkan objek *scene* yang belum terdaftar diperiksa pada *root object* sesuai batas implementasi. Kondisi respons kosong, format tidak valid, dan kegagalan jaringan diuji tanpa mengubah *scene*.
 
-Pengujian menggunakan target pada cache, target yang hanya ditemukan setelah cache dibangun ulang, variasi kapitalisasi, objek tidak aktif, dan nama yang benar-benar tidak tersedia. Bukti UT-03 dan UT-04 harus menunjukkan nilai input, Transform hasil, jalur fallback yang terjadi, dan ketiadaan exception.
+#### 3.5.2.2 Navigasi, Rute, dan Penyelesaian Navigasi
 
-#### 3.5.2.3 Pengujian NavigationGuide dan Rendering Rute
+Pengujian UT-03 sampai UT-08 memakai posisi awal, tujuan, NavMesh, dan konfigurasi *renderer* yang sama. Pemeriksaan mencakup pencarian target, variasi kapitalisasi, target hilang, status jalur, jumlah titik, label, jarak, penghentian otomatis, penghentian manual, pergantian tujuan, tikungan, dan perubahan elevasi. Tangkapan layar serta rekaman Play Mode digunakan untuk membandingkan sudut jalur mentah dengan rute akhir.
 
-Pengujian menggunakan posisi awal serta tujuan yang dicatat, NavMesh yang sama, dan konfigurasi renderer yang sama. UT-05 sampai UT-08 memeriksa status jalur, jumlah titik, label, jarak, penghentian otomatis, penghentian manual, pergantian tujuan, tikungan, serta perubahan elevasi. Screenshot sebelum-sesudah dan rekaman Play Mode digunakan untuk menunjukkan perbedaan corners mentah dengan rute akhir.
+Pengujian UT-19 dan UT-22 memeriksa highlighter serta penyelesaian navigasi. Kedatangan normal dan pembatalan diuji terpisah agar tujuan aktif, pembersihan visual, payload `unity_object_name`, jumlah pengiriman event, dan pembersihan status dapat diverifikasi. Listener serta notifikasi React hanya dipakai sebagai konteks integrasi dan tidak diklaim sebagai implementasi Faiz.
 
-#### 3.5.2.4 Pengujian Pointer Lock dan Joystick
+#### 3.5.2.3 Interaksi, Spawn, Minimap, dan Tutorial
 
-Pengujian UT-09 dan UT-10 mencatat perangkat, sistem operasi, browser, resolusi, dan metode input. Pointer Lock diuji setelah klik pengguna dan dilepas dengan ESC, sedangkan joystick diuji pada perangkat sentuh serta dibandingkan dengan tampilan desktop. Screenshot tunggal tidak cukup untuk membuktikan respons input sehingga rekaman singkat atau log aksi turut dilampirkan.
+Pengujian UT-09 dan UT-10 mencatat perangkat, sistem operasi, peramban, resolusi, dan metode input. *Pointer Lock* diuji setelah klik pengguna dan dilepas dengan ESC, sedangkan *joystick* diuji pada perangkat sentuh serta dibandingkan dengan tampilan desktop. Tangkapan layar diam hanya membuktikan tampilan sehingga respons input tetap memerlukan rekaman atau log aksi.
 
-#### 3.5.2.5 Pengujian Building Culling
+Pengujian UT-16 sampai UT-18 mencatat nama spawn, posisi sebelum dan sesudah perpindahan, radius pencarian NavMesh, *override* lokasi, dan perubahan penanda ketika pemain bergerak. UT-20 dan UT-21 memeriksa langkah tutorial yang setara pada desktop dan perangkat bergerak, perubahan mode melalui `SetDevice()`, *fallback* nilai tidak dikenal, serta visibilitas kontrol yang sesuai.
 
-Pengujian UT-11 menggunakan build, scene, posisi awal, jalur kamera, durasi, dan perangkat yang sama. Metrik minimum adalah renderer aktif, draw call, frame time, frame rate, dan memori. Nilai sebelum dan sesudah disajikan bersama konfigurasi jarak serta interval culling. Karena batas minimum dan maksimum pada scene final sama-sama 200 m, pengujian ini hanya membuktikan perilaku ambang tetap 200 m dan tidak digunakan untuk mengklaim adaptasi jarak dinamis. Pengujian juga memverifikasi camera-frustum culling dengan pemeriksaan setiap 0,1 detik, padding 10 m, grace period 0,35 detik, pengecualian target navigasi, serta pemeliharaan renderer yang diperlukan oleh minimap.
+#### 3.5.2.4 Optimasi, Occlusion Culling, dan Build WebGL
 
-#### 3.5.2.6 Pengujian Konfigurasi dan Deployment WebGL
+Pengujian UT-11 menggunakan *build*, *scene*, posisi awal, jalur kamera, durasi, dan perangkat yang sama. Metrik minimumnya meliputi *renderer* aktif, *draw call*, *frame time*, *frame rate*, dan memori. Karena batas minimum dan maksimum pada *scene* final sama-sama 200 m, hasil hanya digunakan untuk menilai ambang tetap dan tidak untuk mengklaim jarak adaptif.
 
-Pengujian UT-12 memeriksa perubahan Player Settings yang diterapkan optimizer. Pengujian UT-13 mencatat versi Unity, ukuran berkas, waktu sampai aplikasi dapat digunakan, perangkat, browser, koneksi, `Content-Encoding`, `Content-Type`, dan pesan Console. Requirement kurang dari 10 detik tidak dinyatakan tercapai sebelum hasil aktual tersedia.
-
-#### 3.5.2.7 Pengujian DatabaseSyncChecker
-
-Pengujian UT-14 dan UT-15 menggunakan fixture terkendali agar hasil tiga kategori dapat dibandingkan dengan data acuan. Verifikasi kategori cocok dan hilang di scene mencakup seluruh hierarki secara rekursif, sedangkan kategori objek scene yang belum terdaftar hanya dibandingkan terhadap root object sesuai batas implementasi. Skenario kegagalan membedakan respons kosong, format tidak valid, dan kegagalan jaringan. Bukti harus menunjukkan bahwa tool memberikan diagnosis tanpa mengubah scene atau menampilkan kondisi kosong sebagai sinkronisasi berhasil.
-
-#### 3.5.2.8 Pengujian Spawn dan Minimap
-
-Pengujian UT-16 sampai UT-18 mencatat nama spawn, posisi sebelum dan sesudah perpindahan, radius pencarian NavMesh, override lokasi, serta perubahan marker selama pemain bergerak. Skenario positif dan negatif dijalankan pada scene serta commit yang sama. Rekaman digunakan untuk membuktikan perpindahan pemain dan pergerakan marker, sedangkan screenshot Inspector mendokumentasikan konfigurasi registry yang diuji.
-
-#### 3.5.2.9 Pengujian Highlighter, Tutorial, Device Sync, dan Penyelesaian Navigasi
-
-Pengujian UT-19 sampai UT-22 mencatat tujuan aktif, perubahan material atau renderer yang disorot, mode perangkat, langkah tutorial, serta event browser yang diterima. Tutorial desktop dan mobile diuji pada langkah yang setara. Penyelesaian otomatis dan penghentian manual diuji terpisah agar payload tujuan, jumlah pengiriman, pembersihan state, serta respons listener dapat diverifikasi tanpa mengklaim implementasi listener React sebagai kontribusi penulis.
-
-#### 3.5.2.10 Pengujian Camera Frustum dan Occlusion Culling
-
-Pengujian UT-23 mencatat status renderer sebelum dan sesudah kamera diputar, status target navigasi, visibilitas area minimap, interval pemeriksaan 0,1 detik, padding 10 m, grace period 0,35 detik, dan perubahan status occlusion kamera. Hasil profiler dan jumlah renderer aktif tetap `[TBD]` sampai kondisi benchmark disamakan.
-
-#### 3.5.2.11 Pengujian Transisi Overview–Gameplay
-
-Pengujian UT-24 memeriksa selector sebelum spawn, pemilihan spawn valid, pembukaan selector ulang, status `useOcclusionCulling`, nilai fog, dan pemulihan kontrol. Bukti wajib berupa log runtime atau assertion Play Mode serta rekaman transisi; screenshot konfigurasi saja tidak cukup untuk membuktikan perubahan state.
+UT-12 dan UT-13 memeriksa Player Settings, ukuran berkas, waktu sampai aplikasi dapat digunakan, perangkat, peramban, jaringan, `Content-Encoding`, `Content-Type`, dan pesan Console. UT-23 dan UT-24 memeriksa *frustum*, *grace period*, pengecualian target, area minimap, status occlusion kamera, nilai fog, dan pemulihan kontrol ketika berpindah antara tampilan awal dan permainan. Kesimpulan performa hanya diberikan setelah tersedia hasil profiler serta kondisi pembanding yang setara.
 
 ### 3.5.3 User Acceptance Test
 
@@ -988,21 +941,21 @@ Pengujian UT-24 memeriksa selector sebelum spawn, pemilihan spawn valid, pembuka
 
 ### 3.5.5 Analisis Kontribusi Faiz terhadap Tindak Lanjut UAT
 
-Temuan UAT merupakan backlog produk bersama, sedangkan penjelasan kontribusi pada [TABREF:kontribusi_faiz_uat] dibatasi pada komponen engine. Tabel ini tidak mengubah status verifikasi bersama dan tidak menyatakan suatu perbaikan selesai sebelum bukti serta retest tersedia.
+Temuan UAT merupakan tindak lanjut produk bersama, sedangkan [TABREF:kontribusi_faiz_uat] hanya memetakan bagian yang berkaitan dengan *engine*. Status produk mengikuti matriks bersama pada Subbab 3.5.4. Kolom bukti pada tabel ini menunjukkan artefak khusus Unity yang masih diperlukan untuk reproduksi teknis dan tidak mengubah status implementasi produk.
 
 [TABLE-ID:kontribusi_faiz_uat]
 [TABLECAPTION:Pemetaan Kontribusi Engine terhadap Tindak Lanjut UAT]
 [TABLE]
 ID Temuan | Kaitan dengan Engine | Kandidat Kontribusi Penulis | Bukti Peran
-UAT-R02 | Pengguna memerlukan petunjuk penggunaan yang mudah ditemukan | Menyediakan tutorial runtime yang menyesuaikan instruksi desktop atau mobile sebagai pelengkap bantuan pada dashboard | Screenshot tutorial desktop dan mobile tersedia; [TBD: build terintegrasi dan retest]
-UAT-R04 | Pengguna perlu mengenali nama ruang atau fasilitas di lingkungan 3D | Menggunakan `realNames` untuk label tujuan, menjaga fallback nama tampilan, dan menyorot tujuan aktif | [TBD: screenshot label dan highlighter, audit cakupan, dan retest]
-UAT-R05 | Pengguna memerlukan onboarding yang mudah dipahami | Menyediakan urutan tutorial dan visual kontrol yang mengikuti mode perangkat dari `SetDevice()` | Langkah `Lihat Sekeliling` telah dibuktikan pada dua mode; [TBD: skenario pengguna, log `SetDevice`, dan retest]
-UAT-R06 | Pengguna perlu mengetahui posisi saat ini | Menyediakan minimap yang mengikuti pemain serta marker pemain dan tujuan aktif | [TBD: screenshot runtime, rekaman pergerakan marker, dan retest]
-UAT-R07 | Pengguna memerlukan pilihan mode dan titik awal | Mendukung pemilihan serta validasi spawn pada NavMesh dan kontrak `SpawnReceiver.SetSpawn()` | [TBD: screenshot pemilihan spawn, log validasi, dan retest]
-UAT-R10 | Pengguna memerlukan konfirmasi ketika mencapai tujuan | Mengirim event browser `OnNavigationCompleted` setelah state navigasi selesai; implementasi dan screenshot notifikasi React tidak menjadi bukti kontribusi Faiz | [TBD: log dispatch event Unity, build yang sama, dan retest pembatalan manual]
+UAT-R02 | Pengguna memerlukan petunjuk penggunaan yang mudah ditemukan | Menyediakan tutorial runtime yang menyesuaikan instruksi desktop atau mobile sebagai pelengkap bantuan pada dashboard | Tangkapan layar tutorial desktop dan mobile tersedia; build terintegrasi dan pengujian ulang khusus Unity belum diverifikasi
+UAT-R04 | Pengguna perlu mengenali nama ruang atau fasilitas di lingkungan 3D | Menggunakan `realNames` untuk label tujuan, menjaga fallback nama tampilan, dan menyorot tujuan aktif | Tangkapan layar label dan highlighter, audit cakupan, serta pengujian ulang belum diverifikasi
+UAT-R05 | Pengguna memerlukan onboarding yang mudah dipahami | Menyediakan urutan tutorial dan visual kontrol yang mengikuti mode perangkat dari `SetDevice()` | Langkah `Lihat Sekeliling` telah dibuktikan pada dua mode; skenario pengguna, log `SetDevice`, dan pengujian ulang belum diverifikasi
+UAT-R06 | Pengguna perlu mengetahui posisi saat ini | Menyediakan minimap yang mengikuti pemain serta marker pemain dan tujuan aktif | Tangkapan layar runtime, rekaman pergerakan marker, dan pengujian ulang belum diverifikasi
+UAT-R07 | Pengguna memerlukan pilihan mode dan titik awal | Mendukung pemilihan serta validasi spawn pada NavMesh dan kontrak `SpawnReceiver.SetSpawn()` | Tangkapan layar pemilihan spawn, log validasi, dan pengujian ulang belum diverifikasi
+UAT-R10 | Pengguna memerlukan konfirmasi ketika mencapai tujuan | Mengirim event browser `OnNavigationCompleted` hanya setelah navigasi selesai secara normal; implementasi dan tangkapan layar notifikasi React tidak menjadi bukti kontribusi Faiz | Log pengiriman event Unity, build yang sama, dan pengujian ulang pembatalan manual belum diverifikasi
 [/TABLE]
 
-Temuan UAT-R03 dan UAT-R08 melibatkan komponen di luar engine, sedangkan UAT-R01 serta UAT-R09 terutama berkaitan dengan konsistensi database, API, pencarian, dan aset. Penulis tidak mengklaim implementasi bagian tersebut sebagai kontribusi personal. Status produk tetap mengikuti fragment bersama pada Subbab 3.5.4 berdasarkan audit kode, pengujian, sumber resmi, dan bukti deployment yang dicantumkan di sana. Sementara itu, penanda `[TBD]` pada [TABREF:kontribusi_faiz_uat] hanya menunjukkan bukti reproduksi khusus modul Unity yang masih perlu dilengkapi dan tidak membatalkan status hasil integrasi tim.
+Temuan UAT-R03 dan UAT-R08 melibatkan komponen di luar *engine*, sedangkan UAT-R01 dan UAT-R09 terutama berkaitan dengan konsistensi basis data, API, pencarian, serta aset. Faiz tidak mengklaim implementasi bagian tersebut sebagai kontribusi personal. Status produk tetap mengikuti fragment bersama pada Subbab 3.5.4 berdasarkan audit kode sumber, pengujian, sumber resmi, dan bukti deployment. Status Belum diverifikasi pada tabel hanya menunjukkan artefak reproduksi khusus Unity yang masih perlu dilengkapi.
 
 ---
 
@@ -1012,13 +965,14 @@ Temuan UAT-R03 dan UAT-R08 melibatkan komponen di luar engine, sedangkan UAT-R01
 
 Berdasarkan perancangan, implementasi, dan pengujian yang terdokumentasi, kesimpulan laporan ini adalah sebagai berikut:
 
-1. Kontribusi penulis sebagai 3D Simulator & Engine Developer menghasilkan susunan modul yang memisahkan konsumsi data, penerimaan perintah tujuan, pencarian Transform, perhitungan NavMesh, rendering rute, kontrol pengguna, optimasi renderer, konfigurasi build, pemeriksaan sinkronisasi, pemilihan spawn, minimap, penanda tujuan, dan tutorial adaptif.
+1. Kontribusi penulis sebagai 3D Simulator dan Engine Developer menghasilkan susunan modul yang memisahkan konsumsi data, penerimaan perintah tujuan, pencarian Transform, perhitungan NavMesh, rendering rute, kontrol pengguna, optimasi *renderer*, konfigurasi *build*, pemeriksaan sinkronisasi, pemilihan spawn, minimap, penanda tujuan, dan tutorial adaptif.
 2. Alur integrasi menggunakan `unity_object_name` sebagai penghubung teknis antara data gedung atau fasilitas dan GameObject di dalam scene. Unity mengonsumsi `GET /api/unity/data` untuk data runtime dan `GET /api/unity/names` untuk editor tool, menerima `NavigateTo()`, `StopNavigation()`, `SetSpawn()`, serta `SetDevice()`, kemudian mengekspos event browser `OnNavigationCompleted` hanya ketika path lengkap dan ambang kedatangan efektif maksimal 2 m terpenuhi, dengan payload tujuan. Pembatalan manual tidak mengirim event kedatangan; implementasi pemanggil dan listener React berada di luar kontribusi penulis.
-3. Navigasi final menggunakan `NavMesh.SamplePosition`, validasi perpindahan lantai, `NavMesh.CalculatePath`, subdivisi linear dengan jarak titik 0,4 m, `RaycastNonAlloc`, moving average berjendela empat titik, dan `LineRenderer` berlebar 0,2 m dengan offset 0,6 m. Jalur diperbarui setelah perpindahan 1 m. Walaupun Inspector menyimpan `stopDistance` 5 m, ambang kedatangan runtime dibatasi maksimal 2 m serta mensyaratkan path lengkap dan kedekatan terhadap endpoint NavMesh. Hasil aktual dedicated tetap mengikuti matriks pengujian dan bukti yang tersedia.
-4. Kontrol karakter dan kamera third-person menggunakan Pointer Lock pada desktop serta joystick virtual pada perangkat bergerak. Tutorial langkah `Lihat Sekeliling` telah menunjukkan instruksi mouse pada desktop dan gestur area kamera pada mobile. Bukti dinamis `WebPlatformSync.SetDevice()`, respons input, dan penerimaan pengguna tetap `[TBD]` sampai log, rekaman, serta retest build terintegrasi tersedia.
+3. Navigasi final menggunakan `NavMesh.SamplePosition`, validasi perpindahan lantai, `NavMesh.CalculatePath`, subdivisi linear dengan jarak titik 0,4 m, `RaycastNonAlloc`, rata-rata bergerak berjendela empat titik, dan `LineRenderer` berlebar 0,2 m dengan *offset* 0,6 m. Jalur diperbarui setelah perpindahan 1 m. Walaupun Inspector menyimpan `stopDistance` 5 m, ambang kedatangan *runtime* dibatasi maksimal 2 m serta mensyaratkan jalur lengkap dan kedekatan terhadap endpoint NavMesh. Hasil setiap skenario tetap mengikuti matriks pengujian dan bukti yang tersedia.
+4. Kontrol karakter dan kamera sudut pandang orang ketiga menggunakan *Pointer Lock* pada desktop serta *joystick* virtual pada perangkat bergerak. Tutorial langkah `Lihat Sekeliling` telah menunjukkan instruksi tetikus pada desktop dan gestur area kamera pada perangkat bergerak. Respons input dan perubahan mode dinamis melalui `WebPlatformSync.SetDevice()` berstatus Belum diverifikasi karena log serta rekaman pada *build* terintegrasi belum tersedia.
 5. Building Culling, camera-frustum culling, occlusion culling, dan WebGL optimizer telah menjadi bagian dari implementasi engine. Batas minimum dan maksimum culling jarak pada scene final sama-sama 200 m sehingga mode `Combined` bekerja dengan jarak efektif tetap, bukan adaptif. Capture NVIDIA Statistics Overlay telah tersedia sebagai bukti runtime pendahuluan, tetapi dampak kuantitatif belum boleh disimpulkan sebelum Unity Profiler, ukuran build, waktu muat, frame time, draw call, renderer aktif, durasi, dan identitas perangkat dilengkapi pada kondisi uji yang terkendali.
-6. `DatabaseSyncChecker` menyediakan mekanisme pencegahan untuk menemukan ketidaksesuaian `unity_object_name` sebelum build. Pencarian padanan API menjangkau hierarki secara rekursif, tetapi kategori objek scene yang belum terdaftar hanya memeriksa root object. Pemeriksaan aktual yang terdokumentasi menampilkan 320 nama cocok, 3 nama yang tidak ditemukan di scene, dan 14 objek root yang belum terdaftar; fixture terkendali dan pengujian kondisi API kosong atau gagal masih `[TBD]`.
-7. Spawn tervalidasi NavMesh, radius override, minimap, destination highlighter, serta tutorial desktop/mobile telah memiliki bukti visual pada implementasi final. Transisi overview–gameplay dan event selesai navigasi tersedia pada kode, tetapi keterkaitannya dengan UAT-R02, UAT-R05, UAT-R06, UAT-R07, dan UAT-R10 belum dinyatakan selesai sampai log event, rekaman interaksi, build yang sama, serta retest tersedia. Tampilan notifikasi React dikecualikan dari bukti karena berada di luar kontribusi penulis.
+6. `DatabaseSyncChecker` menyediakan mekanisme pencegahan untuk menemukan ketidaksesuaian `unity_object_name` sebelum *build*. Pencarian padanan API menjangkau hierarki secara rekursif, tetapi kategori objek *scene* yang belum terdaftar hanya memeriksa *root object*. Snapshot pemeriksaan lama menampilkan 320 nama cocok, 3 nama yang tidak ditemukan di *scene*, dan 14 objek *root* yang belum terdaftar. Angka itu tidak dianggap sebagai kondisi seed final. Pengujian menggunakan data uji terkendali serta kondisi API kosong atau gagal berstatus Belum diverifikasi.
+7. Spawn tervalidasi NavMesh, radius *override*, minimap, *destination highlighter*, serta tutorial desktop dan perangkat bergerak telah memiliki bukti visual. Pada tingkat produk, tindak lanjut UAT-R01 sampai UAT-R10 telah diterapkan berdasarkan bukti bersama. Namun, rekaman interaksi dan log khusus modul Unity untuk R02, R05, R06, R07, dan R10 masih berstatus Belum diverifikasi. Tampilan notifikasi React tidak digunakan sebagai bukti kontribusi Faiz.
+8. Pada tingkat produk bersama, pengujian Black Box awal menghasilkan 23 dari 24 skenario lulus. Setelah BB-20 diperbaiki dan diuji ulang, hasil akhir menjadi 24 dari 24 skenario lulus. UAT tertutup bersama dua dosen penguji, dua dosen pembimbing, dan satu perwakilan Humas menghasilkan nilai gabungan 81,50 persen. Hasil tersebut tidak diperlakukan sebagai penilaian pengguna publik. Angka pengujian web dan API tetap menjadi bukti teknis milik Iman dan tidak dihitung sebagai hasil pengujian khusus Unity oleh Faiz.
 
 ## 4.2 Saran
 
@@ -1026,8 +980,8 @@ Saran pengembangan lebih lanjut adalah sebagai berikut:
 
 1. Melengkapi automated Play Mode Test dan Edit Mode Test untuk `BuildingDatabase`, `NavigationReceiver`, `NavigationGuide`, Building Culling, `DatabaseSyncChecker`, spawn, minimap, highlighter, tutorial, sinkronisasi perangkat, dan event selesai navigasi agar regresi dapat dideteksi sebelum build WebGL dibuat.
 2. Menetapkan prosedur benchmark yang merekam perangkat, versi peramban, jenis koneksi, ukuran build, waktu muat, frame time, draw call, penggunaan memori, dan jumlah renderer aktif agar dampak optimasi dapat dibandingkan secara adil.
-3. Melakukan retest minimap dan marker tujuan untuk menilai keterbacaan, skala, orientasi, dan kegunaannya sebagai tindak lanjut UAT-R06 sebelum menentukan penyempurnaan visual berikutnya.
-4. Membedakan penyelesaian karena mencapai `stopDistance` dari penghentian manual pada payload atau state event, lalu memverifikasi melalui log bahwa `OnNavigationCompleted` hanya dikirim pada kondisi kedatangan. Tampilan notifikasi pada React tetap menjadi tanggung jawab integrator web.
+3. Melakukan pengujian ulang minimap dan marker tujuan untuk menilai keterbacaan, skala, orientasi, dan kegunaannya sebagai tindak lanjut UAT-R06 sebelum menentukan penyempurnaan visual berikutnya.
+4. Menambahkan pengujian otomatis lintas Unity dan peramban untuk memastikan `OnNavigationCompleted` tetap hanya dikirim ketika pengguna mencapai tujuan dan tidak terkirim saat navigasi dibatalkan. Tampilan notifikasi pada React tetap menjadi tanggung jawab integrator web.
 5. Menyempurnakan deteksi kapabilitas perangkat agar joystick virtual hanya muncul ketika relevan dan Pointer Lock memiliki fallback yang jelas pada peramban yang tidak mendukungnya secara penuh.
 6. Menjaga sinkronisasi `unity_object_name` melalui pemeriksaan otomatis pada pipeline build serta memperluas pemeriksaan objek scene yang belum terdaftar dari root object ke hierarki yang relevan, sehingga build dapat ditahan ketika terdapat target database yang tidak memiliki padanan di scene.
 7. Mengembangkan strategi pemuatan aset secara bertahap apabila hasil profiler menunjukkan bahwa ukuran atau inisialisasi aset menjadi hambatan utama sambil mempertahankan kontrak endpoint, method penerima Unity, dan event browser yang telah didokumentasikan.
@@ -1043,27 +997,27 @@ Jamaludin, J., dan Saepuloh, L. (2024). Tren riset twin digital smart campus. *S
 
 Kurniawan, T. A. (2018). Pemodelan Use Case (UML): Evaluasi terhadap beberapa kesalahan dalam praktik. *Jurnal Teknologi Informasi dan Ilmu Komputer*, 5(1), 77–86. https://doi.org/10.25126/jtiik.201851610
 
-Maulida, M., Zahro, F., Hakim, R., & Akbar, M. S. (2025). Pengujian black box testing pada sistem website pemesanan online Toko Ayam Krispy. *Jurnal Media Akademik*, 3(5). https://doi.org/10.62281/v3i5.1908
+Maulida, M., Zahro, F., Hakim, R., dan Akbar, M. S. (2025). Pengujian black box testing pada sistem website pemesanan online Toko Ayam Krispy. *Jurnal Media Akademik*, 3(5). https://doi.org/10.62281/v3i5.1908
 
 MDN Web Docs, M. (2025). *Pointer Lock API*. https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API
 
-Muharam, Y., Anggara, M. B., & Hanafi, T. J. (2023). Implementasi peta 3 dimensi menggunakan metode IMSDD (Interactive Multimedia System Design and Development) dan WebGL API berbasis web (Studi kasus di SMP Karya Pembangunan 2 Majalaya). *Jurnal Informatika-COMPUTING*, 10, 20–30. https://doi.org/10.55222/computing.v10i01.1155
+Muharam, Y., Anggara, M. B., dan Hanafi, T. J. (2023). Implementasi peta 3 dimensi menggunakan metode IMSDD (Interactive Multimedia System Design and Development) dan WebGL API berbasis web (Studi kasus di SMP Karya Pembangunan 2 Majalaya). *Jurnal Informatika-COMPUTING*, 10, 20–30. https://doi.org/10.55222/computing.v10i01.1155
 
-Pricillia, T., & Zulfachmi. (2021). Perbandingan metode pengembangan perangkat lunak (Waterfall, Prototype, RAD). *Jurnal Bangkit Indonesia*, 10(1), 6–12. https://doi.org/10.52771/bangkitindonesia.v10i1.153
+Pricillia, T., dan Zulfachmi. (2021). Perbandingan metode pengembangan perangkat lunak (Waterfall, Prototype, RAD). *Jurnal Bangkit Indonesia*, 10(1), 6–12. https://doi.org/10.52771/bangkitindonesia.v10i1.153
 
-Taurusta, C., Asiddiq, A. M., Suprianto, S., & Setiawan, H. (2024). Visualisasi gedung kampus 1 Universitas Muhammadiyah Sidoarjo menggunakan augmented reality sebagai media informasi. *Journal of Technology and System Information*, 1(1), 55–70. https://doi.org/10.47134/jtsi.v1i1.2146
+Taurusta, C., Asiddiq, A. M., Suprianto, S., dan Setiawan, H. (2024). Visualisasi gedung kampus 1 Universitas Muhammadiyah Sidoarjo menggunakan augmented reality sebagai media informasi. *Journal of Technology and System Information*, 1(1), 55–70. https://doi.org/10.47134/jtsi.v1i1.2146
 
 UPNVJ. (2022). Lokasi kampus. https://www.upnvj.ac.id/id/tentang-upn/lokasi-kampus.html
 
 UPNVJ. (2025a). Kantin. https://www.upnvj.ac.id/id/fasilitas-layanan/kantin.html
 
-UPNVJ. (2026a). Hubungi kami. *Penerimaan Mahasiswa Baru UPN Veteran Jakarta*. https://penmaru.upnvj.ac.id/id/contact.html
+UPNVJ. (2026). Rapat koordinasi Humas UPNVJ 2026: Fokus strategi komunikasi digital dan media sosial perguruan tinggi. https://www.upnvj.ac.id/id/berita/2026/02/rapat-koordinasi-humas-upnvj-2026-fokus-strategi-komunikasi-digital-dan-media-sosial-perguruan-tinggi.html
 
-Unity Technologies, U. (2026). *AI Navigation: Unity 6.0 Manual*. https://docs.unity3d.com/6000.0/Documentation/Manual/com.unity.ai.navigation.html
+Unity Technologies. (2026a). *AI Navigation: Unity 6.0 Manual*. https://docs.unity3d.com/6000.0/Documentation/Manual/com.unity.ai.navigation.html
 
-Unity Technologies, U. (2026). *Deploy a web application: Unity 6.0 Manual*. https://docs.unity3d.com/6000.0/Documentation/Manual/webgl-deploying.html
+Unity Technologies. (2026b). *Deploy a web application: Unity 6.0 Manual*. https://docs.unity3d.com/6000.0/Documentation/Manual/webgl-deploying.html
 
-Unity Technologies, U. (2026). *Input System: Unity 6.0 Manual*. https://docs.unity3d.com/6000.0/Documentation/Manual/com.unity.inputsystem.html
+Unity Technologies. (2026c). *Input System: Unity 6.0 Manual*. https://docs.unity3d.com/6000.0/Documentation/Manual/com.unity.inputsystem.html
 
 ---
 
@@ -1075,13 +1029,13 @@ NIM: 2210511138
 
 Judul: Pengembangan Sistem Navigasi Spasial dan Optimasi Engine Unity WebGL pada Denah Virtual UPNVJ Kampus Pondok Labu
 
-[TBD: masukkan naskah pernyataan keaslian dan halaman tanda tangan sesuai template resmi kampus]
+Naskah pernyataan keaslian dan halaman tanda tangan belum tersedia. Bukti yang masih diperlukan adalah halaman sesuai template resmi kampus yang telah ditandatangani.
 
 ---
 
 # LAMPIRAN 2. Bukti Implementasi Modul Unity
 
-Bukti implementasi pada bagian ini menggunakan project final `C:\Users\Faiz\Proposal\T_A---Copy` pada commit `5f575c0`, Unity 6000.4.1f1, dan scene `Assets/Scene/SceneUtama.unity`. Project `C:\Users\Faiz\Proposal` hanya menjadi baseline historis Unity 6000.2.6f1 dan tidak digunakan untuk membuktikan konfigurasi atau hasil final. Apabila project Unity berubah setelah commit tersebut, commit acuan dan seluruh bukti yang terdampak harus diperbarui agar kode, scene, build, dan laporan berasal dari versi yang sama.
+Bukti implementasi pada bagian ini menggunakan kode sumber final, Unity 6000.4.1f1, dan `SceneUtama`. Apabila proyek Unity berubah, indeks bukti harus diperbarui agar kode sumber, *scene*, *build*, dan laporan tetap berasal dari versi yang sama. Rincian versi pengembangan disimpan pada catatan internal dan tidak ditampilkan dalam naskah laporan.
 
 Panduan pengambilan bukti pada [TABREF:panduan_bukti_unity] menggunakan Game View 1920 × 1080. Nama file dipertahankan stabil agar dapat dimasukkan ke `images/manifest.json` setelah aset diterima. Setiap gambar kemudian digunakan tepat sekali melalui marker gambar, diberi caption gambar, dan dirujuk di tengah kalimat melalui referensi gambar ID-based. Marker tersebut belum ditambahkan untuk file yang belum tersedia.
 
@@ -1135,25 +1089,25 @@ Spawn, minimap, highlighter, kontrol, dan tutorial | `spawn_selection_overview`,
 WebGL dan occlusion | `webgl_build_profile`, `webgl_player_settings_publishing`, `webgl_player_settings_other`, `webgl_optimizer_console`, `webgl_network_data`, `webgl_network_wasm`, `webgl_wasm_mime_headers`, `occlusion_area_config`, `occlusion_data_asset`, `occlusion_main_camera`, `occlusion_minimap_camera` | Sudah ditempatkan pada BAB III | Exception support telah diperbaiki; bukti konfigurasi tidak menjadi klaim performa
 Sinkronisasi database–scene | `database_sync_checker_result` | Sudah ditempatkan pada BAB III | Lengkapi fixture gagal/kosong untuk UT-15
 Bukti performa awal | `runtime_stats_culling_enabled`, `runtime_stats_culling_disabled` | Ditempatkan sebagai capture statistik runtime pendahuluan | Belum memenuhi benchmark Unity Profiler dan tidak digunakan untuk menyimpulkan peningkatan
-Belum tersedia | Unity Profiler, log dispatch `OnNavigationCompleted`, dan rekaman interaksi | Tetap `[TBD]` | Notifikasi React sengaja tidak dimasukkan karena bukan kontribusi Faiz
+Belum tersedia | Unity Profiler, log pengiriman `OnNavigationCompleted`, dan rekaman interaksi | Belum diverifikasi | Notifikasi React sengaja tidak dimasukkan karena bukan kontribusi Faiz
 [/TABLE]
 
 Aturan pengambilan bukti adalah sebagai berikut:
 
-1. Gunakan project final, scene, commit, build, dan data yang sama untuk bukti hasil. Satu gambar baseline bersifat opsional dan hanya ditempatkan pada lampiran sebagai penjelas perkembangan.
-2. Sertakan rekaman 15–30 detik untuk Pointer Lock, joystick, perpindahan marker, Building Culling, dan event selesai karena screenshot diam tidak membuktikan interaksi.
-3. Catat perangkat, sistem operasi, browser, resolusi, commit, scene, durasi, dan metode ukur pada bukti performa. Angka sebelum dan sesudah hanya dibandingkan apabila seluruh kondisi tersebut sama.
+1. Gunakan project final, scene, build, dan data yang sama untuk bukti hasil. Satu gambar baseline bersifat opsional dan hanya ditempatkan pada lampiran sebagai penjelas perkembangan.
+2. Sertakan rekaman 15–30 detik untuk Pointer Lock, joystick, perpindahan marker, Building Culling, dan event selesai karena tangkapan layar diam tidak membuktikan interaksi.
+3. Catat perangkat, sistem operasi, browser, resolusi, versi kode sumber, scene, durasi, dan metode ukur pada bukti performa. Angka sebelum dan sesudah hanya dibandingkan apabila seluruh kondisi tersebut sama.
 4. Sembunyikan token, cookie, kredensial, dan data sensitif lain sebelum mengambil DevTools Network atau Console.
-5. Gunakan screenshot top-down lama di `Assets/Screenshots` hanya sebagai sumber tambahan minimap, bukan pengganti tampilan minimap saat runtime.
-6. Simpan Console log, Profiler capture, dan HAR atau Network log bersama screenshot agar hasil aktual dapat ditelusuri.
+5. Gunakan tangkapan layar top-down lama hanya sebagai sumber tambahan minimap, bukan pengganti tampilan minimap saat runtime.
+6. Simpan Console log, Profiler capture, dan HAR atau Network log bersama tangkapan layar agar hasil aktual dapat ditelusuri.
 
-Script kontribusi yang diarsipkan sebagai bukti adalah `BuildingDatabase.cs`, `NavigationReceiver.cs`, `NavigationGuide.cs`, `BuildingCulling.cs`, `WebGLOptimizer.cs`, `DatabaseSyncChecker.cs`, `CampusOcclusionInstaller.cs`, `SpawnPointRegistry.cs`, `SpawnSelectionUI.cs`, `SpawnMinimapSceneInstaller.cs`, `MinimapFollow.cs`, `DayNightCycle.cs`, `DestinationHighlighter.cs`, `NavigationDestinationVisual.cs`, `GameTutorialController.cs`, `GameTutorialUI.cs`, `WebPlatformSync.cs`, `TestNavigation.cs`, dan `ReactBridge.jslib`. Artefak konfigurasi yang menyertai bukti adalah `SceneUtama.unity`, `ProjectVersion.txt`, `NavMeshAreas.asset`, `OcclusionCullingData.asset`, `EditorBuildSettings.asset`, `Packages/manifest.json`, output build final, Console log, Profiler capture, serta HAR atau Network log. [TBD: arsip script, artefak konfigurasi, rekaman interaksi, log dispatch event, dan log final]
+Skrip kontribusi yang diarsipkan sebagai bukti adalah `BuildingDatabase.cs`, `NavigationReceiver.cs`, `NavigationGuide.cs`, `BuildingCulling.cs`, `WebGLOptimizer.cs`, `DatabaseSyncChecker.cs`, `CampusOcclusionInstaller.cs`, `SpawnPointRegistry.cs`, `SpawnSelectionUI.cs`, `SpawnMinimapSceneInstaller.cs`, `MinimapFollow.cs`, `DayNightCycle.cs`, `DestinationHighlighter.cs`, `NavigationDestinationVisual.cs`, `GameTutorialController.cs`, `GameTutorialUI.cs`, `WebPlatformSync.cs`, `TestNavigation.cs`, dan `ReactBridge.jslib`. Artefak konfigurasi yang menyertai bukti adalah `SceneUtama`, informasi versi Unity, konfigurasi NavMesh, data occlusion, konfigurasi build, output build final, Console log, Profiler capture, serta HAR atau Network log. Arsip skrip, artefak konfigurasi, rekaman interaksi, log pengiriman event, dan log final belum diverifikasi kelengkapannya.
 
 ---
 
 # LAMPIRAN 3. Bukti Pengujian dan Benchmark
 
-Bukti pengujian pada bagian ini perlu memuat konfigurasi perangkat, versi Unity, versi peramban, kondisi jaringan, fixture data, hasil Play Mode Test, hasil Edit Mode Test, Unity Profiler, DevTools Network, perbandingan build, dan bukti retest. [TBD: artefak pengujian final]
+Bukti pengujian pada bagian ini perlu memuat konfigurasi perangkat, versi Unity, versi peramban, kondisi jaringan, fixture data, hasil Play Mode Test, hasil Edit Mode Test, Unity Profiler, DevTools Network, perbandingan build, dan bukti pengujian ulang. Artefak pengujian final tersebut belum diverifikasi kelengkapannya.
 
 ---
 

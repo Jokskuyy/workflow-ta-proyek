@@ -1,58 +1,30 @@
-@startuml gambar-2-10-tahap-pengembangan
-' Gambar 2.10 - Tahap Pengembangan (Model Prototyping, iteratif)
-' Sumber: BAB II - 2.3.1 Rencana Pengembangan
-
-skinparam backgroundColor #FFFFFF
+@startuml
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 14
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
-skinparam defaultFontSize 13
-skinparam ArrowColor #444444
-skinparam ActivityBorderColor #555555
-skinparam ActivityBackgroundColor #F2F2F2
-skinparam ActivityDiamondBackgroundColor #ECECEC
-skinparam ActivityDiamondBorderColor #555555
-skinparam NoteBackgroundColor #FAFAFA
-skinparam NoteBorderColor #BBBBBB
-
-title Gambar 2.10 — Tahap Pengembangan (Model Prototyping)
+skinparam roundcorner 12
+skinparam ArrowColor #4B5563
+skinparam activity {
+  FontName "Times New Roman"
+  FontStyle plain
+  BackgroundColor #F8FAFC
+  BorderColor #475569
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #475569
+  StartColor #334155
+  EndColor #334155
+}
 
 start
-
-:1. Pengumpulan Kebutuhan\n(Requirement Gathering);
-note right
-  Wawancara stakeholder & survei awal
-  untuk memetakan fungsionalitas
-  Full Stack API dan dashboard.
-end note
-
-repeat
-  :2. Membangun Prototyping Awal\n(Quick Design);
-  note right
-    Desain skema database (ERD)
-    dan mockup antarmuka
-    dashboard admin & publik.
-  end note
-
-  :3. Evaluasi Prototipe\n(Evaluation & Testing);
-  note right
-    Pengujian backend API & dashboard
-    via Black Box Testing dan
-    validasi internal.
-  end note
-
-  if (Prototipe diterima?) then (Belum)
-    :4. Iterasi Perbaikan\n(Iteration);
-    note right
-      Perbaikan bug fungsionalitas
-      CRUD, RLS database, atau
-      koneksi API.
-    end note
-  endif
-repeat while (Perlu perbaikan?) is (Ya) not (Tidak)
-->Prototipe disetujui;
-
-:Sistem siap rilis;
-
+:Analisis kebutuhan pengguna dan\nkontrak integrasi sistem;
+:Perancangan scene, NavMesh,\nkontrol, dan struktur runtime;
+:Pembuatan prototipe navigasi\ndan rendering rute;
+:Evaluasi pada Unity Editor\ndan peramban WebGL;
+while (Hasil evaluasi belum sesuai?) is (Ya)
+  :Perbaikan rute, spawn, minimap,\ntutorial, dan optimasi scene;
+  :Evaluasi ulang pada Unity Editor\ndan peramban WebGL;
+endwhile (Tidak)
+:Integrasi artefak WebGL\ndengan dashboard React;
+:Pengujian ulang fungsi, integrasi,\ndan performa runtime;
 stop
-
 @enduml

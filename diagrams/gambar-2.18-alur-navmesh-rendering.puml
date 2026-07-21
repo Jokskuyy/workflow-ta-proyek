@@ -1,0 +1,42 @@
+@startuml
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 10
+skinparam ArrowColor #475569
+skinparam activity {
+  FontName "Times New Roman"
+  FontStyle plain
+  BackgroundColor #F8FAFC
+  BorderColor #475569
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #475569
+  StartColor #334155
+  EndColor #334155
+}
+
+start
+:Terima dan normalisasi unity_object_name;
+if (Target ditemukan?) then (Tidak)
+  :Hentikan permintaan\ntanpa callback kedatangan;
+  stop
+else (Ya)
+  :Proyeksikan pemain 2 meter dan tujuan 2 meter,\ndengan fallback tujuan 5 meter;
+  if (Posisi valid, selisih vertikal <= 2 meter,\ndan NavMeshPath lengkap?) then (Tidak)
+    :Pertahankan rute valid terakhir\ndan jadwalkan percobaan ulang 1 detik;
+  else (Ya)
+    :Subdivisi 0,4 meter, raycast, offset 0,6 meter,\nmoving average 4 titik, lalu gambar LineRenderer;
+  endif
+  while (Navigasi aktif?) is (Ya)
+    if (Pemain berpindah lebih dari 1 meter?) then (Ya)
+      :Hitung ulang dan gambar rute;
+    endif
+    if (Jarak langsung dan sisa rute\nmasing-masing <= 2 meter?) then (Ya)
+      :CompleteNavigation, hapus rute,\ndan kirim OnNavigationCompleted;
+      stop
+    endif
+  endwhile (Dibatalkan)
+  :StopNavigation dan hapus rute\ntanpa callback kedatangan;
+  stop
+endif
+@enduml

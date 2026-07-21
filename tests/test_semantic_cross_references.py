@@ -164,14 +164,34 @@ def test_reference_token_becomes_ref_field_with_cached_value():
     assert count == 1
     assert unresolved == []
     assert "".join(paragraph.itertext()) == (
-        "Susunan pada  REF fig_arsitektur \\h Gambar 2.3 menjelaskan sistem."
+        "Susunan pada  REF fig_arsitektur \\h \\* CHARFORMAT "
+        "Gambar 2.3 menjelaskan sistem."
     )
-    assert "REF fig_arsitektur \\h" in " ".join(
+    assert "REF fig_arsitektur \\h \\* CHARFORMAT" in " ".join(
         element.text or "" for element in paragraph.iter(f"{{{W}}}instrText")
     )
     assert "[FIGREF:" not in "".join(
         element.text or "" for element in paragraph.iter(f"{{{W}}}t")
     )
+
+    field_runs = [
+        run for run in paragraph.findall(f"{{{W}}}r")
+        if run.find(f"{{{W}}}fldChar") is not None
+        or run.find(f"{{{W}}}instrText") is not None
+        or "Gambar 2.3" in "".join(run.itertext())
+    ]
+    assert len(field_runs) == 5
+    for field_run in field_runs:
+        r_pr = field_run.find(f"{{{W}}}rPr")
+        assert r_pr is not None
+        fonts = r_pr.find(f"{{{W}}}rFonts")
+        assert all(
+            fonts.get(f"{{{W}}}{name}") == "Times New Roman"
+            for name in ("ascii", "hAnsi", "eastAsia", "cs")
+        )
+        assert r_pr.find(f"{{{W}}}b").get(f"{{{W}}}val") == "0"
+        assert r_pr.find(f"{{{W}}}i").get(f"{{{W}}}val") == "0"
+        assert r_pr.find(f"{{{W}}}sz").get(f"{{{W}}}val") == "24"
 
 
 def test_final_validator_accepts_semantic_bookmark_and_ref():

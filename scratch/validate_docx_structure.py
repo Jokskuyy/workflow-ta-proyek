@@ -54,6 +54,129 @@ SEMANTIC_BOOKMARK_RE = re.compile(r'^(?:fig|tbl)_[a-z0-9_]+$')
 REF_FIELD_RE = re.compile(r'\bREF\s+([A-Za-z][A-Za-z0-9_]*)\b', re.IGNORECASE)
 
 
+def validate_times_new_roman_fonts(xml_parts):
+    """Return findings for authored OOXML text that names another font."""
+    findings = set()
+    allowed = {'times new roman', 'symbol', 'wingdings'}
+
+    def is_allowed(value):
+        normalized = (value or '').strip().lower()
+        return (
+            not normalized
+            or normalized in allowed
+            or normalized.startswith('wingdings ')
+        )
+
+    for part_name, raw_xml in xml_parts.items():
+        try:
+            root = ET.fromstring(raw_xml)
+        except ET.ParseError:
+            continue
+        for fonts in root.iter(f'{{{W_NS}}}rFonts'):
+            for attr in ('ascii', 'hAnsi', 'eastAsia', 'cs'):
+                value = fonts.get(f'{{{W_NS}}}{attr}')
+                if value and not is_allowed(value):
+                    findings.add(
+                        f"[font] {part_name} uses {attr}={value!r}; "
+                        "expected Times New Roman."
+                    )
+            for attr in ('asciiTheme', 'hAnsiTheme', 'eastAsiaTheme', 'cstheme'):
+                if fonts.get(f'{{{W_NS}}}{attr}') is not None:
+                    findings.add(
+                        f"[font] {part_name} retains w:{attr}; "
+                        "theme fonts are not allowed in report text."
+                    )
+        for local_name in ('latin', 'ea', 'cs'):
+            for font in root.iter(f'{{{A_NS}}}{local_name}'):
+                value = font.get('typeface')
+                if value and not is_allowed(value):
+                    findings.add(
+                        f"[font] {part_name} uses DrawingML typeface={value!r}; "
+                        "expected Times New Roman."
+                    )
+    return sorted(findings)
+
+
+def validate_body_bold_usage(doc_root):
+    """Reject direct bold in report body outside approved structural roles."""
+    body = doc_root.find(f'{{{W_NS}}}body')
+    if body is None:
+        return []
+
+    parent = {child: node for node in body.iter() for child in node}
+    findings = []
+    in_report_body = False
+
+    def style_id(paragraph):
+        p_pr = paragraph.find(f'{{{W_NS}}}pPr')
+        style = p_pr.find(f'{{{W_NS}}}pStyle') if p_pr is not None else None
+        return style.get(f'{{{W_NS}}}val', '') if style is not None else ''
+
+    def in_first_table_row(paragraph):
+        node = paragraph
+        row = None
+        while node in parent:
+            node = parent[node]
+            if node.tag == f'{{{W_NS}}}tr':
+                row = node
+                break
+        if row is None or row not in parent:
+            return False
+        table = parent[row]
+        rows = [child for child in table if child.tag == f'{{{W_NS}}}tr']
+        return bool(rows and rows[0] is row)
+
+    def bold_enabled(run):
+        r_pr = run.find(f'{{{W_NS}}}rPr')
+        if r_pr is None:
+            return False
+        bold = r_pr.find(f'{{{W_NS}}}b')
+        if bold is None:
+            return False
+        return (bold.get(f'{{{W_NS}}}val') or '1').lower() not in {
+            '0', 'false', 'off', 'none'
+        }
+
+    for paragraph_index, paragraph in enumerate(body.iter(f'{{{W_NS}}}p')):
+        text = ''.join(
+            node.text or '' for node in paragraph.iter(f'{{{W_NS}}}t')
+        ).strip()
+        style = style_id(paragraph)
+        if style == 'Heading1' and re.match(r'^BAB\s+(?:I|1)\b', text, re.IGNORECASE):
+            in_report_body = True
+        if not in_report_body:
+            continue
+        if style.startswith('Heading') or style == 'taappendixheading':
+            continue
+        if in_first_table_row(paragraph):
+            continue
+
+        if style in {'Caption', 'Keterangan'}:
+            label_match = re.match(r'^(?:Gambar|Tabel)\s+\d+(?:\.\d+)+', text)
+            label = label_match.group(0) if label_match else ''
+            for run in paragraph.findall(f'{{{W_NS}}}r'):
+                run_text = ''.join(
+                    node.text or '' for node in run.iter(f'{{{W_NS}}}t')
+                )
+                if bold_enabled(run) and run_text and run_text not in label:
+                    findings.append(
+                        f"[bold] caption paragraph {paragraph_index} has bold "
+                        f"description text {run_text!r}."
+                    )
+            continue
+
+        for run in paragraph.findall(f'{{{W_NS}}}r'):
+            run_text = ''.join(
+                node.text or '' for node in run.iter(f'{{{W_NS}}}t')
+            ).strip()
+            if run_text and bold_enabled(run):
+                findings.append(
+                    f"[bold] body paragraph {paragraph_index} has disallowed "
+                    f"bold text {run_text!r}."
+                )
+    return findings
+
+
 def validate_page_layout(doc_root):
     """Return fatal findings for any section that violates campus geometry."""
     body = doc_root.find(f'{{{W_NS}}}body')
@@ -939,6 +1062,13 @@ def main():
                     'word/ta-footer',
                 ))
             }
+            font_xml_parts = {
+                name: z.read(name)
+                for name in z.namelist()
+                if name.startswith('word/')
+                and name.endswith('.xml')
+                and name != 'word/fontTable.xml'
+            }
     except Exception as e:
         print(f"Error: Failed to open zip or read XML from {docx_path}: {e}")
         sys.exit(1)
@@ -1013,6 +1143,9 @@ def main():
     print("Iterating paragraphs for structure validation...")
     
     errors_found = []
+    print("Checking Times New Roman usage and approved bold roles...")
+    errors_found.extend(validate_times_new_roman_fonts(font_xml_parts))
+    errors_found.extend(validate_body_bold_usage(doc_root))
     print("Checking A4 page size and campus margins on every section...")
     layout_errors = validate_page_layout(doc_root)
     errors_found.extend(layout_errors)

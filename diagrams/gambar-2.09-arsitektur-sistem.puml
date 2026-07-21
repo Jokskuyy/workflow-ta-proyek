@@ -1,68 +1,60 @@
-@startuml gambar-2-09-arsitektur-sistem
-' Gambar 2.9 - Diagram Arsitektur Sistem (versi terkini, mengacu PRD)
-' Menggantikan arsitektur lama (BuildingDataReceiver/BuildingClickHandler - deprecated)
-
-skinparam backgroundColor #FFFFFF
+@startuml
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 13
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
-skinparam defaultFontSize 12
-skinparam ArrowColor #444444
-skinparam componentStyle rectangle
+skinparam roundcorner 10
+skinparam ArrowColor #475569
 skinparam rectangle {
-  BackgroundColor #F2F2F2
-  BorderColor #555555
+  FontName "Times New Roman"
+  FontStyle plain
+  BackgroundColor #F8FAFC
+  BorderColor #475569
 }
 skinparam component {
-  BackgroundColor #F7F7F7
-  BorderColor #666666
-}
-skinparam database {
-  BackgroundColor #ECECEC
-  BorderColor #555555
-}
-skinparam actor {
-  BackgroundColor #ECECEC
-  BorderColor #555555
+  FontName "Times New Roman"
+  FontStyle plain
+  BackgroundColor #F8FAFC
+  BorderColor #475569
 }
 
-title Gambar 2.9 — Diagram Arsitektur Sistem
+left to right direction
 
-actor "Pengguna Publik" as User
-actor "Administrator" as Admin
+actor "Pengguna" as user
 
-rectangle "Browser (Klien)" as Browser {
-  component "React SPA\n(Vite)\n- Dashboard Publik\n- Admin Panel\n- Panel Pencarian\n- Multi-bahasa" as React
-  component "Unity WebGL Canvas\n- Scene 3D Kampus\n- NavMesh Pathfinding\n- First-person Control" as UnityCanvas
-  React -right-> UnityCanvas : SendMessage\n(\"NavigationReceiver\",\n\"NavigateTo\") — satu arah
+rectangle "Vercel Static Hosting" as vercel {
+  rectangle "Dashboard React\nPublik dan Admin" as react
+  rectangle "Denah 2D\nGraf dan A*" as map2d
+  rectangle "Unity WebGL\nRuntime 3D" as unity
 }
 
-rectangle "Vercel" as Vercel {
-  component "Static Hosting\n(dist/, unity-builds/)" as Static
-  component "Serverless Functions\n/api/unity/data\n/api/unity/names\n/api/buildings, /api/rooms\n/api/health" as Serverless
+rectangle "Vercel Serverless Functions" as api {
+  rectangle "GET /api/unity/data" as runtimeApi
+  rectangle "GET /api/unity/names" as editorApi
+  rectangle "GET /api/health" as healthApi
 }
 
-rectangle "Server Kampus" as Kampus {
-  component "Express.js (:3001)\n- Proxy Umami\n- Rate limiter" as Express
-  component "Umami Analytics\n(Docker :3000)" as Umami
-  Express -right-> Umami : proxy
-}
+database "Supabase\nAuth, data, dan analitik" as supabase
+rectangle "DatabaseSyncChecker\nUnity Editor" as checker
+rectangle "Express Proxy\ndan Rate Limiter" as express
+rectangle "Umami\nOpsional" as umami
 
-database "Supabase Cloud\n- PostgreSQL\n- Auth (JWT)\n- Row Level Security" as Supabase
+user --> react : Mengakses dashboard
+react --> map2d : Memilih mode 2D
+react --> unity : Memuat mode 3D
+react --> supabase : Auth dan CRUD langsung
+react --> supabase : Pencatatan analitik aplikasi
+unity --> runtimeApi : Mengambil data runtime
+runtimeApi --> supabase : Membaca gedung dan fasilitas
+checker --> editorApi : Memeriksa identifier editor
+editorApi --> supabase : Membaca nama objek
+react --> unity : NavigateTo / StopNavigation\nSetSpawn / SetDevice
+unity --> react : OnNavigationCompleted\nJSON unity_object_name\nhanya setelah tiba normal
+express ..> umami : Proxy analitik opsional
+react ..> express : Jalur opsional
+healthApi --> supabase : Memeriksa layanan
 
-' Alur pengguna
-User --> React : Akses dashboard & denah
-Admin --> React : Login & CRUD data
-
-' Frontend ke layanan
-React --> Static : Muat aset (SPA + WebGL)
-React --> Serverless : REST API (data gedung/fasilitas)
-React --> Supabase : Auth & query (RLS)
-React --> Express : Statistik analitik
-
-' Unity menarik data sendiri (runtime)
-UnityCanvas --> Serverless : HTTP GET /api/unity/data
-
-' Serverless ke database
-Serverless --> Supabase : Query data
-
+note bottom of unity
+Pembatalan dan target yang tidak ditemukan
+tidak mengirim callback kedatangan.
+end note
 @enduml

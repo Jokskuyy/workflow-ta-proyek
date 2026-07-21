@@ -9,8 +9,8 @@
       ],
       "success_rate": "95.83%"
     },
-    "root_cause": "Script testing Unity ikut terkompilasi ke build WebGL sehingga label tujuan menggunakan unity_object_name.",
-    "corrective_action": "Memisahkan script testing dari build WebGL produksi, memulihkan nama tampilan fasilitas pada label tujuan, membangun ulang aplikasi, dan menguji ulang BB-20.",
+    "root_cause": "Skrip pengujian Unity ikut masuk ke build WebGL sehingga label tujuan menggunakan unity_object_name.",
+    "corrective_action": "Memisahkan skrip pengujian dari build WebGL produksi, memulihkan nama tampilan fasilitas pada label tujuan, membangun ulang aplikasi, dan menguji ulang BB-20.",
     "retest": {
       "completed": true,
       "scenario": "BB-20",
@@ -19,7 +19,7 @@
         "Hasil UAT/dokumentasi revisi/BB20_1.png",
         "Hasil UAT/dokumentasi revisi/BB20_2.png"
       ],
-      "verification": "Dua frame berurutan menunjukkan label tujuan yang mudah dibaca dan garis rute sebelum completion, kemudian garis rute hilang serta notifikasi tiba tampil setelah completion."
+      "verification": "Dua tangkapan layar berurutan menunjukkan label tujuan yang mudah dibaca dan garis rute sebelum pengguna tiba. Setelah pengguna tiba, garis rute hilang dan notifikasi kedatangan tampil."
     },
     "final_verification": {
       "passed_scenarios": 24,
@@ -30,9 +30,11 @@
   },
   "user_acceptance_testing": {
     "respondents": {
+      "session_type": "closed",
       "total_unique": 5,
-      "public_questionnaire": 4,
-      "admin_questionnaire": 4,
+      "public_dashboard_questionnaire": 4,
+      "admin_dashboard_questionnaire": 4,
+      "general_public_participants": 0,
       "participant_roles": {
         "dosen_penguji": 2,
         "dosen_pembimbing": 2,
@@ -73,11 +75,11 @@
     "revision_verification": {
       "UAT-R01": {
         "basis": ["source_audit"],
-        "limitations": ["Perubahan diverifikasi pada seed; penerapan ulang pada Supabase live tidak diklaim."]
+        "limitations": ["Perubahan diverifikasi pada berkas seed; penerapan ulang pada database Supabase aktif belum diverifikasi."]
       },
       "UAT-R02": {
         "basis": ["visual", "source_audit"],
-        "limitations": ["Screenshot merupakan pemeriksaan manual pascaimplementasi, bukan kuesioner UAT kedua."]
+        "limitations": ["Tangkapan layar digunakan untuk memeriksa hasil setelah perbaikan, bukan sebagai kuesioner UAT kedua."]
       },
       "UAT-R03": {
         "basis": ["visual", "source_audit"],
@@ -105,11 +107,11 @@
       },
       "UAT-R09": {
         "basis": ["source_audit"],
-        "limitations": ["Kelengkapan dan keunikan diverifikasi pada seed; sinkronisasi terhadap Supabase live dan seluruh GameObject scene tidak dilebihkan."]
+        "limitations": ["Kelengkapan dan keunikan diverifikasi pada berkas seed; sinkronisasi terhadap database Supabase aktif dan seluruh GameObject Unity belum diverifikasi."]
       },
       "UAT-R10": {
         "basis": ["visual", "automated_test", "source_audit", "user_confirmed_deployment"],
-        "limitations": ["Tangkapan layar memverifikasi alur completion positif; kondisi payload kosong, rusak, berbeda, dan setelah pembatalan diverifikasi melalui 11 pengujian React pada kode sumber aktif 08ebc06."]
+        "limitations": ["Tangkapan layar memverifikasi notifikasi pada kondisi kedatangan normal. Pemberitahuan yang kosong, tidak valid, berbeda, dan diterima setelah pembatalan diperiksa melalui 11 pengujian React."]
       }
     }
   }
