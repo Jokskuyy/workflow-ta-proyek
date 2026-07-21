@@ -56,6 +56,20 @@ def test_citation_punctuation_validator_enforces_no_comma_only_in_body():
     assert "(Nama Penulis, 2024)" in findings[0]
 
 
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("LAMPIRAN 1. Instrumen Pengujian", True),
+        ("Lampiran 12. Matriks Artefak", True),
+        ("Lampiran ini hanya memuat cuplikan kode.", False),
+        ("Lampiran ini memetakan klaim kontribusi.", False),
+        ("LAMPIRAN A. Bukti Tambahan", False),
+    ],
+)
+def test_appendix_heading_detection_requires_numeric_label(text, expected):
+    assert vds.is_appendix_heading_text(text) is expected
+
+
 # A draft with a guaranteed two-way citation mismatch:
 #   - in-text "(Nonexistent 2099)" has no matching reference entry (R1.5)
 #   - the only entry "Smith (2010)" is never cited (R1.6)

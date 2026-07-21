@@ -52,6 +52,12 @@ UNRESOLVED_SOURCE_TOKEN_RE = re.compile(
 )
 SEMANTIC_BOOKMARK_RE = re.compile(r'^(?:fig|tbl)_[a-z0-9_]+$')
 REF_FIELD_RE = re.compile(r'\bREF\s+([A-Za-z][A-Za-z0-9_]*)\b', re.IGNORECASE)
+APPENDIX_HEADING_RE = re.compile(r'^LAMPIRAN\s+\d+\.', re.IGNORECASE)
+
+
+def is_appendix_heading_text(text):
+    """Return True only for the canonical ``LAMPIRAN N.`` heading form."""
+    return bool(APPENDIX_HEADING_RE.match(text.strip()))
 
 
 def validate_page_layout(doc_root):
@@ -1069,7 +1075,7 @@ def main():
         # B. Check Appendix paragraphs (only in body/appendix section)
         is_in_body = (bab1_idx == -1 or idx >= bab1_idx)
         
-        if is_in_body and text.upper().startswith("LAMPIRAN"):
+        if is_in_body and is_appendix_heading_text(text):
             # Ensure style is taappendixheading
             if pStyle_val not in ["taappendixheading"]:
                 errors_found.append(f"Appendix paragraph {idx} '{text}' has incorrect style '{pStyle_val}' (should be taappendixheading)")
