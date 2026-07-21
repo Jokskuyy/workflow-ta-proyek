@@ -1782,8 +1782,17 @@ def build_table_element(item):
         while len(r) < num_cols:
             r.append('')
     tblGrid = lxml.etree.SubElement(tbl, f'{{{ns_uri}}}tblGrid')
-    for _ in range(num_cols):
-        lxml.etree.SubElement(tblGrid, f'{{{ns_uri}}}gridCol', {f'{{{ns_uri}}}w': '2000'})
+    for column_index in range(num_cols):
+        # A Gantt table needs room for the activity description while its
+        # period cells only contain shading.  Encoding the proportion in the
+        # table grid lets the structural formatter scale it to the printable
+        # page width without relying on any caption or cell text.
+        grid_width = '6000' if is_gantt and column_index == 0 else '2000'
+        lxml.etree.SubElement(
+            tblGrid,
+            f'{{{ns_uri}}}gridCol',
+            {f'{{{ns_uri}}}w': grid_width},
+        )
         
     is_first_row = True
     data_row_idx = 0

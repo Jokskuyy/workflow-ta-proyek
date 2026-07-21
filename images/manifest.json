@@ -50,20 +50,6 @@
       "inject_method": "post_com"
     },
     {
-      "id": "diagram_sequence_autentikasi",
-      "file": "diagram_sequence_autentikasi.png",
-      "caption_match": "Sequence Diagram: Autentikasi Administrator",
-      "source": "dokumentasi/sequence_autentikasi.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "diagram_sequence_sinkronisasi",
-      "file": "diagram_sequence_sinkronisasi.png",
-      "caption_match": "Sequence Diagram: Sinkronisasi Data Gedung dan Unity",
-      "source": "dokumentasi/sequence_sinkronisasi.png",
-      "inject_method": "post_com"
-    },
-    {
       "id": "mockup_login_admin",
       "file": "mockup_login_admin.png",
       "caption_match": "Halaman Login Admin",
@@ -150,7 +136,7 @@
     {
       "id": "foto_wawancara_warek",
       "file": "foto_wawancara_warek.jpg",
-      "caption_match": "Dokumentasi Wawancara dan Penandatanganan Pakta Integritas",
+      "caption_match": "Dokumentasi Wawancara Pemangku Kepentingan",
       "source": "unpacked_ta/word/media/image12.jpg",
       "inject_method": "post_com"
     },
@@ -171,49 +157,49 @@
     {
       "id": "survey_01_profil",
       "file": "surveys/survey_01_profil.png",
-      "caption_match": "Hasil Kuesioner: Profil Status Akademik",
+      "caption_match": "Hasil Kuesioner: Profil Status Akademik Responden",
       "source": "unpacked_ta/word/media/image4.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_02_efektivitas",
       "file": "surveys/survey_02_efektivitas.png",
-      "caption_match": "Hasil Kuesioner: Efektivitas Informasi",
+      "caption_match": "Hasil Kuesioner: Efektivitas Media Navigasi Kampus Saat Ini",
       "source": "unpacked_ta/word/media/image5.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_03_frekuensi",
       "file": "surveys/survey_03_frekuensi.png",
-      "caption_match": "Hasil Kuesioner: Frekuensi Akses Denah",
+      "caption_match": "Hasil Kuesioner: Frekuensi Kesulitan Menemukan Lokasi",
       "source": "unpacked_ta/word/media/image6.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_04_perilaku",
       "file": "surveys/survey_04_perilaku.png",
-      "caption_match": "Hasil Kuesioner: Perilaku Pencarian Lokasi",
+      "caption_match": "Hasil Kuesioner: Perilaku Pengguna Saat Mencari Lokasi",
       "source": "unpacked_ta/word/media/image7.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_05_urgensi",
       "file": "surveys/survey_05_urgensi.png",
-      "caption_match": "Hasil Kuesioner: Urgensi Kebutuhan Denah",
+      "caption_match": "Hasil Kuesioner: Urgensi Kebutuhan Peta Virtual 3D",
       "source": "unpacked_ta/word/media/image8.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_06_adopsi",
       "file": "surveys/survey_06_adopsi.png",
-      "caption_match": "Hasil Kuesioner: Tingkat Adopsi Potensial",
+      "caption_match": "Hasil Kuesioner: Potensi Adopsi Denah Virtual 3D",
       "source": "unpacked_ta/word/media/image9.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_07_prioritas",
       "file": "surveys/survey_07_prioritas.png",
-      "caption_match": "Hasil Kuesioner: Prioritas Fitur",
+      "caption_match": "Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus",
       "source": "unpacked_ta/word/media/image10.png",
       "inject_method": "post_com"
     },
@@ -330,13 +316,6 @@
       "inject_method": "post_com"
     },
     {
-      "id": "evidence_work_history",
-      "file": "riwayat_pengerjaan.png",
-      "caption_match": "Riwayat Perubahan Aset dan Material pada Repository",
-      "source": "images/riwayat_pengerjaan.png",
-      "inject_method": "post_com"
-    },
-    {
       "id": "evidence_unity_version",
       "file": "versi_unity.jpeg",
       "caption_match": "Versi Unity yang Digunakan pada Pengukuran Aset",
@@ -404,6 +383,13 @@
       "file": "Perangkat_uji.png",
       "caption_match": "Spesifikasi Perangkat Pengujian Aset",
       "source": "images/Perangkat_uji.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "foto_penyerahan_pakta_upa_tik",
+      "file": "foto_penyerahan_pakta_upa_tik.jpeg",
+      "caption_match": "Dokumentasi Penyerahan Pakta Integritas kepada UPA TIK",
+      "source": "dokumentasi/ttd pakta integritas UPA TIK.jpeg",
       "inject_method": "post_com"
     }
   ]

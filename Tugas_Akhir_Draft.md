@@ -1,14 +1,13 @@
-# INTEGRASI DENAH VIRTUAL UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAKARTA KAMPUS PONDOK LABU
+# PERANCANGAN ASET 3D DAN PENGELOLAAN BASIS DATA
+# PADA SISTEM DENAH VIRTUAL UPNVJ KAMPUS PONDOK LABU
 
-# (PERANCANGAN ASET 3D DAN SKEMA BASIS DATA)
-
-Muhammad Dwikhi Deandra Purnianto
+Dwikhi Deandra Purnianto
 2210511131
 
 INFORMATIKA
 FAKULTAS ILMU KOMPUTER
 UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAKARTA
-2025
+2026
 
 # DAFTAR GAMBAR
 
@@ -21,7 +20,7 @@ UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAKARTA
 # DAFTAR LAMPIRAN
 
 LAMPIRAN 1. Surat Pernyataan Keaslian
-LAMPIRAN 2. Surat Keterangan Implementasi Proyek dari Mitra
+LAMPIRAN 2. Dokumentasi Penyerahan Pakta Integritas kepada UPA TIK
 LAMPIRAN 3. Bukti Pemodelan dan Penataan Aset 3D
 LAMPIRAN 4. Skema Basis Data dan Bukti Pengelolaan Data
 LAMPIRAN 5. Logbook dan Bukti Pengujian
@@ -39,7 +38,7 @@ Visualisasi lingkungan kampus dalam bentuk tiga dimensi dapat membantu penyajian
 
 Prefab Unity dapat menyimpan GameObject beserta komponen dan child-nya sebagai aset yang dapat digunakan kembali, sehingga hierarki dan konvensi penamaan menjadi bagian penting dalam pemeliharaan objek (Unity Technologies 2026a). Aset 3D yang tidak mengikuti struktur seragam akan menyulitkan proses integrasi dengan logika navigasi. Pada sisi lain, data gedung dan fasilitas yang tidak memiliki relasi, identitas integrasi, serta aturan akses yang jelas berisiko menimbulkan ketidaksesuaian antara informasi pada dashboard dan objek pada *scene* Unity. Oleh karena itu, perancangan aset 3D perlu dilakukan bersama perancangan skema basis data, khususnya melalui atribut `unity_object_name` sebagai penghubung antara baris data dan GameObject di Unity.
 
-Pengelolaan data proyek juga membutuhkan pembatasan akses pada tingkat basis data. Penerapan *Row Level Security* (RLS) memungkinkan kebijakan akses dibedakan menurut peran pengguna, sedangkan mekanisme *audit log* menyediakan jejak perubahan untuk mendukung akuntabilitas pengelolaan data (Putra et al. 2026). Kedua mekanisme tersebut menjadi konteks sistem bagi data yang dikelola penulis, tetapi rancangan dan implementasinya tidak dinyatakan sebagai kontribusi penulis. Laporan ini berfokus pada pembuatan dan penataan sebelas aset gedung di Unity Editor, penyusunan prefab serta child `Pointer`, perancangan skema dan ERD, pengelolaan data gedung atau fasilitas, serta penjagaan konsistensi `unity_object_name` pada aset dan data.
+Pengelolaan data proyek juga membutuhkan pembatasan akses pada tingkat basis data. Penerapan *Row Level Security* (RLS) memungkinkan kebijakan akses dibedakan menurut peran pengguna, sedangkan mekanisme *audit log* menyediakan jejak perubahan untuk mendukung akuntabilitas pengelolaan data (Putra et al. 2026). Kedua mekanisme tersebut menjadi konteks sistem bagi data yang dikelola penulis, tetapi rancangan dan implementasinya tidak dinyatakan sebagai kontribusi penulis. Laporan ini berfokus pada pembuatan dan penataan seluruh aset 3D gedung dan fasilitas yang memiliki GameObject pada scene Unity, penyusunan prefab serta child `Pointer`, perancangan skema dan ERD, pengelolaan data gedung atau fasilitas, serta penjagaan konsistensi `unity_object_name` pada aset dan data.
 
 ## 1.2 Identifikasi Masalah
 
@@ -53,9 +52,9 @@ Berdasarkan latar belakang dan kebutuhan proyek, masalah yang menjadi fokus lapo
 
 ## 1.3 Batasan Masalah
 
-Ruang lingkup laporan ini dibatasi agar pembahasan tetap sesuai dengan kontribusi 3D Asset Designer dan Database/Asset Manager, yaitu sebagai berikut:
+Ruang lingkup laporan ini dibatasi agar pembahasan tetap sesuai dengan kontribusi 3D Asset Designer & Database/Asset Manager, yaitu sebagai berikut:
 
-1. Objek yang direpresentasikan dibatasi pada sebelas aset gedung dalam inventaris bukti Kampus UPNVJ Pondok Labu.
+1. Objek yang direpresentasikan dibatasi pada aset 3D gedung dan fasilitas yang benar-benar memiliki GameObject pada scene Unity dan dikerjakan dalam lingkup kontribusi penulis.
 2. Pembuatan dan penataan aset dilakukan langsung di Unity Editor tanpa membahas pemodelan menggunakan Blender.
 3. Pembahasan aset mencakup geometri, material atau tekstur, prefab, hierarki, child `Pointer`, GameObject tujuan, dan konvensi penamaan.
 4. Pembahasan basis data mencakup perancangan tabel dan relasi melalui ERD serta pengelolaan record `gedung` dan `fasilitas` yang terhubung dengan aset.
@@ -63,6 +62,7 @@ Ruang lingkup laporan ini dibatasi agar pembahasan tetap sesuai dengan kontribus
 6. `unity_object_name` digunakan sebagai identifier integrasi yang ditetapkan dan diperbaiki penulis pada record basis data serta GameObject tujuan.
 7. `DatabaseSyncChecker` digunakan penulis sebagai alat validasi; kode alat tersebut merupakan kontribusi 3D Simulator dan Engine Developer.
 8. Logika NavMesh, navigasi, kontrol pemain, optimasi *engine*, API utama, dashboard React, autentikasi, komunikasi `SendMessage`, RLS, dan trigger audit berada di luar kontribusi utama penulis.
+9. Aset disusun sebagai representasi visual berdasarkan observasi dan foto, bukan sebagai model *as-built* dengan ketelitian dimensi hasil pengukuran instrumental.
 
 Pembagian tanggung jawab tim dirangkum pada [TABREF:peran_tanggung_jawab].
 
@@ -71,7 +71,7 @@ Pembagian tanggung jawab tim dirangkum pada [TABREF:peran_tanggung_jawab].
 
 [TABLE]
 Peran | Tanggung Jawab Utama
-3D Asset Designer dan Database/Asset Manager | Membuat dan menata sebelas aset gedung di Unity Editor; menyusun prefab, child `Pointer`, dan GameObject tujuan; merancang skema serta ERD; mengelola data gedung atau fasilitas; dan menjaga `unity_object_name`.
+3D Asset Designer & Database/Asset Manager | Membuat dan menata aset 3D gedung dan fasilitas di Unity Editor; menyusun prefab, child `Pointer`, dan GameObject tujuan; merancang skema serta ERD; mengelola data gedung atau fasilitas; dan menjaga `unity_object_name`.
 3D Simulator dan Engine Developer | Mengembangkan logika navigasi Unity WebGL, NavMesh pathfinding, kontrol pemain, optimasi engine, serta alat editor termasuk `DatabaseSyncChecker`.
 Full Stack Web Developer dan System Integrator | Mengembangkan React SPA, Vercel Serverless Functions, Supabase Auth, API, dashboard, komunikasi React ke Unity, dan integrasi antarkomponen.
 [/TABLE]
@@ -82,7 +82,7 @@ Full Stack Web Developer dan System Integrator | Mengembangkan React SPA, Vercel
 
 Tujuan penyusunan dan pelaksanaan proyek dalam lingkup laporan ini adalah sebagai berikut:
 
-1. Membuat dan menata sebelas aset gedung Kampus UPNVJ Pondok Labu secara langsung di Unity Editor.
+1. Membuat dan menata aset 3D gedung dan fasilitas Kampus UPNVJ Pondok Labu secara langsung di Unity Editor.
 2. Menyusun hierarki prefab, child `Pointer`, dan GameObject tujuan dengan konvensi nama yang konsisten.
 3. Merancang skema basis data relasional dan ERD untuk data gedung, fasilitas, fakultas, program studi, pengguna administrator, dan riwayat perubahan.
 4. Mengelola record gedung serta fasilitas agar atribut dan relasinya sesuai dengan aset yang direpresentasikan.
@@ -100,20 +100,28 @@ Manfaat yang diharapkan dari kontribusi tersebut adalah sebagai berikut:
 
 ## 1.5 Jadwal Kegiatan
 
-Rencana awal kegiatan penulis disusun berdasarkan tahapan perancangan, implementasi, integrasi, dan dokumentasi sebagaimana dirangkum pada [TABREF:jadwal_kegiatan]. Berdasarkan keterangan penulis, durasi aktual keseluruhan kegiatan adalah enam bulan. Tanggal mulai, tanggal selesai, dan pembagian aktivitas per bulan masih perlu dicocokkan dengan logbook.
+Kegiatan aktual penulis berlangsung selama enam bulan dan dirangkum pada [TABREF:jadwal_kegiatan]. Pembagian aktivitas per bulan disajikan berdasarkan rekap dokumentasi pelaksanaan pada Subbab 3.4.1.
 
 [TABLE-ID:jadwal_kegiatan]
 [TABLECAPTION:Jadwal Kegiatan Perancangan Aset 3D dan Basis Data]
 
 [TABLE gantt]
-Aktivitas | Bulan 1 | Bulan 2 | Bulan 3 | Bulan 4 | Bulan 5
-Observasi dan inventarisasi kebutuhan aset serta data | X | | | |
-Perancangan skema basis data dan ERD | X | X | | |
-Pemodelan dan penataan aset 3D | | X | X | |
-Penyusunan prefab dan pemetaan `unity_object_name` | | | X | X |
-Pengelolaan record gedung, fasilitas, dan `unity_object_name` | | | X | X |
-Integrasi, validasi, dan pengujian | | | | X | X
-Dokumentasi dan penyusunan laporan | X | X | X | X | X
+Aktivitas | Bulan 1 | Bulan 2 | Bulan 3 | Bulan 4 | Bulan 5 | Bulan 6
+Observasi stakeholder dan identifikasi kebutuhan aset serta data | X | | | | | |
+Pengambilan foto dan inventarisasi gedung serta fasilitas | X | X | | | | |
+Perancangan skema database dan ERD | X | X | | | | |
+Penetapan konvensi nama aset dan `unity_object_name` | X | X | X | | | |
+Pemodelan aset 3D gedung dan fasilitas | | X | X | X | | |
+Penerapan material dan tekstur | | X | X | X | | |
+Penyusunan prefab, hierarki, `Pointer`, dan GameObject tujuan | | | X | X | | |
+Penyusunan seed serta pengelolaan data gedung dan fasilitas | | | X | X | X | |
+Pemetaan aset dengan `unity_object_name` | | | X | X | X | |
+Pemeriksaan integritas database | | | | X | X | |
+Validasi menggunakan `DatabaseSyncChecker` | | | | X | X | |
+Pemeriksaan visual dan teknis aset | | | | X | X | X
+Koreksi ketidaksesuaian aset dan data | | | | | X | X
+Penyusunan dokumentasi dan laporan | X | X | X | X | X | X
+Pengujian akhir dan finalisasi | | | | | X | X
 [/TABLE]
 
 ## 1.6 Sistematika Penulisan
@@ -144,58 +152,65 @@ Hasil observasi awal menunjukkan beberapa kebutuhan berikut:
 3. Nama internal objek perlu dipisahkan dari nama yang ditampilkan kepada pengguna.
 4. Data fasilitas perlu memiliki relasi yang jelas terhadap gedung agar konteks lokasi tidak hilang.
 5. Perubahan data perlu dapat dilakukan tanpa mengubah model 3D selama identitas integrasi tetap konsisten.
+6. Nama serta fungsi ruangan perlu memiliki status dan waktu verifikasi karena informasi di lapangan dapat berubah atau tidak tersedia secara lengkap.
 
-[TBD: tambahkan catatan observasi pribadi Dwikhi mengenai metode pengukuran, daftar gedung, daftar fasilitas, dan kendala pemodelan di lapangan]
+Pengumpulan referensi dilakukan penulis secara mandiri dengan mendatangi gedung satu per satu, melakukan observasi visual, dan mengambil dokumentasi fotografis terhadap bentuk bangunan atau informasi ruangan yang dapat diakses. Penulis tidak menggunakan alat ukur untuk memperoleh dimensi fisik. Oleh karena itu, metode yang digunakan adalah pemodelan berbasis referensi visual, yaitu menyesuaikan massa bangunan, jumlah lantai, pola bukaan, warna, material, dan hubungan proporsional antarelemen berdasarkan objek yang terlihat pada foto serta pengamatan lapangan. Aset yang dihasilkan berfungsi sebagai representasi visual untuk denah virtual dan tidak diklaim sebagai model *as-built* dengan ukuran presisi.
+
+Kendala utama observasi adalah pengumpulan data dilakukan secara pribadi dari gedung ke gedung dengan akses dan informasi yang terbatas. Sebagian nama atau fungsi ruangan yang tersedia tidak dapat dipastikan telah mengikuti kondisi terbaru, sedangkan beberapa ruangan tidak memiliki informasi yang cukup untuk memperbarui record. Data yang belum dapat diverifikasi tidak dinyatakan sebagai kondisi final. Temuan ini menjadi alasan kebutuhan basis data yang mudah diperbarui serta pencatatan sumber dan waktu verifikasi setiap perubahan nama ruangan.
 
 ### 2.1.2 Analisis Sistem yang Sedang Berjalan
 
-Kuesioner proyek digunakan untuk memahami profil responden, pengalaman menggunakan media navigasi kampus, frekuensi kesulitan mencari lokasi, perilaku pencarian, urgensi denah virtual, potensi adopsi, dan prioritas informasi. Komposisi status akademik responden disajikan pada [FIGREF:survey_01_profil].
+Kuesioner proyek diisi oleh 21 responden. Sebanyak 20 responden (95,2%) merupakan sivitas akademika UPNVJ dan satu responden merupakan pengunjung eksternal. Komposisi tersebut disajikan pada [FIGREF:survey_01_profil] dan menunjukkan bahwa temuan terutama menggambarkan pengalaman pengguna internal pada sampel yang diteliti.
 
 [FIGURE:survey_01_profil]
-[FIGCAPTION:Hasil Kuesioner: Profil Status Akademik]
+[FIGCAPTION:Hasil Kuesioner: Profil Status Akademik Responden]
 
-Persepsi responden terhadap efektivitas informasi navigasi yang tersedia dirangkum pada [FIGREF:survey_02_efektivitas].
+Penilaian terhadap papan penunjuk arah dan peta statis tidak menunjukkan penolakan yang dominan. Sebanyak 33,3% responden memberi nilai 1 atau 2, 23,8% memberi nilai 3, dan 42,9% memberi nilai 4 atau 5. Nilai rata-rata sekitar 3,05 dari 5 pada [FIGREF:survey_02_efektivitas] menunjukkan persepsi yang terbagi, sehingga kebutuhan sistem baru tidak didasarkan pada klaim bahwa seluruh media yang tersedia tidak informatif.
 
 [FIGURE:survey_02_efektivitas]
-[FIGCAPTION:Hasil Kuesioner: Efektivitas Informasi]
+[FIGCAPTION:Hasil Kuesioner: Efektivitas Media Navigasi Kampus Saat Ini]
 
-Frekuensi responden mengakses atau membutuhkan denah kampus dapat ditinjau pada [FIGREF:survey_03_frekuensi].
+Dalam satu semester terakhir, 57,1% responden mengalami kesulitan mencari lokasi sebanyak 1–3 kali, 9,5% mengalaminya lebih dari tiga kali, dan 33,3% tidak pernah mengalaminya. Dengan demikian, 14 dari 21 responden (66,7%) pernah mengalami kesulitan setidaknya satu kali, sebagaimana disajikan pada [FIGREF:survey_03_frekuensi].
 
 [FIGURE:survey_03_frekuensi]
-[FIGCAPTION:Hasil Kuesioner: Frekuensi Akses Denah]
+[FIGCAPTION:Hasil Kuesioner: Frekuensi Kesulitan Menemukan Lokasi]
 
-Cara responden mencari lokasi ketika media yang tersedia belum memadai ditunjukkan pada [FIGREF:survey_04_perilaku].
+Ketika mencari lokasi, 90,5% responden paling sering bertanya kepada orang di sekitar, petugas keamanan, atau layanan mahasiswa. Pola pada [FIGREF:survey_04_perilaku] menunjukkan bahwa bantuan interpersonal masih menjadi jalur utama pada sampel, sedangkan papan penunjuk dan situs kampus digunakan oleh sebagian kecil responden.
 
 [FIGURE:survey_04_perilaku]
-[FIGCAPTION:Hasil Kuesioner: Perilaku Pencarian Lokasi]
+[FIGCAPTION:Hasil Kuesioner: Perilaku Pengguna Saat Mencari Lokasi]
 
-Tingkat urgensi kebutuhan denah virtual menurut responden divisualisasikan pada [FIGREF:survey_05_urgensi].
+Sebanyak 76,2% responden memberi nilai 4 atau 5 terhadap pentingnya peta virtual 3D yang terintegrasi dengan informasi fasilitas. Penilaian pada [FIGREF:survey_05_urgensi] mendukung kebutuhan akan alternatif digital, tetapi tetap diperlakukan sebagai kebutuhan pengguna pada sampel, bukan bukti keberhasilan solusi yang belum diuji pada tahap observasi.
 
 [FIGURE:survey_05_urgensi]
-[FIGCAPTION:Hasil Kuesioner: Urgensi Kebutuhan Denah]
+[FIGCAPTION:Hasil Kuesioner: Urgensi Kebutuhan Peta Virtual 3D]
 
-Potensi penggunaan sistem setelah denah virtual tersedia dapat dilihat pada [FIGREF:survey_06_adopsi].
+Dalam rencana penggunaan, 9,5% responden menyatakan akan menggunakan denah setiap kali berada di kampus, 61,9% ketika mencari lokasi tertentu, 23,8% hanya sesekali, dan 4,8% tidak akan menggunakannya. Distribusi pada [FIGREF:survey_06_adopsi] menunjukkan bahwa fungsi pencarian lokasi merupakan konteks penggunaan yang paling relevan.
 
 [FIGURE:survey_06_adopsi]
-[FIGCAPTION:Hasil Kuesioner: Tingkat Adopsi Potensial]
+[FIGCAPTION:Hasil Kuesioner: Potensi Adopsi Denah Virtual 3D]
 
-Jenis informasi yang diprioritaskan responden dalam sistem dirangkum pada [FIGREF:survey_07_prioritas].
+Informasi yang paling banyak dipilih untuk ditampilkan adalah nama gedung sebesar 95,2%, fasilitas dalam ruangan sebesar 52,4%, dan kapasitas ruangan sebesar 38,1%. Prioritas pada [FIGREF:survey_07_prioritas] menjadi dasar pemilihan atribut gedung dan fasilitas yang dikelola pada laporan ini.
 
 [FIGURE:survey_07_prioritas]
-[FIGCAPTION:Hasil Kuesioner: Prioritas Fitur]
+[FIGCAPTION:Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus]
 
-Rangkaian hasil tersebut menunjukkan bahwa aset 3D tidak dapat diperlakukan hanya sebagai elemen visual. Setiap objek perlu memiliki padanan data yang dapat ditelusuri, sedangkan informasi gedung dan fasilitas perlu disimpan dengan struktur yang mendukung pencarian serta integrasi. [TBD: masukkan angka survei hanya setelah diverifikasi terhadap berkas kuesioner tim]
+Rangkaian hasil tersebut menunjukkan bahwa aset 3D tidak dapat diperlakukan hanya sebagai elemen visual. Setiap objek perlu memiliki padanan data yang dapat ditelusuri, sedangkan informasi gedung dan fasilitas perlu disimpan dengan struktur yang mendukung pencarian serta integrasi. Temuan kuesioner ini digunakan sebagai konteks kebutuhan, bukan sebagai hasil pengujian keberhasilan produk.
 
 ### 2.1.3 Wawancara dengan Stakeholder
 
-Wawancara dengan Kepala UPA TIK UPNVJ membahas pembagian peran tim dan kebutuhan sistem. Berdasarkan pembagian kerja yang telah dikonfirmasi, penulis berperan sebagai 3D Asset Designer dan Database/Asset Manager yang membuat serta menata sebelas aset gedung di Unity Editor, menyusun prefab dan child `Pointer`, merancang skema serta ERD, mengelola data, dan menjaga `unity_object_name`. Anggota lain menangani logika *engine*, alat editor, pengembangan web, autentikasi, API, dan integrasi sistem.
+Wawancara dengan Kepala UPA TIK UPNVJ membahas pembagian peran tim dan kebutuhan sistem. Berdasarkan pembagian kerja yang telah dikonfirmasi, penulis berperan sebagai 3D Asset Designer & Database/Asset Manager yang membuat serta menata aset 3D gedung dan fasilitas di Unity Editor, menyusun prefab dan child `Pointer`, merancang skema serta ERD, mengelola data, dan menjaga `unity_object_name`. Anggota lain menangani logika *engine*, alat editor, pengembangan web, autentikasi, API, dan integrasi sistem.
 
-Koordinasi dengan Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi juga mengidentifikasi adanya pembatasan administratif terhadap distribusi data mentah sarana dan prasarana. Temuan tersebut memperkuat kebutuhan terhadap pengelolaan data yang terkontrol melalui RLS dan pencatatan perubahan. Dokumentasi kegiatan wawancara dan pakta integritas ditunjukkan pada [FIGREF:foto_wawancara_warek].
+Pada 25 Februari 2026, penulis mengikuti wawancara dengan Dr. dr. Ria Maria Theresa, SpKJ., MH. selaku Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi UPNVJ. Wawancara bertujuan memvalidasi kesulitan mahasiswa dan pengunjung dalam mencari ruangan serta memperoleh masukan terhadap solusi berupa dashboard dan denah 3D dengan fasilitas pencarian lokasi di Kampus Pondok Labu.
+
+Narasumber menekankan bahwa data ruangan bersifat dinamis karena renovasi dan perubahan fungsi. Penulis menjelaskan bahwa data gedung dan fasilitas dikelola melalui basis data sehingga perubahan informasi dapat dilakukan tanpa mengubah struktur dasar sistem. Temuan tersebut memperkuat kebutuhan skema data yang dapat dipelihara, relasi yang konsisten, serta pemisahan nama tampilan dari identifier `unity_object_name`.
+
+Pembahasan integrasi mencakup rencana penggunaan subdomain resmi UPNVJ, penyematan sistem pada website universitas, dan kolaborasi dengan UPA TIK untuk data pendukung dashboard. Narasumber mengarahkan koordinasi dengan Pak Taufik pada bagian PKU/Tata Usaha guna memperoleh denah fisik terbaru dan menjelaskan perlunya surat permohonan data yang dapat didisposisikan kepada bagian terkait. Stabilitas Wi-Fi di lingkungan kampus juga disampaikan sebagai perhatian tambahan dalam ekosistem digital kampus, tetapi tidak menjadi ruang lingkup implementasi aset dan basis data penulis.
+
+Wawancara menghasilkan respons positif terhadap proyek sebagai bagian dari digitalisasi sarana dan prasarana kampus. Bagi lingkup pekerjaan penulis, kesimpulan terpenting adalah perlunya memvalidasi model serta record terhadap kondisi fisik terbaru karena perubahan bangunan dapat memengaruhi representasi aset dan data. Dokumentasi kegiatan wawancara ditunjukkan pada [FIGREF:foto_wawancara_warek].
 
 [FIGURE:foto_wawancara_warek]
-[FIGCAPTION:Dokumentasi Wawancara dan Penandatanganan Pakta Integritas]
-
-[TBD: konfirmasi keikutsertaan Dwikhi, tanggal kegiatan, pertanyaan yang diajukan, dan kesimpulan wawancara yang berkaitan langsung dengan aset 3D serta basis data]
+[FIGCAPTION:Dokumentasi Wawancara Pemangku Kepentingan]
 
 ## 2.2 Usulan Solusi
 
@@ -204,7 +219,7 @@ Solusi yang diusulkan adalah platform terintegrasi yang menggabungkan dashboard 
 [FIGURE:diagram_arsitektur]
 [FIGCAPTION:Diagram Arsitektur Sistem]
 
-Dalam arsitektur tersebut, kontribusi penulis menjadi lapisan penghubung antara representasi visual dan data. Sebelas aset 3D menyediakan bentuk serta susunan objek, sementara skema dan pengelolaan data menyediakan identitas, atribut, serta relasi gedung atau fasilitas. Field `unity_object_name` digunakan sebagai jembatan tunggal antara record `gedung` atau `fasilitas` dan GameObject tujuan di bawah child `Pointer` yang disusun penulis.
+Dalam arsitektur tersebut, kontribusi penulis menjadi lapisan penghubung antara representasi visual dan data. Aset 3D gedung dan fasilitas menyediakan bentuk serta susunan objek, sementara skema dan pengelolaan data menyediakan identitas, atribut, serta relasi gedung atau fasilitas. Field `unity_object_name` digunakan sebagai jembatan tunggal antara record `gedung` atau `fasilitas` dan GameObject tujuan di bawah child `Pointer` yang disusun penulis.
 
 ### 2.2.1 Identifikasi Kebutuhan Fungsional
 
@@ -259,13 +274,13 @@ Tahapan kerja dalam lingkup penulis direncanakan sebagai berikut:
 4. Hasil kerja dievaluasi melalui pemeriksaan visual, pengujian integritas referensial, dan validasi sinkronisasi nama; hasil RLS serta audit log digunakan sebagai konteks pengujian sistem bersama.
 5. Rancangan diperbaiki berdasarkan temuan pengujian dan kebutuhan integrasi dari komponen web serta *engine*.
 
-### 2.3.2 Perancangan Sebelas Aset 3D
+### 2.3.2 Perancangan Aset 3D Gedung dan Fasilitas
 
 Rancangan aset menggunakan hierarki yang memisahkan geometri bangunan, objek per lantai, dan titik tujuan navigasi. Setiap gedung ditempatkan dalam satu objek atau prefab induk. Di bawah prefab tersebut terdapat child `Pointer` yang menjadi induk bagi GameObject tujuan dengan nama sesuai `unity_object_name`. Struktur ini memungkinkan logika navigasi mencari Transform tujuan tanpa bergantung pada nama tampilan yang dapat berubah.
 
 Perancangan bentuk aset perlu mempertimbangkan keterbacaan representasi gedung, kesesuaian proporsi, konsistensi skala, pemakaian material, serta kebutuhan optimasi ketika aset dimuat pada aplikasi WebGL. ProBuilder mendukung pembuatan, penyuntingan, dan pemberian tekstur geometri langsung di dalam Unity, sehingga sesuai dengan metode pengerjaan aset yang terlihat pada bukti proses (Unity Technologies 2026b). Rancangan teknis setiap aset nantinya dibandingkan dengan bukti implementasi pada Subbab 3.2.1 dan spesifikasi akhir pada Subbab 3.3.3.
 
-Sebelas aset yang menjadi cakupan penulis adalah Abdul Rachman Saleh, Cipto Mangunkusumo, Dewi Sartika, Jenderal Soedirman, Ki Hajar Dewantara, M. Yamin, Masjid, Muhammad Husni Thamrin, Soepomo, Wahidin Sudiro Husodo, dan Yos Sudarso. Sumber ukuran, target tingkat detail, konfigurasi collider, serta batas teknis setiap aset tetap dicatat sebagai metadata implementasi yang perlu dilengkapi dari logbook dan Unity Editor.
+Scope aset mencakup seluruh aset 3D gedung dan fasilitas yang memiliki GameObject pada scene Unity dan dikerjakan penulis. Daftar record pada database tidak otomatis menjadi jumlah aset 3D karena sebagian data dapat digunakan sebagai informasi tanpa memiliki objek visual tersendiri. Sumber ukuran, target tingkat detail, konfigurasi collider, serta batas teknis setiap aset dicatat melalui dokumentasi Unity Editor dan bukti implementasi yang tersedia.
 
 ### 2.3.3 Perancangan Hierarki Prefab dan Konvensi Penamaan
 
@@ -279,16 +294,16 @@ Konvensi awal yang digunakan adalah sebagai berikut:
 4. Geometri visual dipisahkan dari objek tujuan agar perubahan material atau bentuk tidak mengubah identitas integrasi.
 5. Prefab gedung harus mempertahankan struktur child `Pointer` ketika digunakan kembali pada *scene*.
 
-Kesebelas prefab dan hierarkinya disusun oleh penulis. Setiap prefab memisahkan geometri dari child `Pointer` dan GameObject tujuan, sedangkan rincian objek per lantai serta variasi struktur masing-masing gedung dijelaskan menggunakan tangkapan hierarki pada BAB III.
+Prefab dan hierarki aset gedung serta fasilitas dalam scope penulis disusun dengan memisahkan geometri dari child `Pointer` dan GameObject tujuan. Rincian objek per lantai serta variasi struktur aset dijelaskan menggunakan tangkapan hierarki yang tersedia pada BAB III. Sebelas pasangan render dan hierarki yang tersedia digunakan sebagai bukti representatif, bukan sebagai batas jumlah aset.
 
 ### 2.3.4 Perancangan Skema Basis Data, ERD, dan Pengelolaan Data
 
-Entity Relationship Diagram merupakan representasi konseptual yang memperlihatkan entitas, atribut, dan hubungan sebagai dasar perancangan basis data (Afiifah et al. 2022). Bagian data akademik dan fasilitas dari rancangan relasional proyek divisualisasikan pada [FIGREF:diagram_erd].
+Entity Relationship Diagram merupakan representasi konseptual yang memperlihatkan entitas, atribut, dan hubungan sebagai dasar perancangan basis data (Afiifah et al. 2022). ERD proyek mencakup 11 tabel aktif. Bagian inti data akademik dan fasilitas divisualisasikan pada [FIGREF:diagram_erd], sedangkan relasi tabel denah navigasi didokumentasikan pada berkas `images/ERD_navigasi_peta_kampus.svg`. Tabel `admin_users`, `audit_logs`, dan `web_analytics_log` tetap termasuk dalam skema aktif meskipun tidak memiliki relasi langsung pada diagram inti.
 
 [FIGURE:diagram_erd]
 [FIGCAPTION:ERD Ringkas Data Akademik dan Fasilitas]
 
-Skema utama terdiri atas enam tabel aktif. Struktur ringkasnya disajikan pada [TABREF:struktur_basis_data].
+Skema proyek terdiri atas 11 tabel aktif. Struktur ringkasnya disajikan pada [TABREF:struktur_basis_data].
 
 [TABLE-ID:struktur_basis_data]
 [TABLECAPTION:Struktur Entitas Basis Data]
@@ -299,8 +314,13 @@ Tabel | Fungsi | Relasi atau Batasan Utama
 `fasilitas` | Menyimpan ruangan atau fasilitas di dalam gedung | Foreign key `id_gedung` ke `gedung`; `unity_object_name` unik
 `fakultas` | Menyimpan profil fakultas | Foreign key `id_gedung_utama` ke `gedung`
 `program_studi` | Menyimpan program studi dan akreditasi | Foreign key `id_fakultas` ke `fakultas`; kombinasi nama, jenjang, dan fakultas unik
-`admin_users` | Menyimpan metadata administrator pada rancangan awal | Data autentikasi produksi perlu diverifikasi terhadap Supabase Auth. [TBD: konfirmasi penggunaan tabel]
+`admin_users` | Menyimpan data administrator | Primary key `id`; `username` unik dan wajib diisi
 `audit_logs` | Menyimpan jejak mutasi data | Menyimpan pelaku, aksi, tabel, ID rekaman, data lama, data baru, dan waktu
+`campus_maps` | Menyimpan metadata denah 2D | `slug` unik; satu peta aktif melalui unique index parsial
+`campus_map_nodes` | Menyimpan node jalur, pintu masuk, dan gerbang | Foreign key `map_id` ke `campus_maps`; koordinat berada pada rentang 0 sampai 1
+`campus_map_edges` | Menyimpan hubungan antar-node denah | Foreign key ke node asal dan tujuan; kombinasi peta dan node unik
+`campus_map_building_points` | Menyimpan posisi gedung pada denah | Foreign key ke peta, gedung, dan node masuk; kombinasi peta dan gedung unik
+`web_analytics_log` | Menyimpan catatan kunjungan web | Data pengunjung, halaman, perangkat, dan waktu kunjungan
 [/TABLE]
 
 Penulis merancang entitas, atribut, relasi, serta batasan pada ERD dan mengelola record `gedung` atau `fasilitas` yang berhubungan langsung dengan aset. Pengelolaan tersebut mencakup pemeliharaan informasi tampilan, relasi lokasi, foto, dan `unity_object_name`; autentikasi, RLS, serta trigger audit tetap menjadi konteks komponen sistem lain.
@@ -323,11 +343,6 @@ Alur integrasi data dengan komponen denah virtual ditunjukkan pada [FIGREF:diagr
 [FIGURE:diagram_activity_integrasi]
 [FIGCAPTION:Activity Diagram: Integrasi Data Denah]
 
-Proses autentikasi administrator sebelum operasi pengelolaan data dipetakan pada [FIGREF:diagram_sequence_autentikasi].
-
-[FIGURE:diagram_sequence_autentikasi]
-[FIGCAPTION:Sequence Diagram: Autentikasi Administrator]
-
 ### 2.3.5 Konteks RLS dan Trigger Audit Log
 
 Row Level Security merupakan mekanisme pembatasan akses baris pada basis data PostgreSQL yang dapat digunakan untuk membedakan operasi berdasarkan peran pengguna (PostgreSQL Global Development Group 2026b; Putra et al. 2026). Pada Supabase, tabel pada skema yang terekspos perlu mengaktifkan RLS dan menggunakan policy untuk menentukan akses per peran (Supabase 2026). Pada proyek ini, RLS dan *audit log* merupakan lapisan keamanan sistem yang memengaruhi record yang dikelola penulis, tetapi perancangan policy, fungsi, dan trigger tidak termasuk kontribusi penulis.
@@ -336,10 +351,7 @@ Dalam konteks integrasi, peran `anon` memperoleh akses baca terhadap data publik
 
 ### 2.3.6 Perancangan unity_object_name sebagai Jembatan Data
 
-Alur sinkronisasi dimulai ketika administrator menyimpan `unity_object_name` melalui dashboard. Data diteruskan ke Supabase, tersedia melalui API, kemudian diambil oleh Unity. Proses lengkap tersebut digambarkan pada [FIGREF:diagram_sequence_sinkronisasi].
-
-[FIGURE:diagram_sequence_sinkronisasi]
-[FIGCAPTION:Sequence Diagram: Sinkronisasi Data Gedung dan Unity]
+Alur sinkronisasi dimulai ketika administrator menyimpan `unity_object_name` melalui dashboard. Data diteruskan ke Supabase, tersedia melalui API, kemudian diambil oleh Unity.
 
 Kontrak pemetaan dirancang sebagai berikut:
 
@@ -377,7 +389,7 @@ Rencana pengujian disusun agar setiap bagian rancangan memiliki hasil pengujian 
 
 Pengujian aset 3D direncanakan melalui pemeriksaan visual dan teknis terhadap posisi, skala, orientasi, material, tekstur, collider, susunan prefab, serta titik tujuan di dalam child `Pointer`. Pemeriksaan juga mencatat jumlah objek, jumlah polygon, jumlah material, ukuran tekstur, dan ukuran aset agar pengaruhnya terhadap build dapat dievaluasi. Unity Memory Profiler menyediakan kategori metrik seperti memori tekstur, memori mesh, jumlah material, dan jumlah objek yang dapat digunakan sebagai bukti pengukuran teknis (Unity Technologies 2026c).
 
-[TBD: tetapkan checklist, versi scene atau commit, batas penerimaan, dan daftar aset yang akan diperiksa; spesifikasi perangkat uji sudah tersedia pada Subbab 3.3.3]
+[TBD: tetapkan checklist, versi scene, batas penerimaan, dan daftar aset yang akan diperiksa; spesifikasi perangkat uji sudah tersedia pada Subbab 3.3.3]
 
 ### 2.4.2 Rencana Pengujian Integritas dan Relasi Basis Data
 
@@ -428,13 +440,13 @@ Administrator | Mengelola data gedung, fasilitas, fakultas, dan program studi | 
 
 ## 3.2 Metode Implementasi
 
-Implementasi menggunakan pendekatan iteratif sesuai rancangan *prototyping*. Lingkup penulis mencakup pembuatan dan penataan sebelas aset, hierarki prefab dan child `Pointer`, perancangan skema serta ERD, pengelolaan record gedung atau fasilitas, dan pemetaan `unity_object_name`. Uraian berikut membedakan kontribusi tersebut dari komponen integrasi milik anggota lain.
+Implementasi menggunakan pendekatan iteratif sesuai rancangan *prototyping*. Lingkup penulis mencakup pembuatan dan penataan seluruh aset 3D gedung dan fasilitas yang memiliki GameObject pada scene Unity, hierarki prefab dan child `Pointer`, perancangan skema serta ERD, pengelolaan record gedung atau fasilitas, dan pemetaan `unity_object_name`. Uraian berikut membedakan kontribusi tersebut dari komponen integrasi milik anggota lain.
 
-### 3.2.1 Implementasi Pembuatan dan Penataan Sebelas Aset 3D di Unity Editor
+### 3.2.1 Implementasi Pembuatan dan Penataan Aset 3D Gedung dan Fasilitas di Unity Editor
 
-Penulis membuat dan menata sebelas aset gedung secara langsung pada Unity Editor tanpa Blender. Bukti yang diserahkan mencakup berkas referensi visual kondisi aktual, tangkapan proses pengerjaan pada Unity Editor, sebelas render aset gedung, sebelas tangkapan hierarki, serta inventaris berkas material dan tekstur. Bukti tersebut mendukung uraian proses dan atribusi aset, tetapi belum menggantikan kebutuhan data teknis lengkap seperti dimensi acuan, triangle, material, collider, ukuran build, dan versi setiap aset.
+Penulis membuat dan menata aset 3D gedung dan fasilitas secara langsung pada Unity Editor tanpa Blender. Bukti yang diserahkan mencakup berkas referensi visual kondisi aktual, tangkapan proses pengerjaan pada Unity Editor, render dan tangkapan hierarki yang tersedia, serta inventaris berkas material dan tekstur. Sebelas pasangan render dan hierarki yang tersedia digunakan sebagai sampel bukti representatif, bukan sebagai batas jumlah aset. Dimensi presisi tidak tersedia karena observasi tidak menggunakan alat ukur, sedangkan data teknis seperti triangle, material, collider, ukuran build, dan versi setiap aset dicatat dari bukti Unity yang tersedia.
 
-Folder `images/list_foto/` memuat 21 berkas referensi visual. Berdasarkan nama berkas dan objek yang terlihat, inventaris tersebut mencakup 10 dari 11 aset utama; referensi Jenderal Soedirman belum ditemukan. Sebagian berkas merupakan sudut tambahan atau objek di luar daftar sebelas aset, sedangkan sumber, tanggal, lokasi, dan identitas pengambil gambar belum lengkap. Inventarisnya dirangkum pada [TABREF:inventaris_foto_referensi].
+Folder `images/list_foto/` memuat 21 berkas referensi visual. Berkas tersebut merupakan dokumentasi lapangan, sudut tambahan, atau sumber visual untuk sebagian aset dan entitas database yang terkait. Cakupan foto tidak digunakan untuk menyimpulkan jumlah seluruh GameObject yang dikerjakan. Sumber, tanggal, lokasi, dan identitas pengambil gambar belum seluruhnya tersedia. Inventarisnya dirangkum pada [TABREF:inventaris_foto_referensi].
 
 [TABLE-ID:inventaris_foto_referensi]
 [TABLECAPTION:Inventaris Berkas Referensi Visual Kondisi Aktual]
@@ -445,7 +457,7 @@ No. | Objek yang Terdokumentasi | Berkas Bukti | Catatan Verifikasi
 2 | Gedung Cipto Mangunkusumo | `Foto_gedung_Cipto.jpg` | Sumber dan tanggal belum dicatat
 3 | Gedung M. Yamin | `Foto_gedung_M.Yamin.jpg` | Sumber dan tanggal belum dicatat
 4 | Gedung Muhammad Husni Thamrin | `Foto_gedung_Muh_Tamrin.jpg` | Sumber dan tanggal belum dicatat
-5 | Gedung Soetomo | `Foto_gedung_Soetomo.jpg` | Di luar daftar sebelas aset; jangan disamakan dengan Soepomo
+5 | Gedung Soetomo | `Foto_gedung_Soetomo.jpg` | Entitas berbeda dari Soepomo; status GameObject mengikuti inventaris scene
 6 | Gedung Wahidin Sudiro Husodo dari sisi depan | `Foto_gedung_wahidin.jpg` | Sumber dan tanggal belum dicatat
 7 | Gedung Wahidin Sudiro Husodo dari sisi lain | `Foto_gedung_Wahidin_1.jpg` | Sumber dan tanggal belum dicatat
 8 | Gerbang depan kampus | `Foto_gerbang_depan.jpg` | Objek konteks lingkungan
@@ -459,9 +471,9 @@ No. | Objek yang Terdokumentasi | Berkas Bukti | Catatan Verifikasi
 16 | Gedung Ki Hajar Dewantara | `refrensi_gedung_ki_hadjar_dewantara.jpeg` | Sumber dan tanggal belum dicatat
 17 | Gedung M. Yamin | `refrensi_gedung_m.yamin.jpeg` | Sudut referensi tambahan; sumber dan tanggal belum dicatat
 18 | Gedung Muhammad Husni Thamrin | `refrensi_gedung_muh husni tamrin.jpeg` | Sudut referensi tambahan; sumber dan tanggal belum dicatat
-19 | Gedung R.A. Kartini | `refrensi_gedung_ra_kartini.jpeg` | Di luar daftar sebelas aset
+19 | Gedung R.A. Kartini | `refrensi_gedung_ra_kartini.jpeg` | Entitas database terpisah; status GameObject mengikuti inventaris scene
 20 | Gedung Soepomo | `refrensi_gedung_soepomo.jpeg` | Sumber dan tanggal belum dicatat
-21 | Gedung Soetomo | `refrensi_gedung_soetomo.jpeg` | Di luar daftar sebelas aset
+21 | Gedung Soetomo | `refrensi_gedung_soetomo.jpeg` | Entitas berbeda dari Soepomo; status GameObject mengikuti inventaris scene
 [/TABLE]
 
 Karakter fasad, susunan lantai, bukaan, dan warna Gedung Cipto Mangunkusumo terdokumentasi pada [FIGREF:evidence_photo_cipto] sebagai salah satu referensi visual kondisi aktual.
@@ -484,13 +496,13 @@ Tangkapan proses pada [FIGREF:evidence_process_asset] memperlihatkan Unity Edito
 [FIGURE:evidence_process_asset]
 [FIGCAPTION:Proses Pengerjaan Aset Gedung di Unity Editor]
 
-Berdasarkan bukti yang tersedia, alur implementasi dapat didokumentasikan sebagai pengumpulan foto referensi, pembentukan dan penyesuaian geometri, penerapan material atau tekstur, pengelompokan objek, serta penyusunan aset pada hierarki Unity. Versi editor yang terlihat telah dicatat pada Subbab 3.3.3, sedangkan urutan tanggal, versi setiap prefab, dimensi acuan, dan keputusan perubahan selama iterasi masih perlu dilengkapi dari logbook atau riwayat commit.
+Metode implementasi aset menggunakan pendekatan pemodelan berbasis referensi visual. Foto dan pengamatan langsung digunakan untuk mengenali massa bangunan, jumlah lantai, pola fasad, bukaan, warna, material, dan hubungan proporsional antarelemen. Geometri kemudian dibentuk dan disesuaikan secara visual di Unity Editor, dilanjutkan dengan penerapan material atau tekstur, pengelompokan objek, serta penyusunan aset pada hierarki. Pendekatan ini sesuai untuk kebutuhan representasi denah virtual, tetapi tidak digunakan untuk menyatakan ketelitian dimensi arsitektural.
 
-[TBD: lengkapi tanggal pengerjaan, path dan commit setiap prefab, daftar tool yang digunakan untuk setiap aset, metode pengukuran dimensi, jumlah triangle, material, collider, dan ukuran build]
+Versi editor yang terlihat telah dicatat pada Subbab 3.3.3. Informasi yang masih perlu dilengkapi adalah [TBD: tanggal pengerjaan, path setiap prefab, daftar fitur atau tool Unity yang digunakan untuk setiap aset, jumlah triangle, material, collider, ukuran build, serta keputusan perubahan selama iterasi].
 
 ### 3.2.2 Implementasi Hierarki Prefab dan Penamaan unity_object_name
 
-Folder bukti memuat sebelas tangkapan hierarki yang berpasangan dengan sebelas render aset gedung. Pada setiap prefab, penulis mengelompokkan geometri dan objek per lantai, menyusun child `Pointer`, membuat GameObject tujuan, serta menetapkan nama yang sesuai dengan `unity_object_name`. Mekanisme penggunaan titik tujuan oleh API atau logika navigasi tetap menjadi kontribusi anggota integrator dan pengembang *engine*.
+Folder bukti memuat pasangan render dan tangkapan hierarki untuk sebagian aset gedung. Pada setiap prefab atau struktur objek yang dikerjakan, penulis mengelompokkan geometri dan objek per lantai, menyusun child `Pointer`, membuat GameObject tujuan, serta menetapkan nama yang sesuai dengan `unity_object_name`. Mekanisme penggunaan titik tujuan oleh API atau logika navigasi tetap menjadi kontribusi anggota integrator dan pengembang *engine*.
 
 Secara teknis, implementasi mengikuti aturan berikut:
 
@@ -502,7 +514,9 @@ Secara teknis, implementasi mengikuti aturan berikut:
 
 ### 3.2.3 Implementasi Rancangan Skema dan Pengelolaan Data di Supabase
 
-Skema PostgreSQL yang dirancang penulis mencakup tabel `gedung`, `fasilitas`, `fakultas`, `program_studi`, `admin_users`, dan `audit_logs`. Potongan DDL berikut merepresentasikan struktur logis pada ERD dan digunakan untuk menjelaskan tabel, kolom, relasi, serta batasan. Potongan tersebut tidak diklaim sebagai migration produksi yang ditulis atau diterapkan penulis.
+Skema PostgreSQL yang didokumentasikan penulis mencakup 11 tabel, yaitu `gedung`, `fasilitas`, `fakultas`, `program_studi`, `admin_users`, `audit_logs`, `campus_maps`, `campus_map_nodes`, `campus_map_edges`, `campus_map_building_points`, dan `web_analytics_log`. Berkas SQL setup yang diserahkan penulis digunakan sebagai sumber dokumentasi dan tidak dijalankan saat penyusunan laporan karena memuat operasi `DROP TABLE`. Potongan DDL berikut menampilkan struktur inti untuk menjelaskan tabel, kolom, relasi, serta batasan; status penerapannya pada basis data produksi tetap dibedakan dari keberadaan berkas SQL.
+
+Pada pemetaan aset, Masjid memiliki representasi visual atau GameObject tersendiri, tetapi record datanya berada pada tabel `fasilitas` dengan `id_gedung = 6`, yaitu Gedung Ki Hadjar Dewantara. Record Gedung Soepomo, Gedung Soetomo, Yos Sudarso, RA Kartini, Lapangan Basket, dan entitas gedung lainnya tetap diperlakukan sebagai entitas database yang berbeda.
 
 ```sql
 CREATE TABLE gedung (
@@ -568,11 +582,11 @@ CREATE TABLE audit_logs (
 );
 ```
 
-ERD dan struktur logis enam tabel menjadi bukti perancangan skema oleh penulis. Dalam kapasitas Database/Asset Manager, penulis juga mengelola record `gedung` dan `fasilitas`, termasuk atribut serta `unity_object_name` yang digunakan oleh aset. Lampiran 4 diarahkan pada ERD, struktur data, contoh record yang dikelola, dan riwayat perubahan nilai; migration produksi bukan bukti wajib kontribusi penulis.
+ERD, berkas SQL setup, dan struktur logis 11 tabel menjadi bukti perancangan skema oleh penulis. Dalam kapasitas Database/Asset Manager, penulis juga mengelola record `gedung` dan `fasilitas`, termasuk atribut serta `unity_object_name` yang digunakan oleh aset. Lampiran 4 diarahkan pada ERD, DDL dokumentasi, struktur data, contoh record yang dikelola, dan riwayat perubahan nilai; bukti penerapan ulang pada basis data Supabase aktif tetap dicatat terpisah.
 
 ### 3.2.4 Konteks Implementasi Row Level Security dan Trigger Audit Log
 
-RLS pada sistem memisahkan akses publik dan akses pengelolaan, sedangkan trigger audit mencatat mutasi data. Mekanisme tersebut memengaruhi record yang dikelola penulis, tetapi policy, fungsi, dan trigger tidak dirancang atau diimplementasikan oleh penulis. Karena itu, subbab ini tidak menyajikan SQL sebagai hasil kerja Dwikhi.
+RLS pada sistem memisahkan akses publik dan akses pengelolaan, sedangkan antarmuka sistem menampilkan catatan mutasi data. Mekanisme tersebut memengaruhi record yang dikelola penulis, tetapi policy, fungsi, dan trigger tidak dirancang atau diimplementasikan oleh penulis. Berkas SQL setup yang diperiksa memuat kebijakan RLS, tetapi tidak memuat definisi trigger audit. Oleh karena itu, keberadaan trigger tidak disimpulkan dari berkas tersebut dan SQL RLS tidak disajikan sebagai hasil kerja Dwikhi.
 
 Fungsi *audit log* pada PostgreSQL secara umum dapat membedakan `INSERT`, `UPDATE`, dan `DELETE` serta mengakses nilai `OLD` dan `NEW` sesuai jenis operasi (PostgreSQL Global Development Group 2026c). Tangkapan dashboard audit pada `dokumentasi/audit-log-admin-dashboard.png` digunakan sebagai konteks bahwa perubahan record dapat ditelusuri. Bukti ini tidak digunakan untuk mengatribusikan kode RLS atau trigger kepada penulis.
 
@@ -599,7 +613,7 @@ Penerapan identifier pada record fasilitas terlihat pada [FIGREF:evidence_unity_
 [FIGURE:evidence_unity_names_fasilitas]
 [FIGCAPTION:Contoh Nilai unity_object_name pada Tabel Fasilitas]
 
-Pemetaan pada sebelas prefab merupakan bagian dari pekerjaan penulis. Bukti hierarki Dewi Sartika memperlihatkan contoh objek tujuan `dewi_sartika`, sedangkan hasil pemeriksaan pada Subbab 3.5.5 menunjukkan bahwa keseluruhan data dan *scene* belum sepenuhnya konsisten. Daftar pemetaan lengkap per record, perubahan yang dilakukan, serta metadata pengujian ulang masih diperlukan untuk menunjukkan penyelesaian koreksi secara terukur.
+Pemetaan pada prefab dan GameObject aset dalam scope penulis merupakan bagian dari pekerjaan penulis. Bukti hierarki Dewi Sartika memperlihatkan contoh objek tujuan `dewi_sartika`, sedangkan hasil pemeriksaan pada Subbab 3.5.5 menunjukkan bahwa keseluruhan data dan *scene* belum sepenuhnya konsisten. Daftar pemetaan lengkap per record, perubahan yang dilakukan, serta metadata pengujian ulang masih diperlukan untuk menunjukkan penyelesaian koreksi secara terukur.
 
 ## 3.3 Konfigurasi dan Metadata
 
@@ -612,7 +626,7 @@ Struktur constraint produksi yang tertangkap pada [FIGREF:evidence_constraint_in
 [FIGURE:evidence_constraint_inventory]
 [FIGCAPTION:Inventaris Constraint Tabel Utama pada Supabase]
 
-Nilai produksi setiap tipe fasilitas, aturan nilai `lantai`, format `foto_url`, kebijakan data kosong, constraint lain yang terpotong pada tangkapan, dan riwayat migration perlu dicatat agar skema dapat dipelihara. [TBD: isi keputusan konfigurasi produksi yang dibuat Dwikhi dan tautkan ke versi migration yang digunakan]
+Nilai produksi setiap tipe fasilitas, aturan nilai `lantai`, format `foto_url`, kebijakan data kosong, constraint lain yang terpotong pada tangkapan, dan riwayat perubahan skema perlu dicatat agar skema dapat dipelihara. [TBD: isi keputusan konfigurasi produksi yang dibuat Dwikhi, tanggal atau versi berkas SQL setup, serta status penerapannya pada Supabase aktif]
 
 ### 3.3.2 Konvensi Struktur Prefab dan Penamaan
 
@@ -641,7 +655,7 @@ Parameter minimum yang perlu dicatat meliputi:
 5. Ukuran file sumber, prefab, dan perubahan ukuran build jika tersedia.
 6. Tindakan optimasi seperti penggabungan mesh, penggunaan ulang material, kompresi tekstur, pengurangan detail, atau penghapusan objek yang tidak digunakan.
 
-Versi editor yang terlihat pada [FIGREF:evidence_unity_version] adalah Unity 6.4 dengan identifier `6000.4.1f1_8535861f39e1`. Bukti ini menetapkan lingkungan yang terlihat ketika data dikumpulkan, sedangkan versi proyek pada setiap commit tetap perlu ditautkan melalui logbook.
+Versi editor yang terlihat pada [FIGREF:evidence_unity_version] adalah Unity 6.4 dengan identifier `6000.4.1f1_8535861f39e1`. Bukti ini menetapkan lingkungan yang terlihat ketika data dikumpulkan dan digunakan sebagai konteks untuk membaca metrik aset.
 
 [FIGURE:evidence_unity_version]
 [FIGCAPTION:Versi Unity yang Digunakan pada Pengukuran Aset]
@@ -651,7 +665,7 @@ Perangkat yang digunakan pada pengambilan metrik ditunjukkan pada [FIGREF:eviden
 [FIGURE:evidence_test_device]
 [FIGCAPTION:Spesifikasi Perangkat Pengujian Aset]
 
-Inventaris pada [FIGREF:evidence_prefab_sizes] menampilkan ukuran berkas prefab gedung beserta berkas `.meta` yang berukuran jauh lebih kecil. Nilai yang terbaca untuk tiga aset terukur adalah 24,3 MB pada Ki Hajar Dewantara, 11,2 MB pada Dewi Sartika, dan 11,2 MB pada Jenderal Soedirman. Beberapa nama memiliki lebih dari satu versi berkas, sehingga ukuran tersebut belum boleh dianggap sebagai versi prefab final sebelum path aset dan commit dikonfirmasi.
+Inventaris pada [FIGREF:evidence_prefab_sizes] menampilkan ukuran berkas prefab gedung beserta berkas `.meta` yang berukuran jauh lebih kecil. Nilai yang terbaca untuk tiga aset terukur adalah 24,3 MB pada Ki Hajar Dewantara, 11,2 MB pada Dewi Sartika, dan 11,2 MB pada Jenderal Soedirman. Beberapa nama memiliki lebih dari satu versi berkas, sehingga ukuran tersebut digunakan sebagai nilai yang terlihat pada inventaris, bukan sebagai klaim bahwa seluruh prefab telah memiliki versi final yang sama.
 
 [FIGURE:evidence_prefab_sizes]
 [FIGCAPTION:Ukuran Berkas Prefab Gedung pada Inventaris Aset]
@@ -673,7 +687,7 @@ Rincian GameObject, mesh instance, unique mesh, dan vertex Ki Hajar Dewantara te
 [FIGURE:evidence_metrics_ki_hadjar]
 [FIGCAPTION:Hasil Pengukuran GameObject, Mesh, dan Vertex Ki Hajar Dewantara]
 
-Hasil pengukuran Dewi Sartika direkam pada [FIGREF:evidence_metrics_dewi] dengan 477 GameObject dan 124.973 vertex. Data ini dapat menjadi baseline teknis untuk perbandingan setelah optimasi apabila versi prefab dan commit pengujian dicatat.
+Hasil pengukuran Dewi Sartika direkam pada [FIGREF:evidence_metrics_dewi] dengan 477 GameObject dan 124.973 vertex. Data ini menjadi baseline teknis untuk perbandingan dengan pemeriksaan aset berikutnya apabila tersedia.
 
 [FIGURE:evidence_metrics_dewi]
 [FIGCAPTION:Hasil Pengukuran GameObject, Mesh, dan Vertex Dewi Sartika]
@@ -742,38 +756,34 @@ Berkas | Resolusi Bukti | Keterangan Terverifikasi
 `jendela.png` | 1507 × 1003 piksel | Berkas gambar tersedia pada inventaris
 [/TABLE]
 
-Keberadaan berkas gambar belum memberikan informasi mengenai konfigurasi Unity Material, shader, nilai tiling, resolusi impor yang dipakai saat build, sumber atau lisensi berkas, dan pemetaan material terhadap masing-masing aset. Versi Unity, perangkat pengujian, ukuran beberapa prefab, serta sebagian metrik GameObject, mesh, dan vertex kini tersedia. Jumlah triangle, material, collider, ukuran build, pengaitan setiap metrik dengan versi scene, dan hasil sesudah optimasi masih menjadi [TBD: lengkapi dari Inspector, Profiler, Build Report, path prefab, dan commit pengujian].
+Keberadaan berkas gambar belum memberikan informasi mengenai konfigurasi Unity Material, shader, nilai tiling, resolusi impor yang dipakai saat build, sumber atau lisensi berkas, dan pemetaan material terhadap masing-masing aset. Versi Unity, perangkat pengujian, ukuran beberapa prefab, serta sebagian metrik GameObject, mesh, dan vertex kini tersedia. Jumlah triangle, material, collider, ukuran build, pengaitan setiap metrik dengan versi scene, dan hasil sesudah optimasi masih menjadi [TBD: lengkapi dari Inspector, Profiler, Build Report, dan path prefab].
 
 ## 3.4 Laporan Implementasi Proyek
 
 ### 3.4.1 Logbook Implementasi Proyek
 
-Kerangka logbook awal disajikan pada [TABREF:logbook_implementasi]. Tabel membedakan bukti yang sudah tersedia dari catatan tanggal atau artefak teknis yang masih perlu diberikan oleh penulis.
+Logbook implementasi disusun sebagai rekap bulanan berdasarkan hasil dokumentasi aktual. Rekap ini tidak menggunakan tanggal harian atau riwayat perubahan yang tidak tersedia, melainkan menghubungkan kegiatan, keluaran, dan bukti yang tersedia pada setiap tahap pelaksanaan.
+
+Rekap kegiatan dan bukti pada setiap periode disajikan pada [TABREF:logbook_implementasi].
 
 [TABLE-ID:logbook_implementasi]
 [TABLECAPTION:Logbook Implementasi Aset 3D dan Pengelolaan Data]
 
 [TABLE]
-Tahap | Aktivitas | Keluaran | Bukti dan Status
-Analisis | Inventarisasi gedung, fasilitas, dan kebutuhan data | Daftar kebutuhan aset dan data | 21 berkas referensi visual tersedia; cakupan nama menunjukkan 10 dari 11 aset utama, sedangkan tanggal, lokasi, sumber, dan catatan observasi belum lengkap
-Perancangan aset | Penyusunan struktur objek, prefab, dan konvensi nama | Rancangan hierarki aset | Sebelas tangkapan hierarki tersedia; tanggal dan versi prefab belum tersedia
-Pemodelan | Pembuatan dan penataan aset di Unity Editor | Aset atau prefab 3D | Sebelas render, satu tangkapan proses, versi Unity, ukuran prefab, dan metrik tiga aset tersedia; triangle, material, collider, dan Build Report belum tersedia
-Perancangan basis data | Penyusunan ERD, tabel, relasi, dan batasan | ERD dan struktur logis data | ERD ringkas serta inventaris constraint produksi tersedia; versi atau tanggal rancangan dan migration belum tercatat
-Pengelolaan data | Penataan record gedung/fasilitas dan identifier integrasi | Data yang terhubung dengan aset | Contoh nilai `unity_object_name` pada tabel gedung dan fasilitas tersedia; bukti sebelum-sesudah perubahan dan tanggalnya belum tersedia
-Integrasi | Penyelarasan `unity_object_name` pada data dan GameObject | Mapping aset dan data | Hasil awal dan pemeriksaan lanjutan checker tersedia; cakupan pengujian berbeda serta daftar koreksi belum terdokumentasi
-Pengujian | Pemeriksaan aset, integritas data, dan sinkronisasi | Laporan hasil uji | Bukti struktur constraint, metrik tiga aset, serta dua hasil checker tersedia; uji pelanggaran constraint, checklist, dan retest terkontrol belum tersedia
+Periode | Kegiatan | Hasil | Bukti Dokumentasi | Status
+Bulan 1 | Observasi, wawancara, pengambilan foto, dan identifikasi kebutuhan | Kebutuhan aset dan struktur data teridentifikasi | Notulensi wawancara, dokumen riset, dan `images/list_foto/` | Selesai
+Bulan 2 | Perancangan ERD, skema, dan pemodelan awal | Struktur database dan bentuk awal aset tersedia | ERD, SQL setup, dan screenshot proses Unity | Selesai
+Bulan 3 | Pemodelan, material, tekstur, prefab, dan pengisian seed | Aset serta data gedung atau fasilitas mulai terhubung | Render aset, hierarki, `images/list_material/`, dan seed SQL | Selesai
+Bulan 4 | Penyelesaian hierarki, `Pointer`, serta pemetaan nama | GameObject tujuan dan `unity_object_name` tersusun | Hierarki prefab dan screenshot nama objek Unity | Selesai
+Bulan 5 | Pemeriksaan constraint, aset, dan konsistensi nama | Temuan integritas dan mismatch terdokumentasi | Screenshot constraint, metrik aset, dan `DatabaseSyncChecker` | Selesai
+Bulan 6 | Koreksi, pengujian akhir, dan penyusunan laporan | Bukti implementasi dan hasil pengujian dirangkum | Hasil Black Box, UAT, survei, dan dokumentasi final | Selesai
 [/TABLE]
 
-Riwayat perubahan yang tampak pada [FIGREF:evidence_work_history] memperlihatkan rangkaian commit yang mencakup pembaruan aset, *scene*, material, pencahayaan, dan konfigurasi proyek. Commit yang dipilih berjudul “Update project settings and package configurations”, memiliki hash pendek `941d259`, dan menampilkan 90 berkas berubah, termasuk berkas material di bawah `Assets/Prefab/Materials/`. Tampilan tersebut memperlihatkan akun `wikihow182`, tetapi belum membuktikan bahwa akun tersebut milik Dwikhi dan hanya menampilkan waktu relatif, bukan tanggal absolut.
+Rekap logbook tersebut menunjukkan hubungan antara aktivitas pada Gantt dan artefak yang tersedia. Status selesai menyatakan bahwa kegiatan dan bukti dokumentasinya telah dimasukkan ke draft; status tersebut tidak memperluas atribusi ke kode API, dashboard, navigasi, atau engine milik anggota lain.
 
-[FIGURE:evidence_work_history]
-[FIGCAPTION:Riwayat Perubahan Aset dan Material pada Repository]
+### 3.4.2 Hasil dan Bukti Implementasi Aset 3D Gedung dan Fasilitas
 
-Status atribusi: hash dan ringkasan commit dapat dibaca dari tangkapan, sedangkan kepemilikan akun `wikihow182`, tanggal absolut commit, serta kaitannya dengan keluaran individual masih memerlukan konfirmasi melalui profil repository, riwayat Git, atau logbook penulis. Bukti ini tidak digunakan untuk mengatribusikan seluruh 90 perubahan kepada Dwikhi sebelum konfirmasi tersebut tersedia.
-
-### 3.4.2 Hasil dan Bukti Implementasi Sebelas Aset 3D
-
-Bukti yang diserahkan memuat sebelas render aset gedung hasil pekerjaan penulis dan sebelas tangkapan hierarki yang berpasangan. Ketersediaan bukti dirangkum pada [TABREF:inventaris_bukti_aset]. Status pada tabel menyatakan kepemilikan serta keberadaan berkas bukti, bukan bahwa aset telah lulus pengujian visual, performa, atau integrasi.
+Bukti yang diserahkan memuat render dan tangkapan hierarki aset 3D gedung serta fasilitas yang tersedia pada folder dokumentasi. Sebelas pasangan render dan hierarki yang tersedia digunakan sebagai sampel representatif. Ketersediaan bukti dirangkum pada [TABREF:inventaris_bukti_aset]. Status pada tabel menyatakan kepemilikan serta keberadaan berkas bukti, bukan bahwa seluruh aset telah lulus pengujian visual, performa, atau integrasi.
 
 [TABLE-ID:inventaris_bukti_aset]
 [TABLECAPTION:Inventaris Bukti Aset Gedung dan Hierarki]
@@ -835,12 +845,12 @@ Aset | Bukti Tersedia | Metadata Belum Tersedia | Status
 Cipto Mangunkusumo | Foto aktual, render, hierarki | Versi prefab, vertex atau triangle, collider, material, ukuran file, hasil uji visual | Bukti visual tersedia; pengukuran teknis belum dilakukan
 M. Yamin | Foto aktual, render, hierarki | Versi prefab, vertex atau triangle, collider, material, ukuran file, hasil uji visual | Bukti visual tersedia; pengukuran teknis belum dilakukan
 Wahidin Sudiro Husodo | Foto aktual, render, hierarki | Versi prefab, vertex atau triangle, collider, material, ukuran file, hasil uji visual | Bukti visual tersedia; pengukuran teknis belum dilakukan
-Ki Hajar Dewantara | Referensi visual, render, hierarki, ukuran prefab, GameObject, mesh, dan vertex | Triangle, material, collider, commit, dan hasil uji visual | Pengukuran teknis parsial tersedia
-Dewi Sartika | Referensi visual, render, hierarki, objek `Pointer`, ukuran prefab, GameObject, mesh, dan vertex | Triangle, material, collider, commit, dan hasil uji visual | Struktur integrasi dan pengukuran teknis parsial tersedia
-Jenderal Soedirman | Render, hierarki, ukuran prefab, GameObject, mesh, dan vertex | Foto aktual terverifikasi, triangle, material, collider, commit, dan hasil uji visual | Pengukuran teknis parsial tersedia; referensi aktual belum ada
+Ki Hajar Dewantara | Referensi visual, render, hierarki, ukuran prefab, GameObject, mesh, dan vertex | Triangle, material, collider, dan hasil uji visual | Pengukuran teknis parsial tersedia
+Dewi Sartika | Referensi visual, render, hierarki, objek `Pointer`, ukuran prefab, GameObject, mesh, dan vertex | Triangle, material, collider, dan hasil uji visual | Struktur integrasi dan pengukuran teknis parsial tersedia
+Jenderal Soedirman | Render, hierarki, ukuran prefab, GameObject, mesh, dan vertex | Foto aktual terverifikasi, triangle, material, collider, dan hasil uji visual | Pengukuran teknis parsial tersedia; referensi aktual belum ada
 [/TABLE]
 
-Lima aset lain juga dibuat dan ditata penulis serta telah memiliki pasangan render dan hierarki. Namun, seluruh aset belum memiliki catatan kondisi akhir, keputusan desain, masalah yang ditemukan, tindakan perbaikan, dan hasil pemeriksaan formal. Karena itu, subbab ini membedakan atribusi pekerjaan dari keberhasilan teknis seluruh aset.
+Aset lain dalam scope juga dibuat dan ditata penulis serta telah memiliki bukti render atau hierarki sesuai dokumentasi yang tersedia. Namun, seluruh aset belum memiliki catatan kondisi akhir, keputusan desain, masalah yang ditemukan, tindakan perbaikan, dan hasil pemeriksaan formal. Karena itu, subbab ini membedakan atribusi pekerjaan dari keberhasilan teknis seluruh aset.
 
 ### 3.4.3 Hasil dan Bukti Rancangan Skema serta Pengelolaan Data
 
@@ -851,10 +861,43 @@ Bukti basis data yang terdapat dalam repository laporan dirangkum pada [TABREF:s
 
 [TABLE]
 Komponen | Bukti Tersedia | Temuan | Bukti yang Masih Diperlukan
-ERD | [FIGREF:diagram_erd] dan berkas sumber SVG | Empat entitas data akademik dan fasilitas beserta PK, FK, dan UK dapat ditelusuri secara visual | Tanggal, versi, commit, serta diagram tabel pendukung yang telah dikonfirmasi terhadap skema produksi
-Struktur data dan constraint | Representasi DDL pada Subbab 3.2.3 serta [FIGREF:evidence_constraint_inventory] | Primary key, beberapa unique constraint, foreign key, dan dua aturan `ON DELETE SET NULL` terlihat pada basis data produksi | Migration atau DDL aktual, seluruh baris constraint, catatan keputusan desain, dan riwayat perubahan skema
-Pengelolaan record | [FIGREF:evidence_unity_names_gedung] dan [FIGREF:evidence_unity_names_fasilitas] | Kolom serta contoh nilai identifier integrasi pada record gedung dan fasilitas dapat ditelusuri | Ekspor record lengkap, pasangan nama tampilan–identifier, serta bukti sebelum dan sesudah perubahan beserta tanggal
-Pemetaan aset–data | Hierarki prefab, [FIGREF:impl_sync_db_checker], dan [FIGREF:evidence_sync_checker_lanjutan] | Identifier dibandingkan antara record dan GameObject tujuan pada dua tangkapan dengan cakupan berbeda | Daftar pemetaan sebelas aset, daftar koreksi, versi scene atau endpoint, tanggal, commit, dan retest terkontrol
+ERD | Gambar ERD pada Subbab 2.3.4, berkas sumber SVG, dan `images/ERD_navigasi_peta_kampus.svg` | Empat tabel inti dan lima tabel denah dapat ditelusuri secara visual; `admin_users`, `audit_logs`, dan `web_analytics_log` tercatat sebagai tabel aktif tanpa relasi langsung pada diagram inti | Tanggal, versi, serta konfirmasi terhadap skema produksi
+Struktur data dan constraint | Berkas SQL setup, representasi DDL pada Subbab 3.2.3, serta gambar inventaris constraint pada Subbab 3.3.1 | Primary key, beberapa unique constraint, foreign key, dan dua aturan `ON DELETE SET NULL` dapat ditelusuri; berkas SQL tidak dijalankan saat penyusunan laporan | Versi dan tanggal berkas SQL, seluruh baris constraint produksi, catatan keputusan desain, dan status penerapan pada Supabase aktif
+Pengelolaan record | Gambar contoh nilai `unity_object_name` gedung dan fasilitas pada Subbab 3.2.5 serta inventaris seed 311 record | Kolom, contoh identifier, jumlah fasilitas per induk, dan temuan kualitas data dapat ditelusuri | Berkas seed, ekspor produksi, pasangan nama tampilan–identifier, serta bukti sebelum dan sesudah perubahan beserta tanggal
+Pemetaan aset–data | Hierarki prefab serta gambar hasil `DatabaseSyncChecker` pada Subbab 3.3.2 dan 3.5.5 | Identifier dibandingkan antara record dan GameObject tujuan pada dua tangkapan dengan cakupan berbeda | Daftar pemetaan seluruh GameObject dalam scene, daftar koreksi, versi scene atau endpoint, tanggal, dan retest terkontrol
+[/TABLE]
+
+Inventaris seed terbaru yang diberikan penulis memuat 311 record fasilitas pada kelompok induk yang tercantum di dalam seed. Ringkasannya disajikan pada [TABREF:inventaris_seed_fasilitas] sebagai isi seed yang belum otomatis dianggap sama dengan data produksi atau kondisi lapangan terbaru.
+
+[TABLE-ID:inventaris_seed_fasilitas]
+[TABLECAPTION:Ringkasan Inventaris Fasilitas pada Seed Data]
+
+[TABLE]
+Referensi Seed | Induk Fasilitas | Jumlah Record | Cakupan Lantai
+1 | Gedung Rektorat (Jenderal Soedirman) | 36 | Lantai 1–4
+2 | Gedung Dr. Soepomo | 24 | Lantai 1–4
+3 | Gedung Dr. Wahidin Sudiro Husodo | 38 | Lantai 1–4
+4 | Gedung Dr. Cipto Mangunkusumo | 38 | Lantai 1–4
+5 | Gedung Abdul Rahman Saleh | 25 | Lantai 1–4
+6 | Gedung Ki Hadjar Dewantara | 25 | Lantai 1–4 dan satu record tanpa lantai yang ditentukan
+7 | Gedung Muh. Husni Thamrin | 37 | Lantai 1–4
+8 | Gedung Muhammad Yamin | 20 | Lantai 1–4
+10 | Gedung R.A. Kartini | 24 | Lantai 1–4
+13 | Gedung Dewi Sartika | 26 | Lantai 1–4
+17 | Gedung Soetomo | 18 | Lantai 1–3 menurut record
+Total | Kelompok induk yang tercantum dalam seed | 311 | Berdasarkan seed terbaru yang diberikan penulis
+[/TABLE]
+
+Pemeriksaan terhadap daftar tersebut menghasilkan catatan kualitas data yang dirangkum pada [TABREF:temuan_kualitas_seed_fasilitas]. Catatan dibedakan antara fakta pada seed terbaru dan hal yang masih memerlukan verifikasi terhadap data produksi atau kondisi lapangan.
+
+[TABLE-ID:temuan_kualitas_seed_fasilitas]
+[TABLECAPTION:Temuan Awal Kualitas Data pada Inventaris Fasilitas]
+
+[TABLE]
+Temuan | Bukti pada Inventaris | Dampak | Tindak Lanjut
+Pemetaan Masjid | Masjid merupakan aset visual terpisah, sedangkan record fasilitasnya menggunakan `id_gedung = 6` | Nama aset visual dan induk database dapat berbeda bila tidak dicatat secara eksplisit | Pertahankan catatan pemetaan aset visual–record pada inventaris dan pengujian
+Pemisahan entitas gedung | Gedung Soepomo, Gedung Soetomo, Yos Sudarso, RA Kartini, Lapangan Basket, parkir, lapangan, dan entitas lain dicatat sebagai record gedung yang berbeda; `id_gedung = 17` adalah Gedung Soetomo pada seed terbaru | Penyamaan nama atau fungsi dapat menghasilkan pemetaan yang salah | Cocokkan nama record gedung dengan GameObject dan data fasilitas pada saat sinkronisasi
+Kemutakhiran nama belum terjamin | Pengumpulan lapangan dilakukan mandiri dengan informasi ruangan yang terbatas | Nama atau fungsi ruang dapat berbeda dari kondisi terbaru | Verifikasi melalui pengelola gedung, denah terbaru, atau sumber institusi serta catat tanggal verifikasi
 [/TABLE]
 
 Kontribusi penulis pada bagian basis data adalah perancangan skema dan ERD, pengelolaan record gedung atau fasilitas, serta pemetaan `unity_object_name`. RLS dan audit log hanya menjadi konteks sistem, sedangkan API, dashboard, dan autentikasi tetap diatribusikan kepada anggota integrator. Keberhasilan pengelolaan data akan dinilai melalui contoh perubahan record, integritas relasi, konsistensi nama, dan hasil retest, bukan melalui kepemilikan migration RLS atau trigger.
@@ -874,7 +917,9 @@ Skenario pengujian integritas memeriksa foreign key, kolom wajib, batasan unik, 
 
 [TABLE]
 Skenario | Input | Hasil yang Diharapkan | Hasil Aktual | Status | Bukti yang Diperlukan
-Inventaris struktur constraint | Kueri katalog constraint pada tabel `gedung`, `fakultas`, `fasilitas`, dan `program_studi` | Primary key, unique constraint, foreign key, dan aturan penghapusan dapat ditelusuri | 12 baris ditampilkan; bagian yang terlihat mengonfirmasi beberapa PK, UNIQUE, FK, dan `ON DELETE SET NULL` | Bukti struktur tersedia | [FIGREF:evidence_constraint_inventory], ekspor 12 baris penuh, serta migration terkait
+Inventaris struktur constraint | Kueri katalog constraint pada tabel `gedung`, `fakultas`, `fasilitas`, dan `program_studi` | Primary key, unique constraint, foreign key, dan aturan penghapusan dapat ditelusuri | 12 baris ditampilkan; bagian yang terlihat mengonfirmasi beberapa PK, UNIQUE, FK, dan `ON DELETE SET NULL` | Bukti struktur tersedia | Gambar inventaris constraint pada Subbab 3.3.1, ekspor 12 baris penuh, serta migration terkait
+Pemetaan record Masjid | Bandingkan nama aset visual, `id_gedung`, dan tabel `fasilitas` | Record fasilitas memiliki induk yang sesuai dengan skema data | Masjid merupakan aset visual terpisah dengan record fasilitas pada `id_gedung = 6` | Sesuai pada seed; produksi belum diverifikasi | Seed terbaru, ekspor produksi, dan bukti pemetaan aset
+Pemetaan record Soetomo | Bandingkan nama gedung, `id_gedung`, dan tabel `gedung` | Record mengarah ke entitas gedung yang benar | Seed terbaru menetapkan `id_gedung = 17` sebagai Gedung Soetomo, terpisah dari Lapangan Basket | Sesuai pada seed; produksi belum diverifikasi | Seed terbaru, ekspor produksi, dan retest konsumsi data
 FK fasilitas ke gedung | Insert `fasilitas.id_gedung` yang tidak ada | Operasi ditolak oleh foreign key | Belum dieksekusi | Menunggu eksekusi | Query, pesan galat, dan tangkapan Supabase
 FK fakultas ke gedung utama | Insert `fakultas.id_gedung_utama` yang tidak ada | Operasi ditolak oleh foreign key | Belum dieksekusi | Menunggu eksekusi | Query, pesan galat, dan tangkapan Supabase
 FK program studi ke fakultas | Insert `program_studi.id_fakultas` yang tidak ada | Operasi ditolak oleh foreign key | Belum dieksekusi | Menunggu eksekusi | Query, pesan galat, dan tangkapan Supabase
@@ -913,8 +958,8 @@ Cipto Mangunkusumo | Foto, render, hierarki | Bentuk dapat dibandingkan dan stru
 M. Yamin | Foto, render, hierarki | Bentuk dapat dibandingkan dan struktur dapat ditelusuri | Tiga jenis bukti tersedia; checklist belum diisi | Bukti tersedia, belum dinilai formal | Versi scene, checklist, temuan, koreksi, retest
 Wahidin Sudiro Husodo | Foto, render, hierarki | Bentuk dapat dibandingkan dan struktur dapat ditelusuri | Tiga jenis bukti tersedia; checklist belum diisi | Bukti tersedia, belum dinilai formal | Versi scene, checklist, temuan, koreksi, retest
 Ki Hajar Dewantara, Dewi Sartika, dan Jenderal Soedirman | Render, hierarki, ukuran prefab, GameObject, mesh, dan vertex | Kompleksitas aset tercatat dan dapat dibandingkan | Metrik parsial tiga aset tersedia; triangle, material, collider, dan kriteria batas belum tersedia | Pengukuran parsial, belum dinilai formal | Inspector lengkap, kriteria penerimaan, temuan, koreksi, dan retest
-Lima aset lain | Render dan hierarki | Visual, prefab, material, collider, dan titik tujuan memenuhi kriteria | Pasangan render dan hierarki tersedia; sebagian memiliki referensi visual tambahan | Bukti parsial, belum dinilai formal | Foto pembanding terverifikasi dan checklist sebelas aset
-Performa build | Ukuran prefab, Profiler, atau Build Report serta perangkat pada [FIGREF:evidence_test_device] | Metrik aset dan pengaruhnya terhadap build tercatat | Perangkat uji dan ukuran prefab tersedia; pengaruh terhadap build belum diukur | Belum diuji pada build | Profiler, versi scene, ukuran build sebelum-sesudah, dan Build Report
+Aset lain dalam scope | Render dan hierarki | Visual, prefab, material, collider, dan titik tujuan memenuhi kriteria | Bukti render atau hierarki tersedia sesuai dokumentasi; checklist lengkap belum diisi | Bukti parsial, belum dinilai formal | Foto pembanding terverifikasi dan checklist seluruh aset yang memiliki GameObject
+Performa build | Ukuran prefab, Profiler, atau Build Report serta gambar spesifikasi perangkat pada Subbab 3.3.3 | Metrik aset dan pengaruhnya terhadap build tercatat | Perangkat uji dan ukuran prefab tersedia; pengaruh terhadap build belum diukur | Belum diuji pada build | Profiler, versi scene, ukuran build sebelum-sesudah, dan Build Report
 [/TABLE]
 
 ### 3.5.5 Validasi Konsistensi Aset dan Basis Data
@@ -935,7 +980,7 @@ Status keseluruhan | Belum konsisten | Masih terdapat mismatch pada kedua arah
 
 Tangkapan awal memperlihatkan beberapa contoh nama yang belum cocok, tetapi tidak memuat versi endpoint, versi *scene*, waktu pengujian, atau hasil ekspor lengkap. Angka di atas karena itu diperlakukan sebagai kondisi pada satu tangkapan, bukan baseline terkontrol.
 
-Pemeriksaan lain yang terlihat pada [FIGREF:evidence_sync_checker_lanjutan] mencakup 323 nama pada basis data, 320 nama ditemukan pada *scene*, 3 nama hanya terdapat pada basis data, dan 14 nama hanya terdapat pada *scene*. Bukti ini menunjukkan adanya pemeriksaan lanjutan dengan cakupan lebih besar, tetapi tidak dapat langsung dinyatakan sebagai perbaikan dari hasil sebelumnya karena total nama, versi *scene*, endpoint, tanggal, dan commit tidak sama-sama tercatat.
+Pemeriksaan lain yang terlihat pada [FIGREF:evidence_sync_checker_lanjutan] mencakup 323 nama pada basis data, 320 nama ditemukan pada *scene*, 3 nama hanya terdapat pada basis data, dan 14 nama hanya terdapat pada *scene*. Bukti ini menunjukkan adanya pemeriksaan lanjutan dengan cakupan lebih besar, tetapi tidak dapat langsung dinyatakan sebagai perbaikan dari hasil sebelumnya karena total nama, versi *scene*, endpoint, dan tanggal tidak sama-sama tercatat.
 
 [FIGURE:evidence_sync_checker_lanjutan]
 [FIGCAPTION:Hasil Pemeriksaan Lanjutan Konsistensi Nama Aset dan Basis Data]
@@ -954,7 +999,7 @@ Hanya pada scene | 14 | Masih terdapat nama scene tanpa padanan basis data
 Status keseluruhan | Belum sepenuhnya konsisten | Masih terdapat mismatch pada kedua arah dan metadata pengujian belum lengkap
 [/TABLE]
 
-`DatabaseSyncChecker` dikembangkan oleh Faiz dan digunakan Dwikhi untuk menemukan mismatch. Hasil kerja Dwikhi yang masih perlu dibuktikan adalah daftar koreksi nama pada aset atau data serta retest terkontrol pada *scene*, endpoint, basis data, dan commit yang sama.
+`DatabaseSyncChecker` dikembangkan oleh Faiz dan digunakan Dwikhi untuk menemukan mismatch. Hasil kerja Dwikhi yang masih perlu dibuktikan adalah daftar koreksi nama pada aset atau data serta retest terkontrol pada *scene*, endpoint, dan basis data dengan versi pengujian yang dicatat.
 
 ### 3.5.6 User Acceptance Testing
 
@@ -974,11 +1019,11 @@ Kontribusi yang relevan dengan peran aset dan pengelolaan data terutama berkaita
 
 Kesimpulan yang dapat dirumuskan berdasarkan bukti yang telah tersedia adalah sebagai berikut:
 
-1. Penulis membuat dan menata sebelas aset gedung secara langsung di Unity Editor. Bukti implementasi mencakup sebelas pasangan render dan hierarki, 21 berkas referensi visual dengan cakupan nama 10 dari 11 aset utama, satu tangkapan proses, serta inventaris 37 berkas material dan tekstur. Unity 6.4, perangkat pengujian, ukuran prefab, serta GameObject, mesh, dan vertex untuk Ki Hajar Dewantara, Dewi Sartika, dan Jenderal Soedirman telah tercatat; triangle, material, collider, Build Report, dan hasil optimasi masih diperlukan untuk penilaian teknis lengkap.
+1. Penulis membuat dan menata seluruh aset 3D gedung dan fasilitas yang memiliki GameObject pada scene Unity menggunakan observasi visual dan dokumentasi fotografis tanpa pengukuran dimensi instrumental. Sebelas pasangan render dan hierarki yang tersedia diposisikan sebagai sampel bukti representatif, bukan batas jumlah aset. Inventaris 37 berkas material dan tekstur, Unity 6.4, perangkat pengujian, ukuran prefab, serta GameObject, mesh, dan vertex untuk tiga aset telah tercatat; triangle, material, collider, Build Report, dan hasil optimasi masih diperlukan untuk penilaian teknis lengkap.
 2. Penulis menyusun hierarki prefab, child `Pointer`, dan GameObject tujuan serta menetapkan `unity_object_name` untuk memisahkan geometri visual dari identifier navigasi. Hierarki Dewi Sartika memperlihatkan salah satu contoh penerapan melalui objek tujuan `dewi_sartika`.
-3. Kontribusi basis data penulis meliputi perancangan skema dan ERD serta pengelolaan record gedung atau fasilitas. ERD ringkas, contoh nilai `unity_object_name`, dan tangkapan 12 baris constraint telah tersedia. Bukti tersebut mengonfirmasi sebagian primary key, unique constraint, foreign key, dan aturan `ON DELETE SET NULL`, sedangkan migration aktual serta uji perilaku pelanggaran constraint masih perlu dilengkapi.
+3. Kontribusi basis data penulis meliputi perancangan 11 tabel aktif dalam ERD serta pengelolaan record gedung atau fasilitas. Seed terbaru memuat 19 entitas gedung dan 311 fasilitas. Masjid merupakan aset visual terpisah dengan record fasilitas pada `id_gedung = 6`, sedangkan Soepomo dan Soetomo merupakan entitas berbeda dan `id_gedung = 17` pada seed terbaru adalah Gedung Soetomo. Verifikasi data produksi dan pengujian perilaku constraint masih perlu dilengkapi.
 4. RLS dan trigger audit log memengaruhi data yang dikelola penulis, tetapi keduanya merupakan konteks sistem dan bukan rancangan atau implementasi Dwikhi. Hasil pengujian bersama hanya digunakan untuk memastikan jalur baca, perubahan data, dan pencatatan sistem tersedia.
-5. Dwikhi menggunakan `DatabaseSyncChecker` buatan Faiz untuk memeriksa konsistensi nama. Tangkapan pertama mencatat 97 nama pada basis data, 57 ditemukan pada *scene*, 40 hanya terdapat pada basis data, dan 18 hanya terdapat pada *scene*. Tangkapan lain mencatat 323 nama, 320 ditemukan, 3 hanya pada basis data, dan 14 hanya pada *scene*. Kedua hasil belum dapat dibandingkan sebagai sebelum-sesudah karena versi *scene*, endpoint, waktu, commit, dan daftar koreksi tidak tercatat bersama.
+5. Dwikhi menggunakan `DatabaseSyncChecker` buatan Faiz untuk memeriksa konsistensi nama. Tangkapan pertama mencatat 97 nama pada basis data, 57 ditemukan pada *scene*, 40 hanya terdapat pada basis data, dan 18 hanya terdapat pada *scene*. Tangkapan lain mencatat 323 nama, 320 ditemukan, 3 hanya pada basis data, dan 14 hanya pada *scene*. Kedua hasil belum dapat dibandingkan sebagai sebelum-sesudah karena versi *scene*, endpoint, waktu, dan daftar koreksi tidak tercatat bersama.
 
 ## 4.2 Saran
 
@@ -988,7 +1033,7 @@ Saran pengembangan awal adalah sebagai berikut:
 2. Menambahkan validasi format dan keunikan `unity_object_name` pada form administrator serta pada pipeline integrasi sebelum build.
 3. Menetapkan checklist teknis aset yang mencakup skala, pivot, collider, material, tekstur, jumlah polygon, dan posisi titik tujuan.
 4. Menggunakan `DatabaseSyncChecker` buatan Faiz sebagai pemeriksaan wajib setiap kali terdapat perubahan data gedung, fasilitas, atau hierarki *scene*.
-5. Melengkapi bukti pengerjaan berupa logbook, screenshot proses, commit aset atau data, contoh record sebelum dan sesudah perubahan, hasil pengujian, dan retest agar kontribusi penulis dapat ditelusuri secara akademik.
+5. Melengkapi rekap logbook bulanan, screenshot proses, contoh record sebelum dan sesudah perubahan, hasil pengujian, dan retest agar kontribusi penulis dapat ditelusuri secara akademik.
 
 ---
 
@@ -1032,9 +1077,14 @@ Taurusta, C., Asiddiq, A. M., Suprianto, S., dan Setiawan, H. (2024). Visualisas
 
 ---
 
-# LAMPIRAN 2. Surat Keterangan Implementasi Proyek dari Mitra
+# LAMPIRAN 2. Dokumentasi Penyerahan Pakta Integritas kepada UPA TIK
 
-[TBD: masukkan surat resmi yang telah diverifikasi tanpa mengarang nomor, tanggal, atau tanda tangan]
+Dokumentasi berikut memperlihatkan penyerahan atau penyampaian Pakta Integritas kepada UPA TIK dalam rangka pelaksanaan riset proyek. Foto digunakan sebagai bukti dokumentasi kegiatan dan salinan PDF Pakta Integritas disimpan pada `pakta_integritas/PAKTA INTEGRITAS RISET MAHASISWA.pdf`. Identitas staf, tanggal pengesahan, status persetujuan institusi, dan kesetaraan foto dengan salinan resmi bertanda tangan tidak disimpulkan dari gambar ini.
+
+Foto kegiatan tersebut dirujuk pada [FIGREF:foto_penyerahan_pakta_upa_tik].
+
+[FIGURE:foto_penyerahan_pakta_upa_tik]
+[FIGCAPTION:Dokumentasi Penyerahan Pakta Integritas kepada UPA TIK]
 
 ---
 
@@ -1042,34 +1092,36 @@ Taurusta, C., Asiddiq, A. M., Suprianto, S., dan Setiawan, H. (2024). Visualisas
 
 Bukti awal yang telah tersedia terdiri atas:
 
-1. Dua puluh satu berkas referensi visual pada `images/list_foto/`, dengan cakupan nama 10 dari 11 aset utama dan tanpa referensi Jenderal Soedirman.
+1. Dua puluh satu berkas referensi visual pada `images/list_foto/`, yang digunakan sebagai sampel dokumentasi kondisi gedung dan fasilitas.
 2. Tiga puluh tujuh berkas material dan tekstur pada `images/list_material/`.
-3. Sebelas render aset gedung, sebelas tangkapan hierarki, dan satu tangkapan proses pengerjaan pada `images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/`.
+3. Sebelas render aset gedung, sebelas tangkapan hierarki sebagai sampel representatif, dan satu tangkapan proses pengerjaan pada `images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/`.
 4. Satu tangkapan riwayat perubahan pada `images/riwayat_pengerjaan.png`.
 5. Satu tangkapan Unity 6.4 pada `images/versi_unity.jpeg`.
 6. Satu tangkapan spesifikasi perangkat pengujian pada `images/Perangkat_uji.png`.
 7. Satu inventaris ukuran prefab pada `images/data/Ukuran__file_prefab.png`.
 8. Tiga tangkapan pengukuran GameObject, mesh, dan vertex untuk Ki Hajar Dewantara, Dewi Sartika, dan Jenderal Soedirman.
 
-[TBD: lengkapi identitas pengambil gambar, tanggal dan lokasi pengambilan, sumber dua gambar yang bukan foto lapangan terverifikasi, foto Jenderal Soedirman, path dan commit prefab, sumber atau lisensi material dan tekstur, triangle, jumlah material, collider, versi scene yang diuji, dan Build Report]
+[TBD: lengkapi identitas pengambil gambar, tanggal dan lokasi pengambilan, sumber gambar yang bukan foto lapangan terverifikasi, sumber atau lisensi material dan tekstur, triangle, jumlah material, collider, versi scene yang diuji, dan Build Report]
 
 ---
 
 # LAMPIRAN 4. Skema Basis Data dan Bukti Pengelolaan Data
 
-Bukti yang sudah tersedia adalah ERD ringkas data akademik dan fasilitas, representasi struktur data pada Subbab 3.2.3, tangkapan 12 baris constraint produksi, serta contoh kolom dan nilai `unity_object_name` pada tabel `gedung` dan `fasilitas`. Lampiran ini masih memerlukan `[TBD: versi, tanggal, dan commit ERD]`, `[TBD: migration atau DDL aktual beserta ekspor constraint lengkap]`, `[TBD: kamus data dan catatan keputusan desain]`, `[TBD: ekspor record lengkap serta bukti sebelum dan sesudah dikelola]`, `[TBD: daftar pemetaan nama tampilan dan unity_object_name pada sebelas aset]`, serta `[TBD: daftar koreksi mismatch dan retest terkontrol]`. SQL policy RLS dan trigger audit tidak menjadi bukti wajib kontribusi Dwikhi.
+Bukti yang sudah tersedia adalah diagram empat tabel inti data akademik dan fasilitas, diagram lima tabel denah navigasi, berkas SQL setup, serta representasi struktur 11 tabel aktif pada Subbab 3.2.3. Bukti lain mencakup tangkapan 12 baris constraint produksi, contoh kolom dan nilai `unity_object_name`, serta inventaris seed terbaru berisi 311 record fasilitas pada 19 entitas gedung. Daftar rinci fasilitas per gedung dan lantai dimuat setelah paragraf ini. Lampiran masih memerlukan `[TBD: versi dan tanggal ERD serta berkas SQL setup]`, `[TBD: ekspor constraint produksi lengkap dan status penerapan DDL]`, `[TBD: kamus data dan catatan keputusan desain]`, `[TBD: ekspor produksi serta bukti sebelum dan sesudah koreksi atau pemetaan]`, `[TBD: daftar pemetaan nama tampilan dan unity_object_name pada seluruh GameObject dalam scope]`, serta `[TBD: retest terkontrol setelah koreksi]`. SQL policy RLS dan trigger audit tidak menjadi bukti wajib kontribusi Dwikhi.
+
+<!-- PIPELINE:INCLUDE content/roles/dwikhi/facility-seed-inventory.md -->
 
 ---
 
 # LAMPIRAN 5. Logbook dan Bukti Pengujian
 
-Matriks pengujian integritas, visual aset, dan konsistensi nama telah disiapkan pada Subbab 3.5, sedangkan RLS serta audit log hanya diringkas dari pengujian sistem bersama. Bukti yang tersedia meliputi hasil pengujian fungsional bersama, inventaris constraint, dua tangkapan `DatabaseSyncChecker` dengan cakupan berbeda, metrik parsial tiga aset, dan riwayat commit dengan hash pendek `941d259`. Lampiran ini masih memerlukan `[TBD: logbook bertanggal dan diverifikasi]`, `[TBD: query serta pesan galat uji foreign key, unique constraint, NOT NULL, dan ON DELETE]`, `[TBD: checklist visual sebelas aset]`, `[TBD: daftar koreksi mismatch]`, dan `[TBD: retest pada scene, endpoint, basis data, dan commit yang sama]`.
+Subbab 3.4.1 memuat rekap logbook bulanan yang disusun berdasarkan dokumentasi aktual, bukan logbook harian. Matriks pengujian integritas, visual aset, dan konsistensi nama telah disiapkan pada Subbab 3.5, sedangkan RLS serta audit log hanya diringkas dari pengujian sistem bersama. Bukti yang tersedia meliputi hasil Black Box dan UAT bersama pada `Hasil UAT/`, survei 21 responden, inventaris constraint, dua tangkapan `DatabaseSyncChecker` dengan cakupan berbeda, serta metrik parsial tiga aset. Lampiran ini masih memerlukan `[TBD: query serta pesan galat uji foreign key, unique constraint, NOT NULL, dan ON DELETE]`, `[TBD: checklist visual seluruh aset dalam scope]`, `[TBD: daftar koreksi mismatch]`, dan `[TBD: retest pada scene, endpoint, dan basis data dengan versi pengujian yang dicatat]`.
 
 ---
 
 # LAMPIRAN 6. Mockup Antarmuka sebagai Konteks Integrasi
 
-Lampiran ini memuat mockup yang tidak dibahas pada Subbab 2.3.7 karena tidak menunjukkan kontribusi utama penulis. Konteks autentikasi administrator diperlihatkan pada [FIGREF:mockup_login_admin].
+Bagian lampiran ini memuat mockup yang tidak dibahas pada Subbab 2.3.7 karena tidak menunjukkan kontribusi utama penulis. Konteks autentikasi administrator diperlihatkan pada [FIGREF:mockup_login_admin].
 
 [FIGURE:mockup_login_admin]
 [FIGCAPTION:Halaman Login Admin]

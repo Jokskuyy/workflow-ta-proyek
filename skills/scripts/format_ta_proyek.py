@@ -2312,7 +2312,9 @@ def format_document_xmls(unpacked_dir):
             
             return p
 
-        # Find cover page end index (last paragraph before the SECOND drawing, which is Lembar Pengesahan)
+        # Find the cover-page boundary.  Normally the second drawing is the
+        # approval scan; branch-specific builds may replace a mismatched scan
+        # with a text placeholder instead of reusing another student's page.
         collected_captions = []
         estimated_page = 1
         para_count = 0
@@ -2320,6 +2322,9 @@ def format_document_xmls(unpacked_dir):
         drawing_count = 0
         for idx, child in enumerate(children):
             if idx < bab1_idx_orig and child.tag.endswith('p'):
+                child_text = "".join(child.itertext()).strip()
+                if child_text.startswith('LEMBAR PERSETUJUAN'):
+                    break
                 if child.find('.//w:drawing', namespaces) is not None:
                     drawing_count += 1
                     if drawing_count == 2:
@@ -2355,18 +2360,27 @@ def format_document_xmls(unpacked_dir):
                         has_sectPr = child.find('.//w:sectPr', namespaces) is not None
                         has_fldChar = child.find('.//w:fldChar', namespaces) is not None
                         has_instr = child.find('.//w:instrText', namespaces) is not None
+                        is_approval_placeholder = text.startswith('LEMBAR PERSETUJUAN')
                         if text or has_drawing or has_sectPr or has_fldChar or has_instr:
-                            if has_drawing and not lembar_pengesahan_processed:
-                                scale_lembar_pengesahan(child, namespaces, unpacked_dir, rel_map)
+                            if (has_drawing or is_approval_placeholder) and not lembar_pengesahan_processed:
+                                if has_drawing:
+                                    scale_lembar_pengesahan(child, namespaces, unpacked_dir, rel_map)
                                 pPr = child.find('w:pPr', namespaces)
                                 if pPr is None:
                                     pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
                                     child.insert(0, pPr)
                                 set_child_element(pPr, 'pageBreakBefore', {})
+                                if is_approval_placeholder:
+                                    set_child_element(pPr, 'jc', {'val': 'center'})
+                                    set_child_element(
+                                        pPr,
+                                        'spacing',
+                                        {'before': '3000', 'after': '0', 'line': '360', 'lineRule': 'auto'},
+                                    )
                                 sort_element_children(pPr, PPR_ORDER)
                                 lembar_pengesahan_processed = True
                                 need_page_break_after_lp = True
-                                print(f"  Applied page break, margin scaling, and centering to Lembar Pengesahan at index {idx}")
+                                print(f"  Applied approval-page layout at index {idx}")
                             elif lembar_pengesahan_processed and need_page_break_after_lp:
                                 pPr = child.find('w:pPr', namespaces)
                                 if pPr is None:

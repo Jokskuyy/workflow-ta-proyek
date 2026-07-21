@@ -101,6 +101,19 @@ def test_gantt_colors_replace_x():
             assert cell_text(c).strip().upper() != "X"
 
 
+def test_gantt_activity_column_is_wider_than_period_columns():
+    """The activity label remains readable while month columns stay compact."""
+    item = {"type": "table", "lines": JADWAL_LINES, "mode": "gantt"}
+    tbl = mrg.build_table_element(item)
+    widths = [
+        int(col.get(f"{{{W}}}w"))
+        for col in tbl.findall(f"{{{W}}}tblGrid/{{{W}}}gridCol")
+    ]
+
+    assert widths[0] == 3 * widths[1]
+    assert len(set(widths[1:])) == 1
+
+
 def test_legacy_table_path_unchanged():
     """Without gantt mode, X marks are kept and no shading is applied."""
     item = {"type": "table", "lines": JADWAL_LINES, "mode": None}

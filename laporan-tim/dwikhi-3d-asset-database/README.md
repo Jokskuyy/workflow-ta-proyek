@@ -1,10 +1,10 @@
-# Laporan TA — Muhammad Dwikhi Deandra Purnianto (3D Asset Designer & Database/Asset Manager)
+# Laporan TA — Dwikhi Deandra Purnianto (3D Asset Designer & Database/Asset Manager)
 
 **Branch:** `laporan/dwikhi` — tulis laporan di `Tugas_Akhir_Draft.md` (root repo) saat berada di branch ini.
 
 ## Fokus / Lingkup Laporan
 Berdasarkan pembagian peran (BAB II — Wawancara Stakeholder), kontribusi:
-1. **Pembuatan & Penataan Sebelas Aset 3D Gedung** langsung di **Unity Editor** (tanpa Blender), termasuk geometri, material atau tekstur, prefab, dan hierarki.
+1. **Pembuatan & Penataan Seluruh Aset 3D Gedung dan Fasilitas yang Memiliki GameObject di Unity** langsung di **Unity Editor** (tanpa Blender), termasuk geometri, material atau tekstur, prefab, dan hierarki.
 2. **Konvensi Hierarki Prefab** — menyusun child `Pointer` dan GameObject tujuan dengan nama yang sesuai dengan `unity_object_name`.
 3. **Perancangan Skema Database dan ERD** Supabase PostgreSQL — `gedung`, `fasilitas`, `fakultas`, `program_studi`, `admin_users`, dan `audit_logs` beserta relasinya.
 4. **Pengelolaan Data Gedung dan Fasilitas** — menjaga kelengkapan record serta pemetaan `unity_object_name` pada aset dan data.

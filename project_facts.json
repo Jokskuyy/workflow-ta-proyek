@@ -1,12 +1,12 @@
 {
     "project_metadata": {
-        "title": "Integrasi Denah Virtual Universitas Pembangunan Nasional Veteran Jakarta Kampus Pondok Labu (Dashboard Profil)",
-        "author": "Muhammad Iman Nugraha",
-        "nim": "2210511129",
+        "title": "Perancangan Aset 3D dan Pengelolaan Basis Data pada Sistem Denah Virtual UPNVJ Kampus Pondok Labu",
+        "author": "Dwikhi Deandra Purnianto",
+        "nim": "2210511131",
         "program_study": "S1 Informatika",
         "faculty": "Fakultas Ilmu Komputer",
         "institution": "Universitas Pembangunan Nasional Veteran Jakarta",
-        "academic_year": "2025/2026",
+        "academic_year": "2026",
         "advisors": {
             "pembimbing_1": "Dr. Ridwan Raafi’udin, S.Kom, M.Kom.",
             "pembimbing_2": "Novi Trisman Hadi, S.Pd., M.Kom."
@@ -25,13 +25,18 @@
             {
                 "role": "Wakil Rektor Bidang Kemahasiswaan, Kerja Sama, dan Sistem Informasi UPNVJ",
                 "name": "Dr. dr. Ria Maria Theresa, SpKJ., MH.",
-                "notes": "Wawancara mengenai ketersediaan dan kebijakan pembagian data sarana prasarana. Kebijakan administratif membatasi pembagian data mentah demi keamanan informasi, memvalidasi pentingnya portal informasi terintegrasi dan aman."
+                "date": "2026-02-25",
+                "student_participant": "Dwikhi Deandra Purnianto",
+                "notes": "Wawancara memvalidasi kesulitan mahasiswa dan pengunjung dalam mencari ruangan serta rancangan dashboard dan denah 3D dengan pencarian lokasi. Narasumber menekankan bahwa data ruangan dinamis karena renovasi dan perubahan fungsi, sehingga data harus dapat diperbarui tanpa mengubah struktur dasar sistem. Pembahasan juga mencakup rencana penggunaan subdomain resmi UPNVJ, penyematan pada website universitas, kolaborasi dengan UPA TIK, koordinasi perolehan denah fisik terbaru melalui bagian terkait, kebutuhan surat permohonan data, dan perhatian terhadap stabilitas Wi-Fi. Narasumber memberikan respons positif terhadap arah digitalisasi sarana dan prasarana melalui proyek."
             }
         ],
         "documents": {
             "pakta_integritas_upa_tik": {
-                "status": "signed",
-                "evidence": "dokumentasi/ttd pakta integritas UPA TIK.jpeg"
+                "status": "documentation_available",
+                "evidence": [
+                    "dokumentasi/ttd pakta integritas UPA TIK.jpeg",
+                    "pakta_integritas/PAKTA INTEGRITAS RISET MAHASISWA.pdf"
+                ]
             },
             "wawancara_warek_2": {
                 "status": "completed",
@@ -86,8 +91,8 @@
             ]
         },
         {
-            "name": "Muammar Faiz Khairul Anam",
-            "nim": "TBD",
+            "name": "Muammar Faiz Khairul Anam Setiawan",
+            "nim": "2210511138",
             "role": "Peran 2: 3D Simulator & Engine Developer",
             "focus": [
                 "Unity WebGL Engine",
@@ -100,26 +105,50 @@
             ]
         },
         {
-            "name": "Muhammad Dwikhi Deandra Purnianto",
+            "name": "Dwikhi Deandra Purnianto",
             "nim": "2210511131",
             "role": "Peran 3: 3D Asset Designer & Database/Asset Manager",
             "focus": [
-                "Creation and layout of 11 building assets directly in Unity Editor without Blender",
+                "Creation and layout of all building and facility 3D GameObjects in Unity Editor without Blender",
                 "Prefab hierarchy and child Pointer target GameObjects",
                 "PostgreSQL database schema and ERD design in Supabase Cloud",
                 "Management of gedung and fasilitas records",
                 "unity_object_name mapping and integrity",
                 "Use of DatabaseSyncChecker developed by the 3D Simulator & Engine Developer"
-            ]
+            ],
+            "asset_observation_method": "Observasi visual langsung dan dokumentasi fotografis dengan mendatangi gedung satu per satu. Tidak dilakukan pengukuran dimensi menggunakan alat ukur; bentuk dan proporsi aset disusun sebagai representasi visual berdasarkan massa bangunan, jumlah lantai, pola bukaan, warna, material, dan hubungan antarelemen yang terlihat.",
+            "data_collection_constraint": "Pengumpulan data dilakukan secara mandiri dari gedung ke gedung. Keterbatasan akses dan minimnya informasi menyebabkan sebagian nama atau fungsi ruangan tidak dapat dipastikan mutakhir, sehingga data yang belum terverifikasi tidak boleh dinyatakan sebagai kondisi final."
         }
     ],
+    "dwikhi_project_schedule": {
+        "duration_months": 6,
+        "status": "actual_by_user_confirmation",
+        "logbook_basis": "Rekap bulanan berdasarkan artefak dokumentasi aktual; tidak menggunakan logbook harian.",
+        "activities": [
+            {"activity": "Observasi stakeholder dan identifikasi kebutuhan aset serta data", "months": [1]},
+            {"activity": "Pengambilan foto dan inventarisasi gedung serta fasilitas", "months": [1, 2]},
+            {"activity": "Perancangan skema database dan ERD", "months": [1, 2]},
+            {"activity": "Penetapan konvensi nama aset dan unity_object_name", "months": [1, 2, 3]},
+            {"activity": "Pemodelan aset 3D gedung dan fasilitas", "months": [2, 3, 4]},
+            {"activity": "Penerapan material dan tekstur", "months": [2, 3, 4]},
+            {"activity": "Penyusunan prefab, hierarki, Pointer, dan GameObject tujuan", "months": [3, 4]},
+            {"activity": "Penyusunan seed serta pengelolaan data", "months": [3, 4, 5]},
+            {"activity": "Pemetaan aset dengan unity_object_name", "months": [3, 4, 5]},
+            {"activity": "Pemeriksaan integritas database", "months": [4, 5]},
+            {"activity": "Validasi menggunakan DatabaseSyncChecker", "months": [4, 5]},
+            {"activity": "Pemeriksaan visual dan teknis aset", "months": [4, 5, 6]},
+            {"activity": "Koreksi ketidaksesuaian aset dan data", "months": [5, 6]},
+            {"activity": "Penyusunan dokumentasi dan laporan", "months": [1, 2, 3, 4, 5, 6]},
+            {"activity": "Pengujian akhir dan finalisasi", "months": [5, 6]}
+        ]
+    },
     "testing_status": {
         "black_box_testing": {
-            "completed": false,
+            "completed": true,
             "date_conducted": null,
-            "total_scenarios": 18,
-            "success_rate": null,
-            "details": "Belum dilaksanakan. Menunggu penyelesaian prototipe akhir."
+            "total_scenarios": 24,
+            "success_rate": "100.00%",
+            "details": "Pengujian awal menghasilkan 23 dari 24 skenario lulus. Setelah BB-20 diperbaiki dan diuji ulang, hasil akhir menjadi 24 dari 24 skenario lulus."
         },
         "lighthouse_testing": {
             "completed": true,
@@ -133,16 +162,19 @@
             "details": "Pengujian Lighthouse awal (baseline) dijalankan pada build produksi lokal menggunakan preview server Vite sebelum dilakukan optimasi performa lebih lanjut pada codebase."
         },
         "user_acceptance_test_uat": {
-            "completed": false,
+            "completed": true,
             "date_conducted": null,
             "respondents": {
-                "total": 0,
-                "students": 0,
-                "admin_staff": 0
+                "total": 5,
+                "public_questionnaire": 4,
+                "admin_questionnaire": 4,
+                "general_public_participants": 0
             },
-            "likert_scale_rating": null,
-            "satisfaction_percentage": "TBD",
-            "details": "Akan segera dilaksanakan (proses pengajuan)."
+            "likert_scale_rating": "1-5",
+            "public_dashboard_percentage": "77.78%",
+            "admin_dashboard_percentage": "84.55%",
+            "combined_percentage": "81.50%",
+            "details": "UAT tertutup diikuti lima peserta unik, terdiri atas dua dosen penguji, dua dosen pembimbing, dan satu perwakilan Humas UPNVJ. UAT tidak melibatkan sampel pengguna publik."
         }
     },
     "reference_documents": {
@@ -154,16 +186,44 @@
     },
     "integration_pointer_and_sync": {
         "pointer_mechanism": {
-            "description": "Sebagai 3D Asset Designer dan Database/Asset Manager, Muhammad Dwikhi Deandra Purnianto menyusun child Pointer dan GameObject tujuan pada prefab gedung serta menetapkan nama yang sesuai dengan unity_object_name di database Supabase.",
+            "description": "Sebagai 3D Asset Designer & Database/Asset Manager, Dwikhi Deandra Purnianto membuat dan menata seluruh GameObject 3D gedung serta fasilitas yang dikerjakan pada scene Unity, menyusun child Pointer dan GameObject tujuan, serta menetapkan nama yang sesuai dengan unity_object_name di database Supabase.",
             "hierarchy_screenshot": "dokumentasi/contoh_pointer.png"
         },
         "database_sync_checker": {
             "script_path": "src/unity-scripts/Editor/DatabaseSyncChecker.cs",
-            "description": "Script editor Unity yang dikembangkan oleh Muammar Faiz Khairul Anam untuk memeriksa sinkronisasi antara objek di Unity Hierarchy dan data Supabase melalui API /api/unity/names; Muhammad Dwikhi Deandra Purnianto menggunakannya untuk menemukan dan memperbaiki ketidaksesuaian pada aset atau data.",
+            "description": "Script editor Unity yang dikembangkan oleh Muammar Faiz Khairul Anam Setiawan untuk memeriksa sinkronisasi antara objek di Unity Hierarchy dan data Supabase melalui API /api/unity/names; Dwikhi Deandra Purnianto menggunakannya untuk menemukan dan memperbaiki ketidaksesuaian pada aset atau data.",
             "ui_screenshot": "dokumentasi/contoh_sync_db.png"
         }
     },
+    "facility_seed_inventory": {
+        "source_status": "Seed terbaru yang diberikan pada lampiran SQL menjadi sumber data fasilitas yang didokumentasikan. Supabase belum menggunakan seed terbaru; jumlah GameObject Unity tidak disamakan otomatis dengan jumlah record database.",
+        "building_records": 19,
+        "raw_total_records": 311,
+        "groups": [
+            {"seed_reference": 1, "name": "Gedung Rektorat (Jenderal Soedirman)", "facility_count": 36},
+            {"seed_reference": 2, "name": "Gedung Dr. Soepomo", "facility_count": 24},
+            {"seed_reference": 3, "name": "Gedung Dr. Wahidin Sudiro Husodo", "facility_count": 38},
+            {"seed_reference": 4, "name": "Gedung Dr. Cipto Mangunkusumo", "facility_count": 38},
+            {"seed_reference": 5, "name": "Gedung Abdul Rahman Saleh", "facility_count": 25},
+            {"seed_reference": 6, "name": "Gedung Ki Hadjar Dewantara", "facility_count": 25},
+            {"seed_reference": 7, "name": "Gedung Muh. Husni Thamrin", "facility_count": 37},
+            {"seed_reference": 8, "name": "Gedung Muhammad Yamin", "facility_count": 20},
+            {"seed_reference": 10, "name": "Gedung R.A. Kartini", "facility_count": 24},
+            {"seed_reference": 13, "name": "Gedung Dewi Sartika", "facility_count": 26},
+            {"seed_reference": 17, "name": "Gedung Soetomo", "facility_count": 18}
+        ],
+        "quality_findings": [
+            "Seed terbaru memuat 311 fasilitas setelah standardisasi data dan penyelesaian satu data duplikat.",
+            "Masjid dicatat sebagai fasilitas dengan id_gedung 6 pada Gedung Ki Hadjar Dewantara, sedangkan aset visual Masjid memiliki GameObject tersendiri.",
+            "Gedung Soepomo, Gedung Soetomo, Yos Sudarso, RA Kartini, Lapangan Basket, dan entitas gedung lain merupakan record gedung yang berbeda.",
+            "Nama dan fungsi ruangan belum seluruhnya diverifikasi terhadap kondisi lapangan terbaru."
+        ]
+    },
     "database_schema": {
+        "table_count": 11,
+        "status": "active",
+        "documentation_source": "Berkas SQL setup dan seed terbaru yang diberikan pengguna; SQL setup hanya dibaca sebagai dokumentasi dan tidak dijalankan karena memuat operasi DROP TABLE.",
+        "audit_trigger_evidence": "Definisi trigger audit tidak ditemukan pada berkas SQL setup yang diberikan; keberadaannya tidak boleh disimpulkan dari berkas tersebut.",
         "tables": [
             {
                 "name": "gedung",
@@ -238,6 +298,57 @@
                 ]
             },
             {
+                "name": "campus_maps",
+                "columns": [
+                    "id",
+                    "slug",
+                    "nama",
+                    "image_url",
+                    "image_width",
+                    "image_height",
+                    "is_active",
+                    "created_at",
+                    "updated_at"
+                ]
+            },
+            {
+                "name": "campus_map_nodes",
+                "columns": [
+                    "id",
+                    "map_id",
+                    "label",
+                    "node_type",
+                    "x",
+                    "y",
+                    "created_at"
+                ]
+            },
+            {
+                "name": "campus_map_edges",
+                "columns": [
+                    "id",
+                    "map_id",
+                    "from_node_id",
+                    "to_node_id",
+                    "bidirectional",
+                    "accessible",
+                    "weight"
+                ]
+            },
+            {
+                "name": "campus_map_building_points",
+                "columns": [
+                    "id",
+                    "map_id",
+                    "gedung_id",
+                    "marker_x",
+                    "marker_y",
+                    "entrance_node_id",
+                    "created_at",
+                    "updated_at"
+                ]
+            },
+            {
                 "name": "web_analytics_log",
                 "columns": [
                     "id",
@@ -246,7 +357,7 @@
                     "device_type",
                     "visited_at"
                 ],
-                "status": "legacy"
+                "status": "active"
             }
         ],
         "crud_entities": [

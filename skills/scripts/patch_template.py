@@ -89,11 +89,17 @@ def load_draft_front_matter():
     if len(metadata_lines) < 2:
         return {}
 
+    year = next(
+        (line for line in metadata_lines[2:] if re.fullmatch(r'(?:19|20)\d{2}', line)),
+        None,
+    )
+
     return {
         'title': headings[0],
         'subtitle': headings[1],
         'name': metadata_lines[0],
         'nim': metadata_lines[1],
+        'year': year,
     }
 
 
@@ -108,9 +114,13 @@ def replace_paragraph_text(paragraph, text, ns_uri):
     run = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}r')
     if source_rpr is not None:
         run.append(copy.deepcopy(source_rpr))
-    text_node = lxml.etree.SubElement(run, f'{{{ns_uri}}}t')
-    text_node.text = text
-    text_node.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+    for index, line in enumerate(text.split('\n')):
+        if index:
+            lxml.etree.SubElement(run, f'{{{ns_uri}}}br')
+        if line:
+            text_node = lxml.etree.SubElement(run, f'{{{ns_uri}}}t')
+            text_node.text = line
+            text_node.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
 
 new_erd_markdown = """Penjelasan mengenai struktur tabel, kolom, tipe data, serta aturan relasi antartabel dijabarkan sebagai berikut:
 
@@ -262,6 +272,8 @@ def main():
             'Muhammad Iman Nugraha': front_matter['name'],
             '2210511129': front_matter['nim'],
         }
+        if front_matter.get('year'):
+            front_matter_replacements['2025'] = front_matter['year']
         print(
             'Loaded front matter from %s: %s / %s / %s / %s'
             % (
@@ -287,6 +299,28 @@ def main():
                 replace_paragraph_text(paragraph, replacement, ns_uri)
                 replaced_front_paragraphs += 1
         print(f'Replaced {replaced_front_paragraphs} split front-matter paragraph(s).')
+
+        # The retained template contains Iman's signed approval scan.  It must
+        # not be carried into another student's report when no matching signed
+        # document is available.  Keep the dedicated page, but replace the
+        # mismatched scan with an explicit, non-fabricated placeholder.
+        if front_matter['name'] != 'Muhammad Iman Nugraha':
+            front_drawings = [
+                paragraph
+                for paragraph in body.findall('w:p', namespaces)
+                if paragraph.find('.//w:drawing', namespaces) is not None
+            ]
+            if len(front_drawings) >= 2:
+                replace_paragraph_text(
+                    front_drawings[1],
+                    'LEMBAR PERSETUJUAN\n\n'
+                    + front_matter['name']
+                    + '\nNIM '
+                    + front_matter['nim']
+                    + '\n\n[TBD: lampirkan lembar persetujuan resmi yang telah ditandatangani]',
+                    ns_uri,
+                )
+                print('Replaced mismatched template approval scan with a TBD placeholder.')
 
     wt_replaced = 0
     for wt in root.xpath('//w:t', namespaces=namespaces):
