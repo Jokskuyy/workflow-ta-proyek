@@ -14,7 +14,6 @@ skinparam ActivityDiamondBorderColor #555555
 skinparam SwimlaneTitleFontColor #333333
 skinparam SwimlaneBorderColor #999999
 
-title Gambar 2.13 - Activity Diagram: Pengelolaan Data oleh Admin
 
 |Administrator|
 start

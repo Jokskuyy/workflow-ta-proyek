@@ -12,7 +12,6 @@ skinparam wbsDiagram {
   ArrowColor #444444
 }
 
-title Gambar 3.1 — Hierarki Prefab Gedung dengan Child Pointer di Unity
 
 * [NamaGedung]\n(Prefab Gedung)
 ** Pointer\n(parent unity_object_name)

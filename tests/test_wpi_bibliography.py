@@ -232,18 +232,14 @@ def test_unit_snapshot_draft_entries_match_baseline_spans():
     assert result.section_found is True
 
     baseline = _baseline_entry_spans()
-    assert len(result) == len(baseline) == 14
+    assert len(result) == len(baseline) == 13
 
     for entry, base_spans in zip(result, baseline):
         # Text + italic-span structure must match the captured baseline.
         assert list(entry.spans) == base_spans
-        # Journal articles and the Penmaru page carry one italic container
-        # span. The other official UPNVJ web pages have no container title.
-        expected_italic_spans = (
-            0
-            if entry.raw.startswith("UPNVJ.") and "(2026a)." not in entry.raw
-            else 1
-        )
+        # Journal articles carry one italic container span, while official
+        # UPNVJ web pages do not use an italic container title.
+        expected_italic_spans = 0 if entry.raw.startswith("UPNVJ.") else 1
         assert sum(1 for _, ital in entry.spans if ital) == expected_italic_spans
 
 
@@ -253,8 +249,7 @@ def test_unit_reference_key_surname_and_year():
     assert keys[0] == ('aliyah', '2025')
     assert ('upnvj', '2025a') in keys
     assert ('upnvj', '2025b') in keys
-    assert ('upnvj', '2026a') in keys
-    assert ('upnvj', '2026b') in keys
+    assert ('upnvj', '2026') in keys
     assert ('putra', '2026') in keys
 
 

@@ -18,7 +18,6 @@ skinparam actor {
   BorderColor #555555
 }
 
-title Gambar 2.15 - Sequence Diagram: Autentikasi Administrator
 
 actor "Administrator" as Admin
 participant "Frontend React\n(Admin Dashboard)" as FE

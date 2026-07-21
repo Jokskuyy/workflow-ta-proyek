@@ -7,6 +7,17 @@
         "faculty": "Fakultas Ilmu Komputer",
         "institution": "Universitas Pembangunan Nasional Veteran Jakarta",
         "academic_year": "2025/2026",
+        "schedule": {
+            "duration_months": 6,
+            "phases": {
+                "desain_arsitektur_dan_ui": "Bulan 1",
+                "pengembangan_backend": "Bulan 2-3",
+                "pengembangan_frontend": "Bulan 3-4",
+                "integrasi_dan_pengujian_sistem": "Bulan 4-5",
+                "revisi_final_dan_penulisan_laporan": "Bulan 5-6",
+                "dokumentasi": "Bulan 1-6"
+            }
+        },
         "advisors": {
             "pembimbing_1": "Dr. Ridwan Raafi’udin, S.Kom, M.Kom.",
             "pembimbing_2": "Novi Trisman Hadi, S.Pd., M.Kom."
@@ -154,7 +165,7 @@
                 "Hasil UAT/dokumentasi revisi/BB20_1.png",
                 "Hasil UAT/dokumentasi revisi/BB20_2.png"
             ],
-            "details": "Pengujian awal mencatat 23 dari 24 skenario lulus. BB-20 awalnya tidak lulus karena label tujuan menampilkan unity_object_name akibat script testing Unity ikut masuk ke build WebGL. Setelah tindakan korektif dan build ulang, dua frame retest menunjukkan label Gedung Dewi Sartika beserta garis rute sebelum completion, lalu garis rute hilang dan notifikasi tiba tampil setelah completion. Status akhir menjadi 24 dari 24 skenario terverifikasi lulus."
+            "details": "Pengujian awal mencatat 23 dari 24 skenario lulus. BB-20 awalnya tidak lulus karena skrip pengujian Unity ikut masuk ke build WebGL dan membuat label tujuan menampilkan unity_object_name. Setelah skrip dipisahkan dan aplikasi dibangun ulang, dua tangkapan layar menunjukkan label Gedung Dewi Sartika beserta garis rute sebelum pengguna tiba. Setelah pengguna tiba, garis rute hilang dan notifikasi kedatangan tampil. Hasil akhir menjadi 24 dari 24 skenario lulus."
         },
         "api_deployment_smoke_testing": {
             "completed": true,
@@ -283,15 +294,17 @@
                 "playwright_suite": "not_present"
             },
             "evidence": "Verifikasi repository web aktif dan handoff integrasi Navigation Completion Unity ke React, 21 Juli 2026",
-            "details": "Kode sumber aktif 08ebc06 mencatat npm lint, 13 file dan 129 pengujian Vitest/React Testing Library, serta tsc -b + Vite build lulus. Sembilan pengujian awal pada b572a48 dan dua pengujian lanjutan pada d2e8fdb memverifikasi kontrak OnNavigationCompleted pada React. Tidak ada rangkaian pengujian browser end-to-end/integrasi Unity yang dijalankan, sehingga tidak boleh mengklaim hasil Playwright."
+            "details": "Pemeriksaan kode sumber mencatat ESLint, 13 berkas dan 129 pengujian Vitest/React Testing Library, serta TypeScript dan build Vite lulus. Sebelas pengujian memeriksa notifikasi kedatangan pada React. Belum ada pengujian browser end-to-end yang mencakup integrasi Unity, sehingga laporan tidak boleh mengklaim hasil Playwright."
         },
         "user_acceptance_test_uat": {
             "completed": true,
             "date_conducted": null,
             "respondents": {
+                "session_type": "closed",
                 "total_unique": 5,
-                "public_questionnaire": 4,
-                "admin_questionnaire": 4,
+                "public_dashboard_questionnaire": 4,
+                "admin_dashboard_questionnaire": 4,
+                "general_public_participants": 0,
                 "participant_roles": {
                     "dosen_penguji": 2,
                     "dosen_pembimbing": 2,
@@ -323,7 +336,7 @@
                 "Hasil UAT/User_Humas.pdf",
                 "Hasil UAT/Widya_Cholil.pdf"
             ],
-            "details": "UAT diikuti oleh 5 peserta unik yang terdiri atas 2 dosen penguji, 2 dosen pembimbing, dan 1 perwakilan Humas UPNVJ. Instrumen pengguna publik diisi oleh 4 peserta dan memperoleh 77.78%; instrumen dashboard admin diisi oleh 4 peserta dan memperoleh 84.55%. Sebagian peserta mengisi kedua instrumen sehingga persentase gabungan berdasarkan seluruh jawaban adalah 81.50%."
+            "details": "UAT dilaksanakan secara tertutup dan diikuti oleh 5 peserta unik yang terdiri atas 2 dosen penguji, 2 dosen pembimbing, dan 1 perwakilan Humas UPNVJ; tidak terdapat peserta dari sampel pengguna publik. Instrumen evaluasi Dashboard Publik diisi oleh 4 peserta dan memperoleh 77.78%, sedangkan instrumen evaluasi Dashboard Admin diisi oleh 4 peserta dan memperoleh 84.55%. Sebagian peserta mengisi kedua instrumen sehingga persentase gabungan berdasarkan seluruh jawaban adalah 81.50%."
         },
         "uat_revision_implementation": {
             "date_verified": "2026-07-21",
@@ -539,7 +552,6 @@
         "crud_entities": [
             "gedung",
             "fasilitas",
-            "fakultas",
             "program_studi",
             "campus map configuration"
         ]
@@ -559,7 +571,7 @@
         "frontend_data_path": "React queries Supabase directly for UI data, auth, and CRUD",
         "unity_runtime_data_path": "BuildingDatabase GET /api/unity/data",
         "navigation_command": "window.unityInstance.SendMessage('NavigationReceiver', 'NavigateTo', unityObjectName)",
-        "callback_status": "Unity dispatches OnNavigationCompleted only from normal completion with a JSON unity_object_name payload; React validates it against activeNavigationRef before showing the arrival popup",
+        "callback_status": "Unity mengirim OnNavigationCompleted hanya setelah pengguna tiba dan menyertakan unity_object_name. React membandingkannya dengan tujuan aktif sebelum menampilkan notifikasi kedatangan.",
         "frontend_visual_evidence": {
             "captured_from": "https://dashboard-profile-upnvj.vercel.app/",
             "captured_on": "2026-07-21",

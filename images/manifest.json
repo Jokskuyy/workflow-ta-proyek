@@ -157,14 +157,14 @@
     {
       "id": "blackbox_bb20_rute_aktif",
       "file": "blackbox_bb20_rute_aktif.png",
-      "caption_match": "Retest BB-20 Saat Navigasi Masih Aktif",
+      "caption_match": "Pengujian Ulang BB-20 Saat Navigasi Masih Aktif",
       "source": "Hasil UAT/dokumentasi revisi/BB20_1.png",
       "inject_method": "post_com"
     },
     {
       "id": "blackbox_bb20_navigasi_selesai",
       "file": "blackbox_bb20_navigasi_selesai.png",
-      "caption_match": "Retest BB-20 Setelah Navigasi Selesai",
+      "caption_match": "Pengujian Ulang BB-20 Setelah Navigasi Selesai",
       "source": "Hasil UAT/dokumentasi revisi/BB20_2.png",
       "inject_method": "post_com"
     },

@@ -43,6 +43,22 @@ def test_shared_fragments_are_content_only_without_headings():
             )
 
 
+def test_project_schedule_is_six_months_in_facts_and_draft():
+    facts = json.loads((ROOT / "project_facts.json").read_text(encoding="utf-8"))
+    draft = (ROOT / "Tugas_Akhir_Draft.md").read_text(encoding="utf-8")
+    schedule = facts["project_metadata"]["schedule"]
+
+    assert schedule["duration_months"] == 6
+    assert schedule["phases"]["revisi_final_dan_penulisan_laporan"] == "Bulan 5-6"
+    assert schedule["phases"]["dokumentasi"] == "Bulan 1-6"
+    assert "Keseluruhan rangkaian kegiatan dilaksanakan dalam enam bulan." in draft
+    assert (
+        "Aktivitas | Bulan 1 | Bulan 2 | Bulan 3 | Bulan 4 | Bulan 5 | Bulan 6"
+        in draft
+    )
+    assert "lima bulan atau 20 minggu" not in draft
+
+
 def test_blackbox_fragment_matches_structured_facts():
     result = _shared_results()["black_box_testing"]
     text = (SHARED / "testing" / "blackbox.md").read_text(encoding="utf-8")
@@ -58,18 +74,36 @@ def test_blackbox_fragment_matches_structured_facts():
     assert result["final_verification"]["success_rate"] == "100.00%"
     assert "23 dari 24" in text
     assert "95,83 persen" in text
-    assert "script testing Unity" in text
-    assert "BB-20 dinyatakan lulus pada retest" in text
-    assert "24 dari 24 skenario terverifikasi lulus" in text
+    assert "skrip pengujian Unity" in text
+    assert "BB-20 dinyatakan lulus pada pengujian ulang" in text
+    assert "24 dari 24 skenario lulus" in text
 
 
 def test_uat_fragment_matches_structured_scores():
     result = _shared_results()["user_acceptance_testing"]
     text = (SHARED / "testing" / "uat.md").read_text(encoding="utf-8")
+    appendix = (SHARED / "testing" / "appendix-instruments.md").read_text(
+        encoding="utf-8"
+    )
 
+    assert result["respondents"]["session_type"] == "closed"
+    assert result["respondents"]["total_unique"] == 5
+    assert result["respondents"]["public_dashboard_questionnaire"] == 4
+    assert result["respondents"]["admin_dashboard_questionnaire"] == 4
+    assert result["respondents"]["general_public_participants"] == 0
+    assert result["respondents"]["participant_roles"] == {
+        "dosen_penguji": 2,
+        "dosen_pembimbing": 2,
+        "perwakilan_humas_upnvj": 1,
+    }
     assert result["public_dashboard"]["score"] == 140
     assert result["admin_dashboard"]["score"] == 186
     assert result["combined"]["percentage"] == "81.50%"
+    assert "dilaksanakan secara tertutup" in text
+    assert "tidak melibatkan sampel pengguna publik" in text
+    assert "Instrumen pengguna publik" not in text
+    assert "Instrumen UAT Pengguna Publik" not in appendix
+    assert "Instrumen Evaluasi UAT Dashboard Publik" in appendix
     assert "140 dari skor maksimum 180" in text
     assert "186 dari skor maksimum 220" in text
     assert "326 dari skor maksimum 400" in text
@@ -106,5 +140,5 @@ def test_uat_revision_status_labels_match_structured_implementation():
         assert verification[revision_id]["limitations"]
         assert "Diterapkan" in row
 
-    assert "Tangkapan layar diperlakukan sebagai pemeriksaan manual pascaimplementasi" in text
+    assert "Tangkapan layar diperlakukan sebagai pemeriksaan manual setelah perbaikan" in text
     assert "tidak mengubah hasil UAT awal" in text

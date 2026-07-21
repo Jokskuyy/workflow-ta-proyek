@@ -353,7 +353,7 @@ def test_c2_synthetic_multi_match_is_detected(base_entries, tmp_path):
     target = "Tahap Pengembangan"  # manifest entry: diagram_tahap_pengembangan
     assert caption_match_count(doc, target) == 1
     # Repurpose a different existing Gambar caption to also read as the target.
-    _edit_caption_descriptor(doc, "Tampilan UI Database Sync Checker di Unity Editor", target)
+    _edit_caption_descriptor(doc, "Diagram Arsitektur Sistem", target)
     assert caption_match_count(doc, target) == 2
     entries[DOC] = serialize_doc(doc)
     out = tmp_path / "c2_multi.docx"

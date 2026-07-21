@@ -25,7 +25,6 @@ skinparam actor {
   BorderColor #555555
 }
 
-title Gambar 2.9 - Diagram Arsitektur Sistem
 
 actor "Pengguna Publik" as User
 actor "Administrator" as Admin

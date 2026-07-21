@@ -55,7 +55,7 @@ def test_runtime_and_editor_endpoints_remain_distinct():
     assert "`GET /api/unity/data`" in draft
     assert "Endpoint `/api/unity/names` digunakan oleh `DatabaseSyncChecker` pada Unity Editor" in draft
     assert "React tidak mengirimkan data JSON ke Unity" in draft
-    assert "Unity mengirim `OnNavigationCompleted` dengan JSON `unity_object_name`" in draft
+    assert "Unity mengirim pemberitahuan `OnNavigationCompleted` beserta kode lokasi" in draft
     assert "React belum memasang listener" not in draft
 
 
@@ -116,8 +116,8 @@ def test_navigation_completion_contract_is_active_and_target_validated():
     assert verification["results"]["vitest_test_files"] == 13
     assert verification["results"]["vitest_tests_passed"] == 129
     assert verification["results"]["navigation_completion_tests"] == 11
-    assert "JSON unity_object_name payload" in snapshot["callback_status"]
-    assert "activeNavigationRef" in snapshot["callback_status"]
+    assert "menyertakan unity_object_name" in snapshot["callback_status"]
+    assert "tujuan aktif" in snapshot["callback_status"]
     assert 'type NavigationCompletedPayload = {' in draft
     listener_start = draft.index("window.addEventListener(")
     assert '"OnNavigationCompleted"' in draft[listener_start:listener_start + 150]
@@ -137,7 +137,7 @@ def test_latest_lighthouse_audit_replaces_obsolete_baseline():
     assert lighthouse["metrics"]["mobile"]["largest_contentful_paint_ms"] == 3681
     assert "Performance | 56/100" not in draft
     assert "Mobile | 86/100 | 100/100 | 100/100 | 100/100" in draft
-    assert "lab data lokal" in draft
+    assert "pengujian lokal dengan kondisi yang disimulasikan" in draft
 
 
 def test_database_and_unity_ownership_are_not_attributed_to_iman():
@@ -170,7 +170,7 @@ def test_user_manual_keeps_unity_details_as_handoff_contract():
 
     assert "Tools > UPNVJ > Check Database Sync" not in handoff
     assert "Window > AI > Navigation" not in handoff
-    assert "Engine Developer mengelola scene, NavMesh, tooling, optimasi" in handoff
+    assert "Engine Developer mengelola scene, NavMesh, alat bantu editor, optimasi" in handoff
     assert "Artefak ditempatkan pada path versi" in handoff
 
 
@@ -213,7 +213,7 @@ def test_api_smoke_evidence_is_role_focused_and_preserves_rls_ownership():
     assert "`GET /api/unity/names`" in draft
     assert "HTTP 401; kode PostgreSQL `42501`" in draft
     assert "rancangan policy RLS tetap merupakan kontribusi Database Schema Designer" in draft
-    assert "smoke test manual" in draft
+    assert "pemeriksaan dasar secara manual" in draft
 
 
 def test_frontend_screenshots_use_current_deployment_and_preserve_live_data_limit():
@@ -230,7 +230,7 @@ def test_frontend_screenshots_use_current_deployment_and_preserve_live_data_limi
     for image_id, source in expected_sources.items():
         assert images[image_id]["source"] == source
 
-    assert "331 fasilitas pada Supabase live" in draft
-    assert "311 record pada seed final" in draft
-    assert "seed final belum dibuktikan telah diterapkan ulang" in draft
-    assert "tangkapan layar pencarian tidak digunakan untuk mengklaim alias revisi R01" in draft
+    assert "331 fasilitas pada database Supabase aktif" in draft
+    assert "pembersihan berkas seed menghasilkan 311 data" in draft
+    assert "seed final belum terbukti telah diterapkan kembali" in draft
+    assert "tangkapan layar pencarian tidak digunakan untuk menyatakan bahwa penambahan kata pencarian pada R01" in draft

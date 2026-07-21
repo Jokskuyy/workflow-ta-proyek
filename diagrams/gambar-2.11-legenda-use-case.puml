@@ -21,7 +21,6 @@ skinparam rectangle {
   BorderColor #999999
 }
 
-title Gambar 2.11 — Legenda Use Case Diagram
 
 actor "Aktor" as A
 usecase "Use Case" as U

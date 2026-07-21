@@ -17,6 +17,8 @@ Folder ini berisi diagram dalam format **PlantUML** (`.puml`). Penomoran mengiku
 
 > Semua diagram memakai **palet netral** (abu-abu muda + garis abu gelap), tanpa warna brand.
 
+Judul dan nomor `Gambar X.X` tidak ditanamkan ke dalam kanvas diagram. Penomoran serta deskripsi gambar dibuat oleh caption Word agar nomor tetap mengikuti urutan otomatis laporan.
+
 ## Diagram yang Diregenerasi karena Deprecated
 Mengacu PRD terkini, beberapa diagram lama tidak lagi sesuai sistem sekarang dan telah diperbarui:
 - **Arsitektur Sistem (2.9):** versi lama memakai alur kirim JSON data gedung melalui `SendMessage` dan callback klik objek. Versi aktif: Unity menarik data sendiri melalui `GET /api/unity/data`; React mengirim `NavigateTo`, sedangkan Unity mengembalikan completion JSON `unity_object_name` setelah tiba normal. Express hanya mengarah ke Umami sebagai jalur analitik opsional dan tidak menjadi perantara Supabase.
