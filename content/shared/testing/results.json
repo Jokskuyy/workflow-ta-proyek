@@ -2,7 +2,7 @@
   "schema_version": 1,
   "black_box_testing": {
     "total_scenarios": 24,
-    "initial_result": {
+    "execution_result": {
       "passed_scenarios": 23,
       "failed_scenarios": [
         "BB-20"
@@ -10,20 +10,35 @@
       "success_rate": "95.83%"
     },
     "root_cause": "Script testing Unity ikut terkompilasi ke build WebGL sehingga label tujuan menggunakan unity_object_name.",
-    "corrective_action": "Memisahkan script testing dari build WebGL produksi dan memulihkan nama tampilan fasilitas pada label tujuan.",
-    "final_result": {
+    "corrective_action": "Memisahkan script testing dari build WebGL produksi, memulihkan nama tampilan fasilitas pada label tujuan, membangun ulang aplikasi, dan menguji ulang BB-20.",
+    "retest": {
+      "completed": true,
+      "scenario": "BB-20",
+      "result": "passed",
+      "evidence": [
+        "Hasil UAT/dokumentasi revisi/BB20_1.png",
+        "Hasil UAT/dokumentasi revisi/BB20_2.png"
+      ],
+      "verification": "Dua frame berurutan menunjukkan label tujuan yang mudah dibaca dan garis rute sebelum completion, kemudian garis rute hilang serta notifikasi tiba tampil setelah completion."
+    },
+    "final_verification": {
       "passed_scenarios": 24,
       "failed_scenarios": [],
-      "success_rate": "100.00%",
-      "retested_scenario": "BB-20"
+      "success_rate": "100.00%"
     },
-    "evidence_status": "Hasil awal tersedia pada Hasil_BlackBox.docx; retest dikonfirmasi pemilik proyek dan lampiran formal masih perlu dilengkapi."
+    "evidence_status": "Hasil awal 23 dari 24 tersedia pada Hasil UAT/Hasil_BlackBox.docx; pengujian ulang BB-20 dibuktikan melalui BB20_1.png dan BB20_2.png sehingga status akhir menjadi 24 dari 24 terverifikasi lulus."
   },
   "user_acceptance_testing": {
     "respondents": {
       "total_unique": 5,
       "public_questionnaire": 4,
-      "admin_questionnaire": 4
+      "admin_questionnaire": 4,
+      "participant_roles": {
+        "dosen_penguji": 2,
+        "dosen_pembimbing": 2,
+        "perwakilan_humas_upnvj": 1
+      },
+      "selection_method": "purposive sampling"
     },
     "likert_scale": "1-5",
     "public_dashboard": {
@@ -44,17 +59,58 @@
       "percentage": "81.50%"
     },
     "revision_status": {
-      "UAT-R01": "needs_verification",
-      "UAT-R02": "needs_verification",
-      "UAT-R03": "needs_verification",
-      "UAT-R04": "needs_verification",
-      "UAT-R05": "needs_verification",
-      "UAT-R06": "needs_verification",
-      "UAT-R07": "needs_verification",
-      "UAT-R08": "needs_verification",
-      "UAT-R09": "needs_verification",
-      "UAT-R10": "needs_verification",
-      "UAT-R11": "per_branch_verification"
+      "UAT-R01": "implemented",
+      "UAT-R02": "implemented",
+      "UAT-R03": "implemented",
+      "UAT-R04": "implemented",
+      "UAT-R05": "implemented",
+      "UAT-R06": "implemented",
+      "UAT-R07": "implemented",
+      "UAT-R08": "implemented",
+      "UAT-R09": "implemented",
+      "UAT-R10": "implemented"
+    },
+    "revision_verification": {
+      "UAT-R01": {
+        "basis": ["source_audit"],
+        "limitations": ["Perubahan diverifikasi pada seed; penerapan ulang pada Supabase live tidak diklaim."]
+      },
+      "UAT-R02": {
+        "basis": ["visual", "source_audit"],
+        "limitations": ["Screenshot merupakan pemeriksaan manual pascaimplementasi, bukan kuesioner UAT kedua."]
+      },
+      "UAT-R03": {
+        "basis": ["visual", "source_audit"],
+        "limitations": ["Screenshot membuktikan alur utama pada deployment, bukan pengujian seluruh kombinasi rute."]
+      },
+      "UAT-R04": {
+        "basis": ["source_audit"],
+        "limitations": ["Solusi aktual menggunakan label tujuan dinamis dan object tulisan pada scene; tidak diklaim bahwa seluruh fasilitas memiliki label statis."]
+      },
+      "UAT-R05": {
+        "basis": ["visual", "source_audit"],
+        "limitations": ["Adaptasi bersifat kontekstual melalui bahasa, perangkat, mode, tutorial, pencarian, dan spawn; tidak ada profil persona tersimpan."]
+      },
+      "UAT-R06": {
+        "basis": ["visual", "source_audit"],
+        "limitations": ["Verifikasi visual tidak menggantikan pengujian pengguna berulang pada seluruh landmark."]
+      },
+      "UAT-R07": {
+        "basis": ["visual", "source_audit"],
+        "limitations": ["Validasi source mencakup 16 spawn dan pemeriksaan NavMesh; screenshot tidak menampilkan seluruh spawn satu per satu."]
+      },
+      "UAT-R08": {
+        "basis": ["visual", "official_source"],
+        "limitations": ["Nomor telepon diverifikasi terhadap halaman resmi Penmaru UPNVJ; screenshot hanya memperlihatkan akses tombol bantuan."]
+      },
+      "UAT-R09": {
+        "basis": ["source_audit"],
+        "limitations": ["Kelengkapan dan keunikan diverifikasi pada seed; sinkronisasi terhadap Supabase live dan seluruh GameObject scene tidak dilebihkan."]
+      },
+      "UAT-R10": {
+        "basis": ["visual", "automated_test", "source_audit", "user_confirmed_deployment"],
+        "limitations": ["Tangkapan layar memverifikasi alur completion positif; kondisi payload kosong, rusak, berbeda, dan setelah pembatalan diverifikasi melalui 11 pengujian React pada kode sumber aktif 08ebc06."]
+      }
     }
   }
 }

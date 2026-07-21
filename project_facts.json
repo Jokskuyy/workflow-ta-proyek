@@ -116,11 +116,35 @@
     ],
     "testing_status": {
         "black_box_testing": {
-            "completed": false,
+            "completed": true,
             "date_conducted": null,
-            "total_scenarios": 18,
-            "success_rate": null,
-            "details": "Belum dilaksanakan. Menunggu penyelesaian prototipe akhir."
+            "total_scenarios": 24,
+            "passed_scenarios": 23,
+            "failed_scenarios": [
+                "BB-20"
+            ],
+            "success_rate": "95.83%",
+            "retest": {
+                "completed": true,
+                "scenario": "BB-20",
+                "result": "passed",
+                "evidence_status": "verified_by_two_sequential_screenshots",
+                "evidence": [
+                    "Hasil UAT/dokumentasi revisi/BB20_1.png",
+                    "Hasil UAT/dokumentasi revisi/BB20_2.png"
+                ]
+            },
+            "final_verification": {
+                "passed_scenarios": 24,
+                "failed_scenarios": [],
+                "success_rate": "100.00%"
+            },
+            "evidence": [
+                "Hasil UAT/Hasil_BlackBox.docx",
+                "Hasil UAT/dokumentasi revisi/BB20_1.png",
+                "Hasil UAT/dokumentasi revisi/BB20_2.png"
+            ],
+            "details": "Pengujian awal mencatat 23 dari 24 skenario lulus. BB-20 awalnya tidak lulus karena label tujuan menampilkan unity_object_name akibat script testing Unity ikut masuk ke build WebGL. Setelah tindakan korektif dan build ulang, dua frame retest menunjukkan label Gedung Dewi Sartika beserta garis rute sebelum completion, lalu garis rute hilang dan notifikasi tiba tampil setelah completion. Status akhir menjadi 24 dari 24 skenario terverifikasi lulus."
         },
         "lighthouse_testing": {
             "completed": true,
@@ -134,16 +158,44 @@
             "details": "Pengujian Lighthouse awal (baseline) dijalankan pada build produksi lokal menggunakan preview server Vite sebelum dilakukan optimasi performa lebih lanjut pada codebase."
         },
         "user_acceptance_test_uat": {
-            "completed": false,
+            "completed": true,
             "date_conducted": null,
             "respondents": {
-                "total": 0,
-                "students": 0,
-                "admin_staff": 0
+                "total_unique": 5,
+                "public_questionnaire": 4,
+                "admin_questionnaire": 4,
+                "participant_roles": {
+                    "dosen_penguji": 2,
+                    "dosen_pembimbing": 2,
+                    "perwakilan_humas_upnvj": 1
+                },
+                "selection_method": "purposive sampling"
             },
-            "likert_scale_rating": null,
-            "satisfaction_percentage": "TBD",
-            "details": "Akan segera dilaksanakan (proses pengajuan)."
+            "likert_scale_rating": "1-5",
+            "results": {
+                "public_dashboard": {
+                    "score": 140,
+                    "maximum_score": 180,
+                    "mean": 3.89,
+                    "percentage": "77.78%"
+                },
+                "admin_dashboard": {
+                    "score": 186,
+                    "maximum_score": 220,
+                    "mean": 4.23,
+                    "percentage": "84.55%"
+                },
+                "combined_weighted_percentage": "81.50%"
+            },
+            "evidence": [
+                "Hasil UAT/Hasil_UAT.xlsx",
+                "Hasil UAT/Kharisma_Gusti_Wiati.pdf",
+                "Hasil UAT/Novi_Trisman_Hadi.pdf",
+                "Hasil UAT/Ridwan_Raafiudin.pdf",
+                "Hasil UAT/User_Humas.pdf",
+                "Hasil UAT/Widya_Cholil.pdf"
+            ],
+            "details": "UAT diikuti oleh 5 peserta unik yang terdiri atas 2 dosen penguji, 2 dosen pembimbing, dan 1 perwakilan Humas UPNVJ. Instrumen pengguna publik diisi oleh 4 peserta dan memperoleh 77.78%; instrumen dashboard admin diisi oleh 4 peserta dan memperoleh 84.55%. Sebagian peserta mengisi kedua instrumen sehingga persentase gabungan berdasarkan seluruh jawaban adalah 81.50%."
         }
     },
     "reference_documents": {

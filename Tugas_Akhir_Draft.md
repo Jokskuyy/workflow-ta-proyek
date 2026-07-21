@@ -1002,7 +1002,7 @@ UAT-R07 | Pengguna memerlukan pilihan mode dan titik awal | Mendukung pemilihan 
 UAT-R10 | Pengguna memerlukan konfirmasi ketika mencapai tujuan | Mengirim event browser `OnNavigationCompleted` setelah state navigasi selesai; implementasi dan screenshot notifikasi React tidak menjadi bukti kontribusi Faiz | [TBD: log dispatch event Unity, build yang sama, dan retest pembatalan manual]
 [/TABLE]
 
-Temuan UAT-R03 dan UAT-R08 dapat melibatkan engine, tetapi bentuk solusi akhirnya harus ditetapkan bersama pemilik dashboard dan produk. Temuan UAT-R01 serta UAT-R09 terutama memerlukan konsistensi database, API, pencarian, dan aset. Penulis tidak mengklaim implementasi bagian tersebut tanpa bukti kontribusi yang dapat ditelusuri. Status seluruh tindak lanjut tetap mengikuti fragment bersama dan dipertahankan `[TBD]` sampai screenshot, implementasi pada build yang sama, serta retest tersedia.
+Temuan UAT-R03 dan UAT-R08 melibatkan komponen di luar engine, sedangkan UAT-R01 serta UAT-R09 terutama berkaitan dengan konsistensi database, API, pencarian, dan aset. Penulis tidak mengklaim implementasi bagian tersebut sebagai kontribusi personal. Status produk tetap mengikuti fragment bersama pada Subbab 3.5.4 berdasarkan audit kode, pengujian, sumber resmi, dan bukti deployment yang dicantumkan di sana. Sementara itu, penanda `[TBD]` pada [TABREF:kontribusi_faiz_uat] hanya menunjukkan bukti reproduksi khusus modul Unity yang masih perlu dilengkapi dan tidak membatalkan status hasil integrasi tim.
 
 ---
 
@@ -1037,7 +1037,9 @@ Saran pengembangan lebih lanjut adalah sebagai berikut:
 # DAFTAR PUSTAKA
 
 
-Aliyah, A., Hartono, N., & Muin, A. A. (2024). Penggunaan User Acceptance Testing (UAT) pada pengujian sistem informasi pengelolaan keuangan dan inventaris barang. *Switch: Jurnal Sains dan Teknologi Informasi*, 3(1), 84–100. https://doi.org/10.62951/switch.v3i1.330
+Aliyah, A., Hartono, N., dan Muin, A. A. (2025). Penggunaan User Acceptance Testing (UAT) pada pengujian sistem informasi pengelolaan keuangan dan inventaris barang. *Switch: Jurnal Sains dan Teknologi Informasi*, 3(2), 42–58. https://doi.org/10.62951/switch.v3i1.330
+
+Jamaludin, J., dan Saepuloh, L. (2024). Tren riset twin digital smart campus. *Sang Pencerah: Jurnal Ilmiah Universitas Muhammadiyah Buton*, 10(2), 408–425. https://doi.org/10.35326/pencerah.v10i2.5317
 
 Kurniawan, T. A. (2018). Pemodelan Use Case (UML): Evaluasi terhadap beberapa kesalahan dalam praktik. *Jurnal Teknologi Informasi dan Ilmu Komputer*, 5(1), 77–86. https://doi.org/10.25126/jtiik.201851610
 
@@ -1050,6 +1052,12 @@ Muharam, Y., Anggara, M. B., & Hanafi, T. J. (2023). Implementasi peta 3 dimensi
 Pricillia, T., & Zulfachmi. (2021). Perbandingan metode pengembangan perangkat lunak (Waterfall, Prototype, RAD). *Jurnal Bangkit Indonesia*, 10(1), 6–12. https://doi.org/10.52771/bangkitindonesia.v10i1.153
 
 Taurusta, C., Asiddiq, A. M., Suprianto, S., & Setiawan, H. (2024). Visualisasi gedung kampus 1 Universitas Muhammadiyah Sidoarjo menggunakan augmented reality sebagai media informasi. *Journal of Technology and System Information*, 1(1), 55–70. https://doi.org/10.47134/jtsi.v1i1.2146
+
+UPNVJ. (2022). Lokasi kampus. https://www.upnvj.ac.id/id/tentang-upn/lokasi-kampus.html
+
+UPNVJ. (2025a). Kantin. https://www.upnvj.ac.id/id/fasilitas-layanan/kantin.html
+
+UPNVJ. (2026a). Hubungi kami. *Penerimaan Mahasiswa Baru UPN Veteran Jakarta*. https://penmaru.upnvj.ac.id/id/contact.html
 
 Unity Technologies, U. (2026). *AI Navigation: Unity 6.0 Manual*. https://docs.unity3d.com/6000.0/Documentation/Manual/com.unity.ai.navigation.html
 
@@ -1146,3 +1154,11 @@ Script kontribusi yang diarsipkan sebagai bukti adalah `BuildingDatabase.cs`, `N
 # LAMPIRAN 3. Bukti Pengujian dan Benchmark
 
 Bukti pengujian pada bagian ini perlu memuat konfigurasi perangkat, versi Unity, versi peramban, kondisi jaringan, fixture data, hasil Play Mode Test, hasil Edit Mode Test, Unity Profiler, DevTools Network, perbandingan build, dan bukti retest. [TBD: artefak pengujian final]
+
+---
+
+# LAMPIRAN 4. Instrumen UAT dan Indeks Bukti Pengujian
+
+Instrumen pada lampiran ini merupakan bukti pengujian produk bersama. Pencantumannya tidak mengubah batas kontribusi penulis pada runtime dan tooling Unity.
+
+<!-- PIPELINE:INCLUDE content/shared/testing/appendix-instruments.md -->
