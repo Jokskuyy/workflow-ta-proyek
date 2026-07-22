@@ -10,7 +10,7 @@ sistem **terkini** dan tidak memunculkan kembali pola yang sudah usang.
 ## Ringkasan Sistem (sumber kebenaran: `PRD_Konsolidasi_TA.md`)
 
 Platform Web UPNVJ menyatukan empat komponen:
-1. **Dashboard publik** (React SPA + Vite): statistik traffic, KPI aset kampus, akreditasi prodi, multi-bahasa ID/EN.
+1. **Dashboard publik** (React SPA + Vite): statistik traffic, KPI asset kampus, akreditasi prodi, multi-bahasa ID/EN.
 2. **Denah Virtual 3D** (Unity 6 WebGL): navigasi first-person NavMesh, dua mode (eksplorasi & terpandu).
 3. **Admin Panel** (Supabase Auth + RLS, audit logs, CRUD).
 4. **Analitik** (Umami self-hosted).
@@ -32,7 +32,7 @@ Platform Web UPNVJ menyatukan empat komponen:
 ## Struktur Tim & Branch
 Repo dipakai 3 anggota; tiap anggota menulis di branch sendiri (lihat `PANDUAN-TIM.md`):
 - `laporan/iman` — Full Stack & System Integrator
-- `laporan/dwikhi` — 3D Asset & Database/Asset Manager (seluruh aset 3D gedung dan fasilitas yang memiliki GameObject, prefab dan `Pointer`, ERD, pengelolaan data, serta pemetaan `unity_object_name`; RLS dan audit hanya konteks sistem)
+- `laporan/dwikhi` — Desainer Asset 3D dan Desainer Skema Database (seluruh asset 3D gedung dan fasilitas yang memiliki GameObject, prefab dan `Pointer`, ERD, pengelolaan data, serta pemetaan `unity_object_name`; RLS dan audit hanya konteks sistem)
 - `laporan/faiz` — Simulator & Engine (NavMesh, Catmull-Rom, Building Culling, WebGL Optimizer, Database Sync Checker)
 
 Saat membantu, **cek peran branch aktif** di `laporan-tim/<peran>/` dan fokuskan pembahasan pada lingkup peran itu.

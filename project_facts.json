@@ -1,6 +1,6 @@
 {
     "project_metadata": {
-        "title": "Perancangan Aset 3D dan Pengelolaan Basis Data pada Sistem Denah Virtual UPNVJ Kampus Pondok Labu",
+        "title": "Perancangan Asset 3D dan Pengelolaan Database pada Sistem Denah Virtual UPNVJ Kampus Pondok Labu",
         "author": "Dwikhi Deandra Purnianto",
         "nim": "2210511131",
         "program_study": "S1 Informatika",
@@ -110,7 +110,7 @@
         {
             "name": "Dwikhi Deandra Purnianto",
             "nim": "2210511131",
-            "role": "3D Asset Designer dan Database Schema Designer",
+            "role": "Desainer Asset 3D dan Desainer Skema Database",
             "focus": [
                 "Creation and layout of all building and facility 3D GameObjects in Unity Editor without Blender",
                 "Prefab hierarchy and child Pointer target GameObjects",
@@ -119,7 +119,7 @@
                 "unity_object_name mapping and integrity",
                 "Use of DatabaseSyncChecker developed by the 3D Simulator & Engine Developer"
             ],
-            "asset_observation_method": "Observasi visual langsung dan dokumentasi fotografis dengan mendatangi gedung satu per satu. Tidak dilakukan pengukuran dimensi menggunakan alat ukur; bentuk dan proporsi aset disusun sebagai representasi visual berdasarkan massa bangunan, jumlah lantai, pola bukaan, warna, material, dan hubungan antarelemen yang terlihat.",
+            "asset_observation_method": "Observasi visual langsung dan dokumentasi fotografis dengan mendatangi gedung satu per satu. Tidak dilakukan pengukuran dimensi menggunakan alat ukur; bentuk dan proporsi asset disusun sebagai representasi visual berdasarkan massa bangunan, jumlah lantai, pola bukaan, warna, material, dan hubungan antarelemen yang terlihat.",
             "data_collection_constraint": "Pengumpulan data dilakukan secara mandiri dari gedung ke gedung. Keterbatasan akses dan minimnya informasi menyebabkan sebagian nama atau fungsi ruangan tidak dapat dipastikan mutakhir, sehingga data yang belum terverifikasi tidak boleh dinyatakan sebagai kondisi final."
         }
     ],
@@ -128,19 +128,19 @@
         "status": "actual_by_user_confirmation",
         "logbook_basis": "Rekap bulanan berdasarkan artefak dokumentasi aktual; tidak menggunakan logbook harian.",
         "activities": [
-            {"activity": "Observasi stakeholder dan identifikasi kebutuhan aset serta data", "months": [1]},
+            {"activity": "Observasi stakeholder dan identifikasi kebutuhan asset serta data", "months": [1]},
             {"activity": "Pengambilan foto dan inventarisasi gedung serta fasilitas", "months": [1, 2]},
             {"activity": "Perancangan skema database dan ERD", "months": [1, 2]},
-            {"activity": "Penetapan konvensi nama aset dan unity_object_name", "months": [1, 2, 3]},
-            {"activity": "Pemodelan aset 3D gedung dan fasilitas", "months": [2, 3, 4]},
+            {"activity": "Penetapan konvensi nama asset dan unity_object_name", "months": [1, 2, 3]},
+            {"activity": "Pemodelan asset 3D gedung dan fasilitas", "months": [2, 3, 4]},
             {"activity": "Penerapan material dan tekstur", "months": [2, 3, 4]},
             {"activity": "Penyusunan prefab, hierarki, Pointer, dan GameObject tujuan", "months": [3, 4]},
             {"activity": "Penyusunan seed serta pengelolaan data", "months": [3, 4, 5]},
-            {"activity": "Pemetaan aset dengan unity_object_name", "months": [3, 4, 5]},
+            {"activity": "Pemetaan asset dengan unity_object_name", "months": [3, 4, 5]},
             {"activity": "Pemeriksaan integritas database", "months": [4, 5]},
             {"activity": "Validasi menggunakan DatabaseSyncChecker", "months": [4, 5]},
-            {"activity": "Pemeriksaan visual dan struktur aset", "months": [4, 5, 6]},
-            {"activity": "Koreksi ketidaksesuaian aset dan data", "months": [5, 6]},
+            {"activity": "Pemeriksaan visual dan struktur asset", "months": [4, 5, 6]},
+            {"activity": "Koreksi ketidaksesuaian asset dan data", "months": [5, 6]},
             {"activity": "Penyusunan dokumentasi dan laporan", "months": [1, 2, 3, 4, 5, 6]},
             {"activity": "Pengujian akhir dan finalisasi", "months": [5, 6]}
         ]
@@ -189,23 +189,27 @@
     },
     "integration_pointer_and_sync": {
         "pointer_mechanism": {
-            "description": "Sebagai 3D Asset Designer dan Database Schema Designer, Dwikhi Deandra Purnianto membuat dan menata seluruh GameObject 3D gedung serta fasilitas yang dikerjakan pada scene Unity, menyusun child Pointer dan GameObject tujuan, serta menetapkan nama yang sesuai dengan unity_object_name di database Supabase.",
+            "description": "Sebagai Desainer Asset 3D dan Desainer Skema Database, Dwikhi Deandra Purnianto membuat dan menata seluruh GameObject 3D gedung serta fasilitas yang dikerjakan pada scene Unity, menyusun child Pointer dan GameObject tujuan, serta menetapkan nama yang sesuai dengan unity_object_name di database Supabase.",
             "hierarchy_screenshot": "dokumentasi/contoh_pointer.png"
         },
         "database_sync_checker": {
             "script_path": "src/unity-scripts/Editor/DatabaseSyncChecker.cs",
-            "description": "Script editor Unity yang dikembangkan oleh Muammar Faiz Khairul Anam Setiawan untuk memeriksa sinkronisasi antara objek di Unity Hierarchy dan data Supabase melalui API /api/unity/names; Dwikhi Deandra Purnianto menggunakannya untuk menemukan dan memperbaiki ketidaksesuaian pada aset atau data.",
+            "description": "Script editor Unity yang dikembangkan oleh Muammar Faiz Khairul Anam Setiawan untuk memeriksa sinkronisasi antara objek di Unity Hierarchy dan data Supabase melalui API /api/unity/names; Dwikhi Deandra Purnianto menggunakannya untuk menemukan dan memperbaiki ketidaksesuaian pada asset atau data.",
             "ui_screenshot": "dokumentasi/contoh_sync_db.png"
         }
     },
     "dwikhi_evidence_inventory": {
         "unity_editor_version": "6000.4.1f1",
         "active_scene": "Assets/Scene/SceneUtama.unity",
-        "reference_visual_files": 21,
+        "reference_visual_files": 22,
         "representative_render_hierarchy_pairs": 11,
         "material_texture_files": 37,
         "material_texture_source_match": "Seluruh 37 berkas material dan tekstur pada bukti laporan memiliki byte yang sama dengan berkas bernama sama pada proyek Unity sumber.",
-        "performance_scope": "Data GameObject, mesh, vertex, dan ukuran prefab digunakan sebagai inventaris keadaan aset, bukan hasil optimasi atau pengujian performa.",
+        "additional_material_reference_files": 30,
+        "material_reference_folder_total_files": 67,
+        "additional_material_reference_breakdown": "Dua berkas berupa referensi tekstur permukaan, 21 berkas berupa referensi warna polos, satu berkas logo Mandiri, lima berkas model atau tekstur alat olahraga, dan satu berkas warna patung.",
+        "additional_material_reference_status": "Ke-21 referensi warna digunakan pada material Unity dan dua referensi tekstur permukaan diterapkan pada Gedung Utama/Jenderal Soedirman. Logo Mandiri digunakan pada asset gedung bank sebagai pelengkap visual lingkungan aktual tanpa record database. Lima berkas model atau tekstur alat olahraga digunakan pada objek alat olahraga di depan Gedung Dewi Sartika. Berkas warna patung digunakan pada asset patung. Kecocokan byte berkas tambahan dengan proyek Unity sumber belum diverifikasi.",
+        "performance_scope": "Data GameObject, mesh, vertex, dan ukuran prefab digunakan sebagai inventaris keadaan asset, bukan hasil optimasi atau pengujian performa.",
         "provenance_limit": "Identitas pengambil, tanggal dan lokasi sebagian foto, serta sumber atau lisensi beberapa material dan tekstur belum tercatat lengkap."
     },
     "live_data_snapshot": {
@@ -239,7 +243,7 @@
         ],
         "quality_findings": [
             "Seed terbaru memuat 311 fasilitas setelah standardisasi data dan penyelesaian satu data duplikat.",
-            "Masjid dicatat sebagai fasilitas dengan id_gedung 6 pada Gedung Ki Hadjar Dewantara, sedangkan aset visual Masjid memiliki GameObject tersendiri.",
+            "Masjid dicatat sebagai fasilitas dengan id_gedung 6 pada Gedung Ki Hadjar Dewantara, sedangkan asset visual Masjid memiliki GameObject tersendiri.",
             "Gedung Soepomo, Gedung Soetomo, Yos Sudarso, RA Kartini, Lapangan Basket, dan entitas gedung lain merupakan record gedung yang berbeda.",
             "Nama dan fungsi ruangan belum seluruhnya diverifikasi terhadap kondisi lapangan terbaru."
         ]

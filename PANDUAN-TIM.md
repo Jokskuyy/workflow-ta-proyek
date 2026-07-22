@@ -8,7 +8,7 @@ Repo ini (`workflow-ta-proyek`) dipakai bersama oleh **3 anggota**, namun **seti
 |---|---|---|
 | `master` | Template/kerangka kosong + seluruh toolkit & aset bersama | Bersama |
 | `laporan/iman` | Draf lengkap peran Full Stack & Integrator | Iman |
-| `laporan/dwikhi` | Kerangka peran 3D Asset Designer & Database/Asset Manager | Dwikhi |
+| `laporan/dwikhi` | Kerangka peran Desainer Asset 3D dan Desainer Skema Database | Dwikhi |
 | `laporan/faiz` | Kerangka peran Simulator & Engine | Faiz |
 
 Yang **bersama di semua branch**: `skills/`, `tests/`, `content/shared/`, `content/README.md`, `diagrams/`, `dokumentasi/`, `PRD_Konsolidasi_TA.md`, `diagram_alur_sistem.md`, dan `laporan-tim/`. `scratch/` adalah runtime lokal, bukan sumber edit.

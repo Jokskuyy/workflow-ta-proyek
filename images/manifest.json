@@ -3,14 +3,14 @@
     {
       "id": "diagram_arsitektur",
       "file": "diagram_arsitektur.png",
-      "caption_match": "Arsitektur Integrasi Aset 3D dan Data",
+      "caption_match": "Arsitektur Integrasi Asset 3D dan Data",
             "source": "diagrams/gambar-2-09-arsitektur-integrasi-aset-data.svg",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_tahap_pengembangan",
       "file": "diagram_tahap_pengembangan.png",
-      "caption_match": "Alur Perancangan Aset 3D dan Data",
+      "caption_match": "Alur Perancangan Asset 3D dan Data",
             "source": "diagrams/gambar-2-10-alur-perancangan-aset-data.svg",
       "inject_method": "post_com"
     },
@@ -31,7 +31,7 @@
     {
       "id": "diagram_sequence_validasi",
       "file": "diagram_sequence_validasi.png",
-      "caption_match": "Sequence Diagram Validasi Identifier Aset dan Data",
+      "caption_match": "Sequence Diagram Validasi Identifier Asset dan Data",
             "source": "diagrams/gambar-2-16-sequence-validasi-aset-data.svg",
       "inject_method": "post_com"
     },
@@ -94,21 +94,21 @@
     {
       "id": "mockup_fasilitas_aset",
       "file": "mockup_fasilitas_aset.png",
-      "caption_match": "Bagian Fasilitas dan Aset",
+      "caption_match": "Bagian Fasilitas dan Asset",
       "source": "dokumentasi/section fasilitas-asset(dan gedung).png",
       "inject_method": "post_com"
     },
     {
       "id": "mockup_modal_list_fasilitas",
       "file": "mockup_modal_list_fasilitas.png",
-      "caption_match": "Modal List Fasilitas dan Aset",
+      "caption_match": "Modal List Fasilitas dan Asset",
       "source": "dokumentasi/modal-fasilitas-aset.png",
       "inject_method": "post_com"
     },
     {
       "id": "mockup_modal_detail_fasilitas",
       "file": "mockup_modal_detail_fasilitas.png",
-      "caption_match": "Modal Fasilitas dan Aset",
+      "caption_match": "Modal Fasilitas dan Asset",
       "source": "dokumentasi/modal-fasilitas-aset.png",
       "inject_method": "post_com"
     },
@@ -211,9 +211,16 @@
       "inject_method": "post_com"
     },
     {
+      "id": "evidence_photo_jenderal_soedirman",
+      "file": "list_foto/refrensi_Gedung_jenderal_soedirman.png",
+      "caption_match": "Referensi Visual Gedung Jenderal Soedirman",
+      "source": "images/list_foto/refrensi_Gedung_jenderal_soedirman.png",
+      "inject_method": "post_com"
+    },
+    {
       "id": "evidence_process_asset",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/Proses_penegerjaan_asset_gedung.png",
-      "caption_match": "Proses Pengerjaan Aset Gedung di Unity Editor",
+      "caption_match": "Proses Pengerjaan Asset Gedung di Unity Editor",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/Proses_penegerjaan_asset_gedung.png",
       "inject_method": "post_com"
     },
@@ -246,94 +253,108 @@
       "inject_method": "post_com"
     },
     {
+      "id": "evidence_material_lobby_rektorat",
+      "file": "list_material/lobby_utama_gedung_rektorat_upnvj.jpg",
+      "caption_match": "Berkas Referensi Tekstur Lobi Utama Gedung Rektorat",
+      "source": "images/list_material/lobby_utama_gedung_rektorat_upnvj.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_material_tembok_lobby",
+      "file": "list_material/tembok_nama_lobby_gedung_utama.jpg",
+      "caption_match": "Berkas Referensi Tekstur Tembok Lobi Gedung Utama",
+      "source": "images/list_material/tembok_nama_lobby_gedung_utama.jpg",
+      "inject_method": "post_com"
+    },
+    {
       "id": "evidence_asset_cipto",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Cipto_Mangunkusumo.png",
-      "caption_match": "Aset 3D Gedung Cipto Mangunkusumo",
+      "caption_match": "Asset 3D Gedung Cipto Mangunkusumo",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Cipto_Mangunkusumo.png",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_hierarchy_cipto",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset gedung_Cipto Mangunkusumo.png",
-      "caption_match": "Hierarki Aset Gedung Cipto Mangunkusumo",
+      "caption_match": "Hierarki Asset Gedung Cipto Mangunkusumo",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset gedung_Cipto Mangunkusumo.png",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_asset_myamin",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_M.Yamin.png",
-      "caption_match": "Aset 3D Gedung M. Yamin",
+      "caption_match": "Asset 3D Gedung M. Yamin",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_M.Yamin.png",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_hierarchy_myamin",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_M.Yamin.png",
-      "caption_match": "Hierarki Aset Gedung M. Yamin",
+      "caption_match": "Hierarki Asset Gedung M. Yamin",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_M.Yamin.png",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_asset_wahidin",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_wahidin_Sudiro_Husodo.png",
-      "caption_match": "Aset 3D Gedung Wahidin Sudiro Husodo",
+      "caption_match": "Asset 3D Gedung Wahidin Sudiro Husodo",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_wahidin_Sudiro_Husodo.png",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_hierarchy_wahidin",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Wahidin_Sudiro_Husodo.png",
-      "caption_match": "Hierarki Aset Gedung Wahidin Sudiro Husodo",
+      "caption_match": "Hierarki Asset Gedung Wahidin Sudiro Husodo",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Wahidin_Sudiro_Husodo.png",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_asset_dewi",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Dewi_Sartika.png",
-      "caption_match": "Aset 3D Gedung Dewi Sartika",
+      "caption_match": "Asset 3D Gedung Dewi Sartika",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Dewi_Sartika.png",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_hierarchy_dewi",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Dewi_Sartika.png",
-      "caption_match": "Hierarki Aset Gedung Dewi Sartika",
+      "caption_match": "Hierarki Asset Gedung Dewi Sartika",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Dewi_Sartika.png",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_unity_version",
       "file": "versi_unity.jpeg",
-      "caption_match": "Versi Unity yang Digunakan pada Pengukuran Aset",
+      "caption_match": "Versi Unity yang Digunakan pada Pengukuran Asset",
       "source": "images/versi_unity.jpeg",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_prefab_sizes",
       "file": "data/Ukuran__file_prefab.png",
-      "caption_match": "Ukuran Berkas Prefab Gedung pada Inventaris Aset",
+      "caption_match": "Ukuran Berkas Prefab Gedung pada Inventaris Asset",
       "source": "images/data/Ukuran__file_prefab.png",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_metrics_ki_hadjar",
-      "file": "pengujian_vertex_dan_mesh_gedung.png",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_ki_hajar_dewantara.png",
       "caption_match": "Hasil Pengukuran GameObject, Mesh, dan Vertex Ki Hajar Dewantara",
-      "source": "images/pengujian_vertex_dan_mesh_gedung.png",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_ki_hajar_dewantara.png",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_metrics_dewi",
-      "file": "pengujian_vertex_dan_mesh_gedung_2.png",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_Dewi_Sartika.png",
       "caption_match": "Hasil Pengukuran GameObject, Mesh, dan Vertex Dewi Sartika",
-      "source": "images/pengujian_vertex_dan_mesh_gedung_2.png",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_Dewi_Sartika.png",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_metrics_jenderal",
-      "file": "pengujian_vertex_dan_mesh_gedung_3.png",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_Jenderal_soedirman.png",
       "caption_match": "Hasil Pengukuran GameObject, Mesh, dan Vertex Jenderal Soedirman",
-      "source": "images/pengujian_vertex_dan_mesh_gedung_3.png",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_Jenderal_soedirman.png",
       "inject_method": "post_com"
     },
     {
@@ -360,14 +381,14 @@
     {
       "id": "evidence_sync_checker_lanjutan",
       "file": "hasil_databasesynchacker.png",
-      "caption_match": "Hasil Pemeriksaan Lanjutan Konsistensi Nama Aset dan Basis Data",
+      "caption_match": "Hasil Pemeriksaan Lanjutan Konsistensi Nama Asset dan Database",
       "source": "images/hasil_databasesynchacker.png",
       "inject_method": "post_com"
     },
     {
       "id": "evidence_test_device",
       "file": "Perangkat_uji.png",
-      "caption_match": "Spesifikasi Perangkat Pengujian Aset",
+      "caption_match": "Spesifikasi Perangkat Pengujian Asset",
       "source": "images/Perangkat_uji.png",
       "inject_method": "post_com"
     },

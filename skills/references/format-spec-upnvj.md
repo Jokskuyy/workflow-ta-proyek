@@ -9,10 +9,10 @@
 | **Paper Size** | A4 |
 | **Margins** | Top = 3cm, Bottom = 3cm, **Left = 4cm**, Right = 3cm |
 | **Font Name** | Times New Roman (semua teks: styles, header, footer, tabel, caption) |
-| **Font Size** | Body (12pt), Headings (12pt Bold), Chapter Titles (14pt Bold Centered), Abstracts (11pt) |
+| **Font Size** | Body and code blocks (12pt), Headings (12pt Bold), Chapter Titles (14pt Bold Centered), Abstracts (11pt) |
 | **Line Spacing** | Body & Headings (1.15), Captions & Bibliography (1.0) |
 | **Indentations** | Body (1.0cm first-line indent), Bibliography (1.0cm hanging indent) |
-| **Table Captions** | **Di atas** tabel, center, "Tabel 1.1 ..." (tanpa titik setelah nomor) |
+| **Table Captions** | **Di atas** tabel, center, nomor otomatis **Tabel X.Y** dicetak tebal, deskripsi tetap normal, dan tanpa titik setelah nomor |
 | **Figure Captions** | **Di bawah** gambar, center, "Gambar 2.3 ..." (tanpa titik setelah nomor) |
 | **Figure Narration** | Setiap gambar wajib dirujuk secara eksplisit sebagai "Gambar X.Y" dalam paragraf narasi biasa pada bab yang sama. Rujukan ditempatkan di tengah kalimat, bukan sebagai kata pertama paragraf/kalimat. Pelanggaran bersifat fatal dan menggagalkan build. |
 | **Front Matter Pages** | Romawi (`i, ii, iii...`) di kanan bawah; halaman sampul tidak menampilkan nomor |

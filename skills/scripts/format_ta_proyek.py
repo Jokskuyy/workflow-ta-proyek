@@ -31,6 +31,143 @@ FOOTER_CONTENT_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocess
 MAIN_LINE_SPACING_AUTO = '276'
 
 
+# Istilah asing, nama produk, singkatan teknis, dan identifier yang telah
+# dikonfirmasi penulis tetap berukuran 12 pt dan dicetak miring pada keluaran
+# Word.
+REQUIRED_ITALIC_TERMS = (
+    'Vercel Serverless Functions',
+    'Full Stack Web Developer',
+    'Entity Relationship Diagram',
+    'User Acceptance Testing',
+    'Structured Query Language',
+    'Data Definition Language',
+    'Black Box Testing',
+    'Application Programming Interface',
+    'System Integrator',
+    'Row Level Security',
+    'DevOps Engineer',
+    'Public Dashboard',
+    'Supabase Auth',
+    'Engine Developer',
+    '3D Simulator',
+    'Admin Panel',
+    'unique constraint',
+    'foreign key',
+    'primary key',
+    'REST API',
+    '/api/unity/names',
+    '/api/unity/data',
+    'PostgreSQL',
+    'Supabase',
+    'WebGL',
+    'React',
+    'Black Box',
+    'ERD',
+    'DDL',
+    'UAT',
+    'RLS',
+    'API',
+    'SQL',
+    'abdul_rahman_saleh',
+    'cipto_mangunkusumo',
+    'backface culling',
+    'occlusion culling',
+    'unity_object_name',
+    'mesh instance',
+    'hero section',
+    'DatabaseSyncChecker',
+    'CullingPoint',
+    'dewi_sartika',
+    'ki_hadjar_dewantara',
+    'unique mesh',
+    'id_gedung_utama',
+    'nama_fasilitas',
+    'nama_gedung',
+    'id_gedung',
+    'foto_url',
+    'seed data',
+    'audit log',
+    'audit trail',
+    'database',
+    'asset',
+    'GameObjects',
+    'GameObject',
+    'Pointers',
+    'Pointer',
+    'traceability',
+    'deployment',
+    'identifier',
+    'frontend',
+    'backend',
+    'purposive',
+    'baseline',
+    'mismatch',
+    'snapshot',
+    'endpoint',
+    'callback',
+    'constraint',
+    'prototyping',
+    'sidebar',
+    'prefabs',
+    'prefab',
+    'runtime',
+    'default',
+    'culling',
+    'editor',
+    'Unity',
+    'scene',
+    'child',
+    'mesh',
+    'vertex',
+    'shader',
+    'collider',
+    'build',
+    'seed',
+    'query',
+    'record',
+    'tuple',
+    'setup',
+    'live',
+    'button',
+    'dashboard',
+    'minimap',
+    'pipeline',
+    'checklist',
+    'screenshot',
+    'frame rate',
+    'render',
+    'NavMesh',
+    'ProBuilder',
+    'SendMessage',
+    'Transform',
+    'Hierarchy',
+    'Inspector',
+    'Vercel',
+    'Express',
+    'Umami',
+    'JSON',
+    'CRUD',
+    'Auth',
+    'DevOps',
+    'bridge',
+    'web',
+    'mobile',
+    'desktop',
+    'footer',
+    'retest',
+    'gray',
+)
+
+_REQUIRED_ITALIC_PATTERN = re.compile(
+    r'(?<![A-Za-z0-9_])('
+    + '|'.join(re.escape(term) for term in sorted(
+        REQUIRED_ITALIC_TERMS, key=len, reverse=True
+    ))
+    + r')(?![A-Za-z0-9_])',
+    re.IGNORECASE,
+)
+
+
 def main_line_spacing_attrs(before='0', after='0'):
     """Return canonical OOXML spacing attributes for body/heading paragraphs."""
     return {
@@ -1110,6 +1247,103 @@ def clean_bibliography_sdt(sdt_elem, entries=None, draft_path="Tugas_Akhir_Draft
         sdtContent.append(p)
     print(f"Replaced bibliography entries inside SDT from draft ({len(entries)} entries).")
 
+
+def apply_required_inline_term_formatting(root, namespaces):
+    """Italicize required terms without touching Word fields or hyperlinks.
+
+    Runs containing drawings, tabs, breaks, or field instructions are skipped
+    because splitting those runs could damage document semantics. Ordinary
+    text runs are split around matched terms while retaining every pre-existing
+    run property; matched fragments additionally receive italic and 12 pt.
+    """
+    ns_uri = namespaces['w']
+    xml_space = '{http://www.w3.org/XML/1998/namespace}space'
+    allowed_children = {
+        f'{{{ns_uri}}}rPr',
+        f'{{{ns_uri}}}t',
+    }
+    formatted = 0
+
+    for run in list(root.findall('.//w:r', namespaces)):
+        if any(
+            ancestor.tag == f'{{{ns_uri}}}hyperlink'
+            for ancestor in run.iterancestors()
+        ):
+            # Product names or generic foreign terms can also occur inside a
+            # URL. Preserve the hyperlink text as a single unmodified target.
+            continue
+        children = list(run)
+        if any(child.tag not in allowed_children for child in children):
+            continue
+        text_nodes = [child for child in children if child.tag == f'{{{ns_uri}}}t']
+        if len(text_nodes) != 1 or not text_nodes[0].text:
+            continue
+
+        source_text = text_nodes[0].text
+        matches = list(_REQUIRED_ITALIC_PATTERN.finditer(source_text))
+        if not matches:
+            continue
+
+        pieces = []
+        cursor = 0
+        for match in matches:
+            if match.start() > cursor:
+                pieces.append((source_text[cursor:match.start()], False))
+            pieces.append((match.group(0), True))
+            cursor = match.end()
+        if cursor < len(source_text):
+            pieces.append((source_text[cursor:], False))
+
+        parent = run.getparent()
+        if parent is None:
+            continue
+        insertion_index = parent.index(run)
+        new_runs = []
+        for piece, should_format in pieces:
+            if not piece:
+                continue
+            new_run = copy.deepcopy(run)
+            new_text = new_run.find('w:t', namespaces)
+            new_text.text = piece
+            if piece[:1].isspace() or piece[-1:].isspace():
+                new_text.set(xml_space, 'preserve')
+            else:
+                new_text.attrib.pop(xml_space, None)
+
+            if should_format:
+                run_props = new_run.find('w:rPr', namespaces)
+                if run_props is None:
+                    run_props = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+                    new_run.insert(0, run_props)
+                set_child_element(run_props, 'i', {})
+                set_child_element(run_props, 'iCs', {})
+                set_child_element(run_props, 'sz', {'val': '24'})
+                set_child_element(run_props, 'szCs', {'val': '24'})
+                formatted += 1
+            new_run.tail = None
+            new_runs.append(new_run)
+
+        if new_runs:
+            new_runs[-1].tail = run.tail
+            for offset, new_run in enumerate(new_runs):
+                parent.insert(insertion_index + offset, new_run)
+            parent.remove(run)
+
+    return formatted
+
+
+def normalize_nine_point_font_size(root, namespaces):
+    """Replace every explicit 9 pt Word size with the canonical 12 pt size."""
+    ns_uri = namespaces['w']
+    updated = 0
+    for tag in ('sz', 'szCs'):
+        for size in root.iter(f'{{{ns_uri}}}{tag}'):
+            if size.get(f'{{{ns_uri}}}val') != '18':
+                continue
+            size.set(f'{{{ns_uri}}}val', '24')
+            updated += 1
+    return updated
+
 def load_rels_map(unpacked_dir):
     rels_path = os.path.join(unpacked_dir, 'word', '_rels', 'document.xml.rels')
     rel_map = {}
@@ -1499,6 +1733,21 @@ def format_all_tables(root, namespaces):
             gc.set(qn('w'), str(w))
 
         # --- Per-row / per-cell formatting ------------------------------------
+        # Pipe tables may carry intentional per-column alignment in the
+        # paragraph properties produced by the Markdown parser.  Preserve
+        # those alignments when at least one body cell is explicitly centered
+        # or right-aligned.  Legacy [TABLE] blocks keep the historical rule
+        # (centered header, left-aligned body).
+        preserve_cell_alignment = any(
+            pPr is not None
+            and (jc := pPr.find('w:jc', namespaces)) is not None
+            and jc.get(qn('val')) in ('center', 'right')
+            for row in rows[1:]
+            for cell in row.findall('w:tc', namespaces)
+            for p in cell.findall('w:p', namespaces)
+            for pPr in [p.find('w:pPr', namespaces)]
+        )
+
         for row_idx, row in enumerate(rows):
             is_header = (row_idx == 0)
 
@@ -1554,11 +1803,16 @@ def format_all_tables(root, namespaces):
                         pPr = lxml.etree.Element(qn('pPr'))
                         p.insert(0, pPr)
 
-                    # Horizontal alignment: header centered, body left.
-                    if is_header:
-                        set_child_element(pPr, 'jc', {'val': 'center'})
+                    # Horizontal alignment: preserve an intentional pipe-table
+                    # alignment; otherwise use the report-wide table default.
+                    existing_jc = pPr.find('w:jc', namespaces)
+                    if preserve_cell_alignment and existing_jc is not None:
+                        jc_val = existing_jc.get(qn('val'))
+                        if jc_val not in ('left', 'center', 'right'):
+                            jc_val = 'center' if is_header else 'left'
                     else:
-                        set_child_element(pPr, 'jc', {'val': 'left'})
+                        jc_val = 'center' if is_header else 'left'
+                    set_child_element(pPr, 'jc', {'val': jc_val})
 
                     # Clear indentation and keep pPr children ordered.
                     set_child_element(pPr, 'ind', {'left': '0', 'firstLine': '0', 'right': '0'})
@@ -1797,11 +2051,23 @@ def format_caption_paragraph_clean(
     
     # SEQ field
     r2 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    if label in ('Gambar', 'Tabel'):
+        rPr2 = lxml.etree.SubElement(r2, f'{{{ns_uri}}}rPr')
+        set_child_element(rPr2, 'b', {})
+        set_child_element(rPr2, 'bCs', {})
+        set_child_element(rPr2, 'sz', {'val': '24'})
+        set_child_element(rPr2, 'szCs', {'val': '24'})
     fld2 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "begin"})
     r2.append(fld2)
     p.append(r2)
     
     r3 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    if label in ('Gambar', 'Tabel'):
+        rPr3 = lxml.etree.SubElement(r3, f'{{{ns_uri}}}rPr')
+        set_child_element(rPr3, 'b', {})
+        set_child_element(rPr3, 'bCs', {})
+        set_child_element(rPr3, 'sz', {'val': '24'})
+        set_child_element(rPr3, 'szCs', {'val': '24'})
     ins3 = lxml.etree.Element(f'{{{ns_uri}}}instrText')
     if default_val == 1:
         ins3.text = f" SEQ {seq_name} \\r 1 \\* ARABIC "
@@ -1812,17 +2078,35 @@ def format_caption_paragraph_clean(
     p.append(r3)
     
     r4 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    if label in ('Gambar', 'Tabel'):
+        rPr4 = lxml.etree.SubElement(r4, f'{{{ns_uri}}}rPr')
+        set_child_element(rPr4, 'b', {})
+        set_child_element(rPr4, 'bCs', {})
+        set_child_element(rPr4, 'sz', {'val': '24'})
+        set_child_element(rPr4, 'szCs', {'val': '24'})
     fld4 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "separate"})
     r4.append(fld4)
     p.append(r4)
     
     r5 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    if label in ('Gambar', 'Tabel'):
+        rPr5 = lxml.etree.SubElement(r5, f'{{{ns_uri}}}rPr')
+        set_child_element(rPr5, 'b', {})
+        set_child_element(rPr5, 'bCs', {})
+        set_child_element(rPr5, 'sz', {'val': '24'})
+        set_child_element(rPr5, 'szCs', {'val': '24'})
     t5 = lxml.etree.Element(f'{{{ns_uri}}}t')
     t5.text = str(default_val)
     r5.append(t5)
     p.append(r5)
     
     r6 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    if label in ('Gambar', 'Tabel'):
+        rPr6 = lxml.etree.SubElement(r6, f'{{{ns_uri}}}rPr')
+        set_child_element(rPr6, 'b', {})
+        set_child_element(rPr6, 'bCs', {})
+        set_child_element(rPr6, 'sz', {'val': '24'})
+        set_child_element(rPr6, 'szCs', {'val': '24'})
     fld6 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "end"})
     r6.append(fld6)
     p.append(r6)
@@ -2995,6 +3279,10 @@ def format_document_xmls(unpacked_dir):
 
 
         format_all_tables(root, namespaces)
+        normalized_size_elements = normalize_nine_point_font_size(root, namespaces)
+        print(f"Normalized {normalized_size_elements} explicit 9 pt sizes to 12 pt.")
+        formatted_terms = apply_required_inline_term_formatting(root, namespaces)
+        print(f"Applied required inline formatting to {formatted_terms} term occurrences.")
         fix_whitespace_preservation(root)
         tree.write(doc_path, encoding='utf-8', xml_declaration=True)
         print("Updated document.xml.")
@@ -3018,7 +3306,12 @@ def fix_all_fonts_lxml(directory):
             modified = False
             for elem in root.iter():
                 tag_local = elem.tag.split('}')[-1]
-                if tag_local == 'rFonts':
+                if (tag_local in ('sz', 'szCs')
+                        and elem.tag.startswith(f'{{{W_NS}}}')
+                        and elem.get(f'{{{W_NS}}}val') == '18'):
+                    elem.set(f'{{{W_NS}}}val', '24')
+                    modified = True
+                elif tag_local == 'rFonts':
                     for attr in ['ascii', 'hAnsi', 'eastAsia', 'cs']:
                         full_attr = f'{{{W_NS}}}{attr}'
                         val = elem.get(full_attr)

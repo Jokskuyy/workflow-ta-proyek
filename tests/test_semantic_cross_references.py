@@ -147,6 +147,153 @@ def test_caption_bookmark_spans_prefix_and_seq_number_only():
     )
 
 
+def test_entire_figure_number_is_bold_12pt_but_description_is_not_bold():
+    paragraph = LET.Element(f"{{{W}}}p")
+    fmt.format_caption_paragraph_clean(
+        paragraph,
+        "Gambar",
+        "3.",
+        "Gambar",
+        7,
+        "Hierarki aset",
+        NS,
+    )
+
+    number_run = next(
+        run for run in paragraph.findall("w:r", NS)
+        if "".join(run.itertext()) == "7"
+    )
+    number_props = number_run.find("w:rPr", NS)
+    assert number_props.find("w:b", NS) is not None
+    assert number_props.find("w:bCs", NS) is not None
+    assert number_props.find("w:sz", NS).get(f"{{{W}}}val") == "24"
+
+    description_run = next(
+        run for run in paragraph.findall("w:r", NS)
+        if "Hierarki aset" in "".join(run.itertext())
+    )
+    description_props = description_run.find("w:rPr", NS)
+    assert description_props.find("w:b", NS) is None
+
+
+def test_entire_table_number_is_bold_12pt_but_description_is_not_bold():
+    paragraph = LET.Element(f"{{{W}}}p")
+    fmt.format_caption_paragraph_clean(
+        paragraph,
+        "Tabel",
+        "2.",
+        "Tabel",
+        4,
+        "Rangkuman pengujian",
+        NS,
+    )
+
+    number_runs = paragraph.findall("w:r", NS)[:6]
+    visible = "".join(
+        element.text or "" for element in paragraph.iter(f"{{{W}}}t")
+    )
+    assert visible == "Tabel 2.4 Rangkuman pengujian"
+    for run in number_runs:
+        props = run.find("w:rPr", NS)
+        assert props is not None
+        assert props.find("w:b", NS) is not None
+        assert props.find("w:bCs", NS) is not None
+        assert props.find("w:sz", NS).get(f"{{{W}}}val") == "24"
+        assert props.find("w:szCs", NS).get(f"{{{W}}}val") == "24"
+
+    description_run = paragraph.findall("w:r", NS)[-1]
+    description_props = description_run.find("w:rPr", NS)
+    assert description_props.find("w:b", NS) is None
+
+
+def test_required_technical_terms_are_split_and_formatted_without_field_damage():
+    root = LET.Element(f"{{{W}}}document")
+    body = LET.SubElement(root, f"{{{W}}}body")
+    paragraph = LET.SubElement(body, f"{{{W}}}p")
+    run = LET.SubElement(paragraph, f"{{{W}}}r")
+    text = LET.SubElement(run, f"{{{W}}}t")
+    text.text = "Asset Pointer di Unity memakai child dewi_sartika pada database."
+
+    field_run = LET.SubElement(paragraph, f"{{{W}}}r")
+    instruction = LET.SubElement(field_run, f"{{{W}}}instrText")
+    instruction.text = " REF Unity_Pointer \\h "
+
+    count = fmt.apply_required_inline_term_formatting(root, NS)
+
+    assert count == 6
+    assert "".join(paragraph.itertext()) == (
+        "Asset Pointer di Unity memakai child dewi_sartika pada database."
+        " REF Unity_Pointer \\h "
+    )
+    assert instruction.getparent() is field_run
+    formatted_texts = []
+    for candidate in paragraph.findall("w:r", NS):
+        props = candidate.find("w:rPr", NS)
+        if props is None or props.find("w:i", NS) is None:
+            continue
+        assert props.find("w:iCs", NS) is not None
+        assert props.find("w:sz", NS).get(f"{{{W}}}val") == "24"
+        assert props.find("w:szCs", NS).get(f"{{{W}}}val") == "24"
+        formatted_texts.append("".join(candidate.itertext()))
+    assert formatted_texts == [
+        "Asset", "Pointer", "Unity", "child", "dewi_sartika", "database"
+    ]
+
+
+def test_confirmed_product_names_and_acronyms_are_italic_12pt():
+    root = LET.Element(f"{{{W}}}document")
+    body = LET.SubElement(root, f"{{{W}}}body")
+    paragraph = LET.SubElement(body, f"{{{W}}}p")
+    run = LET.SubElement(paragraph, f"{{{W}}}r")
+    text = LET.SubElement(run, f"{{{W}}}t")
+    text.text = "Unity React Supabase PostgreSQL API SQL RLS UAT WebGL"
+
+    count = fmt.apply_required_inline_term_formatting(root, NS)
+
+    assert count == 9
+    italic_texts = []
+    for candidate in paragraph.findall("w:r", NS):
+        props = candidate.find("w:rPr", NS)
+        if props is None or props.find("w:i", NS) is None:
+            continue
+        assert props.find("w:iCs", NS) is not None
+        assert props.find("w:sz", NS).get(f"{{{W}}}val") == "24"
+        assert props.find("w:szCs", NS).get(f"{{{W}}}val") == "24"
+        italic_texts.append("".join(candidate.itertext()))
+
+    assert italic_texts == [
+        "Unity", "React", "Supabase", "PostgreSQL", "API", "SQL", "RLS", "UAT", "WebGL"
+    ]
+
+
+def test_every_explicit_9pt_size_is_normalized_to_12pt():
+    root = LET.Element(f"{{{W}}}document")
+    body = LET.SubElement(root, f"{{{W}}}body")
+    paragraph = LET.SubElement(body, f"{{{W}}}p")
+    paragraph_props = LET.SubElement(paragraph, f"{{{W}}}pPr")
+    style = LET.SubElement(paragraph_props, f"{{{W}}}pStyle")
+    style.set(f"{{{W}}}val", "Normal")
+    alignment = LET.SubElement(paragraph_props, f"{{{W}}}jc")
+    alignment.set(f"{{{W}}}val", "left")
+    indentation = LET.SubElement(paragraph_props, f"{{{W}}}ind")
+    indentation.set(f"{{{W}}}left", "720")
+    indentation.set(f"{{{W}}}firstLine", "0")
+    run = LET.SubElement(paragraph, f"{{{W}}}r")
+    run_props = LET.SubElement(run, f"{{{W}}}rPr")
+    size = LET.SubElement(run_props, f"{{{W}}}sz")
+    size.set(f"{{{W}}}val", "18")
+    size_cs = LET.SubElement(run_props, f"{{{W}}}szCs")
+    size_cs.set(f"{{{W}}}val", "18")
+    text = LET.SubElement(run, f"{{{W}}}t")
+    text.text = "SELECT * FROM gedung;"
+
+    updated = fmt.normalize_nine_point_font_size(root, NS)
+
+    assert updated == 2
+    assert run_props.find("w:sz", NS).get(f"{{{W}}}val") == "24"
+    assert run_props.find("w:szCs", NS).get(f"{{{W}}}val") == "24"
+
+
 def test_reference_token_becomes_ref_field_with_cached_value():
     paragraph = LET.Element(f"{{{W}}}p")
     run = LET.SubElement(paragraph, f"{{{W}}}r")

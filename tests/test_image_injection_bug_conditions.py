@@ -310,7 +310,7 @@ def test_c2_natural_zero_match_entries_are_detected(base_entries, tmp_path):
     ``test_c2_synthetic_zero_match_is_detected`` (``diagram_erd``)."""
     entries = dict(base_entries)
     doc = parse_doc(entries)
-    target = "Arsitektur Integrasi Aset 3D dan Data"  # manifest entry: diagram_arsitektur
+    target = "Arsitektur Integrasi Asset 3D dan Data"  # manifest entry: diagram_arsitektur
     assert caption_match_count(doc, target) == 1, (
         "precondition: entry diagram_arsitektur must resolve to exactly 1 caption "
         "in the captured baseline document"
@@ -328,13 +328,19 @@ def test_c2_natural_zero_match_entries_are_detected(base_entries, tmp_path):
 
 
 def _edit_caption_descriptor(doc, find_text: str, new_descriptor: str):
-    """Replace the trailing descriptive w:t run of the caption containing find_text."""
+    """Replace a caption descriptor even when formatting split it across runs."""
     for p in caption_paragraphs(doc):
         if para_style(p) == "Caption" and find_text in para_text(p):
             t_runs = [t for t in p.iter(f"{{{W}}}t") if t.text and find_text in t.text]
             if t_runs:
                 t_runs[-1].text = t_runs[-1].text.replace(find_text, new_descriptor)
                 return p
+            text_nodes = [t for t in p.iter(f"{{{W}}}t") if t.text]
+            combined = "".join(t.text for t in text_nodes)
+            text_nodes[0].text = combined.replace(find_text, new_descriptor)
+            for text_node in text_nodes[1:]:
+                text_node.getparent().remove(text_node)
+            return p
     raise AssertionError(f"caption containing '{find_text}' not found")
 
 

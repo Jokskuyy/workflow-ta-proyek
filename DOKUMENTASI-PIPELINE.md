@@ -259,7 +259,7 @@ Package `skills/scripts/alur_penulisan/` adalah library Python untuk memproses M
 | Branch | Peran |
 |---|---|
 | `laporan/iman` | Full Stack & System Integrator |
-| `laporan/dwikhi` | 3D Asset Designer & Database/Asset Manager |
+| `laporan/dwikhi` | Desainer Asset 3D dan Desainer Skema Database |
 | `laporan/faiz` | Simulator & Engine |
 
 Branch lain menghasilkan status `HELD`; tidak ada berkas yang dibaca atau ditulis sampai lingkup peran dapat ditentukan.
@@ -496,7 +496,7 @@ Perintah tersebut membaca draf dan fragment, mem-parse hasil komposisi, serta me
 | Caption | 12 pt, center, spasi 1,0, tanpa first-line indent |
 | Bibliografi | Spasi 1,0, hanging indent 1 cm |
 
-Font simbol/kode seperti Symbol, Wingdings, dan Courier New dipertahankan agar glyph dan blok kode tidak rusak.
+Font simbol/kode seperti Symbol, Wingdings, dan Courier New dipertahankan agar glyph dan blok kode tidak rusak. Setiap ukuran eksplisit 9 pt dinormalisasi menjadi 12 pt pada dokumen, style, header, footer, tabel, dan blok kode.
 
 Seluruh `sectPr` yang tersisa dipaksa kembali ke A4 dan margin yang sama, sehingga section tambahan dari template tidak boleh membawa margin berbeda.
 

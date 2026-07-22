@@ -377,4 +377,4 @@ Inventaris berikut mempertahankan nama dan pengelompokan yang diberikan penulis 
    c. Lantai 3.
       1) Perpustakaan Utama Kampus.
 
-Pada seed terbaru, `id_gedung = 17` digunakan untuk fasilitas Gedung Soetomo. Gedung Soetomo dan Lapangan Basket diperlakukan sebagai entitas yang berbeda. Inventaris ini mendokumentasikan isi seed dan tidak menyatakan bahwa data tersebut telah diterapkan ulang pada basis data Supabase aktif.
+Pada seed terbaru, `id_gedung = 17` digunakan untuk fasilitas Gedung Soetomo. Gedung Soetomo dan Lapangan Basket diperlakukan sebagai entitas yang berbeda. Inventaris ini mendokumentasikan isi seed dan tidak menyatakan bahwa data tersebut telah diterapkan ulang pada database Supabase aktif.

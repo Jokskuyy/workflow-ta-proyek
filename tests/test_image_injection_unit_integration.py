@@ -280,7 +280,7 @@ def _make_duplicate_media(entries: dict, idx_a: int, idx_b: int):
 
 
 def _edit_caption_descriptor(doc, find_text: str, new_descriptor: str):
-    """Replace the trailing descriptive run of the caption containing find_text."""
+    """Replace a caption descriptor even when formatting split it across runs."""
     body = body_of(doc)
     for p in body.findall("w:p", NS):
         if para_style(p) == "Caption" and find_text in para_text(p):
@@ -288,6 +288,12 @@ def _edit_caption_descriptor(doc, find_text: str, new_descriptor: str):
             if t_runs:
                 t_runs[-1].text = t_runs[-1].text.replace(find_text, new_descriptor)
                 return p
+            text_nodes = [t for t in p.iter(f"{{{W}}}t") if t.text]
+            combined = "".join(t.text for t in text_nodes)
+            text_nodes[0].text = combined.replace(find_text, new_descriptor)
+            for text_node in text_nodes[1:]:
+                text_node.getparent().remove(text_node)
+            return p
     raise AssertionError(f"caption containing {find_text!r} not found")
 
 
@@ -410,7 +416,7 @@ def test_unit_resolve_caption_indices_zero_one_multiple():
     """inj.resolve_caption_indices returns ALL matching body indices: 0, 1, or
     many, per the pStyle=='Caption' + contains + remainder rule."""
     ns = {"w": W}
-    match = "Arsitektur Integrasi Aset 3D dan Data"
+    match = "Arsitektur Integrasi Asset 3D dan Data"
 
     # Zero matches: no caption mentions the target descriptor.
     body0 = _body_from_captions(["Gambar 2.1 Sesuatu Yang Lain",
@@ -721,7 +727,7 @@ def test_validator_c4_oversized_without_pagebreak_rejected(reconciled_project):
     entries = read_all(reconciled_project / "captured.docx")
     doc = parse_doc(entries)
     threshold = _printable_height(doc)
-    p = _drawing_p_before_caption(doc, "Sequence Diagram Validasi Identifier Aset dan Data")
+    p = _drawing_p_before_caption(doc, "Sequence Diagram Validasi Identifier Asset dan Data")
     assert p is not None, "expected a drawing before the asset-data validation sequence caption"
     _make_tall_strip_pbb(p, threshold + 2_000_000)
     entries[DOC] = serialize_doc(doc)
@@ -772,14 +778,14 @@ def test_integration_negative_all_four_defects(reconciled_project):
         "Bagan Rusak Tak Cocok",
     )
     threshold = _printable_height(doc)
-    tall_p = _drawing_p_before_caption(doc, "Sequence Diagram Validasi Identifier Aset dan Data")
+    tall_p = _drawing_p_before_caption(doc, "Sequence Diagram Validasi Identifier Asset dan Data")
     assert tall_p is not None
     _make_tall_strip_pbb(tall_p, threshold + 2_500_000)
     entries[DOC] = serialize_doc(doc)
 
     # Media-level defects: C1 (duplicate) + C3 (content drift on a third figure).
     entries, (src, dst) = _make_duplicate_media(entries, 5, 12)
-    victim = _media_before_caption(entries, "Alur Perancangan Aset 3D dan Data")
+    victim = _media_before_caption(entries, "Alur Perancangan Asset 3D dan Data")
     assert victim is not None and victim not in (src, dst)
     entries[victim] = entries[victim] + b"\x00drift-bytes"
 

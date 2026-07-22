@@ -511,5 +511,75 @@ def test_ambiguous_marker_and_is_ambiguous():
     assert reg2.tbl_remap["1.9"] == "1.1"
 
 
+def test_required_endpoint_terms_are_italic_and_12pt():
+    root = ET.Element("{%s}document" % W)
+    body = ET.SubElement(root, "{%s}body" % W)
+    body.append(make_par("Akses /api/unity/data dan /api/unity/names."))
+
+    formatted = fmt.apply_required_inline_term_formatting(root, NS)
+
+    assert formatted == 2
+    endpoint_runs = {}
+    for run in root.findall(".//w:r", NS):
+        text = "".join(run.xpath(".//w:t/text()", namespaces=NS))
+        if text in {"/api/unity/data", "/api/unity/names"}:
+            endpoint_runs[text] = run
+
+    assert set(endpoint_runs) == {"/api/unity/data", "/api/unity/names"}
+    for run in endpoint_runs.values():
+        assert run.find("w:rPr/w:i", NS) is not None
+        assert run.find("w:rPr/w:iCs", NS) is not None
+        assert run.find("w:rPr/w:sz", NS).get("{%s}val" % W) == "24"
+        assert run.find("w:rPr/w:szCs", NS).get("{%s}val" % W) == "24"
+
+
+def test_required_role_phrases_in_table_cell_are_italic_and_12pt():
+    root = ET.Element("{%s}document" % W)
+    body = ET.SubElement(root, "{%s}body" % W)
+    table = ET.SubElement(body, "{%s}tbl" % W)
+    row = ET.SubElement(table, "{%s}tr" % W)
+    cell = ET.SubElement(row, "{%s}tc" % W)
+    cell.append(make_par(
+        "Full Stack Web Developer, System Integrator, dan DevOps Engineer"
+    ))
+
+    formatted = fmt.apply_required_inline_term_formatting(root, NS)
+
+    assert formatted == 3
+    expected = {
+        "Full Stack Web Developer",
+        "System Integrator",
+        "DevOps Engineer",
+    }
+    formatted_runs = {}
+    for run in cell.findall(".//w:r", NS):
+        text = "".join(run.xpath(".//w:t/text()", namespaces=NS))
+        if text in expected:
+            formatted_runs[text] = run
+
+    assert set(formatted_runs) == expected
+    for run in formatted_runs.values():
+        assert run.find("w:rPr/w:i", NS) is not None
+        assert run.find("w:rPr/w:iCs", NS) is not None
+        assert run.find("w:rPr/w:sz", NS).get("{%s}val" % W) == "24"
+        assert run.find("w:rPr/w:szCs", NS).get("{%s}val" % W) == "24"
+
+
+def test_required_terms_inside_hyperlink_url_are_not_reformatted():
+    root = ET.Element("{%s}document" % W)
+    body = ET.SubElement(root, "{%s}body" % W)
+    paragraph = ET.SubElement(body, "{%s}p" % W)
+    hyperlink = ET.SubElement(paragraph, "{%s}hyperlink" % W)
+    run = ET.SubElement(hyperlink, "{%s}r" % W)
+    text = ET.SubElement(run, "{%s}t" % W)
+    text.text = "https://example.test/web/Unity"
+
+    formatted = fmt.apply_required_inline_term_formatting(root, NS)
+
+    assert formatted == 0
+    assert text.text == "https://example.test/web/Unity"
+    assert run.find("w:rPr", NS) is None
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-q"]))
