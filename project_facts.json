@@ -117,6 +117,8 @@
                 "Core PostgreSQL schema and ERD design for gedung, fasilitas, fakultas, and program_studi",
                 "Management of gedung and fasilitas records",
                 "unity_object_name mapping and integrity",
+                "Design of RLS policy requirements",
+                "Design of audit_logs table schema",
                 "Use of DatabaseSyncChecker developed by the 3D Simulator & Engine Developer"
             ],
             "asset_observation_method": "Observasi visual langsung dan dokumentasi fotografis dengan mendatangi gedung satu per satu. Tidak dilakukan pengukuran dimensi menggunakan alat ukur; bentuk dan proporsi asset disusun sebagai representasi visual berdasarkan massa bangunan, jumlah lantai, pola bukaan, warna, material, dan hubungan antarelemen yang terlihat.",
@@ -266,9 +268,9 @@
             "campus_map_building_points",
             "web_analytics_log"
         ],
-        "integration_ownership": "Dwikhi merancang empat tabel inti dan ERD; Iman mengintegrasikan SQL ke repositori web. Tabel ekstensi, Supabase Auth, RLS, dan layanan audit diperlakukan sebagai konteks sistem.",
+        "integration_ownership": "Dwikhi merancang empat tabel inti dan ERD, kebutuhan kebijakan RLS, serta skema tabel audit_logs; Iman mengintegrasikan SQL ke repositori web dan mengimplementasikan layanan audit pada Dashboard. Tabel ekstensi dan Supabase Auth diperlakukan sebagai konteks sistem. Penerapan SQL produksi RLS dan trigger audit database tidak diklaim tanpa bukti.",
         "documentation_source": "Berkas SQL setup dan seed terbaru yang diberikan pengguna; SQL setup hanya dibaca sebagai dokumentasi dan tidak dijalankan karena memuat operasi DROP TABLE.",
-        "audit_trigger_evidence": "Definisi trigger audit tidak ditemukan pada berkas SQL setup. Pencatatan audit dilakukan oleh layanan aplikasi dan bukan kontribusi Dwikhi.",
+        "audit_trigger_evidence": "Definisi trigger audit tidak ditemukan pada berkas SQL setup. Dwikhi merancang skema tabel audit_logs; pencatatan audit dilakukan oleh layanan aplikasi Dashboard yang diimplementasikan Iman. Trigger audit database tidak diklaim.",
         "tables": [
             {
                 "name": "gedung",

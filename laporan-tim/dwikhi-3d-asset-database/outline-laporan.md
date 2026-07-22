@@ -2,7 +2,7 @@
 
 ## BAB I Pendahuluan
 
-BAB I memakai konteks proyek bersama, lalu memfokuskan rumusan masalah, batasan, tujuan, dan manfaat pada asset 3D, rancangan data inti, seed, serta pemetaan `unity_object_name`.
+BAB I memakai konteks proyek bersama, lalu memfokuskan rumusan masalah, batasan, tujuan, dan manfaat pada asset 3D, rancangan data inti, kebutuhan kebijakan RLS, skema tabel `audit_logs`, seed, serta pemetaan `unity_object_name`.
 
 ## BAB II Rancangan Proyek
 
@@ -34,7 +34,7 @@ Gunakan observasi bersama tanpa mengubah batas interpretasi kuesioner dan wawanc
 
 ## BAB III Implementasi Proyek
 
-BAB III memuat bukti proses Unity Editor, hierarki prefab, empat tabel inti, pengelolaan seed, pemetaan identifier, inventaris material atau tekstur, serta penggunaan alat pemeriksa buatan Faiz. Konfigurasi akses dan audit aplikasi dijelaskan sebagai batas integrasi, bukan implementasi Dwikhi.
+BAB III memuat bukti proses Unity Editor, hierarki prefab, empat tabel inti, pengelolaan seed, pemetaan identifier, inventaris material atau tekstur, perancangan kebutuhan RLS dan skema `audit_logs`, serta penggunaan alat pemeriksa buatan Faiz. Layanan audit Dashboard dijelaskan sebagai implementasi Iman; trigger audit database tidak diklaim tanpa bukti.
 
 ## BAB IV Penutup
 

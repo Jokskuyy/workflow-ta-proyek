@@ -31,9 +31,9 @@ FOOTER_CONTENT_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocess
 MAIN_LINE_SPACING_AUTO = '276'
 
 
-# Istilah asing, nama produk, singkatan teknis, dan identifier yang telah
-# dikonfirmasi penulis tetap berukuran 12 pt dan dicetak miring pada keluaran
-# Word.
+# Istilah asing, nama produk, dan identifier yang telah dikonfirmasi penulis
+# tetap berukuran 12 pt dan dicetak miring pada keluaran Word. Singkatan teknis
+# yang dikunci pada handoff (API, SQL, RLS, UAT, WebGL, ERD, DDL) tetap regular.
 REQUIRED_ITALIC_TERMS = (
     'Vercel Serverless Functions',
     'Full Stack Web Developer',
@@ -54,20 +54,15 @@ REQUIRED_ITALIC_TERMS = (
     'unique constraint',
     'foreign key',
     'primary key',
-    'REST API',
+    'REST',
     '/api/unity/names',
     '/api/unity/data',
     'PostgreSQL',
     'Supabase',
-    'WebGL',
+    # WebGL is an approved regular acronym; do not add it here.
     'React',
     'Black Box',
-    'ERD',
-    'DDL',
-    'UAT',
-    'RLS',
-    'API',
-    'SQL',
+    # ERD, DDL, UAT, RLS, API, and SQL are regular acronyms.
     'abdul_rahman_saleh',
     'cipto_mangunkusumo',
     'backface culling',
@@ -165,6 +160,12 @@ _REQUIRED_ITALIC_PATTERN = re.compile(
     ))
     + r')(?![A-Za-z0-9_])',
     re.IGNORECASE,
+)
+
+REGULAR_TECHNICAL_TERMS = ('API', 'SQL', 'RLS', 'UAT', 'WebGL', 'ERD', 'DDL')
+_REGULAR_TECHNICAL_PATTERN = re.compile(
+    r'(?<![A-Za-z0-9_])(' + '|'.join(REGULAR_TECHNICAL_TERMS)
+    + r')(?![A-Za-z0-9_])'
 )
 
 
@@ -1115,7 +1116,6 @@ def ensure_hyperlink_style(styles_root):
         set_child_element(rPr, 'color', {'val': '000000', 'themeColor': 'text1'})
         set_child_element(rPr, 'u', {'val': 'none'})
         style.append(rPr)
-        
         sort_element_children(style, STYLE_ORDER)
         styles_root.append(style)
     else:
@@ -1125,6 +1125,40 @@ def ensure_hyperlink_style(styles_root):
             style.append(rPr)
         set_child_element(rPr, 'color', {'val': '000000', 'themeColor': 'text1'})
         set_child_element(rPr, 'u', {'val': 'none'})
+
+
+def ensure_codeblock_style(styles_root):
+    """Define the stable paragraph style used by fenced Markdown code blocks."""
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    namespaces = {'w': ns_uri}
+    style = styles_root.find("w:style[@w:styleId='CodeBlock']", namespaces)
+    if style is None:
+        style = lxml.etree.Element(f'{{{ns_uri}}}style')
+        style.set(f'{{{ns_uri}}}type', 'paragraph')
+        style.set(f'{{{ns_uri}}}styleId', 'CodeBlock')
+        set_child_element(style, 'name', {'val': 'CodeBlock'})
+        set_child_element(style, 'basedOn', {'val': 'Normal'})
+        set_child_element(style, 'next', {'val': 'CodeBlock'})
+        set_child_element(style, 'qFormat', {})
+        styles_root.append(style)
+    pPr = style.find('w:pPr', namespaces)
+    if pPr is None:
+        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+        style.append(pPr)
+    set_child_element(pPr, 'jc', {'val': 'left'})
+    set_child_element(pPr, 'ind', {'left': '720', 'firstLine': '0'})
+    set_child_element(pPr, 'spacing', {'before': '0', 'after': '0', 'line': '240', 'lineRule': 'auto'})
+    sort_element_children(pPr, PPR_ORDER)
+    rPr = style.find('w:rPr', namespaces)
+    if rPr is None:
+        rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+        style.append(rPr)
+    set_child_element(rPr, 'rFonts', {'ascii': 'Courier New', 'hAnsi': 'Courier New', 'cs': 'Courier New'})
+    set_child_element(rPr, 'i', {})
+    set_child_element(rPr, 'iCs', {})
+    set_child_element(rPr, 'sz', {'val': '24'})
+    set_child_element(rPr, 'szCs', {'val': '24'})
+    sort_element_children(style, STYLE_ORDER)
 
 
 def clean_heading_text_and_add_num(p, level, num_id):
@@ -1180,8 +1214,9 @@ def clean_bibliography_sdt(sdt_elem, entries=None, draft_path="Tugas_Akhir_Draft
 
     Each entry is rendered with the baseline paragraph style (R1.3): pStyle
     Normal; ind left=567 hanging=567; spacing before=0/after=120/line=240/
-    lineRule=auto; jc=both. Italic spans (``*...*`` in the draft) become
-    ``w:i``/``w:iCs`` runs (R1.2); entry order follows the draft (R1.4).
+    lineRule=auto; jc=left. Italic spans (``*...*`` in the draft) become
+    ``w:i``/``w:iCs`` runs (R1.2); entry order follows the parser's
+    alphabetical author/year order (R1.4).
 
     If the section is missing or empty (R1.8) the function prints a non-fatal
     [WARN] and leaves the SDT untouched -- it never writes fake entries, so the
@@ -1227,7 +1262,7 @@ def clean_bibliography_sdt(sdt_elem, entries=None, draft_path="Tugas_Akhir_Draft
         set_child_element(pPr, 'pStyle', {'val': 'Normal'})
         set_child_element(pPr, 'ind', {'left': '567', 'hanging': '567'})
         set_child_element(pPr, 'spacing', {'before': '0', 'after': '120', 'line': '240', 'lineRule': 'auto'})
-        set_child_element(pPr, 'jc', {'val': 'both'})
+        set_child_element(pPr, 'jc', {'val': 'left'})
         sort_element_children(pPr, PPR_ORDER)
         p.append(pPr)
 
@@ -1330,6 +1365,59 @@ def apply_required_inline_term_formatting(root, namespaces):
             parent.remove(run)
 
     return formatted
+
+
+def normalize_regular_technical_terms(root, namespaces):
+    """Remove accidental emphasis from approved technical acronyms.
+
+    Markdown authored with ``*API*`` or a larger italic phrase must still
+    render the acronym regular under the handoff typography rule. The helper
+    splits only ordinary text runs and leaves fields, hyperlinks, and drawings
+    untouched.
+    """
+    ns_uri = namespaces['w']
+    allowed_children = {f'{{{ns_uri}}}rPr', f'{{{ns_uri}}}t'}
+    changed = 0
+    for run in list(root.findall('.//w:r', namespaces)):
+        if any(a.tag == f'{{{ns_uri}}}hyperlink' for a in run.iterancestors()):
+            continue
+        children = list(run)
+        if any(c.tag not in allowed_children for c in children):
+            continue
+        text_node = run.find('w:t', namespaces)
+        if text_node is None or not text_node.text:
+            continue
+        matches = list(_REGULAR_TECHNICAL_PATTERN.finditer(text_node.text))
+        if not matches:
+            continue
+        pieces = []
+        cursor = 0
+        for match in matches:
+            if match.start() > cursor:
+                pieces.append((text_node.text[cursor:match.start()], False))
+            pieces.append((match.group(0), True))
+            cursor = match.end()
+        if cursor < len(text_node.text):
+            pieces.append((text_node.text[cursor:], False))
+        parent = run.getparent()
+        if parent is None:
+            continue
+        index = parent.index(run)
+        for offset, (piece, regular) in enumerate(pieces):
+            new_run = copy.deepcopy(run)
+            new_text = new_run.find('w:t', namespaces)
+            new_text.text = piece
+            if regular:
+                rpr = new_run.find('w:rPr', namespaces)
+                if rpr is not None:
+                    for tag in ('i', 'iCs'):
+                        elem = rpr.find(f'w:{tag}', namespaces)
+                        if elem is not None:
+                            rpr.remove(elem)
+                changed += 1
+            parent.insert(index + offset, new_run)
+        parent.remove(run)
+    return changed
 
 
 def normalize_nine_point_font_size(root, namespaces):
@@ -2319,6 +2407,7 @@ def format_document_xmls(unpacked_dir):
         ensure_front_matter_heading_style(root)
         ensure_appendix_heading_style(root)
         ensure_toc9_style(root)
+        ensure_codeblock_style(root)
         # ensure_hyperlink_style(root)
         for style in root.findall('w:style', namespaces):
             style_id = style.get(f'{{{ns_uri}}}styleId')
@@ -2604,6 +2693,7 @@ def format_document_xmls(unpacked_dir):
         para_count = 0
         cover_end_idx = 0
         drawing_count = 0
+        bibliography_active = False
         for idx, child in enumerate(children):
             if idx < bab1_idx_orig and child.tag.endswith('p'):
                 child_text = "".join(child.itertext()).strip()
@@ -2949,6 +3039,12 @@ def format_document_xmls(unpacked_dir):
                 
                 # Correct in-text citations
                 text = "".join([t.text for t in p.iter(f'{{{ns_uri}}}t') if t.text])
+                if pStyle_val.startswith('Heading'):
+                    heading_text = text.strip().upper()
+                    if heading_text == 'DAFTAR PUSTAKA':
+                        bibliography_active = True
+                    elif bibliography_active:
+                        bibliography_active = False
                 if 'Aliyah Aliyah' in text:
                     cleaned_text = text.replace(
                         'Aliyah Aliyah et al., 2024',
@@ -3009,7 +3105,14 @@ def format_document_xmls(unpacked_dir):
                     elif pStyle_val == 'Heading5': clean_heading_text_and_add_num(p, 4, 76)
                 else:
                     # Body text
-                    if is_section2:
+                    if bibliography_active and pStyle_val == 'Normal':
+                        if pPr is None:
+                            pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                            p.insert(0, pPr)
+                        set_child_element(pPr, 'ind', {'left': '567', 'hanging': '567'})
+                        set_child_element(pPr, 'jc', {'val': 'left'})
+                        set_child_element(pPr, 'spacing', {'before': '0', 'after': '120', 'line': '240', 'lineRule': 'auto'})
+                    elif is_section2:
                         if pStyle_val == 'Normal':
                             if pPr is None:
                                 pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
@@ -3283,6 +3386,8 @@ def format_document_xmls(unpacked_dir):
         print(f"Normalized {normalized_size_elements} explicit 9 pt sizes to 12 pt.")
         formatted_terms = apply_required_inline_term_formatting(root, namespaces)
         print(f"Applied required inline formatting to {formatted_terms} term occurrences.")
+        normalized_acronyms = normalize_regular_technical_terms(root, namespaces)
+        print(f"Normalized {normalized_acronyms} regular technical acronym fragments.")
         fix_whitespace_preservation(root)
         tree.write(doc_path, encoding='utf-8', xml_declaration=True)
         print("Updated document.xml.")

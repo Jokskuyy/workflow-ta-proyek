@@ -136,9 +136,9 @@ The writing process uses the following files in the workspace parent directory (
   - **Focus Areas**: Unity WebGL Engine, NavMesh pathfinding, Catmull-Rom Centripetal curve, Building Culling, Pointer Lock, Virtual mobile joystick, Editor tools (WebGL Settings Optimizer, Database Sync Checker).
 - **Muhammad Dwikhi Deandra Purnianto**
   - **Role**: *Peran 3: 3D Asset Designer & Database/Asset Manager*
-  - **Focus Areas**: creation and layout of 11 building assets directly in Unity Editor (no Blender), prefab hierarchy and child `Pointer` targets, PostgreSQL schema and ERD design, management of building/facility records, and validation of the `unity_object_name` bridge using the Database Sync Checker developed by the 3D Simulator & Engine Developer. RLS and audit triggers are system context, not this role's contribution.
+  - **Focus Areas**: creation and layout of all 3D building and facility assets completed in the Unity scene (no Blender), prefab hierarchy and child `Pointer` targets, PostgreSQL schema and ERD design, design of RLS policy requirements and the `audit_logs` table schema, management of building/facility records, and validation of the `unity_object_name` bridge using the Database Sync Checker developed by the 3D Simulator & Engine Developer. The Dashboard audit service belongs to Iman; production SQL for RLS and database audit triggers is not claimed without evidence.
 
 ### Technical & Environment Constraints
 - **3D Modeling & Layout**: Executed directly in **Unity Editor** instead of external software like Blender.
-- **Database**: PostgreSQL hosted on **Supabase Cloud**, utilizing database triggers for `audit_logs` and Row Level Security (RLS) for data protection.
+- **Database**: PostgreSQL hosted on **Supabase Cloud**. Dwikhi designs the core schema, RLS policy requirements, and `audit_logs` table structure; Iman implements the Dashboard audit service. Database audit triggers are not attributed without SQL or execution evidence.
 - **Analytics**: **Umami Analytics** self-hosted (port 3000) with Express.js proxy server (port 3001).

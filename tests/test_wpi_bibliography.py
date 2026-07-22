@@ -68,7 +68,7 @@ def entry_lines(draw):
 
     Each line is already stripped, never empty, never starts with '#', and is
     never exactly '---', so parse_bibliography_entries keeps every line as one
-    entry in order.
+    entry and sorts the result by author/year.
     """
     k = draw(st.integers(min_value=1, max_value=8))
     lines = []
@@ -95,7 +95,7 @@ def alternating_spans(draw):
 
 
 # =========================================================================== #
-# Property 1: Parsing entri referensi mempertahankan jumlah dan urutan
+# Property 1: Parsing entri referensi mempertahankan jumlah dan urutan kanonik
 # =========================================================================== #
 # Feature: writing-pipeline-improvements, Property 1: Parsing entri referensi mempertahankan jumlah dan urutan
 # Validates: Requirements 1.1, 1.4
@@ -113,7 +113,13 @@ def test_property1_entry_count_and_order(lines, blanks):
 
     assert result.section_found is True
     assert len(result) == len(lines)                       # exact count (R1.1)
-    assert [e.raw for e in result] == lines                # same order (R1.4)
+    expected = sorted(
+        lines,
+        key=lambda raw: mrg.reference_key(
+            mrg.ReferenceEntry(raw=raw, spans=(), authors=(raw.split(',', 1)[0],), year=None)
+        ),
+    )
+    assert [e.raw for e in result] == expected
 
 
 # =========================================================================== #
@@ -167,7 +173,7 @@ def test_property3_bibliography_paragraph_style_invariant(spans_list):
         assert sp.get(W('after')) == '120'
         assert sp.get(W('line')) == '240'
         assert sp.get(W('lineRule')) == 'auto'
-        assert pPr.find(W('jc')).get(W('val')) == 'both'
+        assert pPr.find(W('jc')).get(W('val')) == 'left'
 
 
 # =========================================================================== #

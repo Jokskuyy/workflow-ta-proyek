@@ -18,7 +18,7 @@ Platform Web UPNVJ menyatukan empat komponen:
 ### Arsitektur kunci (JANGAN ditulis keliru)
 - **API utama = Vercel Serverless Functions (Node.js)** (`/api/unity/data`, `/api/unity/names`, `/api/buildings`, `/api/rooms`, `/api/health`).
 - **Express.js (port 3001)** hanya **proxy Umami Analytics + rate limiter**, BUKAN API utama.
-- **Database = Supabase Cloud (PostgreSQL)** dengan **RLS** (anon=SELECT, authenticated=CRUD) + **trigger audit logs**.
+- **Database = Supabase Cloud (PostgreSQL)** dengan **RLS** (anon=SELECT, authenticated=CRUD) dan pencatatan audit melalui layanan aplikasi. Definisi trigger audit database tidak dinyatakan tanpa bukti SQL atau eksekusi.
 - **Komunikasi React→Unity bersifat SATU ARAH** via `SendMessage("NavigationReceiver","NavigateTo", unity_object_name)`.
 - **Unity menarik datanya sendiri** via `HTTP GET /api/unity/data` saat runtime (modul `BuildingDatabase`).
 - **`unity_object_name`** = jembatan tunggal antara baris DB (`gedung`/`fasilitas`) dan GameObject di scene (lowercase + underscore, case-insensitive).
@@ -32,7 +32,7 @@ Platform Web UPNVJ menyatukan empat komponen:
 ## Struktur Tim & Branch
 Repo dipakai 3 anggota; tiap anggota menulis di branch sendiri (lihat `PANDUAN-TIM.md`):
 - `laporan/iman` — Full Stack & System Integrator
-- `laporan/dwikhi` — Desainer Asset 3D dan Desainer Skema Database (seluruh asset 3D gedung dan fasilitas yang memiliki GameObject, prefab dan `Pointer`, ERD, pengelolaan data, serta pemetaan `unity_object_name`; RLS dan audit hanya konteks sistem)
+- `laporan/dwikhi` — Desainer Asset 3D dan Desainer Skema Database (seluruh asset 3D gedung dan fasilitas yang dikerjakan pada scene, prefab dan `Pointer`, ERD, pengelolaan data, perancangan kebijakan RLS, perancangan skema tabel `audit_logs`, serta pemetaan `unity_object_name`; implementasi layanan audit berada pada Iman dan trigger audit database tidak diklaim)
 - `laporan/faiz` — Simulator & Engine (NavMesh, Catmull-Rom, Building Culling, WebGL Optimizer, Database Sync Checker)
 
 Saat membantu, **cek peran branch aktif** di `laporan-tim/<peran>/` dan fokuskan pembahasan pada lingkup peran itu.

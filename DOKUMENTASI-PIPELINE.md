@@ -167,7 +167,7 @@ Sebelum menulis angka, status implementasi, atau hasil pengujian, periksa `proje
 
 ### Konsistensi istilah
 
-`term_registry.json` menyimpan bentuk kanonik istilah seperti dashboard, user interface, back-end, front-end, database, model 3D, virtual reality, Smart Campus, API, REST API, RLS, use case, Black Box Testing, UAT, ERD, pointer, dan prefab.
+`term_registry.json` menyimpan bentuk kanonik istilah seperti Dashboard Publik, Panel Admin, antarmuka, frontend, backend, database, pemangku kepentingan, tangkapan layar, kode sumber, respons, kredensial, Row Level Security, Black Box Testing, User Acceptance Testing, pointer, dan prefab. Registry juga menetapkan bahwa singkatan API, SQL, RLS, UAT, WebGL, ERD, dan DDL tetap regular; registry dipakai untuk pemeriksaan, bukan penggantian teks otomatis.
 
 Pemeriksa istilah:
 

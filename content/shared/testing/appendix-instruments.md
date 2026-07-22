@@ -18,7 +18,7 @@ PUB-08 | Kinerja Sistem | Aplikasi berjalan dengan lancar saat memuat denah virt
 PUB-09 | Kinerja Sistem | Interaksi pada denah terasa responsif dan tidak mengalami keterlambatan yang mengganggu.
 [/TABLE]
 
-Instrumen administrator pada [TABREF:lampiran_instrumen_uat_admin] memuat sebelas pernyataan yang menilai pengelolaan data, autentikasi, kemudahan penggunaan, desain, dan kinerja Admin Panel.
+Instrumen administrator pada [TABREF:lampiran_instrumen_uat_admin] memuat sebelas pernyataan yang menilai pengelolaan data, autentikasi, kemudahan penggunaan, desain, dan kinerja Panel Admin.
 
 [TABLE-ID:lampiran_instrumen_uat_admin]
 [TABLECAPTION:Instrumen UAT Dashboard Admin]
@@ -30,7 +30,7 @@ ADM-02 | Manajemen dan Fungsionalitas Data | Formulir pengisian data, seperti na
 ADM-03 | Manajemen dan Fungsionalitas Data | Sistem memberikan notifikasi atau pesan yang jelas ketika data berhasil disimpan, diubah, atau gagal diproses.
 ADM-04 | Manajemen dan Fungsionalitas Data | Perubahan data pada Dashboard Admin tersinkronisasi dan tampil dengan benar pada sisi pengguna akhir.
 ADM-05 | Keamanan dan Autentikasi | Proses login dan logout berjalan lancar dan aman.
-ADM-06 | Keamanan dan Autentikasi | Pengguna yang tidak memiliki hak akses tidak dapat masuk ke Admin Panel.
+ADM-06 | Keamanan dan Autentikasi | Pengguna yang tidak memiliki hak akses tidak dapat masuk ke Panel Admin.
 ADM-07 | Kemudahan Penggunaan | Susunan menu pada sidebar atau navigasi dashboard terstruktur dan memudahkan pencarian halaman yang dibutuhkan.
 ADM-08 | Kemudahan Penggunaan | Saya dapat mengelola data tanpa memerlukan waktu lama untuk mempelajari cara kerja sistem.
 ADM-09 | Kemudahan Penggunaan | Tabel atau daftar data mudah dibaca, diurutkan, atau dicari menggunakan fitur pencarian.

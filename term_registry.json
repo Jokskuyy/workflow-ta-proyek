@@ -1,0 +1,57 @@
+{
+  "istilah_teknis": {
+    "dashboard publik": "Dashboard Publik",
+    "admin panel": "Panel Admin",
+    "antarmuka": "antarmuka",
+    "frontend": "frontend",
+    "backend": "backend",
+    "database": "database",
+    "stakeholder": "pemangku kepentingan",
+    "smartphone": "smartphone",
+    "browser": "browser",
+    "deployment": "deployment",
+    "hosting": "hosting",
+    "screenshot": "tangkapan layar",
+    "source code": "kode sumber",
+    "automated test": "pengujian otomatis",
+    "response": "respons",
+    "credential": "kredensial",
+    "unity_object_name": "unity_object_name",
+    "databasesyncchecker": "DatabaseSyncChecker",
+    "runtime unity": "Unity saat dijalankan",
+    "sendmessage": "SendMessage",
+    "on navigation completed": "OnNavigationCompleted",
+    "payload": "data yang dikirim",
+    "row level security": "Row Level Security",
+    "audit log": "audit log",
+    "audit_logs": "audit_logs",
+    "entity relationship diagram": "Entity Relationship Diagram",
+    "black box testing": "Black Box Testing",
+    "user acceptance testing": "User Acceptance Testing",
+    "prefab": "prefab",
+    "gameobject": "GameObject",
+    "scene": "scene",
+    "asset": "asset",
+    "desainer": "desainer",
+    "proyek": "proyek"
+  },
+  "formatting": {
+    "italic_full_terms": [
+      "Full Stack Web Developer",
+      "System Integrator",
+      "DevOps Engineer",
+      "Row Level Security",
+      "Entity Relationship Diagram",
+      "Black Box Testing",
+      "User Acceptance Testing"
+    ],
+    "regular_acronyms": [
+      "API",
+      "SQL",
+      "RLS",
+      "UAT",
+      "WebGL"
+    ]
+  },
+  "catatan": "Registry menjadi rujukan pemeriksaan konsistensi; tidak mengganti teks secara otomatis."
+}

@@ -38,7 +38,7 @@ Visualisasi lingkungan kampus dalam bentuk tiga dimensi dapat membantu penyajian
 
 Dalam *Unity*, *scene* merupakan ruang kerja yang memuat lingkungan aplikasi, sedangkan *GameObject* merupakan unit objek yang dapat diberi komponen dan disusun dalam hubungan induk-anak. *Prefab* adalah templat *GameObject* beserta komponen dan susunan *child*-nya yang dapat digunakan kembali, sehingga hierarki dan konvensi penamaan menjadi bagian penting dalam pemeliharaan objek (Unity Technologies 2026a). *Asset* 3D yang tidak mengikuti struktur seragam akan menyulitkan proses integrasi dengan logika navigasi. Pada sisi lain, data gedung dan fasilitas yang tidak memiliki relasi, identitas integrasi, serta aturan akses yang jelas berisiko menimbulkan ketidaksesuaian antara informasi pada *dashboard* dan objek pada *scene* *Unity*. Oleh karena itu, perancangan *asset* 3D perlu dilakukan bersama perancangan skema *database*, khususnya melalui atribut `unity_object_name` sebagai penghubung antara baris data dan *GameObject* di *Unity*.
 
-Pengelolaan data proyek juga membutuhkan pembatasan akses pada tingkat *database*. *Row Level Security* (RLS) adalah mekanisme yang membatasi baris data yang boleh dibaca atau diubah berdasarkan peran pengguna. *Audit log* adalah catatan berurutan mengenai tindakan perubahan data agar pelaku, jenis perubahan, dan waktu kejadian dapat ditelusuri (Putra et al. 2026). Kedua mekanisme tersebut menjadi konteks sistem bagi data yang dikelola penulis, tetapi rancangan dan implementasinya tidak dinyatakan sebagai kontribusi penulis. Laporan ini berfokus pada pembuatan dan penataan seluruh *asset* 3D gedung dan fasilitas yang memiliki *GameObject* pada *scene* *Unity*, penyusunan *prefab* serta *child* `Pointer`, perancangan skema melalui *Entity Relationship Diagram* (ERD), yaitu diagram yang menggambarkan entitas dan hubungannya, pengelolaan data gedung atau fasilitas, serta penjagaan konsistensi `unity_object_name` pada *asset* dan data.
+Pengelolaan data proyek juga membutuhkan pembatasan akses pada tingkat *database*. *Row Level Security* (RLS) adalah mekanisme yang membatasi baris data yang boleh dibaca atau diubah berdasarkan peran pengguna. Pada tingkat rancangan, penulis menetapkan kebutuhan kebijakan RLS untuk membedakan akses baca publik dan perubahan terautentikasi. *Audit log* adalah catatan berurutan mengenai tindakan perubahan data agar pelaku, jenis perubahan, dan waktu kejadian dapat ditelusuri (Putra et al. 2026). Penulis merancang struktur tabel `audit_logs`, sedangkan pencatatan melalui layanan Dashboard diimplementasikan Iman. Definisi trigger audit database tidak diklaim karena bukti SQL atau eksekusinya tidak tersedia. Laporan ini berfokus pada pembuatan dan penataan seluruh *asset* 3D gedung dan fasilitas yang memiliki *GameObject* pada *scene* *Unity*, penyusunan *prefab* serta *child* `Pointer`, perancangan skema melalui *Entity Relationship Diagram* (ERD), yaitu diagram yang menggambarkan entitas dan hubungannya, pengelolaan data gedung atau fasilitas, serta penjagaan konsistensi `unity_object_name` pada *asset* dan data.
 
 ## 1.2 Identifikasi Masalah
 
@@ -58,10 +58,10 @@ Ruang lingkup laporan ini dibatasi agar pembahasan tetap sesuai dengan kontribus
 2. Pembuatan dan penataan asset dilakukan langsung di Unity Editor tanpa membahas pemodelan menggunakan Blender.
 3. Pembahasan *asset* mencakup geometri, material, tekstur, *prefab*, hierarki, *child* `Pointer`, *GameObject* tujuan, dan konvensi penamaan. Material mengatur tampilan permukaan objek, sedangkan tekstur merupakan gambar atau pola yang diterapkan pada material. [BUTUH SITASI]
 4. Pembahasan database mencakup perancangan tabel dan relasi melalui ERD serta pengelolaan record `gedung` dan `fasilitas` yang terhubung dengan asset.
-5. RLS, Supabase Auth, dan pencatatan audit melalui layanan aplikasi dibahas sebagai konteks sistem, bukan sebagai rancangan atau implementasi penulis.
+5. Penulis merancang kebutuhan kebijakan RLS dan struktur tabel `audit_logs`. Supabase Auth serta layanan pencatatan audit pada Dashboard dibahas sebagai konteks implementasi Iman; SQL produksi RLS dan trigger audit database tidak diklaim tanpa bukti.
 6. `unity_object_name` digunakan sebagai identifier integrasi yang ditetapkan dan diperbaiki penulis pada record database serta GameObject tujuan.
 7. `DatabaseSyncChecker` adalah alat pada *Unity Editor* yang membandingkan nama tujuan pada *database* dengan nama *GameObject* pada *scene*. Penulis menggunakan alat tersebut untuk validasi, sedangkan kode alat merupakan kontribusi *3D Simulator* dan *Engine Developer*.
-8. Logika *NavMesh*, navigasi, kontrol pemain, optimasi *engine*, *API* utama, *dashboard* *React*, autentikasi, komunikasi `SendMessage`, *RLS*, dan layanan audit berada di luar kontribusi utama penulis. *API* pada batasan ini berarti antarmuka pertukaran data antarkomponen perangkat lunak.
+8. Logika *NavMesh*, navigasi, kontrol pemain, optimasi *engine*, *API* utama, *dashboard* *React*, autentikasi, komunikasi `SendMessage`, penerapan SQL produksi RLS, layanan audit Dashboard, dan trigger audit database berada di luar implementasi utama penulis. Perancangan kebutuhan kebijakan RLS dan struktur tabel `audit_logs` tetap termasuk kontribusi penulis. *API* pada batasan ini berarti antarmuka pertukaran data antarkomponen perangkat lunak.
 9. *Asset* disusun berdasarkan observasi visual, yaitu pengamatan bentuk dan kondisi melalui lokasi serta foto tanpa pengukuran dimensi menggunakan alat ukur. Hasilnya merupakan representasi visual, bukan model *as-built* dengan ketelitian dimensi arsitektural.
 
 Pembagian tanggung jawab tim dirangkum pada [TABREF:peran_tanggung_jawab].
@@ -71,9 +71,9 @@ Pembagian tanggung jawab tim dirangkum pada [TABREF:peran_tanggung_jawab].
 
 [TABLE]
 Peran | Tanggung Jawab Utama
-Desainer *Asset* 3D dan Desainer Skema *Database* | Merancang *asset* visual 3D dan hierarki *prefab* beserta `Pointer`, merancang skema *database* *Supabase* *PostgreSQL* dan ERD, mengelola data serta pemetaan *asset*, dan menjaga konsistensi `unity_object_name`.
+Desainer *Asset* 3D dan Desainer Skema *Database* | Merancang *asset* visual 3D dan hierarki *prefab* beserta `Pointer`, merancang skema *database* *Supabase* *PostgreSQL* dan ERD, merancang kebutuhan kebijakan RLS serta struktur tabel `audit_logs`, mengelola data serta pemetaan *asset*, dan menjaga konsistensi `unity_object_name`.
 *3D Simulator* dan *Engine Developer* | Mengembangkan *runtime* *Unity* *WebGL*, termasuk `BuildingDatabase`, `NavigationReceiver`, `DatabaseSyncChecker`, navigasi *NavMesh*, interaksi pengguna, optimasi performa, dan proses *build* *WebGL*.
-*Full Stack Web Developer*, *System Integrator*, dan *DevOps Engineer* | Mengembangkan *Public Dashboard* dan *Admin Panel* *React*, *REST API* pada *Vercel Serverless Functions*, integrasi *Supabase Auth* dan *CRUD*, *bridge* sisi *React*, pencatatan analitik aplikasi, pengujian *web*, serta *deployment* dan operasional layanan *web*; *Express* dan *Umami* dikelola sebagai jalur opsional.
+*Full Stack Web Developer*, *System Integrator*, dan *DevOps Engineer* | Mengembangkan Dashboard Publik dan Panel Admin *React*, *REST API* pada *Vercel Serverless Functions*, integrasi *Supabase Auth* dan *CRUD*, *bridge* sisi *React*, pencatatan analitik aplikasi, pengujian *web*, serta *deployment* dan operasional layanan *web*; *Express* dan *Umami* dikelola sebagai jalur opsional.
 [/TABLE]
 
 ## 1.4 Tujuan dan Manfaat
@@ -84,7 +84,7 @@ Tujuan penyusunan dan pelaksanaan proyek dalam lingkup laporan ini adalah sebaga
 
 1. Membuat dan menata asset 3D gedung dan fasilitas Kampus UPNVJ Pondok Labu secara langsung di Unity Editor.
 2. Menyusun hierarki prefab, child `Pointer`, dan GameObject tujuan dengan konvensi nama yang konsisten.
-3. Merancang skema database relasional dan ERD untuk data gedung, fasilitas, fakultas, program studi, pengguna administrator, dan riwayat perubahan.
+3. Merancang skema database relasional dan ERD untuk data gedung, fasilitas, fakultas, program studi, pengguna administrator, dan riwayat perubahan, termasuk kebutuhan kebijakan RLS serta struktur tabel `audit_logs`.
 4. Mengelola record gedung serta fasilitas agar atribut dan relasinya sesuai dengan asset yang direpresentasikan.
 5. Menetapkan dan memperbaiki `unity_object_name` pada database serta GameObject tujuan sebagai jembatan integrasi.
 6. Menggunakan `DatabaseSyncChecker` yang dikembangkan anggota tim untuk memvalidasi konsistensi asset dan data.
@@ -181,7 +181,7 @@ Kebutuhan teknis yang mendukung lingkup laporan ini adalah sebagai berikut:
 4. Berkas *SQL setup* dan *seed* digunakan sebagai sumber pemeriksaan struktur tabel, relasi, *constraint*, dan isi data (PostgreSQL Global Development Group 2026a; PostgreSQL Global Development Group 2026b).
 5. Endpoint */api/unity/names* menyediakan daftar `unity_object_name` untuk kebutuhan pemeriksaan pada Unity Editor.
 6. `DatabaseSyncChecker` yang dikembangkan Faiz digunakan Dwikhi untuk membandingkan identifier database dengan nama GameObject pada scene.
-7. Autentikasi, RLS, API, pencatatan audit melalui layanan aplikasi, dan deployment merupakan komponen integrasi yang diimplementasikan di luar kontribusi penulis.
+7. Autentikasi, penerapan SQL produksi RLS, API, pencatatan audit melalui layanan aplikasi, dan deployment merupakan komponen integrasi yang diimplementasikan di luar kontribusi penulis; kebutuhan kebijakan RLS tetap dirancang pada tingkat integrasi.
 
 ### 2.2.3 Identifikasi Kebutuhan Non-Fungsional
 
@@ -259,7 +259,7 @@ Tabel | Fungsi | Relasi atau Batasan Utama
 `program_studi` | Menyimpan program studi dan akreditasi | Foreign key `id_fakultas` ke `fakultas`; kombinasi nama, jenjang, dan fakultas unik
 [/TABLE]
 
-Penulis merancang entitas, atribut, relasi, serta batasan pada ERD inti. Berkas SQL kemudian diintegrasikan ke repositori web oleh Iman. Skema sistem terkini juga memiliki empat tabel Denah 2D dan tiga tabel pendukung untuk profil administrator, audit, dan analitik. Tujuh tabel tersebut dijelaskan sebagai konteks sistem dan tidak diklaim sebagai rancangan inti penulis. Supabase Auth, RLS, serta pencatatan audit melalui layanan aplikasi juga berada di luar kontribusi Dwikhi.
+Penulis merancang entitas, atribut, relasi, serta batasan pada ERD inti dan struktur tabel `audit_logs`, serta menetapkan kebutuhan kebijakan RLS pada tingkat rancangan. Berkas SQL kemudian diintegrasikan ke repositori web oleh Iman. Skema sistem terkini juga memiliki empat tabel Denah 2D dan tiga tabel pendukung untuk profil administrator, audit, dan analitik. Tujuh tabel tersebut dijelaskan sebagai konteks sistem dan tidak diklaim sebagai rancangan inti penulis. Layanan pencatatan audit Dashboard diimplementasikan Iman; trigger audit database dan penerapan SQL produksi RLS tidak diklaim tanpa bukti.
 
 ### 2.3.5 Perancangan Pengelolaan Seed dan Kualitas Data
 
@@ -411,7 +411,7 @@ Secara teknis, implementasi mengikuti aturan berikut:
 
 ### 3.2.3 Implementasi Rancangan Skema dan Pengelolaan Data di Supabase
 
-Rancangan data inti penulis mencakup tabel `gedung`, `fasilitas`, `fakultas`, dan `program_studi`. Keempat tabel tersebut membentuk hubungan data lokasi kampus yang digunakan sebagai dasar pengelolaan gedung, fasilitas, dan program studi. *Data Definition Language* (DDL) merupakan bagian *SQL* yang secara khusus mendefinisikan struktur seperti tabel, kolom, dan batasannya. [BUTUH SITASI] Berkas *setup* sistem yang kemudian diintegrasikan Iman ke repositori *web* memuat tujuh tabel tambahan untuk autentikasi, audit aplikasi, analitik lama, dan Denah 2D. Tabel tambahan tersebut merupakan konteks sistem dan tidak diklaim sebagai rancangan inti penulis. Potongan DDL berikut hanya menampilkan empat tabel inti yang dirancang Dwikhi. Berkas *setup* digunakan sebagai sumber dokumentasi struktural dan tidak dijalankan saat penyusunan laporan karena memuat operasi penghapusan tabel.
+Rancangan data inti penulis mencakup tabel `gedung`, `fasilitas`, `fakultas`, dan `program_studi`. Keempat tabel tersebut membentuk hubungan data lokasi kampus yang digunakan sebagai dasar pengelolaan gedung, fasilitas, dan program studi. Penulis juga merancang struktur tabel `audit_logs` dan kebutuhan kebijakan RLS sebagai bagian dari rancangan integrasi. *Data Definition Language* (DDL) merupakan bagian *SQL* yang secara khusus mendefinisikan struktur seperti tabel, kolom, dan batasannya. [BUTUH SITASI] Berkas *setup* sistem yang kemudian diintegrasikan Iman ke repositori *web* memuat tujuh tabel tambahan untuk autentikasi, audit aplikasi, analitik lama, dan Denah 2D. Tabel tambahan tersebut merupakan konteks sistem dan tidak diklaim sebagai rancangan inti penulis. Potongan DDL berikut hanya menampilkan empat tabel inti yang dirancang Dwikhi. Berkas *setup* digunakan sebagai sumber dokumentasi struktural dan tidak dijalankan saat penyusunan laporan karena memuat operasi penghapusan tabel.
 
 Pada pemetaan asset, Masjid memiliki representasi visual atau GameObject tersendiri, tetapi record datanya berada pada tabel `fasilitas` dengan `id_gedung = 6`, yaitu Gedung Ki Hadjar Dewantara. Record Gedung Soepomo, Gedung Soetomo, Yos Sudarso, RA Kartini, Lapangan Basket, dan entitas gedung lainnya tetap diperlakukan sebagai entitas database yang berbeda.
 
@@ -463,7 +463,7 @@ ERD empat tabel inti, DDL dokumentasi, dan seed menjadi bukti perancangan data o
 
 ### 3.2.4 Batas Integrasi Akses Data dan Pencatatan Audit
 
-RLS dan Supabase Auth membatasi akses data pada sistem, sedangkan pencatatan audit dilakukan oleh layanan aplikasi ketika operasi pengelolaan data dijalankan. Mekanisme tersebut memengaruhi record yang dikelola penulis, tetapi konfigurasi akses, autentikasi, dan layanan audit bukan kontribusi Dwikhi. Berkas setup yang diperiksa memuat kebijakan RLS dan tidak memuat definisi trigger audit. Oleh karena itu, laporan tidak mengatribusikan RLS, Auth, maupun trigger kepada penulis. Tangkapan dashboard audit hanya digunakan sebagai konteks bahwa perubahan record dapat ditelusuri melalui sistem.
+RLS dan Supabase Auth membatasi akses data pada sistem. Dalam lingkup Dwikhi, kebijakan RLS dirancang sebagai kebutuhan akses baca publik dan perubahan terautentikasi, bukan diklaim sebagai penerapan SQL produksi. Penulis juga merancang skema tabel `audit_logs`, sedangkan pencatatan audit dilakukan oleh layanan Dashboard yang diimplementasikan Iman. Berkas *setup* yang diperiksa tidak memuat definisi trigger audit database. Tangkapan Dashboard audit hanya digunakan sebagai konteks bahwa perubahan record dapat ditelusuri melalui sistem.
 
 ### 3.2.5 Implementasi Pemetaan unity_object_name pada Asset dan Database
 
@@ -782,7 +782,7 @@ Pemisahan entitas gedung | Gedung Soepomo, Gedung Soetomo, Yos Sudarso, RA Karti
 Kemutakhiran nama belum terjamin | Pengumpulan lapangan dilakukan mandiri dengan informasi ruangan yang terbatas | Nama atau fungsi ruang dapat berbeda dari kondisi terbaru | Verifikasi melalui pengelola gedung, denah terbaru, atau sumber institusi serta catat tanggal verifikasi
 [/TABLE]
 
-Kontribusi penulis pada bagian database adalah perancangan empat tabel inti dan ERD, pengelolaan record gedung atau fasilitas, serta pemetaan `unity_object_name`. RLS, Supabase Auth, dan pencatatan audit melalui layanan aplikasi hanya menjadi konteks sistem, sedangkan API serta dashboard diatribusikan kepada Iman. Keberhasilan pengelolaan data dinilai melalui struktur relasi, kualitas seed, dan konsistensi nama, bukan melalui kepemilikan konfigurasi akses atau layanan audit.
+Kontribusi penulis pada bagian database adalah perancangan empat tabel inti dan ERD, kebutuhan kebijakan RLS, struktur tabel `audit_logs`, pengelolaan record gedung atau fasilitas, serta pemetaan `unity_object_name`. Supabase Auth, pencatatan audit melalui layanan aplikasi, API, serta Dashboard diatribusikan sebagai konteks implementasi Iman. Keberhasilan pengelolaan data dinilai melalui struktur relasi, kualitas seed, dan konsistensi nama, bukan melalui klaim penerapan SQL produksi atau trigger audit database.
 
 ## 3.5 Hasil Pengujian Proyek
 
@@ -845,7 +845,7 @@ Asset lain dalam scope | Render dan hierarki | Struktur asset dan objek tujuan d
 
 ### 3.5.5 Validasi Konsistensi Asset dan Database
 
-Validasi konsistensi memeriksa bahwa setiap `unity_object_name` dalam cakupan memiliki tepat satu padanan GameObject tujuan dan tidak terdapat nama ganda. Pengujian juga perlu memastikan perbedaan kapitalisasi ditangani sesuai kontrak runtime tanpa mengabaikan konvensi penulisan proyek. Hasil yang terlihat pada [FIGREF:impl_sync_db_checker] dirangkum pada [TABREF:hasil_sync_checker_awal].
+Validasi konsistensi memeriksa bahwa setiap `unity_object_name` dalam cakupan memiliki tepat satu padanan GameObject tujuan dan tidak terdapat nama ganda. Pengujian juga perlu memastikan perbedaan kapitalisasi ditangani sesuai ketentuan integrasi saat Unity dijalankan tanpa mengabaikan konvensi penulisan proyek. Hasil yang terlihat pada [FIGREF:impl_sync_db_checker] dirangkum pada [TABREF:hasil_sync_checker_awal].
 
 [TABLE-ID:hasil_sync_checker_awal]
 [TABLECAPTION:Hasil Awal Pemeriksaan Konsistensi Nama]
@@ -903,7 +903,7 @@ Kesimpulan yang dapat dirumuskan berdasarkan bukti yang telah tersedia adalah se
 1. Penulis membuat dan menata asset 3D gedung dan fasilitas yang memiliki GameObject pada scene Unity menggunakan observasi visual dan dokumentasi fotografis tanpa pengukuran dimensi instrumental. Sebelas pasangan render dan hierarki diposisikan sebagai sampel bukti representatif, bukan batas jumlah asset. Inventaris 37 material dan tekstur awal telah dicocokkan dengan proyek Unity sumber. Dari 30 berkas tambahan, dua referensi tekstur diterapkan pada Gedung Utama/Jenderal Soedirman, 21 referensi warna digunakan pada material Unity, logo Mandiri digunakan pada asset gedung bank pelengkap lingkungan, lima berkas alat olahraga digunakan pada objek di depan Gedung Dewi Sartika, dan satu berkas warna digunakan pada asset patung. Data GameObject, mesh, vertex, dan ukuran prefab untuk tiga asset digunakan sebagai dokumentasi keadaan asset, bukan hasil pengujian performa.
 2. Penulis menyusun hierarki prefab, child `Pointer`, dan GameObject tujuan serta menetapkan `unity_object_name` untuk memisahkan geometri visual dari identifier navigasi. Hierarki Dewi Sartika memperlihatkan salah satu contoh penerapan melalui objek tujuan `dewi_sartika`.
 3. Kontribusi database penulis meliputi perancangan empat tabel inti dalam ERD serta pengelolaan record gedung atau fasilitas. Setup sistem memuat tujuh tabel ekstensi yang tidak diklaim sebagai rancangan inti Dwikhi. Seed final memuat 19 gedung dan 311 fasilitas, sedangkan data Supabase aktif yang diperiksa masih memuat 19 gedung dan 331 fasilitas. Perbedaan ini dipertahankan secara eksplisit karena seed final belum diterapkan ulang pada database aktif.
-4. RLS, Supabase Auth, dan pencatatan audit melalui layanan aplikasi memengaruhi data yang dikelola penulis, tetapi merupakan konteks integrasi dan bukan rancangan atau implementasi Dwikhi. Hasil pengujian bersama hanya digunakan untuk memastikan jalur baca, perubahan data, dan pencatatan sistem tersedia.
+4. Penulis merancang kebutuhan kebijakan RLS dan struktur tabel `audit_logs`. Supabase Auth serta layanan pencatatan audit Dashboard merupakan konteks implementasi Iman, sedangkan trigger audit database dan SQL produksi RLS tidak diklaim tanpa bukti. Hasil pengujian bersama hanya digunakan untuk memastikan jalur baca, perubahan data, dan pencatatan sistem tersedia.
 5. Dwikhi menggunakan `DatabaseSyncChecker` buatan Faiz untuk memeriksa konsistensi nama. Tangkapan pertama mencatat 97 nama pada database, 57 ditemukan pada *scene*, 40 hanya terdapat pada database, dan 18 hanya terdapat pada *scene*. Tangkapan lain mencatat 323 nama, 320 ditemukan, 3 hanya pada database, dan 14 hanya pada *scene*. Kedua hasil belum dapat dibandingkan sebagai sebelum-sesudah karena versi *scene*, endpoint, waktu, dan daftar koreksi tidak tercatat bersama.
 
 ## 4.2 Saran
@@ -920,20 +920,6 @@ Saran pengembangan awal adalah sebagai berikut:
 
 # DAFTAR PUSTAKA
 
-PostgreSQL Global Development Group (2026a). _PostgreSQL 18 documentation: Constraints_. https://www.postgresql.org/docs/18/ddl-constraints.html
-
-PostgreSQL Global Development Group (2026b). _PostgreSQL 18 documentation: The SQL language_. https://www.postgresql.org/docs/current/sql.html
-
-Unity Technologies (2026a). _Unity 6 Manual: Prefabs_. https://docs.unity3d.com/6000.0/Documentation/Manual/Prefabs.html
-
-Unity Technologies (2026b). _Unity 6 Manual: ProBuilder_. https://docs.unity3d.com/6000.0/Documentation/Manual/com.unity.probuilder.html
-
-React (2026). _Describing the UI_. https://react.dev/learn/describing-the-ui
-
-Supabase (2026). _Data REST API_. https://supabase.com/docs/guides/api
-
-Vercel (2026). _Vercel Functions_. https://vercel.com/docs/functions
-
 Afiifah, K., Azzahra, Z. F., dan Anggoro, A. D. (2022). Analisis teknik Entity-Relationship Diagram dalam perancangan database: Sebuah literature review. _INTECH (Informatika dan Teknologi)_, 3(1), 8–11. https://doi.org/10.54895/intech.v3i1.1261
 
 Aliyah, A., Hartono, N., dan Muin, A. A. (2025). Penggunaan User Acceptance Testing (UAT) pada pengujian sistem informasi pengelolaan keuangan dan inventaris barang. _Switch: Jurnal Sains dan Teknologi Informasi_, 3(2), 42–58. https://doi.org/10.62951/switch.v3i1.330
@@ -944,17 +930,31 @@ Maulida, M., Zahro, F., Hakim, R., dan Akbar, M. S. (2025). Pengujian black box 
 
 Muharam, Y., Anggara, M. B., dan Hanafi, T. J. (2023). Implementasi peta 3 dimensi menggunakan metode IMSDD (Interactive Multimedia System Design and Development) dan WebGL API berbasis web (Studi kasus di SMP Karya Pembangunan 2 Majalaya). _COMPUTING: Jurnal Informatika_, 10(1), 37–42. https://doi.org/10.55222/computing.v10i01.1155
 
+PostgreSQL Global Development Group (2026a). _PostgreSQL 18 documentation: Constraints_. https://www.postgresql.org/docs/18/ddl-constraints.html
+
+PostgreSQL Global Development Group (2026b). _PostgreSQL 18 documentation: The SQL language_. https://www.postgresql.org/docs/current/sql.html
+
 Pricillia, T., dan Zulfachmi (2021). Perbandingan metode pengembangan perangkat lunak (Waterfall, Prototype, RAD). _Jurnal Bangkit Indonesia_, 10(1), 6–12. https://doi.org/10.52771/bangkitindonesia.v10i1.153
 
 Putra, I. G. W. W., Dharma, E. M., dan Permana, P. T. H. (2026). Implementasi relational database dengan Row-Level Security (RLS) pada sistem inventory menggunakan Supabase dan React Native Expo (Studi kasus Bengkel Sari Merta). _JATI (Jurnal Mahasiswa Teknik Informatika)_, 10(2), 2443–2448. https://doi.org/10.36040/jati.v10i2.17551
 
+React (2026). _Describing the UI_. https://react.dev/learn/describing-the-ui
+
+Supabase (2026). _Data REST API_. https://supabase.com/docs/guides/api
+
 Taurusta, C., Asiddiq, A. M., Suprianto, S., dan Setiawan, H. (2024). Visualisasi gedung kampus 1 Universitas Muhammadiyah Sidoarjo menggunakan augmented reality sebagai media informasi. _Journal of Technology and System Information_, 1(1), 55–70. https://doi.org/10.47134/jtsi.v1i1.2146
+
+Unity Technologies (2026a). _Unity 6 Manual: Prefabs_. https://docs.unity3d.com/6000.0/Documentation/Manual/Prefabs.html
+
+Unity Technologies (2026b). _Unity 6 Manual: ProBuilder_. https://docs.unity3d.com/6000.0/Documentation/Manual/com.unity.probuilder.html
 
 UPNVJ. (2022). Lokasi Kampus UPN Veteran Jakarta. https://www.upnvj.ac.id/id/tentang-upn/lokasi-kampus.html
 
 UPNVJ. (2025a). Kantin. https://www.upnvj.ac.id/id/fasilitas/kantin.html
 
 UPNVJ. (2026). Rapat koordinasi Humas UPNVJ 2026: Fokus strategi komunikasi digital dan media sosial perguruan tinggi. https://www.upnvj.ac.id/id/berita/2026/02/rapat-koordinasi-humas-upnvj-2026-fokus-strategi-komunikasi-digital-dan-media-sosial-perguruan-tinggi.html
+
+Vercel (2026). _Vercel Functions_. https://vercel.com/docs/functions
 
 ---
 
@@ -994,7 +994,7 @@ Identitas pengambil gambar, tanggal dan lokasi sebagian foto, serta sumber atau 
 
 # LAMPIRAN 4. Skema Database dan Bukti Pengelolaan Data
 
-Bukti yang tersedia adalah ERD empat tabel inti, berkas setup, DDL dokumentasi, inventaris constraint produksi, contoh nilai `unity_object_name`, serta inventaris seed final berisi 311 fasilitas pada 19 gedung. Daftar rinci fasilitas per gedung dan lantai dimuat setelah paragraf ini. Tanggal versi awal ERD, ekspor constraint produksi lengkap, catatan keputusan desain, ekspor data sebelum dan sesudah koreksi, serta daftar pemetaan seluruh GameObject tidak tersedia. Keterbatasan tersebut dinyatakan secara eksplisit dan tidak digantikan dengan klaim penerapan DDL atau pengujian ulang pada database aktif. Konfigurasi RLS, Auth, dan layanan audit bukan bukti kontribusi Dwikhi.
+Bukti yang tersedia adalah ERD empat tabel inti, rancangan kebutuhan kebijakan RLS, skema tabel `audit_logs`, berkas setup, DDL dokumentasi, inventaris constraint produksi, contoh nilai `unity_object_name`, serta inventaris seed final berisi 311 fasilitas pada 19 gedung. Daftar rinci fasilitas per gedung dan lantai dimuat setelah paragraf ini. Tanggal versi awal ERD, ekspor constraint produksi lengkap, catatan keputusan desain, ekspor data sebelum dan sesudah koreksi, serta daftar pemetaan seluruh GameObject tidak tersedia. Keterbatasan tersebut dinyatakan secara eksplisit dan tidak digantikan dengan klaim penerapan DDL, SQL produksi RLS, trigger audit, atau pengujian ulang pada database aktif. Layanan audit Dashboard tetap merupakan implementasi Iman.
 
 <!-- PIPELINE:INCLUDE content/roles/dwikhi/facility-seed-inventory.md -->
 

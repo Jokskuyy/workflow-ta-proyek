@@ -10,8 +10,9 @@ Branch `laporan/dwikhi` mendokumentasikan peran Desainer Asset 3D dan Desainer S
 4. Pengelolaan seed gedung dan fasilitas.
 5. Pemetaan `unity_object_name` antara record dan GameObject tujuan.
 6. Penggunaan `DatabaseSyncChecker` buatan Faiz untuk memeriksa konsistensi asset dan data.
+7. Perancangan kebutuhan kebijakan RLS dan skema tabel `audit_logs` tanpa mengklaim penerapan SQL produksi atau trigger audit database.
 
-Tabel Denah 2D, Supabase Auth, RLS, layanan audit, frontend, API, runtime Unity, dan deployment hanya dijelaskan sebagai konteks integrasi. Iman menangani integrasi SQL ke repositori web. Faiz menangani kode pemeriksa, runtime Unity, navigasi, optimasi, dan build WebGL.
+Tabel Denah 2D, Supabase Auth, layanan audit pada Dashboard, frontend, API, runtime Unity, dan deployment hanya dijelaskan sebagai konteks integrasi. Iman menangani integrasi SQL ke repositori web serta layanan audit Dashboard. Faiz menangani kode pemeriksa, runtime Unity, navigasi, optimasi, dan build WebGL. RLS dibahas sebagai kebijakan yang dirancang pada tingkat kebutuhan dan tidak diklaim sebagai SQL produksi; trigger audit database tidak diklaim tanpa bukti.
 
 ## Diagram Aktif
 
@@ -29,7 +30,7 @@ Sumber diagram berada di folder `diagrams/` dan menggunakan PlantUML sebagai sum
 2. Seed final 19 gedung dan 311 fasilitas dibedakan dari snapshot Supabase aktif 19 gedung dan 331 fasilitas.
 3. Hasil sinkronisasi 320 cocok, 3 hanya pada database, dan 14 hanya pada scene diperlakukan sebagai snapshot lama.
 4. Provenance foto atau tekstur yang tidak tersedia dinyatakan sebagai keterbatasan.
-5. RLS, Auth, dan layanan audit bukan kontribusi Dwikhi.
+5. Dwikhi merancang kebutuhan kebijakan RLS dan skema tabel `audit_logs`; penerapan layanan audit Dashboard ditangani Iman, sedangkan trigger audit database tidak diklaim tanpa bukti.
 
 ## Acuan
 

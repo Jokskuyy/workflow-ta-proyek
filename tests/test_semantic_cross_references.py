@@ -240,7 +240,7 @@ def test_required_technical_terms_are_split_and_formatted_without_field_damage()
     ]
 
 
-def test_confirmed_product_names_and_acronyms_are_italic_12pt():
+def test_confirmed_product_names_are_italic_and_acronyms_are_regular():
     root = LET.Element(f"{{{W}}}document")
     body = LET.SubElement(root, f"{{{W}}}body")
     paragraph = LET.SubElement(body, f"{{{W}}}p")
@@ -250,7 +250,7 @@ def test_confirmed_product_names_and_acronyms_are_italic_12pt():
 
     count = fmt.apply_required_inline_term_formatting(root, NS)
 
-    assert count == 9
+    assert count == 4
     italic_texts = []
     for candidate in paragraph.findall("w:r", NS):
         props = candidate.find("w:rPr", NS)
@@ -261,9 +261,13 @@ def test_confirmed_product_names_and_acronyms_are_italic_12pt():
         assert props.find("w:szCs", NS).get(f"{{{W}}}val") == "24"
         italic_texts.append("".join(candidate.itertext()))
 
-    assert italic_texts == [
-        "Unity", "React", "Supabase", "PostgreSQL", "API", "SQL", "RLS", "UAT", "WebGL"
-    ]
+    assert italic_texts == ["Unity", "React", "Supabase", "PostgreSQL"]
+    fmt.normalize_regular_technical_terms(root, NS)
+    for candidate in paragraph.findall("w:r", NS):
+        text_value = "".join(candidate.itertext()).strip()
+        if text_value in {"API", "SQL", "RLS", "UAT", "WebGL"}:
+            props = candidate.find("w:rPr", NS)
+            assert props is None or props.find("w:i", NS) is None
 
 
 def test_every_explicit_9pt_size_is_normalized_to_12pt():

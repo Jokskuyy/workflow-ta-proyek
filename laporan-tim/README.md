@@ -7,7 +7,7 @@ Folder ini berisi **panduan & kerangka laporan** untuk tiap anggota tim. Penulis
 | Anggota | Peran | Branch |
 |---|---|---|
 | **Muhammad Iman Nugraha** (2210511129) | Full Stack Developer & System Integrator | `laporan/iman` |
-| **Muhammad Dwikhi Deandra Purnianto** | Desainer Asset 3D dan Desainer Skema Database | `laporan/dwikhi` |
+| **Dwikhi Deandra Purnianto** (2210511131) | Desainer Asset 3D dan Desainer Skema Database; perancangan kebutuhan kebijakan RLS dan skema `audit_logs` | `laporan/dwikhi` |
 | **Muammar Faiz Khairul Anam** | 3D Simulator & Engine Developer | `laporan/faiz` |
 
 ## Isi Folder

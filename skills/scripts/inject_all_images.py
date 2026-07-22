@@ -312,6 +312,97 @@ def generate_drawing_xml(r_id, cx, cy, name, docpr_id, max_height_emu=None):
     return lxml.etree.fromstring(xml)
 
 
+def restore_post_com_typography(doc_root):
+    """Restore typography that Word COM may flatten while updating fields.
+
+    This pass is deliberately structural: it does not touch hyperlinks,
+    drawings, or field instructions. CodeBlock paragraphs and inline code are
+    restored first, then the shared technical-term formatter is reused when
+    available so paragraph and table terminology follows the same registry.
+    """
+    namespaces = {'w': WORD_NS}
+    ns = WORD_NS
+    def set_font(rpr, name, size='24', italic=False):
+        fonts = rpr.find('w:rFonts', namespaces)
+        if fonts is None:
+            fonts = lxml.etree.Element(f'{{{ns}}}rFonts')
+            rpr.insert(0, fonts)
+        for attr in ('ascii', 'hAnsi', 'cs'):
+            fonts.set(f'{{{ns}}}{attr}', name)
+        for tag in ('sz', 'szCs'):
+            elem = rpr.find(f'w:{tag}', namespaces)
+            if elem is None:
+                elem = lxml.etree.SubElement(rpr, f'{{{ns}}}{tag}')
+            elem.set(f'{{{ns}}}val', str(size))
+        for tag in ('i', 'iCs'):
+            elem = rpr.find(f'w:{tag}', namespaces)
+            if italic and elem is None:
+                lxml.etree.SubElement(rpr, f'{{{ns}}}{tag}')
+            elif not italic and elem is not None:
+                rpr.remove(elem)
+
+    front_matter = True
+    for paragraph in doc_root.findall('.//w:p', namespaces):
+        style = _para_style(paragraph, namespaces)
+        is_caption = style == 'Caption'
+        is_codeblock = style == 'CodeBlock'
+        paragraph_text = _para_text(paragraph)
+        if re.match(r'^BAB\s+(?:[IVXLCDM]+|\d+)', paragraph_text, re.IGNORECASE):
+            front_matter = False
+        if paragraph.find('.//w:drawing', namespaces) is not None or is_caption:
+            ppr = paragraph.find('w:pPr', namespaces)
+            if ppr is None:
+                ppr = lxml.etree.Element(f'{{{ns}}}pPr')
+                paragraph.insert(0, ppr)
+            for tag in ('keepNext', 'keepLines'):
+                if ppr.find(f'w:{tag}', namespaces) is None:
+                    lxml.etree.SubElement(ppr, f'{{{ns}}}{tag}')
+        for run in paragraph.findall('.//w:r', namespaces):
+            if any(a.tag == f'{{{ns}}}hyperlink' for a in run.iterancestors()):
+                continue
+            if run.find('w:instrText', namespaces) is not None or run.find('w:fldChar', namespaces) is not None:
+                rpr = run.find('w:rPr', namespaces)
+                if rpr is not None:
+                    for tag in ('i', 'iCs'):
+                        elem = rpr.find(f'w:{tag}', namespaces)
+                        if elem is not None:
+                            rpr.remove(elem)
+                continue
+            rpr = run.find('w:rPr', namespaces)
+            if rpr is None:
+                rpr = lxml.etree.Element(f'{{{ns}}}rPr')
+                run.insert(0, rpr)
+            if is_codeblock:
+                set_font(rpr, 'Courier New', '24', italic=True)
+            else:
+                if front_matter and not is_caption:
+                    # Word COM occasionally changes front-matter runs to the
+                    # template's fallback font or 9 pt. Preserve intentional
+                    # larger headings, but restore the report body baseline.
+                    set_font(rpr, 'Times New Roman', '24' if style != 'Heading1' else '28', italic=False)
+                fonts = rpr.find('w:rFonts', namespaces)
+                font_text = '' if fonts is None else ' '.join(
+                    fonts.get(f'{{{ns}}}{attr}', '') for attr in ('ascii', 'hAnsi', 'cs')
+                )
+                if 'Consolas' in font_text or 'Courier New' in font_text:
+                    set_font(rpr, 'Times New Roman', '24', italic=True)
+                if is_caption:
+                    for tag in ('i', 'iCs'):
+                        elem = rpr.find(f'w:{tag}', namespaces)
+                        if elem is not None:
+                            rpr.remove(elem)
+
+    try:
+        from format_ta_proyek import (
+            apply_required_inline_term_formatting,
+            normalize_regular_technical_terms,
+        )
+        apply_required_inline_term_formatting(doc_root, namespaces)
+        normalize_regular_technical_terms(doc_root, namespaces)
+    except Exception as exc:
+        print(f"[WARN] post-COM technical term restoration skipped: {exc}")
+
+
 def inject_all_images(docx_path):
     print(f"Injecting all images into {docx_path}...")
     temp_dir = "temp_inject_dir"
@@ -830,6 +921,9 @@ def inject_all_images(docx_path):
                 f'Post-COM TOC pass: restored bookmark {toc_anchor} '
                 'in the final defensive pass.'
             )
+
+    # Restore typography and keep properties after Word COM has updated fields.
+    restore_post_com_typography(doc_root)
 
     # Write changes
     rels_tree.write(rels_path, encoding='utf-8', xml_declaration=True)

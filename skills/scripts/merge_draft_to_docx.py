@@ -145,7 +145,14 @@ def infer_workspace_root(md_path):
     """Infer a repository root for direct parsing of a draft or wrapper file."""
     source = Path(md_path).resolve()
     for candidate in (source.parent, *source.parents):
-        if (candidate / ".git").exists() or (candidate / "AGENTS.md").is_file():
+        if (
+            (candidate / ".git").exists()
+            or (candidate / "AGENTS.md").is_file()
+            or (
+                (candidate / "content" / "shared").is_dir()
+                and (candidate / "Tugas_Akhir_Draft.md").is_file()
+            )
+        ):
             return candidate
     return source.parent
 
@@ -1003,7 +1010,9 @@ def parse_bibliography_entries(draft_path_or_text):
     """Read the '# DAFTAR PUSTAKA' section -> :class:`BibliographyResult`.
 
     Each non-empty line under the heading (until the next '#' heading or a
-    '---' horizontal rule) is one entry, in order of appearance (R1.1, R1.4).
+    '---' horizontal rule) is one entry. Entries are returned in alphabetical
+    author/year order so the Markdown body and bibliography SDT share one
+    deterministic order.
     If the heading is absent, an empty result with ``section_found=False`` is
     returned (R1.8).
     """
@@ -1031,6 +1040,7 @@ def parse_bibliography_entries(draft_path_or_text):
             authors=_parse_authors(stripped),
             year=(ym.group(1).lower() if ym else None),
         ))
+    entries.sort(key=reference_key)
     return BibliographyResult(entries, section_found=True)
 
 
@@ -1356,7 +1366,9 @@ def emit_runs(p_elem, tokens, default_rPr=None, rel_manager=None):
 
     TEXT tokens replicate the baseline rPr byte-for-byte (Times New Roman,
     sz/szCs 24, optional w:b/bCs and w:i/iCs) so balanced/plain text is
-    identical to the frozen oracle. CODE tokens use Consolas. LINK tokens wrap a
+    identical to the frozen oracle. Inline CODE tokens use Times New Roman
+    12 pt italic, while fenced blocks use the CodeBlock style and Courier New.
+    LINK tokens wrap a
     run inside a ``w:hyperlink`` carrying an r:id allocated by ``rel_manager``
     (falls back to a plain run when no rel_manager is supplied).
     """
@@ -1380,11 +1392,14 @@ def emit_runs(p_elem, tokens, default_rPr=None, rel_manager=None):
             r = lxml.etree.Element(f'{{{ns_uri}}}r')
             rPr = lxml.etree.SubElement(r, f'{{{ns_uri}}}rPr')
             lxml.etree.SubElement(rPr, f'{{{ns_uri}}}rFonts', {
-                f'{{{ns_uri}}}ascii': 'Consolas',
-                f'{{{ns_uri}}}hAnsi': 'Consolas'
+                f'{{{ns_uri}}}ascii': 'Times New Roman',
+                f'{{{ns_uri}}}hAnsi': 'Times New Roman',
+                f'{{{ns_uri}}}cs': 'Times New Roman',
             })
-            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '18'})
-            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '18'})
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}i')
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}iCs')
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '24'})
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '24'})
             t = lxml.etree.SubElement(r, f'{{{ns_uri}}}t')
             t.text = tok.text
             if tok.text.startswith(' ') or tok.text.endswith(' '):
@@ -1606,7 +1621,7 @@ def build_code_block_elements(item):
     for line in item['lines']:
         p = lxml.etree.Element(f'{{{ns_uri}}}p')
         pPr = lxml.etree.SubElement(p, f'{{{ns_uri}}}pPr')
-        lxml.etree.SubElement(pPr, f'{{{ns_uri}}}pStyle', {f'{{{ns_uri}}}val': 'Normal'})
+        lxml.etree.SubElement(pPr, f'{{{ns_uri}}}pStyle', {f'{{{ns_uri}}}val': 'CodeBlock'})
         lxml.etree.SubElement(pPr, f'{{{ns_uri}}}jc', {f'{{{ns_uri}}}val': 'left'})
         
         lxml.etree.SubElement(pPr, f'{{{ns_uri}}}ind', {
@@ -1625,11 +1640,14 @@ def build_code_block_elements(item):
         rPr = lxml.etree.SubElement(r, f'{{{ns_uri}}}rPr')
         
         lxml.etree.SubElement(rPr, f'{{{ns_uri}}}rFonts', {
-            f'{{{ns_uri}}}ascii': 'Consolas',
-            f'{{{ns_uri}}}hAnsi': 'Consolas'
+            f'{{{ns_uri}}}ascii': 'Courier New',
+            f'{{{ns_uri}}}hAnsi': 'Courier New',
+            f'{{{ns_uri}}}cs': 'Courier New',
         })
-        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '18'})
-        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '18'})
+        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}i')
+        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}iCs')
+        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '24'})
+        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '24'})
         
         t = lxml.etree.SubElement(r, f'{{{ns_uri}}}t')
         t.text = line
