@@ -34,7 +34,7 @@ else (Denah 3D)
     :Unity mengirim OnNavigationCompleted\ndengan JSON unity_object_name;
     :React memvalidasi tujuan aktif\ndan menampilkan notifikasi;
   else (Dibatalkan atau target tidak ditemukan)
-    :Unity menghentikan proses\ntanpa callback kedatangan;
+    :Unity menghentikan proses\ntanpa pemberitahuan tujuan tercapai;
   endif
 endif
 stop

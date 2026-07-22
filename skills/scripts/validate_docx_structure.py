@@ -1355,7 +1355,8 @@ def main():
                 errors_found.append(f"Gambar caption {idx} '{text}' is missing w:keepLines (caption may split across pages)")
     
     # H. Check for orphan code text outside code-styled paragraphs
-    # After font normalization, code blocks have: sz=18 (9pt) + ind left=720, no Consolas
+    # After font normalization, code blocks have: sz=24 (12pt) + ind left=720, no Consolas.
+    # Keep sz=18 as a compatibility fallback for older fixture documents.
     print("Checking for orphan code text outside code blocks...")
     code_markers = ['$$ LANGUAGE plpgsql', 'CREATE TRIGGER', 'CREATE OR REPLACE FUNCTION',
                     'EXECUTE FUNCTION', 'RETURNS TRIGGER AS $$']
@@ -1369,13 +1370,13 @@ def main():
         pStyle_val = pStyle.get(f'{{{ns_w}}}val') if pStyle is not None else ""
         if 'code' in pStyle_val.lower():
             continue
-        # Detect code block by sz=18 (9pt) + ind left=720
+        # Detect code block by sz=24 (12pt) + ind left=720
         is_code_block = False
         ind_elem = pPr.find('w:ind', namespaces) if pPr is not None else None
         left_val = ind_elem.get(f'{{{ns_w}}}left', '0') if ind_elem is not None else '0'
         if left_val == '720':
             for sz_el in p.findall('.//w:sz', namespaces):
-                if sz_el.get(f'{{{ns_w}}}val') == '18':
+                if sz_el.get(f'{{{ns_w}}}val') in {'24', '18'}:
                     is_code_block = True
                     break
         # Also check for Consolas font (pre-normalization)

@@ -44,7 +44,7 @@ Rekap anonim pada [TABREF:lampiran_rekap_responden_uat] menunjukkan kelengkapan 
 [TABLECAPTION:Rekap Anonim Respons UAT]
 
 [TABLE]
-Kode Peserta | Skor Dashboard Publik | Skor Dashboard Admin | Kelengkapan
+Kode | Skor Publik | Skor Admin | Kelengkapan
 R-01 | 39 dari 45 | 52 dari 55 | Mengisi kedua instrumen
 R-02 | 39 dari 45 | 48 dari 55 | Mengisi kedua instrumen
 R-03 | 31 dari 45 | 37 dari 55 | Mengisi kedua instrumen

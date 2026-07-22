@@ -54,7 +54,7 @@ EXPECTED_FAIZ_CAPTION_NUMBERS = (
     {"1.1", "1.2"}
     | {f"2.{number}" for number in range(1, 15)}
     | {f"3.{number}" for number in range(1, 35)}
-    | {f"4.{number}" for number in range(1, 6)}
+    | {f"4.{number}" for number in range(1, 28)}
 )
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"

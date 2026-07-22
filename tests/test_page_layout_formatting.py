@@ -172,11 +172,17 @@ def test_inline_and_block_code_use_times_new_roman():
     inline_fonts = inline_code.find(f"{qn('rPr')}/{qn('rFonts')}")
     assert inline_fonts.get(qn("ascii")) == "Times New Roman"
     assert inline_fonts.get(qn("hAnsi")) == "Times New Roman"
+    assert inline_code.find(f"{qn('rPr')}/{qn('i')}") is not None
+    assert inline_code.find(f"{qn('rPr')}/{qn('sz')}").get(qn("val")) == "24"
+    assert inline_code.find(f"{qn('rPr')}/{qn('szCs')}").get(qn("val")) == "24"
 
     block = merger.build_code_block_elements({"lines": ["NavigateTo(target)"]})[0]
     block_fonts = block.find(f"{qn('r')}/{qn('rPr')}/{qn('rFonts')}")
     for attribute in ("ascii", "hAnsi", "eastAsia", "cs"):
         assert block_fonts.get(qn(attribute)) == "Times New Roman"
+    block_rpr = block.find(f"{qn('r')}/{qn('rPr')}")
+    assert block_rpr.find(qn("sz")).get(qn("val")) == "24"
+    assert block_rpr.find(qn("szCs")).get(qn("val")) == "24"
 
 
 def test_font_audit_rejects_theme_and_non_tnr_fonts():

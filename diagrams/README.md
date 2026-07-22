@@ -22,7 +22,7 @@ Diagram lain pada folder ini merupakan sumber historis atau digunakan oleh lapor
 3. Unity runtime mengambil data melalui `GET /api/unity/data`.
 4. `DatabaseSyncChecker` pada Unity Editor menggunakan `GET /api/unity/names`.
 5. React mengirim `NavigateTo`, `StopNavigation`, `SetSpawn`, dan `SetDevice` melalui `SendMessage`.
-6. Unity mengirim `OnNavigationCompleted` hanya setelah navigasi selesai secara normal. Pembatalan dan target yang tidak ditemukan tidak menghasilkan callback kedatangan.
+6. Unity mengirim `OnNavigationCompleted` hanya setelah navigasi selesai secara normal. Pembatalan dan target yang tidak ditemukan tidak menghasilkan pemberitahuan bahwa tujuan telah tercapai.
 7. Express dan Umami hanya membentuk jalur analitik opsional.
 
 ## Aturan visual

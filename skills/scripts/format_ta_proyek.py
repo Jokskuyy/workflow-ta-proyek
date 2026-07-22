@@ -2053,6 +2053,21 @@ def replace_semantic_references_in_paragraph(p, targets, namespaces):
     )]
     return replacement_count, unresolved
 
+
+def replace_semantic_references_in_table_cells(body, targets, namespaces):
+    """Replace stable figure/table references in every non-caption table cell."""
+    replacement_count = 0
+    unresolved_tokens = []
+    for table_p in body.xpath('.//w:tbl//w:p', namespaces=namespaces):
+        if (_paragraph_style(table_p, namespaces) or "Normal") == 'Caption':
+            continue
+        count, unresolved = replace_semantic_references_in_paragraph(
+            table_p, targets, namespaces
+        )
+        replacement_count += count
+        unresolved_tokens.extend(unresolved)
+    return replacement_count, unresolved_tokens
+
 def insert_dynamic_toc_field(body, insertion_idx, field_instruction, namespaces):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     
@@ -2622,6 +2637,14 @@ def format_document_xmls(unpacked_dir):
             )
             semantic_ref_count += count
             unresolved_semantic_refs.extend(unresolved)
+        # Table-cell evidence often contains the same stable [FIGREF:id] tokens
+        # as body prose.  Process those paragraphs separately so the generated
+        # REF fields remain clickable even when the reference is inside a cell.
+        count, unresolved = replace_semantic_references_in_table_cells(
+            body, semantic_targets, namespaces
+        )
+        semantic_ref_count += count
+        unresolved_semantic_refs.extend(unresolved)
         if semantic_ref_count:
             print(
                 "  Inserted %d semantic figure/table REF field(s)."

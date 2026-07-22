@@ -12,7 +12,7 @@ Hasil pengolahan instrumen evaluasi Dashboard Publik dirangkum pada [TABREF:uat_
 [TABLECAPTION:Rekapitulasi UAT Dashboard Publik]
 
 [TABLE]
-Dimensi | Jumlah Pernyataan | Skor Aktual | Skor Maksimum | Rata-rata | Persentase
+Dimensi | Pernyataan | Aktual | Maksimum | Rata-rata | Persentase
 Fungsionalitas dan Kegunaan | 2 | 32 | 40 | 4,00 | 80,00 persen
 Kemudahan Penggunaan | 2 | 28 | 40 | 3,50 | 70,00 persen
 Desain dan Interaksi | 3 | 48 | 60 | 4,00 | 80,00 persen
@@ -28,7 +28,7 @@ Hasil pengolahan instrumen dashboard admin dirangkum pada [TABREF:uat_dashboard_
 [TABLECAPTION:Rekapitulasi UAT Dashboard Admin]
 
 [TABLE]
-Dimensi | Jumlah Pernyataan | Skor Aktual | Skor Maksimum | Rata-rata | Persentase
+Dimensi | Pernyataan | Aktual | Maksimum | Rata-rata | Persentase
 Manajemen dan Fungsionalitas Data | 4 | 70 | 80 | 4,38 | 87,50 persen
 Keamanan dan Autentikasi | 2 | 34 | 40 | 4,25 | 85,00 persen
 Kemudahan Penggunaan | 3 | 49 | 60 | 4,08 | 81,67 persen

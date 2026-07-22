@@ -46,18 +46,18 @@ alt Target ditemukan
     receiver -> bridge : OnNavigationCompleted(JSON target)
     bridge -> react : CustomEvent OnNavigationCompleted
     react -> react : Memvalidasi tujuan aktif
-    react --> user : Menampilkan notifikasi tiba
+    react --> user : Menampilkan notifikasi tujuan tercapai
   else Pengguna membatalkan
     react -> receiver : SendMessage StopNavigation()
     receiver -> guide : Menghapus rute
     note right of receiver
-    Tidak mengirim callback kedatangan
+    Tidak mengirim pemberitahuan tujuan tercapai
     end note
   end
 else Target tidak ditemukan
   receiver --> react : Navigasi tidak dimulai
   note right of receiver
-  Tidak mengirim callback kedatangan
+  Tidak mengirim pemberitahuan tujuan tercapai
   end note
 end
 @enduml

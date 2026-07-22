@@ -335,6 +335,195 @@
       "caption_match": "Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus",
       "source": "unpacked_ta/word/media/image10.png",
       "inject_method": "post_com"
+    },
+    {
+      "id": "doc_pakta_integritas",
+      "file": "faiz/dokumentasi/doc_pakta_integritas.jpg",
+      "caption_match": "Dokumentasi Foto Pakta Integritas",
+      "source": "Images_faiz/Dokumentasi/foto_pakta_integritas.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_disposisi_p01",
+      "file": "faiz/dokumentasi/doc_disposisi_p01.jpg",
+      "caption_match": "Dokumentasi Lembar Disposisi Halaman 1",
+      "source": "Images_faiz/Dokumentasi/lembar_disposisi_halaman_1.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_disposisi_p02",
+      "file": "faiz/dokumentasi/doc_disposisi_p02.jpg",
+      "caption_match": "Dokumentasi Lembar Disposisi Halaman 2",
+      "source": "Images_faiz/Dokumentasi/lembar_disposisi_halaman_2.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_permohonan_riset_p01",
+      "file": "faiz/dokumentasi/doc_permohonan_riset_p01.jpg",
+      "caption_match": "Dokumentasi Surat Permohonan Riset Halaman 1",
+      "source": "Images_faiz/Dokumentasi/permohonan_riset_mahasiswa_page_0001.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_permohonan_riset_p02",
+      "file": "faiz/dokumentasi/doc_permohonan_riset_p02.jpg",
+      "caption_match": "Dokumentasi Surat Permohonan Riset Halaman 2",
+      "source": "Images_faiz/Dokumentasi/permohonan_riset_mahasiswa_page_0002.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_surat_riset",
+      "file": "faiz/dokumentasi/doc_surat_riset.jpg",
+      "caption_match": "Dokumentasi Surat Riset",
+      "source": "Images_faiz/Dokumentasi/S.Riset_Muhammad_Iman_Nugraha_Dwiki_dan_Faiz_.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_pengajuan_uat",
+      "file": "faiz/dokumentasi/doc_pengajuan_uat.jpg",
+      "caption_match": "Dokumentasi Surat Pengajuan UAT",
+      "source": "Images_faiz/Dokumentasi/Surat_Pengajuan_UAT.jpeg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_respon_uat_p01",
+      "file": "faiz/dokumentasi/doc_respon_uat_p01.jpg",
+      "caption_match": "Dokumentasi Surat Respons UAT Halaman 1",
+      "source": "Images_faiz/Dokumentasi/Surat_respon_UAT_Iman_Dwikhi_Faiz_page_0001.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_respon_uat_p02",
+      "file": "faiz/dokumentasi/doc_respon_uat_p02.jpg",
+      "caption_match": "Dokumentasi Surat Respons UAT Halaman 2",
+      "source": "Images_faiz/Dokumentasi/Surat_respon_UAT_Iman_Dwikhi_Faiz_page_0002.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_kharisma_p01",
+      "file": "faiz/dokumentasi/kharisma_page-1.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Kharisma Halaman 1",
+      "source": "Images_faiz/Dokumentasi/UAT_Kharisma_Gusti_Wiati.pdf#page=1",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_kharisma_p02",
+      "file": "faiz/dokumentasi/kharisma_page-2.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Kharisma Halaman 2",
+      "source": "Images_faiz/Dokumentasi/UAT_Kharisma_Gusti_Wiati.pdf#page=2",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_novi_p01",
+      "file": "faiz/dokumentasi/novi_page-1.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Novi Halaman 1",
+      "source": "Images_faiz/Dokumentasi/UAT_Novi_Trisman_Hadi.pdf#page=1",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_novi_p02",
+      "file": "faiz/dokumentasi/novi_page-2.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Novi Halaman 2",
+      "source": "Images_faiz/Dokumentasi/UAT_Novi_Trisman_Hadi.pdf#page=2",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_novi_p03",
+      "file": "faiz/dokumentasi/novi_page-3.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Novi Halaman 3",
+      "source": "Images_faiz/Dokumentasi/UAT_Novi_Trisman_Hadi.pdf#page=3",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_novi_p04",
+      "file": "faiz/dokumentasi/novi_page-4.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Novi Halaman 4",
+      "source": "Images_faiz/Dokumentasi/UAT_Novi_Trisman_Hadi.pdf#page=4",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_ridwan_p01",
+      "file": "faiz/dokumentasi/ridwan_page-1.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Ridwan Halaman 1",
+      "source": "Images_faiz/Dokumentasi/UAT_Ridwan_Raafiudin.pdf#page=1",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_ridwan_p02",
+      "file": "faiz/dokumentasi/ridwan_page-2.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Ridwan Halaman 2",
+      "source": "Images_faiz/Dokumentasi/UAT_Ridwan_Raafiudin.pdf#page=2",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_ridwan_p03",
+      "file": "faiz/dokumentasi/ridwan_page-3.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Ridwan Halaman 3",
+      "source": "Images_faiz/Dokumentasi/UAT_Ridwan_Raafiudin.pdf#page=3",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_ridwan_p04",
+      "file": "faiz/dokumentasi/ridwan_page-4.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Ridwan Halaman 4",
+      "source": "Images_faiz/Dokumentasi/UAT_Ridwan_Raafiudin.pdf#page=4",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_humas_p01",
+      "file": "faiz/dokumentasi/humas_page-1.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Humas Halaman 1",
+      "source": "Images_faiz/Dokumentasi/UAT_User_Humas.pdf#page=1",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_humas_p02",
+      "file": "faiz/dokumentasi/humas_page-2.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Humas Halaman 2",
+      "source": "Images_faiz/Dokumentasi/UAT_User_Humas.pdf#page=2",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_humas_p03",
+      "file": "faiz/dokumentasi/humas_page-3.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Humas Halaman 3",
+      "source": "Images_faiz/Dokumentasi/UAT_User_Humas.pdf#page=3",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_humas_p04",
+      "file": "faiz/dokumentasi/humas_page-4.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Humas Halaman 4",
+      "source": "Images_faiz/Dokumentasi/UAT_User_Humas.pdf#page=4",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_widya_p01",
+      "file": "faiz/dokumentasi/widya_page-1.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Widya Halaman 1",
+      "source": "Images_faiz/Dokumentasi/UAT_Widya_Cholil.pdf#page=1",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_widya_p02",
+      "file": "faiz/dokumentasi/widya_page-2.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Widya Halaman 2",
+      "source": "Images_faiz/Dokumentasi/UAT_Widya_Cholil.pdf#page=2",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_widya_p03",
+      "file": "faiz/dokumentasi/widya_page-3.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Widya Halaman 3",
+      "source": "Images_faiz/Dokumentasi/UAT_Widya_Cholil.pdf#page=3",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "doc_uat_widya_p04",
+      "file": "faiz/dokumentasi/widya_page-4.jpg",
+      "caption_match": "Dokumentasi Formulir UAT Widya Halaman 4",
+      "source": "Images_faiz/Dokumentasi/UAT_Widya_Cholil.pdf#page=4",
+      "inject_method": "post_com"
     }
   ]
 }

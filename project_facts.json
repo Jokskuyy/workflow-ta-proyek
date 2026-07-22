@@ -165,7 +165,7 @@
                 "Hasil UAT/dokumentasi revisi/BB20_1.png",
                 "Hasil UAT/dokumentasi revisi/BB20_2.png"
             ],
-            "details": "Pengujian awal mencatat 23 dari 24 skenario lulus. BB-20 awalnya tidak lulus karena skrip pengujian Unity ikut masuk ke build WebGL dan membuat label tujuan menampilkan unity_object_name. Setelah skrip dipisahkan dan aplikasi dibangun ulang, dua tangkapan layar menunjukkan label Gedung Dewi Sartika beserta garis rute sebelum pengguna tiba. Setelah pengguna tiba, garis rute hilang dan notifikasi kedatangan tampil. Hasil akhir menjadi 24 dari 24 skenario lulus."
+            "details": "Pengujian awal mencatat 23 dari 24 skenario lulus. BB-20 awalnya tidak lulus karena skrip pengujian Unity ikut masuk ke build WebGL dan membuat label tujuan menampilkan unity_object_name. Setelah skrip dipisahkan dan aplikasi dibangun ulang, dua tangkapan layar menunjukkan label Gedung Dewi Sartika beserta garis rute sebelum pengguna mencapai tujuan. Setelah tujuan tercapai, garis rute hilang dan notifikasi bahwa tujuan telah dicapai tampil. Hasil akhir menjadi 24 dari 24 skenario lulus."
         },
         "lighthouse_testing": {
             "completed": true,
@@ -291,7 +291,7 @@
     },
     "integration_pointer_and_sync": {
         "pointer_mechanism": {
-            "description": "Hierarki scene menyediakan GameObject target yang namanya mengikuti unity_object_name. Struktur tersebut merupakan kontrak integrasi dan prasyarat scene; kontribusi engine Faiz dimulai pada konsumsi data, pencarian Transform target, dan penggunaan target untuk navigasi.",
+            "description": "Hierarki scene menyediakan GameObject target yang namanya mengikuti unity_object_name. Struktur tersebut merupakan kontrak integrasi dan prasyarat scene; kontribusi engine penulis dimulai pada konsumsi data, pencarian Transform target, dan penggunaan target untuk navigasi.",
             "hierarchy_screenshot": "dokumentasi/contoh_pointer.png"
         },
         "database_sync_checker": {

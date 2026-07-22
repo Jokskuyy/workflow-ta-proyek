@@ -18,7 +18,7 @@ skinparam activity {
 start
 :Terima dan normalisasi unity_object_name;
 if (Target ditemukan?) then (Tidak)
-  :Hentikan permintaan\ntanpa callback kedatangan;
+  :Hentikan permintaan\ntanpa pemberitahuan tujuan tercapai;
   stop
 else (Ya)
   :Proyeksikan pemain 2 meter dan tujuan 2 meter,\ndengan fallback tujuan 5 meter;
@@ -36,7 +36,7 @@ else (Ya)
       stop
     endif
   endwhile (Dibatalkan)
-  :StopNavigation dan hapus rute\ntanpa callback kedatangan;
+  :StopNavigation dan hapus rute\ntanpa pemberitahuan tujuan tercapai;
   stop
 endif
 @enduml

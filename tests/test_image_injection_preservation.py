@@ -155,28 +155,24 @@ PRESERVE_PBT = settings(
 NON_MANIFEST_CAPTIONS = [
     ("Tabel 1.1 Peran dan Tanggung Jawab", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "Heading2", False),
     ("Tabel 1.2 Jadwal Kegiatan", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 2.1 Analisis Sistem yang Berjalan dan Implikasi Kebutuhan", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "", False),
-    ("Tabel 2.2 Pemetaan Komponen Arsitektur terhadap Peran Engine", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
-    ("Tabel 2.3 Pemetaan Diagram Rancangan terhadap Kebutuhan Laporan Faiz", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
-    ("Tabel 2.4 Alur Algoritme Penerimaan Tujuan dan Navigasi", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
-    ("Tabel 2.5 Alur Pemrosesan Titik Rute sebelum Rendering", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
-    ("Tabel 2.6 Rancangan State Occlusion dan Fog pada Overview–Gameplay", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 2.7 Rencana Pengujian Modul Simulator dan Engine", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 3.1 Hubungan Pemangku Kepentingan dengan Proyek", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "Heading2", False),
-    ("Tabel 3.2 Logbook Implementasi Modul Simulator dan Engine", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
-    ("Tabel 3.3 Alur Rendering Rute pada NavigationGuide", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 3.4 Batas Kontribusi Penulis dalam Sistem Terintegrasi", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading2", False),
+    ("Tabel 2.1 Kondisi Sistem dan Kebutuhan", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "", False),
+    ("Tabel 2.2 Istilah Teknis Utama", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
+    ("Tabel 2.3 Komponen Arsitektur dan Peran Penulis", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
+    ("Tabel 2.4 Fungsi Diagram Rancangan", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
+    ("Tabel 2.5 Alur Penerimaan Tujuan dan Navigasi", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
+    ("Tabel 2.6 Pemrosesan Titik Rute", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
+    ("Tabel 2.7 Peralihan Tampilan Awal dan Permainan", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 2.8 Rencana Pengujian Simulator dan Engine", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 3.1 Hubungan Mitra dan Proyek", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "Heading2", False),
+    ("Tabel 3.2 Logbook Modul Simulator dan Engine", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
+    ("Tabel 3.3 Alur Rendering Rute", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 3.4 Batas Kontribusi Penulis", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading2", False),
     ("Tabel 3.5 Hasil Pengujian Black Box Testing", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 3.6 Hasil Pengujian Khusus Modul Unity", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading4", False),
+    ("Tabel 3.6 Hasil Pengujian Modul Unity", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading4", False),
     ("Tabel 3.7 Rekapitulasi UAT Dashboard Publik", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
     ("Tabel 3.8 Rekapitulasi UAT Dashboard Admin", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
     ("Tabel 3.9 Matriks Tindak Lanjut Hasil UAT", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 3.10 Pemetaan Kontribusi Engine terhadap Tindak Lanjut UAT", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 4.1 Panduan Pengambilan dan Penempatan Bukti Unity", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "", False),
-    ("Tabel 4.2 Status Bukti Unity yang Sudah Diterima", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 4.3 Instrumen Evaluasi UAT Dashboard Publik", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 4.4 Instrumen UAT Dashboard Admin", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 4.5 Rekap Anonim Respons UAT", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 3.10 Kontribusi Engine pada Tindak Lanjut UAT", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
 ]
 
 # --- Property 6: every SEQ caption and its field --------------------------- #
@@ -184,21 +180,21 @@ NON_MANIFEST_CAPTIONS = [
 RESTART_CAPTIONS = {
     "Gambar 2.1 Hasil Kuesioner: Profil Status Akademik Responden",
     "Gambar 3.1 Hierarki Prefab Gedung dengan Child Pointer di Unity",
+    "Gambar 4.1 Dokumentasi Foto Pakta Integritas",
     "Tabel 1.1 Peran dan Tanggung Jawab",
-    "Tabel 2.1 Analisis Sistem yang Berjalan dan Implikasi Kebutuhan",
-    "Tabel 3.1 Hubungan Pemangku Kepentingan dengan Proyek",
-    "Tabel 4.1 Panduan Pengambilan dan Penempatan Bukti Unity",
+    "Tabel 2.1 Kondisi Sistem dan Kebutuhan",
+    "Tabel 3.1 Hubungan Mitra dan Proyek",
 }
-EXPECTED_SEQ_GAMBAR_COUNT = 48
-EXPECTED_SEQ_TABEL_COUNT = 24
+EXPECTED_SEQ_GAMBAR_COUNT = 75
+EXPECTED_SEQ_TABEL_COUNT = 20
 
 # --- Property 7: scaled extents of every injected figure (noChangeAspect) -- #
 # Recorded (cx, cy) EMU extents; all within width and aspect-locked on unfixed code.
 FIGURE_EXTENTS = [
     (1512000, 1513892), (5040000, 7129161), (5400000, 2334146), (5400000, 2529799),
     (5400000, 2580599), (5400000, 2298033), (5400000, 2766043), (5400000, 2342074),
-    (5400000, 2729916), (5400000, 3037499), (2151325, 5760000), (5400000, 2570171),
-    (5399999, 2589179), (4529339, 5760000), (5400000, 4198050), (5250265, 5760000),
+    (5400000, 2729916), (5400000, 3037499), (2151325, 5760000), (5400000, 2543225),
+    (5399999, 2589179), (4605462, 5760000), (5400000, 4024766), (5400000, 5528425),
     (3953357, 5760000), (4229083, 5760000), (5400000, 5406250), (5400000, 4519780),
     (5334973, 5760000), (5400000, 3223125), (5400000, 3223125), (5400000, 3223125),
     (5400000, 3223125), (2016180, 5760000), (5400000, 3223125), (5400000, 3223125),
@@ -207,7 +203,14 @@ FIGURE_EXTENTS = [
     (4645859, 5760000), (5400000, 712973), (5400000, 5752365), (5400000, 3223125),
     (5400000, 3376318), (5400000, 3233242), (5400000, 3375000), (5400000, 2492307),
     (4229452, 5760000), (5400000, 3223125), (5400000, 3223125), (5400000, 3223125),
-    (5400000, 3214235), (5400000, 2492307),
+    (5400000, 3214235), (5400000, 2492307), (5400000, 4050000), (4069743, 5760000),
+    (4069743, 5760000), (4052490, 5760000), (4070879, 5760000), (4075347, 5760000),
+    (3801600, 5760000), (4069565, 5760000), (4058331, 5760000),
+    (4072944, 5760000), (4072944, 5760000), (4072944, 5760000), (4072944, 5760000),
+    (4072944, 5760000), (4072944, 5760000), (4072944, 5760000), (4072944, 5760000),
+    (4072944, 5760000), (4072944, 5760000), (4072944, 5760000), (4072944, 5760000),
+    (4072944, 5760000), (4072944, 5760000), (4072944, 5760000), (4072944, 5760000),
+    (4072944, 5760000), (4072944, 5760000),
 ]
 
 # --- Property 8: structural invariants ------------------------------------- #

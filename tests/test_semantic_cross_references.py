@@ -2,6 +2,7 @@
 
 import importlib.util
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -38,6 +39,15 @@ from alur_penulisan.figure_table import number_objects  # noqa: E402
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 NS = {"w": W}
+
+
+def test_faiz_draft_contains_exactly_two_appendix_headings():
+    draft = (ROOT / "Tugas_Akhir_Draft.md").read_text(encoding="utf-8-sig")
+    headings = re.findall(r"^# (LAMPIRAN \d+\.[^\r\n]+)$", draft, re.MULTILINE)
+    assert headings == [
+        "LAMPIRAN 1. Kode Sumber Utama",
+        "LAMPIRAN 2. Dokumentasi",
+    ]
 
 
 def _write_manifest(tmp_path):
@@ -192,6 +202,34 @@ def test_reference_token_becomes_ref_field_with_cached_value():
         assert r_pr.find(f"{{{W}}}b").get(f"{{{W}}}val") == "0"
         assert r_pr.find(f"{{{W}}}i").get(f"{{{W}}}val") == "0"
         assert r_pr.find(f"{{{W}}}sz").get(f"{{{W}}}val") == "24"
+
+
+def test_reference_token_inside_table_cell_becomes_clickable_ref_field():
+    body = LET.Element(f"{{{W}}}body")
+    table = LET.SubElement(body, f"{{{W}}}tbl")
+    row = LET.SubElement(table, f"{{{W}}}tr")
+    cell = LET.SubElement(row, f"{{{W}}}tc")
+    paragraph = LET.SubElement(cell, f"{{{W}}}p")
+    run = LET.SubElement(paragraph, f"{{{W}}}r")
+    text = LET.SubElement(run, f"{{{W}}}t")
+    text.text = "Lihat [FIGREF:arsitektur] sebagai bukti."
+    targets = {("FIGREF", "arsitektur"): {
+        "bookmark": "fig_arsitektur",
+        "display": "Gambar 2.3",
+    }}
+
+    count, unresolved = fmt.replace_semantic_references_in_table_cells(
+        body, targets, NS
+    )
+
+    instructions = " ".join(
+        element.text or ""
+        for element in cell.iter(f"{{{W}}}instrText")
+    )
+    assert count == 1
+    assert unresolved == []
+    assert "REF fig_arsitektur \\h \\* CHARFORMAT" in instructions
+    assert "[FIGREF:" not in "".join(cell.itertext())
 
 
 def test_final_validator_accepts_semantic_bookmark_and_ref():

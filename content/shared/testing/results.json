@@ -19,7 +19,7 @@
         "Hasil UAT/dokumentasi revisi/BB20_1.png",
         "Hasil UAT/dokumentasi revisi/BB20_2.png"
       ],
-      "verification": "Dua tangkapan layar berurutan menunjukkan label tujuan yang mudah dibaca dan garis rute sebelum pengguna tiba. Setelah pengguna tiba, garis rute hilang dan notifikasi kedatangan tampil."
+      "verification": "Dua tangkapan layar berurutan menunjukkan label tujuan yang mudah dibaca dan garis rute sebelum pengguna mencapai tujuan. Setelah tujuan tercapai, garis rute hilang dan notifikasi bahwa tujuan telah dicapai tampil."
     },
     "final_verification": {
       "passed_scenarios": 24,
@@ -111,7 +111,7 @@
       },
       "UAT-R10": {
         "basis": ["visual", "automated_test", "source_audit", "user_confirmed_deployment"],
-        "limitations": ["Tangkapan layar memverifikasi notifikasi pada kondisi kedatangan normal. Pemberitahuan yang kosong, tidak valid, berbeda, dan diterima setelah pembatalan diperiksa melalui 11 pengujian React."]
+        "limitations": ["Tangkapan layar memverifikasi notifikasi pada kondisi navigasi selesai normal. Pemberitahuan yang kosong, tidak valid, berbeda, dan diterima setelah pembatalan diperiksa melalui 11 pengujian React."]
       }
     }
   }

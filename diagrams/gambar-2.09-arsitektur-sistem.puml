@@ -48,13 +48,13 @@ runtimeApi --> supabase : Membaca gedung dan fasilitas
 checker --> editorApi : Memeriksa identifier editor
 editorApi --> supabase : Membaca nama objek
 react --> unity : NavigateTo / StopNavigation\nSetSpawn / SetDevice
-unity --> react : OnNavigationCompleted\nJSON unity_object_name\nhanya setelah tiba normal
+unity --> react : OnNavigationCompleted\nJSON unity_object_name\nhanya setelah tujuan tercapai
 express ..> umami : Proxy analitik opsional
 react ..> express : Jalur opsional
 healthApi --> supabase : Memeriksa layanan
 
 note bottom of unity
 Pembatalan dan target yang tidak ditemukan
-tidak mengirim callback kedatangan.
+tidak mengirim pemberitahuan tujuan tercapai.
 end note
 @enduml

@@ -1391,8 +1391,12 @@ def emit_runs(p_elem, tokens, default_rPr=None, rel_manager=None):
                 f'{{{ns_uri}}}eastAsia': 'Times New Roman',
                 f'{{{ns_uri}}}cs': 'Times New Roman'
             })
-            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '18'})
-            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '18'})
+            # Technical identifiers are presented as inline code and italicized
+            # to preserve the report's established treatment of foreign terms.
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}i')
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}iCs')
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '24'})
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '24'})
             t = lxml.etree.SubElement(r, f'{{{ns_uri}}}t')
             t.text = tok.text
             if tok.text.startswith(' ') or tok.text.endswith(' '):
@@ -1638,8 +1642,8 @@ def build_code_block_elements(item):
             f'{{{ns_uri}}}eastAsia': 'Times New Roman',
             f'{{{ns_uri}}}cs': 'Times New Roman'
         })
-        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '18'})
-        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '18'})
+        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '24'})
+        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '24'})
         
         t = lxml.etree.SubElement(r, f'{{{ns_uri}}}t')
         t.text = line

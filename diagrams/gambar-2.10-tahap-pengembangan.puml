@@ -24,7 +24,7 @@ while (Hasil evaluasi belum sesuai?) is (Ya)
   :Perbaikan rute, spawn, minimap,\ntutorial, dan optimasi scene;
   :Evaluasi ulang pada Unity Editor\ndan peramban WebGL;
 endwhile (Tidak)
-:Integrasi artefak WebGL\ndengan dashboard React;
+:Integrasi hasil build WebGL\ndengan dashboard React;
 :Pengujian ulang fungsi, integrasi,\ndan performa runtime;
 stop
 @enduml
