@@ -26,6 +26,7 @@ FIGURE_CAPTION_RESERVE_EMU = 1080000  # 3 cm
 MAX_WIDTH = 5400000
 # 1 twip = 635 EMU (used to derive the printable page height threshold for C4).
 EMU_PER_TWIP = 635
+EMU_PER_CM = 360000
 
 WORD_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships'
@@ -141,6 +142,104 @@ def _para_style(p, namespaces):
         return ""
     pStyle = pPr.find('w:pStyle', namespaces)
     return pStyle.get(f'{{{WORD_NS}}}val') if pStyle is not None else ""
+
+
+def _ensure_paragraph_property(paragraph, property_name, namespaces):
+    ppr = paragraph.find('w:pPr', namespaces)
+    if ppr is None:
+        ppr = lxml.etree.Element(f'{{{WORD_NS}}}pPr')
+        paragraph.insert(0, ppr)
+    prop = ppr.find(f'w:{property_name}', namespaces)
+    if prop is None:
+        prop = lxml.etree.SubElement(ppr, f'{{{WORD_NS}}}{property_name}')
+    return ppr, prop
+
+
+def enforce_manifest_page_groups(body, manifest_items, namespaces):
+    """Keep selected narrative/figure pairs together on one report page.
+
+    A group is declared entirely through manifest metadata. Its expected direct
+    body sequence is narrative, drawing 1, caption 1, drawing 2, caption 2.
+    ``keepNext`` links the sequence and ``pageBreakBefore`` starts the group on
+    a fresh page. The final caption keeps the required property in the XML but
+    explicitly disables it so the chain ends without pulling the next section.
+    """
+    groups = {}
+    for item in manifest_items:
+        group_id = item.get('page_group')
+        if group_id:
+            groups.setdefault(group_id, []).append(item)
+
+    grouped = 0
+    wp_ns = 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing'
+    for group_id, items in groups.items():
+        ordered = sorted(items, key=lambda item: item.get('page_group_order', 0))
+        if len(ordered) != 2 or [item.get('page_group_order') for item in ordered] != [1, 2]:
+            raise ValueError(
+                f"Page group '{group_id}' must contain exactly two items ordered 1 and 2."
+            )
+
+        children = list(body)
+        drawing_indices = []
+        for item in ordered:
+            identity = f"FIGURE:{item['id']}"
+            matches = [
+                index for index, child in enumerate(children)
+                if child.tag == f'{{{WORD_NS}}}p'
+                and identity in child.xpath(
+                    './/wp:docPr/@name', namespaces={'wp': wp_ns}
+                )
+            ]
+            if len(matches) != 1:
+                raise ValueError(
+                    f"Page group '{group_id}' item '{item['id']}' resolved to "
+                    f"{len(matches)} drawing paragraphs; expected exactly 1."
+                )
+            drawing_indices.append(matches[0])
+
+        first_drawing, second_drawing = drawing_indices
+        if first_drawing < 1 or second_drawing != first_drawing + 2:
+            raise ValueError(
+                f"Page group '{group_id}' does not have adjacent drawing/caption pairs."
+            )
+        narrative_index = first_drawing - 1
+        first_caption = first_drawing + 1
+        second_caption = second_drawing + 1
+        if second_caption >= len(children):
+            raise ValueError(f"Page group '{group_id}' is missing its second caption.")
+
+        narrative = children[narrative_index]
+        chain = [
+            narrative,
+            children[first_drawing],
+            children[first_caption],
+            children[second_drawing],
+            children[second_caption],
+        ]
+        if narrative.tag != f'{{{WORD_NS}}}p' or not _para_text(narrative):
+            raise ValueError(f"Page group '{group_id}' is missing its narrative paragraph.")
+        if any(_para_style(paragraph, namespaces) != 'Caption' for paragraph in chain[2::2]):
+            raise ValueError(f"Page group '{group_id}' has an invalid caption paragraph.")
+
+        _ensure_paragraph_property(narrative, 'pageBreakBefore', namespaces)
+        for paragraph in chain:
+            _ensure_paragraph_property(paragraph, 'keepNext', namespaces)
+            _ensure_paragraph_property(paragraph, 'keepLines', namespaces)
+        for paragraph in chain[1:]:
+            ppr = paragraph.find('w:pPr', namespaces)
+            page_break = ppr.find('w:pageBreakBefore', namespaces) if ppr is not None else None
+            if page_break is not None:
+                ppr.remove(page_break)
+
+        last_ppr, last_keep_next = _ensure_paragraph_property(
+            chain[-1], 'keepNext', namespaces
+        )
+        last_keep_next.set(f'{{{WORD_NS}}}val', '0')
+        grouped += 1
+        print(
+            f"Page group '{group_id}': kept narrative and two figure/caption pairs together."
+        )
+    return grouped
 
 
 def resolve_caption_indices(body, caption_match, namespaces):
@@ -341,6 +440,32 @@ def restore_post_com_typography(doc_root):
             elif not italic and elem is not None:
                 rpr.remove(elem)
 
+    def restore_abstract_layout():
+        abstract_active = False
+        for paragraph in doc_root.findall('.//w:p', namespaces):
+            paragraph_text = _para_text(paragraph).strip()
+            style = _para_style(paragraph, namespaces)
+            if style == 'Heading1' and paragraph_text.upper() in {'ABSTRAK', 'ABSTRACT'}:
+                ppr = paragraph.find('w:pPr', namespaces)
+                if ppr is None:
+                    ppr = lxml.etree.Element(f'{{{ns}}}pPr')
+                    paragraph.insert(0, ppr)
+                if ppr.find('w:pageBreakBefore', namespaces) is None:
+                    lxml.etree.SubElement(ppr, f'{{{ns}}}pageBreakBefore')
+                abstract_active = True
+                continue
+            if abstract_active and style == 'Heading1':
+                abstract_active = False
+            if not abstract_active or style not in {'Normal', ''}:
+                continue
+            for run in paragraph.findall('.//w:r', namespaces):
+                rpr = run.find('w:rPr', namespaces)
+                if rpr is None:
+                    rpr = lxml.etree.Element(f'{{{ns}}}rPr')
+                    run.insert(0, rpr)
+                italic = rpr.find('w:i', namespaces) is not None
+                set_font(rpr, 'Times New Roman', '22', italic=italic)
+
     front_matter = True
     for paragraph in doc_root.findall('.//w:p', namespaces):
         style = _para_style(paragraph, namespaces)
@@ -399,8 +524,30 @@ def restore_post_com_typography(doc_root):
         )
         apply_required_inline_term_formatting(doc_root, namespaces)
         normalize_regular_technical_terms(doc_root, namespaces)
-    except Exception as exc:
-        print(f"[WARN] post-COM technical term restoration skipped: {exc}")
+    except Exception:
+        # The build invokes a synchronized copy from ``scratch/``. Resolve the
+        # canonical formatter explicitly so post-COM typography restoration is
+        # not dependent on the process working directory's import path.
+        canonical_scripts = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), '..', '..', 'skills', 'scripts')
+        )
+        if not os.path.isdir(canonical_scripts):
+            canonical_scripts = os.path.abspath(
+                os.path.join(os.getcwd(), 'skills', 'scripts')
+            )
+        if canonical_scripts not in sys.path:
+            sys.path.insert(0, canonical_scripts)
+        try:
+            from format_ta_proyek import (
+                apply_required_inline_term_formatting,
+                normalize_regular_technical_terms,
+            )
+            apply_required_inline_term_formatting(doc_root, namespaces)
+            normalize_regular_technical_terms(doc_root, namespaces)
+            print('Post-COM technical term restoration loaded canonical formatter.')
+        except Exception as exc:
+            print(f"[WARN] post-COM technical term restoration skipped: {exc}")
+    restore_abstract_layout()
 
 
 def inject_all_images(docx_path):
@@ -627,6 +774,14 @@ def inject_all_images(docx_path):
         pair_figure_height = max(
             1, page_height_threshold - FIGURE_CAPTION_RESERVE_EMU
         )
+        if item.get('max_height_cm') is not None:
+            requested_height = int(float(item['max_height_cm']) * EMU_PER_CM)
+            if requested_height <= 0:
+                raise ValueError(
+                    f"Manifest item '{item_id}' has invalid max_height_cm="
+                    f"{item['max_height_cm']!r}."
+                )
+            pair_figure_height = min(pair_figure_height, requested_height)
         p_drawing = generate_drawing_xml(
             r_id,
             cx,
@@ -694,6 +849,10 @@ def inject_all_images(docx_path):
         if changed:
             cap_fixed += 1
     print(f"Post-COM keep-props pass: ensured keepNext/keepLines on {cap_fixed} caption paragraph(s).")
+
+    page_groups = enforce_manifest_page_groups(body, post_com_items, namespaces)
+    if page_groups:
+        print(f"Post-COM page-group pass: enforced {page_groups} grouped page(s).")
 
     # Keep the visible Daftar Isi heading outside the TOC content control in
     # the final package.  Word/LibreOffice can otherwise split the heading

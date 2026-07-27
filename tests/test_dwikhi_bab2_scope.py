@@ -76,7 +76,8 @@ def test_erd_contains_only_four_core_tables():
 
 
 def test_final_draft_has_no_technical_placeholders_or_asset_performance_claims():
-    assert "[TBD:" not in DRAFT
+    approved_tbd = set()
+    assert set(re.findall(r"\[TBD:[^\]]+\]", DRAFT)) == approved_tbd
     assert "Build Report" not in DRAFT
     assert "Memory Profiler" not in DRAFT
     assert "Performa build" not in DRAFT

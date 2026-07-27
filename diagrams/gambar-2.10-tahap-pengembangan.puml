@@ -11,24 +11,20 @@ skinparam ActivityDiamondBackgroundColor #EDF3F8
 skinparam ActivityDiamondBorderColor #555555
 
 start
-:Mengumpulkan referensi visual\ndan kebutuhan data;
-
-fork
-  :Mengamati bentuk, lantai,\nbukaan, warna, dan material;
-  :Membuat serta menata aset\ndi Unity Editor;
-  :Menyusun prefab, Pointer,\ndan GameObject tujuan;
-fork again
-  :Menginventarisasi gedung,\nfasilitas, fakultas, dan program studi;
-  :Merancang entitas, atribut,\nrelasi, dan constraint;
-  :Menyusun serta memeriksa seed;
-end fork
-
-:Menetapkan unity_object_name\npada data dan GameObject;
-:Menjalankan pemeriksaan\nkonsistensi aset dan data;
+:Mengumpulkan kebutuhan\nserta referensi visual;
+:Merancang ERD dan struktur\nentitas inti;
+:Menetapkan kebutuhan kebijakan RLS\npada tingkat rancangan;
+:Membuat struktur database\ndan mengisi data awal;
+:Memilih Gedung Dewi Sartika\nsebagai contoh proses visual;
+:Membuat bentuk, lantai,\nmaterial, dan objek pendukung;
+:Menyusun prefab dan kelompok Pointer;
+:Menetapkan kode lokasi pada data\ndan objek tujuan;
+:Menempatkan asset pada scene utama;
+:Menggunakan alat pemeriksa\nuntuk membandingkan nama;
 
 while (Masih terdapat ketidaksesuaian?) is (Ya)
-  :Menentukan sumber masalah\npada data atau scene;
-  :Memperbaiki identifier, data,\natau nama GameObject;
+  :Menentukan sumber masalah\npada data atau objek;
+  :Memperbaiki kode, data,\natau nama objek tujuan;
   :Mengulangi pemeriksaan;
 endwhile (Tidak)
 

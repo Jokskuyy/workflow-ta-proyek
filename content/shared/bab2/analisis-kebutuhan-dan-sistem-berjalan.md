@@ -39,7 +39,7 @@ Hasil kuesioner dan tinjauan sistem berjalan diringkas pada [TABREF:analisis_sis
 [TABLECAPTION:Analisis Sistem yang Berjalan dan Implikasi Kebutuhan]
 
 [TABLE]
-Aspek | Kondisi Teramati atau Terverifikasi | Kesenjangan dalam Ruang Lingkup Proyek | Implikasi terhadap Kebutuhan Sistem
+Aspek | Kondisi yang Teramati | Kesenjangan dalam Ruang Lingkup Proyek | Implikasi terhadap Kebutuhan Sistem
 Pencarian lokasi | Responden masih dominan meminta bantuan orang lain dan 66,7 persen pernah mengalami kesulitan setidaknya satu kali dalam satu semester | Produk memerlukan hubungan antara pencarian tujuan dan panduan spasial | Menyediakan pencarian lokasi serta panduan melalui Denah 2D dan Denah 3D
 Informasi tujuan | Nama gedung dan fasilitas menjadi prioritas informasi responden | Informasi lokasi dan fasilitas perlu disajikan secara terhubung dengan tujuan navigasi | Menampilkan nama tujuan, informasi fasilitas, jarak, rute, dan petunjuk orientasi yang relevan
 Konsistensi identitas | Data fasilitas dan objek Unity digunakan oleh beberapa komponen dengan bentuk konsumsi yang berbeda | Setiap tujuan memerlukan identifier yang konsisten pada database, API, dashboard, dan Unity | Menggunakan `unity_object_name` sebagai pemetaan identitas lintas komponen

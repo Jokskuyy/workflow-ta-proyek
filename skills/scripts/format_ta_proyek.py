@@ -1420,6 +1420,54 @@ def normalize_regular_technical_terms(root, namespaces):
     return changed
 
 
+def enforce_bilingual_abstract_layout(root, namespaces):
+    """Keep both abstracts on separate pages with an 11 pt body baseline."""
+    ns_uri = namespaces['w']
+    body = root.find('.//w:body', namespaces)
+    if body is None:
+        return 0
+    active = False
+    formatted = 0
+    for paragraph in body.findall('w:p', namespaces):
+        text = ''.join(
+            node.text for node in paragraph.iter(f'{{{ns_uri}}}t') if node.text
+        ).strip()
+        ppr = paragraph.find('w:pPr', namespaces)
+        style = ppr.find('w:pStyle', namespaces) if ppr is not None else None
+        style_val = style.get(f'{{{ns_uri}}}val') if style is not None else ''
+        if style_val == 'Heading1' and text.upper() in {'ABSTRAK', 'ABSTRACT'}:
+            if ppr is None:
+                ppr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                paragraph.insert(0, ppr)
+            set_child_element(ppr, 'pageBreakBefore', {})
+            sort_element_children(ppr, PPR_ORDER)
+            active = True
+            continue
+        if active and style_val == 'Heading1':
+            active = False
+        if not active or style_val not in {'Normal', ''}:
+            continue
+        for run in paragraph.findall('.//w:r', namespaces):
+            rpr = run.find('w:rPr', namespaces)
+            if rpr is None:
+                rpr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+                run.insert(0, rpr)
+            set_child_element(
+                rpr,
+                'rFonts',
+                {
+                    'ascii': 'Times New Roman',
+                    'hAnsi': 'Times New Roman',
+                    'eastAsia': 'Times New Roman',
+                    'cs': 'Times New Roman',
+                },
+            )
+            set_child_element(rpr, 'sz', {'val': '22'})
+            set_child_element(rpr, 'szCs', {'val': '22'})
+            formatted += 1
+    return formatted
+
+
 def normalize_nine_point_font_size(root, namespaces):
     """Replace every explicit 9 pt Word size with the canonical 12 pt size."""
     ns_uri = namespaces['w']
@@ -2242,6 +2290,69 @@ def next_bookmark_numeric_id(root, namespaces):
     return max(values, default=0) + 1
 
 
+def ensure_main_body_bookmark(root, namespaces):
+    """Bound the main-body caption range used by the figure/table lists.
+
+    Word's TOC ``\b`` switch limits a caption list to a bookmark range.  The
+    range starts at BAB I and ends immediately before LAMPIRAN 1, so appendix
+    captions remain valid cross-reference targets without entering Daftar
+    Gambar or Daftar Tabel.
+    """
+    ns_uri = namespaces['w']
+    body = root.find('.//w:body', namespaces)
+    if body is None:
+        return False
+
+    paragraphs = list(body.findall('w:p', namespaces))
+    start_p = None
+    end_p = None
+    for paragraph in paragraphs:
+        text = ''.join(paragraph.itertext()).strip()
+        if start_p is None and (text.startswith('BAB I PENDAHULUAN') or text.startswith('BAB I ')):
+            start_p = paragraph
+        if end_p is None and text.startswith('LAMPIRAN 1.'):
+            end_p = paragraph
+    if start_p is None or end_p is None:
+        print('[WARNING] Could not establish _TA_MainBody bookmark range.')
+        return False
+
+    removed_ids = set()
+    for element in list(root.iter()):
+        if element.tag.endswith('bookmarkStart') and (
+            element.get(f'{{{ns_uri}}}name') or element.get('name')
+        ) == '_TA_MainBody':
+            raw_id = element.get(f'{{{ns_uri}}}id') or element.get('id')
+            if raw_id is not None:
+                removed_ids.add(str(raw_id))
+            parent = element.getparent()
+            if parent is not None:
+                parent.remove(element)
+    if removed_ids:
+        for element in list(root.iter()):
+            if element.tag.endswith('bookmarkEnd'):
+                raw_id = element.get(f'{{{ns_uri}}}id') or element.get('id')
+                if str(raw_id) in removed_ids:
+                    parent = element.getparent()
+                    if parent is not None:
+                        parent.remove(element)
+
+    bookmark_id = next_bookmark_numeric_id(root, namespaces)
+    start = lxml.etree.Element(f'{{{ns_uri}}}bookmarkStart')
+    start.set(f'{{{ns_uri}}}id', str(bookmark_id))
+    start.set(f'{{{ns_uri}}}name', '_TA_MainBody')
+    start_ppr = start_p.find('w:pPr', namespaces)
+    start_index = start_p.index(start_ppr) + 1 if start_ppr is not None else 0
+    start_p.insert(start_index, start)
+
+    end = lxml.etree.Element(f'{{{ns_uri}}}bookmarkEnd')
+    end.set(f'{{{ns_uri}}}id', str(bookmark_id))
+    end_ppr = end_p.find('w:pPr', namespaces)
+    end_index = end_p.index(end_ppr) + 1 if end_ppr is not None else 0
+    end_p.insert(end_index, end)
+    print('Bound _TA_MainBody bookmark from BAB I through BAB IV.')
+    return True
+
+
 def replace_semantic_references_in_paragraph(p, targets, namespaces):
     """Replace semantic Markdown references with cached Word ``REF`` fields.
 
@@ -2799,6 +2910,8 @@ def format_document_xmls(unpacked_dir):
             body.remove(child)
         for child in reconstructed_children:
             body.append(child)
+
+        ensure_main_body_bookmark(root, namespaces)
             
         # 3. Create DAFTAR LAMPIRAN section (run before boundaries are checked so it's in Section 1)
         daftar_tabel_idx = -1
@@ -3093,7 +3206,10 @@ def format_document_xmls(unpacked_dir):
                             pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
                             p.insert(0, pPr)
                         set_child_element(pPr, 'pageBreakBefore', {})
-                        if 'DAFTAR' in text.upper() or 'KATA PENGANTAR' in text.upper() or 'ABSTRAK' in text.upper():
+                        if ('DAFTAR' in text.upper()
+                                or 'KATA PENGANTAR' in text.upper()
+                                or 'ABSTRAK' in text.upper()
+                                or 'ABSTRACT' in text.upper()):
                             set_child_element(pPr, 'pStyle', {'val': 'Heading1'})
                             numPr = pPr.find(f'{{{ns_uri}}}numPr', namespaces)
                             if numPr is not None: pPr.remove(numPr)
@@ -3315,7 +3431,7 @@ def format_document_xmls(unpacked_dir):
                         daftar_tabel_idx = idx
                         break
                         
-            insert_dynamic_toc_field(body, daftar_gambar_idx + 1, ' TOC \\h \\z \\c "Gambar" ', namespaces)
+            insert_dynamic_toc_field(body, daftar_gambar_idx + 1, ' TOC \\h \\z \\c "Gambar" \\b _TA_MainBody ', namespaces)
             
         # 2. Clean and insert Table of Tables
         children = list(body)
@@ -3377,7 +3493,7 @@ def format_document_xmls(unpacked_dir):
                         insertion_idx = idx
                         break
                         
-            insert_dynamic_toc_field(body, daftar_tabel_idx + 1, ' TOC \\h \\z \\c "Tabel" ', namespaces)
+            insert_dynamic_toc_field(body, daftar_tabel_idx + 1, ' TOC \\h \\z \\c "Tabel" \\b _TA_MainBody ', namespaces)
             
 
 
@@ -3388,6 +3504,25 @@ def format_document_xmls(unpacked_dir):
         print(f"Applied required inline formatting to {formatted_terms} term occurrences.")
         normalized_acronyms = normalize_regular_technical_terms(root, namespaces)
         print(f"Normalized {normalized_acronyms} regular technical acronym fragments.")
+        abstract_runs = enforce_bilingual_abstract_layout(root, namespaces)
+        print(f"Enforced bilingual abstract layout on {abstract_runs} run(s).")
+        # Cover identity block for the Dwikhi report is required at 14 pt.
+        # Apply direct run sizing after the general 12 pt normalization pass.
+        for paragraph in body.findall('.//w:p', namespaces):
+            paragraph_text = ''.join(
+                node.text for node in paragraph.iter(f'{{{ns_uri}}}t') if node.text
+            ).strip()
+            if paragraph_text in {'Dwikhi Deandra Purnianto', '2210511131'}:
+                for run in paragraph.findall('.//w:r', namespaces):
+                    rpr = run.find('w:rPr', namespaces)
+                    if rpr is None:
+                        rpr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+                        run.insert(0, rpr)
+                    for tag in ('sz', 'szCs'):
+                        size = rpr.find(f'w:{tag}', namespaces)
+                        if size is None:
+                            size = lxml.etree.SubElement(rpr, f'{{{ns_uri}}}{tag}')
+                        size.set(f'{{{ns_uri}}}val', '28')
         fix_whitespace_preservation(root)
         tree.write(doc_path, encoding='utf-8', xml_declaration=True)
         print("Updated document.xml.")

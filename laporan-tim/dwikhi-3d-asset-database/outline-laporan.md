@@ -34,7 +34,7 @@ Gunakan observasi bersama tanpa mengubah batas interpretasi kuesioner dan wawanc
 
 ## BAB III Implementasi Proyek
 
-BAB III memuat bukti proses Unity Editor, hierarki prefab, empat tabel inti, pengelolaan seed, pemetaan identifier, inventaris material atau tekstur, perancangan kebutuhan RLS dan skema `audit_logs`, serta penggunaan alat pemeriksa buatan Faiz. Layanan audit Dashboard dijelaskan sebagai implementasi Iman; trigger audit database tidak diklaim tanpa bukti.
+BAB III memuat bukti proses Unity Editor sebagai alat utama dan Blender untuk sebagian objek pendukung, hierarki prefab, empat tabel inti, pengelolaan seed, pemetaan identifier, inventaris material atau tekstur, perancangan kebutuhan RLS dan skema `audit_logs`, serta penggunaan alat pemeriksa buatan Faiz. Layanan audit Dashboard dijelaskan sebagai implementasi Iman; trigger audit database tidak diklaim tanpa bukti. Penggunaan Sketchfab tidak dinyatakan tanpa nama model, URL, pembuat, dan lisensi.
 
 ## BAB IV Penutup
 

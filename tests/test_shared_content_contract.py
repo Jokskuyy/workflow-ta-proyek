@@ -52,8 +52,8 @@ def test_blackbox_fragment_matches_structured_facts():
     assert result["retest"]["scenario"] == "BB-20"
     assert result["retest"]["result"] == "passed"
     assert "24 dari 24" in text
-    assert "skrip pengujian Unity" in text
-    assert "dinyatakan lulus pada pengujian ulang" in text
+    assert "kode internal `unity_object_name`" in text
+    assert "ringkasan pengujian bersama mencatat BB-20 lulus" in text
 
 
 def test_uat_fragment_matches_structured_scores():
@@ -76,8 +76,11 @@ def test_uat_revision_ids_are_complete_and_unique():
         revision_id = f"UAT-R{number:02d}"
         assert text.count(revision_id) >= 1
         assert revision_id in status
-    table_rows = [line for line in text.splitlines() if line.startswith("UAT-R")]
+    table_rows = [
+        line for line in text.splitlines()
+        if line.lstrip().startswith("| UAT-R")
+    ]
     assert len(table_rows) == 10
-    assert len({line.split("|", 1)[0].strip() for line in table_rows}) == 10
+    assert len({line.split("|", 2)[1].strip() for line in table_rows}) == 10
     assert "UAT-R11" not in text
     assert "UAT-R11" not in status

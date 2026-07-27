@@ -416,7 +416,7 @@ def test_unit_resolve_caption_indices_zero_one_multiple():
     """inj.resolve_caption_indices returns ALL matching body indices: 0, 1, or
     many, per the pStyle=='Caption' + contains + remainder rule."""
     ns = {"w": W}
-    match = "Arsitektur Integrasi Asset 3D dan Data"
+    match = "Arsitektur Keseluruhan Sistem Denah Virtual UPNVJ Kampus Pondok Labu"
 
     # Zero matches: no caption mentions the target descriptor.
     body0 = _body_from_captions(["Gambar 2.1 Sesuatu Yang Lain",

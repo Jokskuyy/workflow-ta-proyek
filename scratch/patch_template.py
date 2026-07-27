@@ -94,12 +94,75 @@ def load_draft_front_matter():
         None,
     )
 
+    def extract_section(heading, keyword_label):
+        marker = f'# {heading}'
+        try:
+            start = next(
+                index for index, line in enumerate(lines[:heading_end])
+                if line.strip() == marker
+            )
+        except StopIteration:
+            return None, None
+        section_lines = []
+        for line in lines[start + 1:heading_end]:
+            stripped = line.strip()
+            if stripped.startswith('# '):
+                break
+            if stripped:
+                section_lines.append(stripped)
+        keyword_prefix = f'{keyword_label}:'
+        keyword_line = next(
+            (line for line in section_lines if line.lower().startswith(keyword_prefix.lower())),
+            None,
+        )
+        abstract_lines = [line for line in section_lines if line != keyword_line]
+        keyword_text = keyword_line[len(keyword_prefix):].strip() if keyword_line else None
+        return ' '.join(abstract_lines).strip() or None, keyword_text
+
+    abstract_id, keywords_id = extract_section('ABSTRAK', 'Kata kunci')
+    abstract_en, keywords_en = extract_section('ABSTRACT', 'Keywords')
+
+    def extract_paragraph_section(heading):
+        marker = f'# {heading}'
+        try:
+            start = next(
+                index for index, line in enumerate(lines[:heading_end])
+                if line.strip() == marker
+            )
+        except StopIteration:
+            return []
+        paragraphs = []
+        current = []
+        for line in lines[start + 1:heading_end]:
+            stripped = line.strip()
+            if stripped.startswith('# '):
+                break
+            if stripped:
+                current.append(stripped)
+            elif current:
+                paragraphs.append(' '.join(current))
+                current = []
+        if current:
+            paragraphs.append(' '.join(current))
+        return paragraphs
+
     return {
         'title': headings[0],
         'subtitle': headings[1],
         'name': metadata_lines[0],
         'nim': metadata_lines[1],
         'year': year,
+        'abstract_id': abstract_id,
+        'keywords_id': keywords_id,
+        'abstract_en': abstract_en,
+        'keywords_en': keywords_en,
+        'originality_statement': extract_paragraph_section(
+            'SURAT PERNYATAAN KEASLIAN'
+        ),
+        'copyright_statement': extract_paragraph_section(
+            'PERNYATAAN MENGENAI SKRIPSI DAN SUMBER INFORMASI SERTA PELIMPAHAN HAK CIPTA'
+        ),
+        'preface': extract_paragraph_section('KATA PENGANTAR'),
     }
 
 
@@ -121,6 +184,573 @@ def replace_paragraph_text(paragraph, text, ns_uri):
             text_node = lxml.etree.SubElement(run, f'{{{ns_uri}}}t')
             text_node.text = line
             text_node.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+
+
+APPROVAL_IMAGE_SOURCE = os.path.join(
+    'images', 'lembar_persetujuan.jpeg'
+)
+
+
+def _next_relationship_id(rels_root):
+    ids = []
+    for relationship in rels_root:
+        value = relationship.get('Id', '')
+        if value.startswith('rId') and value[3:].isdigit():
+            ids.append(int(value[3:]))
+    return f'rId{max(ids, default=0) + 1}'
+
+
+def _next_media_name(media_dir, extension='png'):
+    numbers = []
+    for filename in os.listdir(media_dir):
+        match = re.fullmatch(r'image(\d+)\.[^.]+', filename, re.IGNORECASE)
+        if match:
+            numbers.append(int(match.group(1)))
+    return f'image{max(numbers, default=0) + 1}.{extension.lstrip(".").lower()}'
+
+
+def _next_docpr_id(root):
+    values = []
+    wp_uri = 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing'
+    for node in root.iter(f'{{{wp_uri}}}docPr'):
+        value = node.get('id')
+        if value and value.isdigit():
+            values.append(int(value))
+    return max(values, default=0) + 1
+
+
+def inject_approval_image(paragraph, root, unpacked_dir, ns_uri):
+    """Replace the approval placeholder with the latest supplied image.
+
+    The latest approval image is embedded byte-for-byte as JPEG. It remains a
+    front-matter element rather than a report figure, so no caption, marker, or
+    manifest entry is created.
+    """
+    image_source = os.path.join(os.getcwd(), APPROVAL_IMAGE_SOURCE)
+    if not os.path.exists(image_source):
+        raise FileNotFoundError(
+            'Approval image is missing: ' + image_source
+        )
+
+    media_dir = os.path.join(unpacked_dir, 'word', 'media')
+    rels_path = os.path.join(unpacked_dir, 'word', '_rels', 'document.xml.rels')
+    content_types_path = os.path.join(unpacked_dir, '[Content_Types].xml')
+    os.makedirs(media_dir, exist_ok=True)
+
+    rel_ns = 'http://schemas.openxmlformats.org/package/2006/relationships'
+    rel_tree = lxml.etree.parse(rels_path)
+    rels_root = rel_tree.getroot()
+    r_id = _next_relationship_id(rels_root)
+    source_extension = os.path.splitext(image_source)[1].lstrip('.').lower() or 'png'
+    media_name = _next_media_name(media_dir, source_extension)
+    shutil.copy2(image_source, os.path.join(media_dir, media_name))
+    lxml.etree.SubElement(
+        rels_root,
+        f'{{{rel_ns}}}Relationship',
+        {
+            'Id': r_id,
+            'Type': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
+            'Target': f'media/{media_name}',
+        },
+    )
+    rel_tree.write(rels_path, encoding='utf-8', xml_declaration=True)
+
+    content_types_ns = 'http://schemas.openxmlformats.org/package/2006/content-types'
+    content_tree = lxml.etree.parse(content_types_path)
+    content_root = content_tree.getroot()
+    content_type_by_extension = {
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'png': 'image/png',
+        'webp': 'image/webp',
+    }
+    media_content_type = content_type_by_extension.get(
+        source_extension, 'application/octet-stream'
+    )
+    has_source_extension = any(
+        (node.get('Extension') or '').lower() == source_extension
+        for node in content_root.findall(f'{{{content_types_ns}}}Default')
+    )
+    if not has_source_extension:
+        lxml.etree.SubElement(
+            content_root,
+            f'{{{content_types_ns}}}Default',
+            {'Extension': source_extension, 'ContentType': media_content_type},
+        )
+        content_tree.write(content_types_path, encoding='utf-8', xml_declaration=True)
+
+    try:
+        from inject_all_images import generate_drawing_xml, get_image_dimensions
+    except ImportError:
+        from skills.scripts.inject_all_images import generate_drawing_xml, get_image_dimensions
+
+    width, height = get_image_dimensions(image_source)
+    drawing_paragraph = generate_drawing_xml(
+        r_id,
+        width * 9525,
+        height * 9525,
+        'approval-sheet',
+        _next_docpr_id(root),
+        max_height_emu=8532000,
+    )
+    ppr = paragraph.find(f'{{{ns_uri}}}pPr')
+    for child in list(paragraph):
+        if child is not ppr:
+            paragraph.remove(child)
+    if ppr is None:
+        ppr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+        paragraph.insert(0, ppr)
+    if ppr.find(f'{{{ns_uri}}}pageBreakBefore') is None:
+        lxml.etree.SubElement(ppr, f'{{{ns_uri}}}pageBreakBefore')
+    jc = ppr.find(f'{{{ns_uri}}}jc')
+    if jc is None:
+        jc = lxml.etree.SubElement(ppr, f'{{{ns_uri}}}jc')
+    jc.set(f'{{{ns_uri}}}val', 'center')
+    for property_name in ('keepNext', 'keepLines'):
+        if ppr.find(f'{{{ns_uri}}}{property_name}') is None:
+            lxml.etree.SubElement(ppr, f'{{{ns_uri}}}{property_name}')
+    drawing_run = drawing_paragraph.find(f'{{{ns_uri}}}r')
+    paragraph.append(copy.deepcopy(drawing_run))
+    return media_name
+
+
+def set_paragraph_font_size(paragraph, half_points, ns_uri):
+    """Set direct run size for a cover identity paragraph."""
+    for run in paragraph.findall('.//w:r', {'w': ns_uri}):
+        rpr = run.find('w:rPr', {'w': ns_uri})
+        if rpr is None:
+            rpr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+            run.insert(0, rpr)
+        for tag in ('sz', 'szCs'):
+            node = rpr.find(f'w:{tag}', {'w': ns_uri})
+            if node is None:
+                node = lxml.etree.SubElement(rpr, f'{{{ns_uri}}}{tag}')
+            node.set(f'{{{ns_uri}}}val', str(half_points))
+
+
+def _plain_front_matter_text(text):
+    """Remove Markdown-only delimiters before inserting front-matter prose."""
+    if not text:
+        return ''
+    return re.sub(r'(?<!\\)[*_`]', '', text).replace('\\*', '*')
+
+
+def _build_front_matter_paragraph(
+        text, ns_uri, *, style='Normal', half_points=22,
+        page_break_before=False, alignment='both', first_line_twips=None,
+        left_twips=None, hanging_twips=None, bold=False,
+        after_twips='0', line_twips='240'):
+    paragraph = lxml.etree.Element(f'{{{ns_uri}}}p')
+    ppr = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}pPr')
+    lxml.etree.SubElement(
+        ppr, f'{{{ns_uri}}}pStyle', {f'{{{ns_uri}}}val': style}
+    )
+    if page_break_before:
+        lxml.etree.SubElement(ppr, f'{{{ns_uri}}}pageBreakBefore')
+    lxml.etree.SubElement(
+        ppr, f'{{{ns_uri}}}jc', {f'{{{ns_uri}}}val': alignment}
+    )
+    spacing = {
+        f'{{{ns_uri}}}before': '0',
+        f'{{{ns_uri}}}after': str(after_twips),
+    }
+    if line_twips is not None:
+        spacing[f'{{{ns_uri}}}line'] = str(line_twips)
+        spacing[f'{{{ns_uri}}}lineRule'] = 'auto'
+    lxml.etree.SubElement(ppr, f'{{{ns_uri}}}spacing', spacing)
+    if any(
+        value is not None
+        for value in (first_line_twips, left_twips, hanging_twips)
+    ):
+        indent = {}
+        if first_line_twips is not None:
+            indent[f'{{{ns_uri}}}firstLine'] = str(first_line_twips)
+        if left_twips is not None:
+            indent[f'{{{ns_uri}}}left'] = str(left_twips)
+        if hanging_twips is not None:
+            indent[f'{{{ns_uri}}}hanging'] = str(hanging_twips)
+        lxml.etree.SubElement(
+            ppr,
+            f'{{{ns_uri}}}ind',
+            indent,
+        )
+    run = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}r')
+    rpr = lxml.etree.SubElement(run, f'{{{ns_uri}}}rPr')
+    lxml.etree.SubElement(
+        rpr,
+        f'{{{ns_uri}}}rFonts',
+        {
+            f'{{{ns_uri}}}ascii': 'Times New Roman',
+            f'{{{ns_uri}}}hAnsi': 'Times New Roman',
+            f'{{{ns_uri}}}eastAsia': 'Times New Roman',
+            f'{{{ns_uri}}}cs': 'Times New Roman',
+        },
+    )
+    lxml.etree.SubElement(
+        rpr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': str(half_points)}
+    )
+    lxml.etree.SubElement(
+        rpr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': str(half_points)}
+    )
+    if bold:
+        lxml.etree.SubElement(rpr, f'{{{ns_uri}}}b')
+        lxml.etree.SubElement(rpr, f'{{{ns_uri}}}bCs')
+    text_node = lxml.etree.SubElement(run, f'{{{ns_uri}}}t')
+    text_node.text = _plain_front_matter_text(text)
+    text_node.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+    return paragraph
+
+
+def insert_cover_two_and_statement(body, approval_paragraph, front_matter, ns_uri):
+    """Insert a second cover that follows the first cover's layout.
+
+    The archive template's first cover contains a fixed sequence of
+    paragraphs around the logo and identity block.  Reusing that sequence
+    keeps the second cover's title, identity, and bottom alignment in the
+    same positions.  The thesis title replaces the logo paragraph; no logo
+    or image is added to the second cover.
+    """
+    insertion_index = list(body).index(approval_paragraph)
+    title = front_matter['title']
+    subtitle = front_matter['subtitle']
+    preceding_paragraphs = [
+        paragraph for paragraph in list(body)[:insertion_index]
+        if paragraph.tag == f'{{{ns_uri}}}p'
+    ]
+
+    # The archive cover consists of 15 paragraphs (title, logo slot, and
+    # identity block).  Clone those paragraphs when available so all spacing,
+    # alignment, and font properties track the first cover automatically.
+    if len(preceding_paragraphs) >= 15:
+        cover_paragraphs = [
+            copy.deepcopy(paragraph)
+            for paragraph in preceding_paragraphs[:15]
+        ]
+        replace_paragraph_text(cover_paragraphs[0], 'LAPORAN PROYEK', ns_uri)
+        replace_paragraph_text(cover_paragraphs[1], '', ns_uri)
+        # Replace the logo paragraph with the two-line thesis title while
+        # retaining the first cover's logo-slot position and paragraph style.
+        title_slot = copy.deepcopy(cover_paragraphs[0])
+        replace_paragraph_text(
+            title_slot, title + '\n' + subtitle, ns_uri
+        )
+        cover_paragraphs[4] = title_slot
+        replace_paragraph_text(
+            cover_paragraphs[7], front_matter['name'], ns_uri
+        )
+        replace_paragraph_text(
+            cover_paragraphs[8], front_matter['nim'], ns_uri
+        )
+        replace_paragraph_text(cover_paragraphs[11], 'INFORMATIKA', ns_uri)
+        replace_paragraph_text(
+            cover_paragraphs[12], 'FAKULTAS ILMU KOMPUTER', ns_uri
+        )
+        replace_paragraph_text(
+            cover_paragraphs[13],
+            'UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAKARTA',
+            ns_uri,
+        )
+        replace_paragraph_text(
+            cover_paragraphs[14], front_matter['year'], ns_uri
+        )
+        first_ppr = cover_paragraphs[0].find(f'{{{ns_uri}}}pPr')
+        if first_ppr is None:
+            first_ppr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+            cover_paragraphs[0].insert(0, first_ppr)
+        if first_ppr.find(f'{{{ns_uri}}}pageBreakBefore') is None:
+            lxml.etree.SubElement(
+                first_ppr, f'{{{ns_uri}}}pageBreakBefore'
+            )
+    else:
+        # Keep the helper useful in isolation and in unit tests that provide
+        # only a small synthetic body rather than the full archive cover.
+        text_kwargs = {
+            'half_points': 28,
+            'alignment': 'center',
+            'bold': True,
+            'after_twips': '120',
+            'line_twips': None,
+        }
+        blank_kwargs = {
+            'alignment': 'center',
+            'after_twips': '0',
+            'line_twips': '240',
+        }
+        cover_paragraphs = [
+            _build_front_matter_paragraph(
+                'LAPORAN PROYEK', ns_uri, page_break_before=True,
+                **text_kwargs,
+            ),
+            _build_front_matter_paragraph('', ns_uri, **blank_kwargs),
+            _build_front_matter_paragraph('', ns_uri, **blank_kwargs),
+            _build_front_matter_paragraph('', ns_uri, **blank_kwargs),
+            _build_front_matter_paragraph(
+                title + '\n' + subtitle, ns_uri, **text_kwargs
+            ),
+            _build_front_matter_paragraph('', ns_uri, **blank_kwargs),
+            _build_front_matter_paragraph('', ns_uri, **blank_kwargs),
+            _build_front_matter_paragraph(
+                front_matter['name'], ns_uri, **text_kwargs
+            ),
+            _build_front_matter_paragraph(
+                front_matter['nim'], ns_uri, **text_kwargs
+            ),
+            _build_front_matter_paragraph('', ns_uri, **blank_kwargs),
+            _build_front_matter_paragraph('', ns_uri, **blank_kwargs),
+            _build_front_matter_paragraph(
+                'INFORMATIKA', ns_uri, **text_kwargs
+            ),
+            _build_front_matter_paragraph(
+                'FAKULTAS ILMU KOMPUTER', ns_uri, **text_kwargs
+            ),
+            _build_front_matter_paragraph(
+                'UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAKARTA',
+                ns_uri, **text_kwargs,
+            ),
+            _build_front_matter_paragraph(
+                front_matter['year'], ns_uri, **text_kwargs
+            ),
+        ]
+    statement_source = front_matter.get('originality_statement') or []
+    if statement_source:
+        statement_paragraphs = [
+            _build_front_matter_paragraph(
+                'SURAT PERNYATAAN KEASLIAN',
+                ns_uri, style='Normal', half_points=24,
+                page_break_before=True, alignment='center', bold=True,
+                after_twips='240',
+            ),
+        ]
+        field_prefixes = ('Nama:', 'NIM:', 'Program Studi:', 'Judul Proyek:')
+        signature_prefixes = (
+            'Jakarta,', 'Yang menyatakan,', '[Meterai dan tanda tangan]'
+        )
+        for text in statement_source:
+            is_field = text.startswith(field_prefixes)
+            is_signature = (
+                text.startswith(signature_prefixes)
+                or text == front_matter.get('name')
+            )
+            if is_signature:
+                alignment = 'right'
+                first_line_twips = None
+            elif is_field or text == 'Yang bertanda tangan di bawah ini:':
+                alignment = 'left'
+                first_line_twips = None
+            else:
+                alignment = 'both'
+                first_line_twips = 567
+            after_twips = (
+                '720' if text == '[Meterai dan tanda tangan]' else
+                '240' if text.startswith('Demikian surat pernyataan') else
+                '0'
+            )
+            statement_paragraphs.append(
+                _build_front_matter_paragraph(
+                    text, ns_uri, half_points=24, alignment=alignment,
+                    first_line_twips=first_line_twips,
+                    after_twips=after_twips, line_twips='276',
+                )
+            )
+    else:
+        statement_paragraphs = [
+            _build_front_matter_paragraph(
+                'PERNYATAAN MENGENAI SKRIPSI DAN SUMBER INFORMASI',
+                ns_uri, style='Normal', half_points=24,
+                page_break_before=True, alignment='center', bold=True,
+            ),
+            _build_front_matter_paragraph('', ns_uri, alignment='center'),
+        ]
+
+    copyright_source = front_matter.get('copyright_statement') or []
+    if copyright_source:
+        copyright_paragraphs = [
+            _build_front_matter_paragraph(
+                'PERNYATAAN MENGENAI SKRIPSI DAN SUMBER INFORMASI SERTA PELIMPAHAN HAK CIPTA',
+                ns_uri, style='Normal', half_points=24,
+                page_break_before=True, alignment='center', bold=True,
+                after_twips='240',
+            ),
+        ]
+        signature_values = {
+            front_matter.get('name'),
+            front_matter.get('nim'),
+            f"{front_matter.get('name')} {front_matter.get('nim')}",
+        }
+        for text in copyright_source:
+            is_signature = (
+                text.startswith('Jakarta,')
+                or text in signature_values
+            )
+            copyright_paragraphs.append(
+                _build_front_matter_paragraph(
+                    text, ns_uri, half_points=24,
+                    alignment='right' if is_signature else 'both',
+                    first_line_twips=None if is_signature else 567,
+                    after_twips='240' if text.startswith('Dengan ini saya melimpahkan') else '0',
+                    line_twips='276',
+                )
+            )
+        statement_paragraphs.extend(copyright_paragraphs)
+    cover_paragraphs.extend(statement_paragraphs)
+    for offset, paragraph in enumerate(cover_paragraphs):
+        body.insert(insertion_index + offset, paragraph)
+    return len(cover_paragraphs)
+
+
+def insert_blank_front_heading(body, heading, ns_uri):
+    """Insert one blank front-matter page immediately before Daftar Isi."""
+    target = None
+    fallback = None
+    for child in body:
+        visible = ''.join(
+            node.text for node in child.iter(f'{{{ns_uri}}}t') if node.text
+        ).strip()
+        if visible.upper() == 'DAFTAR GAMBAR' and fallback is None:
+            fallback = child
+        if 'DAFTAR ISI' in visible.upper():
+            target = child
+            break
+    if target is None:
+        target = fallback
+    if target is None:
+        return 0
+    target_ppr = target.find(f'{{{ns_uri}}}pPr')
+    if target_ppr is None:
+        target_ppr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+        target.insert(0, target_ppr)
+    if target_ppr.find(f'{{{ns_uri}}}pageBreakBefore') is None:
+        lxml.etree.SubElement(target_ppr, f'{{{ns_uri}}}pageBreakBefore')
+    insertion_index = list(body).index(target)
+    paragraphs = [
+        _build_front_matter_paragraph(
+            heading, ns_uri, style='Normal', half_points=24,
+            page_break_before=True, alignment='center', bold=True,
+        ),
+        _build_front_matter_paragraph('', ns_uri, alignment='center'),
+    ]
+    for offset, paragraph in enumerate(paragraphs):
+        body.insert(insertion_index + offset, paragraph)
+    return len(paragraphs)
+
+
+def insert_preface_page(body, preface_paragraphs, ns_uri, signature_values=None):
+    """Insert the authored Kata Pengantar immediately before Daftar Isi."""
+    if not preface_paragraphs:
+        return 0
+    target = None
+    fallback = None
+    for child in body:
+        visible = ''.join(
+            node.text for node in child.iter(f'{{{ns_uri}}}t') if node.text
+        ).strip()
+        field_code = ''.join(
+            node.text for node in child.iter(f'{{{ns_uri}}}instrText') if node.text
+        ).upper()
+        if visible.upper() == 'DAFTAR GAMBAR' and fallback is None:
+            fallback = child
+        if 'DAFTAR ISI' in visible.upper() or ' TOC ' in f' {field_code} ':
+            target = child
+            break
+    if target is None:
+        target = fallback
+    if target is None:
+        return 0
+
+    target_ppr = target.find(f'{{{ns_uri}}}pPr')
+    if target_ppr is None:
+        target_ppr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+        target.insert(0, target_ppr)
+    if target_ppr.find(f'{{{ns_uri}}}pageBreakBefore') is None:
+        lxml.etree.SubElement(target_ppr, f'{{{ns_uri}}}pageBreakBefore')
+
+    insertion_index = list(body).index(target)
+    paragraphs = [
+        _build_front_matter_paragraph(
+            'KATA PENGANTAR', ns_uri, style='Normal', half_points=24,
+            page_break_before=True, alignment='center', bold=True,
+        ),
+    ]
+    signature_values = {
+        value for value in (signature_values or ()) if value
+    }
+    for text in preface_paragraphs:
+        numbered = re.match(r'^\d+\.\s+', text) is not None
+        is_signature = (
+            text.startswith('Jakarta,')
+            or text in signature_values
+            or bool(re.fullmatch(r'\d{10}', text))
+        )
+        paragraphs.append(
+            _build_front_matter_paragraph(
+                text, ns_uri, half_points=24,
+                alignment='right' if is_signature else 'both',
+                first_line_twips=(
+                    None if numbered or is_signature else 567
+                ),
+                left_twips=567 if numbered and not is_signature else None,
+                hanging_twips=360 if numbered and not is_signature else None,
+                after_twips='0', line_twips='276',
+            )
+        )
+    for offset, paragraph in enumerate(paragraphs):
+        body.insert(insertion_index + offset, paragraph)
+    return len(paragraphs)
+
+
+def insert_bilingual_abstracts(body, front_matter, ns_uri):
+    """Insert one separate page per abstract immediately before DAFTAR ISI."""
+    required = ('abstract_id', 'keywords_id', 'abstract_en', 'keywords_en')
+    if not front_matter or not all(front_matter.get(key) for key in required):
+        return 0
+    target = None
+    fallback = None
+    for child in body:
+        visible = ''.join(
+            node.text for node in child.iter(f'{{{ns_uri}}}t') if node.text
+        ).strip()
+        field_code = ''.join(
+            node.text for node in child.iter(f'{{{ns_uri}}}instrText') if node.text
+        ).upper()
+        if visible == 'DAFTAR GAMBAR' and fallback is None:
+            fallback = child
+        if 'DAFTAR ISI' in visible.upper() or ' TOC ' in f' {field_code} ':
+            target = child
+            break
+    if target is None:
+        target = fallback
+    if target is None:
+        return 0
+    insertion_index = list(body).index(target)
+    paragraphs = [
+        _build_front_matter_paragraph(
+            'ABSTRAK', ns_uri, style='Heading1', half_points=24,
+            page_break_before=True, alignment='center', bold=True,
+        ),
+        _build_front_matter_paragraph(
+            front_matter['abstract_id'], ns_uri, half_points=22,
+            alignment='both', first_line_twips=567,
+        ),
+        _build_front_matter_paragraph(
+            f"Kata kunci: {front_matter['keywords_id']}", ns_uri,
+            half_points=22, alignment='left',
+        ),
+        _build_front_matter_paragraph(
+            'ABSTRACT', ns_uri, style='Heading1', half_points=24,
+            page_break_before=True, alignment='center', bold=True,
+        ),
+        _build_front_matter_paragraph(
+            front_matter['abstract_en'], ns_uri, half_points=22,
+            alignment='both', first_line_twips=567,
+        ),
+        _build_front_matter_paragraph(
+            f"Keywords: {front_matter['keywords_en']}", ns_uri,
+            half_points=22, alignment='left',
+        ),
+    ]
+    for offset, paragraph in enumerate(paragraphs):
+        body.insert(insertion_index + offset, paragraph)
+    return len(paragraphs)
 
 new_erd_markdown = """Penjelasan mengenai struktur tabel, kolom, tipe data, serta aturan relasi antartabel dijabarkan sebagai berikut:
 
@@ -300,10 +930,10 @@ def main():
                 replaced_front_paragraphs += 1
         print(f'Replaced {replaced_front_paragraphs} split front-matter paragraph(s).')
 
-        # The retained template contains Iman's signed approval scan.  It must
-        # not be carried into another student's report when no matching signed
-        # document is available.  Keep the dedicated page, but replace the
-        # mismatched scan with an explicit, non-fabricated placeholder.
+        # The retained template contains Iman's signed approval scan. It must
+        # not be carried into another student's report. Dwikhi's supplied PDF
+        # is embedded exactly as rendered; other reports retain the existing
+        # non-fabricated placeholder behavior.
         if front_matter['name'] != 'Muhammad Iman Nugraha':
             front_drawings = [
                 paragraph
@@ -311,16 +941,33 @@ def main():
                 if paragraph.find('.//w:drawing', namespaces) is not None
             ]
             if len(front_drawings) >= 2:
-                replace_paragraph_text(
-                    front_drawings[1],
-                    'LEMBAR PERSETUJUAN\n\n'
-                    + front_matter['name']
-                    + '\nNIM '
-                    + front_matter['nim']
-                    + '\n\n[TBD: lampirkan lembar persetujuan resmi yang telah ditandatangani]',
-                    ns_uri,
-                )
-                print('Replaced mismatched template approval scan with a TBD placeholder.')
+                approval_paragraph = front_drawings[1]
+                if front_matter['name'] == 'Dwikhi Deandra Purnianto':
+                    media_name = inject_approval_image(
+                        approval_paragraph, root, 'unpacked_ta', ns_uri
+                    )
+                    print(
+                        'Replaced template approval scan with the latest approval image '
+                        f'({media_name}).'
+                    )
+                    inserted_front = insert_cover_two_and_statement(
+                        body, approval_paragraph, front_matter, ns_uri
+                    )
+                    print(
+                        'Inserted second cover and originality statement page '
+                        f'({inserted_front} paragraph(s)).'
+                    )
+                else:
+                    replace_paragraph_text(
+                        approval_paragraph,
+                        'LEMBAR PERSETUJUAN\n\n'
+                        + front_matter['name']
+                        + '\nNIM '
+                        + front_matter['nim']
+                        + '\n\n[TBD: lampirkan lembar persetujuan resmi yang telah ditandatangani]',
+                        ns_uri,
+                    )
+                    print('Replaced mismatched template approval scan with a TBD placeholder.')
 
     wt_replaced = 0
     for wt in root.xpath('//w:t', namespaces=namespaces):
@@ -551,6 +1198,45 @@ def main():
     else:
         print("Warning: Could not locate ERD section paragraphs in document.xml.")
         
+    if front_matter:
+        inserted_abstract_paragraphs = insert_bilingual_abstracts(
+            body, front_matter, ns_uri
+        )
+        if inserted_abstract_paragraphs:
+            print(
+                'Inserted %d bilingual abstract paragraph(s).'
+                % inserted_abstract_paragraphs
+            )
+        else:
+            print('Warning: bilingual abstract metadata was incomplete or target was missing.')
+
+        if front_matter.get('name') == 'Dwikhi Deandra Purnianto':
+            inserted_preface = insert_preface_page(
+                body,
+                front_matter.get('preface'),
+                ns_uri,
+                signature_values=(
+                    front_matter.get('name'),
+                    front_matter.get('nim'),
+                ),
+            )
+            if not inserted_preface:
+                inserted_preface = insert_blank_front_heading(
+                    body, 'KATA PENGANTAR', ns_uri
+                )
+            if inserted_preface:
+                print(
+                    'Inserted Kata Pengantar page '
+                    f'({inserted_preface} paragraph(s)).'
+                )
+
+        identity_values = {front_matter.get('name'), front_matter.get('nim')}
+        for paragraph in body.findall('.//w:p', namespaces):
+            paragraph_text = ''.join(
+                node.text for node in paragraph.iter(f'{{{ns_uri}}}t') if node.text
+            ).strip()
+            if paragraph_text in identity_values:
+                set_paragraph_font_size(paragraph, 28, ns_uri)
     tree.write(xml_path, encoding='utf-8', xml_declaration=True)
     print("SUCCESS: document.xml patched and saved.")
     

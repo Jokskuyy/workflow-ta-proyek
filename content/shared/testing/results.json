@@ -16,17 +16,16 @@
       "scenario": "BB-20",
       "result": "passed",
       "evidence": [
-        "Hasil UAT/dokumentasi revisi/BB20_1.png",
-        "Hasil UAT/dokumentasi revisi/BB20_2.png"
+        "Ringkasan data pengujian bersama"
       ],
-      "verification": "Dua tangkapan layar berurutan menunjukkan label tujuan yang mudah dibaca dan garis rute sebelum pengguna tiba. Setelah pengguna tiba, garis rute hilang dan notifikasi kedatangan tampil."
+      "verification": "Ringkasan pengujian bersama mencatat BB-20 lulus setelah label tujuan menggunakan nama yang mudah dibaca."
     },
     "final_verification": {
       "passed_scenarios": 24,
       "failed_scenarios": [],
       "success_rate": "100.00%"
     },
-    "evidence_status": "Hasil awal 23 dari 24 tersedia pada Hasil UAT/Hasil_BlackBox.docx; pengujian ulang BB-20 dibuktikan melalui BB20_1.png dan BB20_2.png sehingga status akhir menjadi 24 dari 24 terverifikasi lulus."
+    "evidence_status": "Ringkasan data pengujian bersama mencatat hasil awal 23 dari 24 dan hasil akhir 24 dari 24 skenario lulus."
   },
   "user_acceptance_testing": {
     "respondents": {
@@ -75,43 +74,43 @@
     "revision_verification": {
       "UAT-R01": {
         "basis": ["source_audit"],
-        "limitations": ["Perubahan diverifikasi pada berkas seed; penerapan ulang pada database Supabase aktif belum diverifikasi."]
+        "limitations": ["Ringkasan hanya menjelaskan perubahan yang tercatat pada berkas seed."]
       },
       "UAT-R02": {
-        "basis": ["visual", "source_audit"],
-        "limitations": ["Tangkapan layar digunakan untuk memeriksa hasil setelah perbaikan, bukan sebagai kuesioner UAT kedua."]
+        "basis": ["source_audit"],
+        "limitations": ["Ringkasan mengikuti artefak produk bersama dan bukan kuesioner UAT kedua."]
       },
       "UAT-R03": {
-        "basis": ["visual", "source_audit"],
-        "limitations": ["Screenshot membuktikan alur utama pada deployment, bukan pengujian seluruh kombinasi rute."]
+        "basis": ["source_audit"],
+        "limitations": ["Ringkasan tidak menyatakan seluruh kombinasi rute telah diuji."]
       },
       "UAT-R04": {
         "basis": ["source_audit"],
         "limitations": ["Solusi aktual menggunakan label tujuan dinamis dan object tulisan pada scene; tidak diklaim bahwa seluruh fasilitas memiliki label statis."]
       },
       "UAT-R05": {
-        "basis": ["visual", "source_audit"],
+        "basis": ["source_audit"],
         "limitations": ["Adaptasi bersifat kontekstual melalui bahasa, perangkat, mode, tutorial, pencarian, dan spawn; tidak ada profil persona tersimpan."]
       },
       "UAT-R06": {
-        "basis": ["visual", "source_audit"],
-        "limitations": ["Verifikasi visual tidak menggantikan pengujian pengguna berulang pada seluruh landmark."]
+        "basis": ["source_audit"],
+        "limitations": ["Ringkasan tidak menyatakan seluruh landmark telah diuji oleh pengguna."]
       },
       "UAT-R07": {
-        "basis": ["visual", "source_audit"],
-        "limitations": ["Validasi source mencakup 16 spawn dan pemeriksaan NavMesh; screenshot tidak menampilkan seluruh spawn satu per satu."]
+        "basis": ["source_audit"],
+        "limitations": ["Ringkasan mencatat 16 titik awal pada konfigurasi produk."]
       },
       "UAT-R08": {
-        "basis": ["visual", "official_source"],
-        "limitations": ["Nomor telepon diverifikasi terhadap halaman resmi Penmaru UPNVJ; screenshot hanya memperlihatkan akses tombol bantuan."]
+        "basis": ["source_audit", "official_source"],
+        "limitations": ["Nomor telepon mengikuti halaman resmi Penmaru UPNVJ."]
       },
       "UAT-R09": {
         "basis": ["source_audit"],
-        "limitations": ["Kelengkapan dan keunikan diverifikasi pada berkas seed; sinkronisasi terhadap database Supabase aktif dan seluruh GameObject Unity belum diverifikasi."]
+        "limitations": ["Ringkasan hanya menjelaskan kelengkapan dan keunikan yang tercatat pada berkas seed."]
       },
       "UAT-R10": {
-        "basis": ["visual", "automated_test", "source_audit", "user_confirmed_deployment"],
-        "limitations": ["Tangkapan layar memverifikasi notifikasi pada kondisi kedatangan normal. Pemberitahuan yang kosong, tidak valid, berbeda, dan diterima setelah pembatalan diperiksa melalui 11 pengujian React."]
+        "basis": ["automated_test", "source_audit", "user_confirmed_deployment"],
+        "limitations": ["Ringkasan mencatat 11 pengujian React untuk beberapa kondisi pemberitahuan."]
       }
     }
   }

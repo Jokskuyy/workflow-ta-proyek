@@ -19,7 +19,7 @@ def test_project_facts_json_is_valid_and_role_scope_is_current():
 def test_draft_does_not_claim_production_trigger_or_exclusive_tool_ownership():
     draft = (ROOT / "Tugas_Akhir_Draft.md").read_text(encoding="utf-8")
     assert "trigger audit database tidak diklaim" in draft
-    assert "DatabaseSyncChecker` dikembangkan oleh Faiz" in draft
+    assert "DatabaseSyncChecker` buatan *3D Simulator* dan *Engine Developer*" in draft
     assert "kebutuhan kebijakan RLS" in draft
     assert "struktur tabel `audit_logs`" in draft
     assert "kontrak runtime" not in draft

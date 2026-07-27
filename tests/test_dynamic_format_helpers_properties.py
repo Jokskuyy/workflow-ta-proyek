@@ -292,7 +292,7 @@ def test_property7_no_caption_text_not_in_draft(label, number, desc, absent):
 # case/whitespace of the heading text.
 # Validates: Requirements 5.1, 5.2, 5.4
 FRONT_HINT_HEADINGS = ["DAFTAR ISI", "KATA PENGANTAR", "DAFTAR GAMBAR",
-                       "DAFTAR TABEL", "ABSTRAK"]
+                       "DAFTAR TABEL", "ABSTRAK", "ABSTRACT"]
 _pre_par_strategy = st.one_of(
     st.builds(lambda t: ("h1", t), st.sampled_from(FRONT_HINT_HEADINGS)),
     st.builds(lambda t: ("narr", t), st.text(alphabet=_desc_chars,

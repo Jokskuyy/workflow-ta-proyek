@@ -112,7 +112,7 @@
             "nim": "2210511131",
             "role": "Desainer Asset 3D dan Desainer Skema Database",
             "focus": [
-                "Creation and layout of all building and facility 3D GameObjects in Unity Editor without Blender",
+                "Creation and layout of all building and facility 3D GameObjects primarily in Unity Editor, with Blender used for some supporting objects",
                 "Prefab hierarchy and child Pointer target GameObjects",
                 "Core PostgreSQL schema and ERD design for gedung, fasilitas, fakultas, and program_studi",
                 "Management of gedung and fasilitas records",
@@ -121,8 +121,8 @@
                 "Design of audit_logs table schema",
                 "Use of DatabaseSyncChecker developed by the 3D Simulator & Engine Developer"
             ],
-            "asset_observation_method": "Observasi visual langsung dan dokumentasi fotografis dengan mendatangi gedung satu per satu. Tidak dilakukan pengukuran dimensi menggunakan alat ukur; bentuk dan proporsi asset disusun sebagai representasi visual berdasarkan massa bangunan, jumlah lantai, pola bukaan, warna, material, dan hubungan antarelemen yang terlihat.",
-            "data_collection_constraint": "Pengumpulan data dilakukan secara mandiri dari gedung ke gedung. Keterbatasan akses dan minimnya informasi menyebabkan sebagian nama atau fungsi ruangan tidak dapat dipastikan mutakhir, sehingga data yang belum terverifikasi tidak boleh dinyatakan sebagai kondisi final."
+            "asset_observation_method": "Observasi visual langsung dan dokumentasi fotografis dengan mendatangi gedung satu per satu. Tidak dilakukan pengukuran dimensi menggunakan alat ukur; bentuk dan proporsi asset disusun sebagai representasi visual berdasarkan bentuk utama bangunan, jumlah lantai, susunan pintu dan jendela, warna, material, dan perbandingan antarbagian yang terlihat.",
+            "data_collection_constraint": "Pengumpulan data dilakukan secara mandiri dari gedung ke gedung. Nama dan fungsi ruangan dicatat berdasarkan informasi yang tersedia saat observasi."
         }
     ],
     "dwikhi_project_schedule": {
@@ -203,19 +203,88 @@
     "dwikhi_evidence_inventory": {
         "unity_editor_version": "6000.4.1f1",
         "active_scene": "Assets/Scene/SceneUtama.unity",
-        "reference_visual_files": 22,
-        "representative_render_hierarchy_pairs": 11,
+        "reference_visual_files": 30,
+        "reference_visual_files_used_in_report_inventory": 30,
+        "render_hierarchy_pairs": 20,
+        "canonical_asset_count": 19,
+        "database_building_asset_count": 19,
+        "facility_asset_evidence_count": 1,
+        "documented_asset_evidence_total": 20,
+        "missing_render_hierarchy_asset": null,
+        "parkir_belakang_render_hierarchy": {
+            "render_file": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_parkir_belakang.png",
+            "render_resolution": "1242 x 421",
+            "hierarchy_file": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_parkir_belakang.png",
+            "hierarchy_resolution": "360 x 837"
+        },
         "material_texture_files": 37,
         "material_texture_source_match": "Seluruh 37 berkas material dan tekstur pada bukti laporan memiliki byte yang sama dengan berkas bernama sama pada proyek Unity sumber.",
-        "additional_material_reference_files": 30,
-        "material_reference_folder_total_files": 67,
-        "additional_material_reference_breakdown": "Dua berkas berupa referensi tekstur permukaan, 21 berkas berupa referensi warna polos, satu berkas logo Mandiri, lima berkas model atau tekstur alat olahraga, dan satu berkas warna patung.",
-        "additional_material_reference_status": "Ke-21 referensi warna digunakan pada material Unity dan dua referensi tekstur permukaan diterapkan pada Gedung Utama/Jenderal Soedirman. Logo Mandiri digunakan pada asset gedung bank sebagai pelengkap visual lingkungan aktual tanpa record database. Lima berkas model atau tekstur alat olahraga digunakan pada objek alat olahraga di depan Gedung Dewi Sartika. Berkas warna patung digunakan pada asset patung. Kecocokan byte berkas tambahan dengan proyek Unity sumber belum diverifikasi.",
+        "additional_material_reference_files": 32,
+        "material_reference_folder_total_files": 69,
+        "additional_material_reference_breakdown": "Dua berkas berupa referensi tekstur permukaan, 21 berkas berupa referensi warna polos, satu berkas logo Mandiri, lima berkas model atau tekstur alat olahraga, satu berkas warna patung, serta dua referensi interpretasi material berupa kaca.jpg dan material_warna_besi.png.",
+        "additional_material_reference_status": "Ke-21 referensi warna digunakan pada material Unity dan dua referensi tekstur permukaan diterapkan pada Gedung Utama/Jenderal Soedirman. Logo Mandiri digunakan pada asset gedung bank sebagai pelengkap visual lingkungan aktual tanpa record database. Lima berkas model atau tekstur alat olahraga digunakan pada objek alat olahraga di depan Gedung Dewi Sartika. Berkas warna patung digunakan pada asset patung. Material kaca jendela interior dan material tulisan nama gedung dibuat langsung di Unity sehingga tidak tersedia sebagai PNG. kaca.jpg yang diperoleh dari internet hanya menjadi interpretasi visual material kaca jendela interior, sedangkan material_warna_besi.png yang diperoleh dari internet hanya menjadi interpretasi visual material tulisan nama gedung. Kedua referensi tidak ditampilkan secara eksplisit dan tidak digunakan sebagai tekstur yang diterapkan langsung pada proyek.",
+        "interpretive_material_references": {
+            "kaca.jpg": {
+                "represents": "Material kaca jendela interior",
+                "displayed_explicitly": false,
+                "project_use": "Referensi dari internet untuk interpretasi visual; material asli dibuat langsung di Unity dan tidak diekspor sebagai PNG"
+            },
+            "material_warna_besi.png": {
+                "represents": "Material tulisan nama gedung",
+                "displayed_explicitly": false,
+                "project_use": "Referensi dari internet untuk interpretasi visual; material asli dibuat langsung di Unity dan tidak diekspor sebagai PNG"
+            }
+        },
+        "modeling_tools": {
+            "primary": "Unity Editor",
+            "supporting": "Blender",
+            "blender_evidence": "Tangkapan layar memperlihatkan pembuatan objek teks 3D; pemetaan objek tersebut ke asset tertentu belum tersedia.",
+            "sketchfab_claim_status": "Tidak diklaim sampai nama model, URL, pembuat, dan lisensi tersedia."
+        },
+        "prefab_sizes": {
+            "Abdul Rahman Saleh": "7.26 MB",
+            "Cipto Mangunkusumo": "7.58 MB",
+            "Dewi Sartika": "11.2 MB",
+            "Jenderal Soedirman": "11.2 MB",
+            "Ki Hadjar Dewantara": "24.3 MB",
+            "M. Yamin": "6.21 MB",
+            "Muh. Husni Thamrin": "10.5 MB",
+            "R.A. Kartini": "19.1 MB",
+            "Soepomo": "3.06 MB",
+            "Soetomo": "2.16 MB",
+            "UKM": "3.20 MB",
+            "Wahidin Sudiro Husodo": "14.7 MB",
+            "Yos Sudarso": "7.93 MB",
+            "Kantin": "21,160 KB",
+            "Lapangan Upacara": "468 KB",
+            "Lapangan Basket": "1,451 KB",
+            "Masjid": "4.15 MB",
+            "Parkir Belakang": "5,592 KB",
+            "Parkir Depan": "89,222 KB",
+            "Parkir Hukum": "9,400 KB"
+        },
+        "measured_asset_count": 20,
+        "measured_building_asset_count": 19,
+        "measured_facility_asset_count": 1,
+        "parkir_hukum_metrics": {
+            "game_objects": 69,
+            "mesh_instances": 61,
+            "unique_meshes": 61,
+            "vertices": 21680,
+            "triangles": 11072,
+            "material_slots": 71,
+            "unique_materials": 8,
+            "colliders": 61,
+            "collider_type": "MeshCollider",
+            "prefab_size_bytes": 9624700,
+            "prefab_path": "Assets/Prefab/Gedung/Fix/Environment/parkir_hukum.prefab",
+            "evidence_file": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_Parkir_hukum.png"
+        },
         "performance_scope": "Data GameObject, mesh, vertex, dan ukuran prefab digunakan sebagai inventaris keadaan asset, bukan hasil optimasi atau pengujian performa.",
-        "provenance_limit": "Identitas pengambil, tanggal dan lokasi sebagian foto, serta sumber atau lisensi beberapa material dan tekstur belum tercatat lengkap."
+        "provenance_limit": "kaca.jpg serta material_warna_besi.png diperlakukan sebagai interpretasi visual material yang dibuat langsung di Unity dan tidak dianggap sebagai tekstur yang diterapkan langsung pada proyek."
     },
     "live_data_snapshot": {
-        "status": "historical_and_not_latest_seed",
+        "status": "historical_context",
         "building_records": 19,
         "facility_records": 331,
         "unity_name_records": 323,
@@ -224,22 +293,22 @@
             "database_only": 3,
             "scene_only": 14
         },
-        "interpretation": "Data endpoint dan hasil DatabaseSyncChecker merupakan snapshot lama. Seed final berisi 19 gedung dan 311 fasilitas serta belum diterapkan ulang pada Supabase aktif."
+        "interpretation": "Data endpoint dan hasil DatabaseSyncChecker merupakan catatan pemeriksaan pada waktu yang berbeda dari inventaris seed. Laporan menggunakan seed final berisi 19 entitas gedung dan 311 fasilitas sebagai sumber jumlah record."
     },
     "facility_seed_inventory": {
-        "source_status": "Seed terbaru yang diberikan pada lampiran SQL menjadi sumber data fasilitas yang didokumentasikan. Supabase belum menggunakan seed terbaru; jumlah GameObject Unity tidak disamakan otomatis dengan jumlah record database.",
+        "source_status": "Seed terbaru yang diberikan pada lampiran SQL menjadi sumber data fasilitas yang didokumentasikan. Jumlah GameObject Unity tidak disamakan otomatis dengan jumlah record database.",
         "building_records": 19,
         "raw_total_records": 311,
         "groups": [
-            {"seed_reference": 1, "name": "Gedung Rektorat (Jenderal Soedirman)", "facility_count": 36},
-            {"seed_reference": 2, "name": "Gedung Dr. Soepomo", "facility_count": 24},
+            {"seed_reference": 1, "name": "Gedung Rektorat (jenderal soedirman)", "facility_count": 36},
+            {"seed_reference": 2, "name": "Gedung DR. Soepomo", "facility_count": 24},
             {"seed_reference": 3, "name": "Gedung Dr. Wahidin Sudiro Husodo", "facility_count": 38},
             {"seed_reference": 4, "name": "Gedung Dr. Cipto Mangunkusumo", "facility_count": 38},
             {"seed_reference": 5, "name": "Gedung Abdul Rahman Saleh", "facility_count": 25},
             {"seed_reference": 6, "name": "Gedung Ki Hadjar Dewantara", "facility_count": 25},
             {"seed_reference": 7, "name": "Gedung Muh. Husni Thamrin", "facility_count": 37},
             {"seed_reference": 8, "name": "Gedung Muhammad Yamin", "facility_count": 20},
-            {"seed_reference": 10, "name": "Gedung R.A. Kartini", "facility_count": 24},
+            {"seed_reference": 10, "name": "Gedung RA Kartini", "facility_count": 24},
             {"seed_reference": 13, "name": "Gedung Dewi Sartika", "facility_count": 26},
             {"seed_reference": 17, "name": "Gedung Soetomo", "facility_count": 18}
         ],
@@ -247,7 +316,7 @@
             "Seed terbaru memuat 311 fasilitas setelah standardisasi data dan penyelesaian satu data duplikat.",
             "Masjid dicatat sebagai fasilitas dengan id_gedung 6 pada Gedung Ki Hadjar Dewantara, sedangkan asset visual Masjid memiliki GameObject tersendiri.",
             "Gedung Soepomo, Gedung Soetomo, Yos Sudarso, RA Kartini, Lapangan Basket, dan entitas gedung lain merupakan record gedung yang berbeda.",
-            "Nama dan fungsi ruangan belum seluruhnya diverifikasi terhadap kondisi lapangan terbaru."
+            "Pengumpulan data lapangan dilakukan secara mandiri dengan informasi nama dan fungsi ruangan yang tersedia saat observasi."
         ]
     },
     "database_schema": {

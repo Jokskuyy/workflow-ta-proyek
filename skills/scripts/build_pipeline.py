@@ -39,8 +39,11 @@ def ensure_unlocked(path, attempts=5, wait_seconds=2):
 
 def run_command(args, label):
     print(f"\n>>> Running: {label}...")
-    # Use C:\Python312\python.exe to match user environment
+    # Prefer the documented interpreter, but fall back to the active runtime
+    # when that path is not installed on the current workstation.
     python_exe = "C:\\Python312\\python.exe"
+    if not os.path.exists(python_exe):
+        python_exe = sys.executable
     cmd = [python_exe] + args
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:

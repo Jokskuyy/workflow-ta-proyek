@@ -4,7 +4,7 @@ Branch `laporan/dwikhi` mendokumentasikan peran Desainer Asset 3D dan Desainer S
 
 ## Fokus Laporan
 
-1. Pembuatan dan penataan asset 3D gedung serta fasilitas yang memiliki GameObject pada scene Unity menggunakan Unity Editor.
+1. Pembuatan dan penataan asset 3D gedung serta fasilitas yang memiliki GameObject pada scene Unity, dengan Unity Editor sebagai alat utama dan Blender untuk sebagian objek pendukung yang memiliki bukti.
 2. Penyusunan prefab, child `Pointer`, dan GameObject tujuan.
 3. Perancangan ERD dan struktur empat tabel inti: `gedung`, `fasilitas`, `fakultas`, dan `program_studi`.
 4. Pengelolaan seed gedung dan fasilitas.
@@ -29,7 +29,7 @@ Sumber diagram berada di folder `diagrams/` dan menggunakan PlantUML sebagai sum
 1. Tidak ada klaim optimasi performa asset karena optimasi dilakukan pada runtime Unity melalui pekerjaan Faiz.
 2. Seed final 19 gedung dan 311 fasilitas dibedakan dari snapshot Supabase aktif 19 gedung dan 331 fasilitas.
 3. Hasil sinkronisasi 320 cocok, 3 hanya pada database, dan 14 hanya pada scene diperlakukan sebagai snapshot lama.
-4. Provenance foto atau tekstur yang tidak tersedia dinyatakan sebagai keterbatasan.
+4. Provenance foto yang tidak tersedia dinyatakan sebagai keterbatasan. `kaca.jpg` dan `material_warna_besi.png` hanya menjadi interpretasi visual untuk material yang dibuat langsung di Unity, bukan tekstur sumber proyek. Penggunaan Sketchfab tidak diklaim sebelum nama model, URL, pembuat, dan lisensi tersedia.
 5. Dwikhi merancang kebutuhan kebijakan RLS dan skema tabel `audit_logs`; penerapan layanan audit Dashboard ditangani Iman, sedangkan trigger audit database tidak diklaim tanpa bukti.
 
 ## Acuan

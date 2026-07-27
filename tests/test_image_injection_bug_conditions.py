@@ -310,7 +310,7 @@ def test_c2_natural_zero_match_entries_are_detected(base_entries, tmp_path):
     ``test_c2_synthetic_zero_match_is_detected`` (``diagram_erd``)."""
     entries = dict(base_entries)
     doc = parse_doc(entries)
-    target = "Arsitektur Integrasi Asset 3D dan Data"  # manifest entry: diagram_arsitektur
+    target = "Arsitektur Keseluruhan Sistem Denah Virtual UPNVJ Kampus Pondok Labu"  # manifest entry: diagram_arsitektur
     assert caption_match_count(doc, target) == 1, (
         "precondition: entry diagram_arsitektur must resolve to exactly 1 caption "
         "in the captured baseline document"

@@ -2,191 +2,107 @@
   "images": [
     {
       "id": "diagram_arsitektur",
-      "file": "diagram_arsitektur.png",
-      "caption_match": "Arsitektur Integrasi Asset 3D dan Data",
-            "source": "diagrams/gambar-2-09-arsitektur-integrasi-aset-data.svg",
+      "file": "arsitektur_keseluruhan_sistem.png",
+      "caption_match": "Arsitektur Keseluruhan Sistem Denah Virtual UPNVJ Kampus Pondok Labu",
+            "source": "images/arsitektur_keseluruhan_sistem.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_tahap_pengembangan",
       "file": "diagram_tahap_pengembangan.png",
       "caption_match": "Alur Perancangan Asset 3D dan Data",
-            "source": "diagrams/gambar-2-10-alur-perancangan-aset-data.svg",
+            "source": "images/diagram_tahap_pengembangan.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_hierarki_prefab",
       "file": "diagram_hierarki_prefab.png",
       "caption_match": "Rancangan Hierarki Prefab dan Target Navigasi",
-            "source": "diagrams/gambar-2-11-hierarki-prefab.svg",
+            "source": "images/diagram_hierarki_prefab.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_erd",
       "file": "diagram_erd.png",
       "caption_match": "ERD Inti Data Gedung, Fasilitas, Fakultas, dan Program Studi",
-            "source": "diagrams/gambar-2-17-erd-inti-data-kampus.svg",
+            "source": "images/diagram_erd.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_sequence_validasi",
       "file": "diagram_sequence_validasi.png",
       "caption_match": "Sequence Diagram Validasi Identifier Asset dan Data",
-            "source": "diagrams/gambar-2-16-sequence-validasi-aset-data.svg",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_login_admin",
-      "file": "mockup_login_admin.png",
-      "caption_match": "Halaman Login Admin",
-      "source": "dokumentasi/login-page.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_dashboard_admin",
-      "file": "mockup_dashboard_admin.png",
-      "caption_match": "Halaman Dashboard Admin",
-      "source": "dokumentasi/header+gedung-view.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_modal_tambah_gedung",
-      "file": "mockup_modal_tambah_gedung.png",
-      "caption_match": "Modal Tambah Data Gedung",
-      "source": "dokumentasi/modal-create-gedung.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_modal_edit_gedung",
-      "file": "mockup_modal_edit_gedung.png",
-      "caption_match": "Modal Update Data Gedung",
-      "source": "dokumentasi/modal-edit-gedung.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_modal_hapus_gedung",
-      "file": "mockup_modal_hapus_gedung.png",
-      "caption_match": "Modal Konfirmasi Hapus Data Gedung",
-      "source": "dokumentasi/modal-konfirmasi-delete-gedung.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_admin_traffic",
-      "file": "mockup_admin_traffic.png",
-      "caption_match": "Traffic Website Admin",
-      "source": "dokumentasi/section-admin-traffic-view.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_hero_section",
-      "file": "mockup_hero_section.png",
-      "caption_match": "Hero Section",
-      "source": "dokumentasi/section-header+hero.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_public_traffic",
-      "file": "mockup_public_traffic.png",
-      "caption_match": "Public Traffic Statistics Website",
-      "source": "dokumentasi/traffic-web-public.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_fasilitas_aset",
-      "file": "mockup_fasilitas_aset.png",
-      "caption_match": "Bagian Fasilitas dan Asset",
-      "source": "dokumentasi/section fasilitas-asset(dan gedung).png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_modal_list_fasilitas",
-      "file": "mockup_modal_list_fasilitas.png",
-      "caption_match": "Modal List Fasilitas dan Asset",
-      "source": "dokumentasi/modal-fasilitas-aset.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_modal_detail_fasilitas",
-      "file": "mockup_modal_detail_fasilitas.png",
-      "caption_match": "Modal Fasilitas dan Asset",
-      "source": "dokumentasi/modal-fasilitas-aset.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "mockup_footer",
-      "file": "mockup_footer.png",
-      "caption_match": "Bagian Footer",
-      "source": "dokumentasi/section-footer.png",
+            "source": "images/diagram_sequence_validasi.png",
       "inject_method": "post_com"
     },
     {
       "id": "foto_wawancara_warek",
       "file": "foto_wawancara_warek.jpg",
       "caption_match": "Dokumentasi Wawancara Pemangku Kepentingan",
-      "source": "unpacked_ta/word/media/image12.jpg",
+      "source": "images/foto_wawancara_warek.jpg",
       "inject_method": "post_com"
     },
     {
       "id": "impl_pointer_hierarchy",
       "file": "impl_pointer_hierarchy.png",
       "caption_match": "Hierarki Prefab Gedung dengan Child Pointer di Unity",
-      "source": "unpacked_ta/word/media/image31.png",
+      "source": "images/impl_pointer_hierarchy.png",
       "inject_method": "post_com"
     },
     {
       "id": "impl_sync_db_checker",
       "file": "impl_sync_db_checker.png",
       "caption_match": "Tampilan UI Database Sync Checker di Unity Editor",
-      "source": "unpacked_ta/word/media/image32.png",
+      "source": "images/impl_sync_db_checker.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_01_profil",
       "file": "surveys/survey_01_profil.png",
       "caption_match": "Hasil Kuesioner: Profil Status Akademik Responden",
-      "source": "unpacked_ta/word/media/image4.png",
+      "source": "images/surveys/survey_01_profil.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_02_efektivitas",
       "file": "surveys/survey_02_efektivitas.png",
       "caption_match": "Hasil Kuesioner: Efektivitas Media Navigasi Kampus Saat Ini",
-      "source": "unpacked_ta/word/media/image5.png",
+      "source": "images/surveys/survey_02_efektivitas.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_03_frekuensi",
       "file": "surveys/survey_03_frekuensi.png",
       "caption_match": "Hasil Kuesioner: Frekuensi Kesulitan Menemukan Lokasi",
-      "source": "unpacked_ta/word/media/image6.png",
+      "source": "images/surveys/survey_03_frekuensi.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_04_perilaku",
       "file": "surveys/survey_04_perilaku.png",
       "caption_match": "Hasil Kuesioner: Perilaku Pengguna Saat Mencari Lokasi",
-      "source": "unpacked_ta/word/media/image7.png",
+      "source": "images/surveys/survey_04_perilaku.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_05_urgensi",
       "file": "surveys/survey_05_urgensi.png",
       "caption_match": "Hasil Kuesioner: Urgensi Kebutuhan Peta Virtual 3D",
-      "source": "unpacked_ta/word/media/image8.png",
+      "source": "images/surveys/survey_05_urgensi.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_06_adopsi",
       "file": "surveys/survey_06_adopsi.png",
       "caption_match": "Hasil Kuesioner: Potensi Adopsi Denah Virtual 3D",
-      "source": "unpacked_ta/word/media/image9.png",
+      "source": "images/surveys/survey_06_adopsi.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_07_prioritas",
       "file": "surveys/survey_07_prioritas.png",
       "caption_match": "Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus",
-      "source": "unpacked_ta/word/media/image10.png",
+      "source": "images/surveys/survey_07_prioritas.png",
       "inject_method": "post_com"
     },
     {
@@ -218,10 +134,101 @@
       "inject_method": "post_com"
     },
     {
+      "id": "evidence_photo_parkir_belakang",
+      "file": "list_foto/Refrensi_parkiran_belakang.png",
+      "caption_match": "Referensi Aktual Parkir Belakang",
+      "source": "images/list_foto/Refrensi_parkiran_belakang.webp",
+      "inject_method": "post_com"
+    },
+    {
       "id": "evidence_process_asset",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/Proses_penegerjaan_asset_gedung.png",
       "caption_match": "Proses Pengerjaan Asset Gedung di Unity Editor",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/Proses_penegerjaan_asset_gedung.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "process_dewi_reference",
+      "file": "list_foto/refrensi_gedung_dewi_sartika.jpeg",
+      "caption_match": "Referensi Visual Gedung Dewi Sartika",
+      "source": "images/list_foto/refrensi_gedung_dewi_sartika.jpeg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "process_dewi_base",
+      "file": "pembuatan_gedung/bentuk_dasar_dewi_sartika.png",
+      "caption_match": "Bentuk Dasar Gedung Dewi Sartika",
+      "source": "images/pembuatan_gedung/bentuk_dasar_dewi_sartika.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "process_dewi_ground_floor",
+      "file": "pembuatan_gedung/pembentukan_lantai_dasar_Gedung_dewi_sartika.png",
+      "caption_match": "Pembentukan Struktur Lantai Dasar Gedung Dewi Sartika",
+      "source": "images/pembuatan_gedung/pembentukan_lantai_dasar_Gedung_dewi_sartika.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "process_dewi_material_create",
+      "file": "pembuatan_gedung/Langkah_pembuatan_material_1.png",
+      "caption_match": "Pembuatan Material Baru pada Unity",
+      "source": "images/pembuatan_gedung/Langkah_pembuatan_material_1.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "process_dewi_material_texture",
+      "file": "pembuatan_gedung/Langkah_pembuatan_material_2_(drag_and_drop_png).png",
+      "caption_match": "Penambahan Tekstur pada Material di Unity",
+      "source": "images/pembuatan_gedung/Langkah_pembuatan_material_2_(drag_and_drop_png).png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "process_dewi_material_apply",
+      "file": "pembuatan_gedung/Langkah_pembuatan_material_3_(drag_and_drop_material).png",
+      "caption_match": "Tampilan Model Gedung Dewi Sartika pada Tahap Penggunaan Material",
+      "source": "images/pembuatan_gedung/Langkah_pembuatan_material_3_(drag_and_drop_material).png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "process_dewi_environment",
+      "file": "pembuatan_gedung/penambahan_environment_Gedung_dewi_sartika.png",
+      "caption_match": "Penambahan Objek Pendukung pada Gedung Dewi Sartika",
+      "source": "images/pembuatan_gedung/penambahan_environment_Gedung_dewi_sartika.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "process_dewi_floor_groups",
+      "file": "pembuatan_gedung/pembagian_gedung_dewi_sartika_per_lantai.png",
+      "caption_match": "Pengelompokan Gedung Dewi Sartika Berdasarkan Lantai",
+      "source": "images/pembuatan_gedung/pembagian_gedung_dewi_sartika_per_lantai.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "process_dewi_pointer_create",
+      "file": "pembuatan_gedung/Pembuatan_pointer_1.png",
+      "caption_match": "Pembuatan Kelompok Pointer pada Gedung Dewi Sartika",
+      "source": "images/pembuatan_gedung/Pembuatan_pointer_1.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "process_dewi_pointer_target",
+      "file": "pembuatan_gedung/Pembuatan_pointer_2.png",
+      "caption_match": "Penamaan dan Penempatan Objek Tujuan dewi_sartika",
+      "source": "images/pembuatan_gedung/Pembuatan_pointer_2.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "process_dewi_scene_placement",
+      "file": "pembuatan_gedung/penempatan_gedung_dewi_sartika_di_scene_utama.png",
+      "caption_match": "Penempatan Gedung Dewi Sartika pada Scene Utama",
+      "source": "images/pembuatan_gedung/penempatan_gedung_dewi_sartika_di_scene_utama.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "process_dewi_prefab_save",
+      "file": "pembuatan_gedung/penyimpanan_prefab_gedung_dewi_sartika.png",
+      "caption_match": "Penyimpanan Gedung Dewi Sartika sebagai Prefab",
+      "source": "images/pembuatan_gedung/penyimpanan_prefab_gedung_dewi_sartika.png",
       "inject_method": "post_com"
     },
     {
@@ -271,42 +278,60 @@
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Cipto_Mangunkusumo.png",
       "caption_match": "Asset 3D Gedung Cipto Mangunkusumo",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Cipto_Mangunkusumo.png",
-      "inject_method": "post_com"
+      "inject_method": "post_com",
+      "max_height_cm": 7.5,
+      "page_group": "bab3_cipto_pair",
+      "page_group_order": 1
     },
     {
       "id": "evidence_hierarchy_cipto",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset gedung_Cipto Mangunkusumo.png",
       "caption_match": "Hierarki Asset Gedung Cipto Mangunkusumo",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset gedung_Cipto Mangunkusumo.png",
-      "inject_method": "post_com"
+      "inject_method": "post_com",
+      "max_height_cm": 7.5,
+      "page_group": "bab3_cipto_pair",
+      "page_group_order": 2
     },
     {
       "id": "evidence_asset_myamin",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_M.Yamin.png",
       "caption_match": "Asset 3D Gedung M. Yamin",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_M.Yamin.png",
-      "inject_method": "post_com"
+      "inject_method": "post_com",
+      "max_height_cm": 7.5,
+      "page_group": "bab3_myamin_pair",
+      "page_group_order": 1
     },
     {
       "id": "evidence_hierarchy_myamin",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_M.Yamin.png",
       "caption_match": "Hierarki Asset Gedung M. Yamin",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_M.Yamin.png",
-      "inject_method": "post_com"
+      "inject_method": "post_com",
+      "max_height_cm": 7.5,
+      "page_group": "bab3_myamin_pair",
+      "page_group_order": 2
     },
     {
       "id": "evidence_asset_wahidin",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_wahidin_Sudiro_Husodo.png",
       "caption_match": "Asset 3D Gedung Wahidin Sudiro Husodo",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_wahidin_Sudiro_Husodo.png",
-      "inject_method": "post_com"
+      "inject_method": "post_com",
+      "max_height_cm": 7.5,
+      "page_group": "bab3_wahidin_pair",
+      "page_group_order": 1
     },
     {
       "id": "evidence_hierarchy_wahidin",
       "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Wahidin_Sudiro_Husodo.png",
       "caption_match": "Hierarki Asset Gedung Wahidin Sudiro Husodo",
       "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Wahidin_Sudiro_Husodo.png",
-      "inject_method": "post_com"
+      "inject_method": "post_com",
+      "max_height_cm": 7.5,
+      "page_group": "bab3_wahidin_pair",
+      "page_group_order": 2
     },
     {
       "id": "evidence_asset_dewi",
@@ -358,6 +383,132 @@
       "inject_method": "post_com"
     },
     {
+      "id": "evidence_prefab_sizes_latest",
+      "file": "data/Ukuran__file_prefab_1.png",
+      "caption_match": "Ukuran Berkas Prefab Lingkungan Terbaru",
+      "source": "images/data/Ukuran__file_prefab_1.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_abdul_rahman",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_Gedung_Abdul_Rachman.png",
+      "caption_match": "Hasil Pengukuran Asset Abdul Rahman Saleh",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_Gedung_Abdul_Rachman.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_cipto",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_Cipto.png",
+      "caption_match": "Hasil Pengukuran Asset Cipto Mangunkusumo",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_Cipto.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_myamin",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_M_Yamin.png",
+      "caption_match": "Hasil Pengukuran Asset M. Yamin",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_M_Yamin.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_thamrin",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_Muh_Husni_Thamrin.png",
+      "caption_match": "Hasil Pengukuran Asset Muh. Husni Thamrin",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_Muh_Husni_Thamrin.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_kartini",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_Ra_kartini.png",
+      "caption_match": "Hasil Pengukuran Asset R.A. Kartini",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_Ra_kartini.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_soepomo",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_soepomo.png",
+      "caption_match": "Hasil Pengukuran Asset Soepomo",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_soepomo.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_soetomo",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_soetomo.png",
+      "caption_match": "Hasil Pengukuran Asset Soetomo",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_soetomo.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_ukm",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_Gedung_UKM.png",
+      "caption_match": "Hasil Pengukuran Asset UKM",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_Gedung_UKM.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_wahidin",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_Gedung_Wahidin.png",
+      "caption_match": "Hasil Pengukuran Asset Wahidin Sudiro Husodo",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_Gedung_Wahidin.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_yos",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_Yos_Sudarso.png",
+      "caption_match": "Hasil Pengukuran Asset Yos Sudarso",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_gedung_Yos_Sudarso.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_kantin",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_Kantin.png",
+      "caption_match": "Hasil Pengukuran Asset Kantin",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_Kantin.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_lapangan_upacara",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_Lapanagn_upacara.png",
+      "caption_match": "Hasil Pengukuran Asset Lapangan Upacara",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_Lapanagn_upacara.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_lapangan_basket",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_Lapangan_Basket.png",
+      "caption_match": "Hasil Pengukuran Asset Lapangan Basket",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_Lapangan_Basket.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_masjid",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_masjid.png",
+      "caption_match": "Hasil Pengukuran Asset Masjid",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_masjid.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_parkir_belakang",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_Parkir_Belakang.png",
+      "caption_match": "Hasil Pengukuran Asset Parkir Belakang",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_Parkir_Belakang.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_parkir_depan",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_Parkir_depan.png",
+      "caption_match": "Hasil Pengukuran Asset Parkir Depan",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_Parkir_depan.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_metrics_parkir_hukum",
+      "file": "Pengujian_vertex/pengujian_vertex_dan_mesh_Parkir_hukum.png",
+      "caption_match": "Hasil Pengukuran Asset Parkir Hukum",
+      "source": "images/Pengujian_vertex/pengujian_vertex_dan_mesh_Parkir_hukum.png",
+      "inject_method": "post_com"
+    },
+    {
       "id": "evidence_constraint_inventory",
       "file": "Memeriksa_constraint_database.png",
       "caption_match": "Inventaris Constraint Tabel Utama pada Supabase",
@@ -393,10 +544,247 @@
       "inject_method": "post_com"
     },
     {
+      "id": "evidence_asset_abdul_rahman",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung Abdul_Rachman_Saleh.png",
+      "caption_match": "Asset 3D Gedung Abdul Rahman Saleh",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung Abdul_Rachman_Saleh.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_abdul_rahman",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset gedung_Abdul Rachman_Saleh.png",
+      "caption_match": "Hierarki Asset Gedung Abdul Rahman Saleh",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset gedung_Abdul Rachman_Saleh.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_jenderal",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Jenderal_Soedirman.png",
+      "caption_match": "Asset 3D Gedung Jenderal Soedirman",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Jenderal_Soedirman.png",
+      "inject_method": "post_com",
+      "max_height_cm": 7.5,
+      "page_group": "bab3_jenderal_pair",
+      "page_group_order": 1
+    },
+    {
+      "id": "evidence_hierarchy_jenderal",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Jenderal_Soedirman.png",
+      "caption_match": "Hierarki Asset Gedung Jenderal Soedirman",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Jenderal_Soedirman.png",
+      "inject_method": "post_com",
+      "max_height_cm": 7.5,
+      "page_group": "bab3_jenderal_pair",
+      "page_group_order": 2
+    },
+    {
+      "id": "evidence_asset_ki_hadjar",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Ki hajar_Dewantara.png",
+      "caption_match": "Asset 3D Gedung Ki Hadjar Dewantara",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Ki hajar_Dewantara.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_ki_hadjar",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Ki_hajar_Dewantara.png",
+      "caption_match": "Hierarki Asset Gedung Ki Hadjar Dewantara",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Ki_hajar_Dewantara.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_masjid",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Masjid.png",
+      "caption_match": "Asset 3D Masjid",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Masjid.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_masjid",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Masjid.png",
+      "caption_match": "Hierarki Asset Masjid",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Masjid.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_thamrin",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_muh_husni_tamrin.png",
+      "caption_match": "Asset 3D Gedung Muh. Husni Thamrin",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_muh_husni_tamrin.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_thamrin",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Husni_Tamrin.png",
+      "caption_match": "Hierarki Asset Gedung Muh. Husni Thamrin",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Husni_Tamrin.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_kartini",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_R.A.Kartini.png",
+      "caption_match": "Asset 3D Gedung R.A. Kartini",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_R.A.Kartini.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_kartini",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_R.A.Kartini.png",
+      "caption_match": "Hierarki Asset Gedung R.A. Kartini",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_R.A.Kartini.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_soepomo",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Soepomo.png",
+      "caption_match": "Asset 3D Gedung Soepomo",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Soepomo.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_soepomo",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Soepomo.png",
+      "caption_match": "Hierarki Asset Gedung Soepomo",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Soepomo.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_soetomo",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Soetomo.png",
+      "caption_match": "Asset 3D Gedung Soetomo",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Soetomo.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_soetomo",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Soetomo.png",
+      "caption_match": "Hierarki Asset Gedung Soetomo",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Soetomo.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_ukm",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_UKM.png",
+      "caption_match": "Asset 3D Gedung UKM",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_UKM.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_ukm",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_UKM.png",
+      "caption_match": "Hierarki Asset Gedung UKM",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_UKM.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_yos",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Yos_Sudarsso.png",
+      "caption_match": "Asset 3D Gedung Yos Sudarso",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_gedung_Yos_Sudarsso.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_yos",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Yos_Sudarso.png",
+      "caption_match": "Hierarki Asset Gedung Yos Sudarso",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_gedung_Yos_Sudarso.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_kantin",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_kantin.png",
+      "caption_match": "Asset 3D Kantin",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_kantin.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_kantin",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_kantin.png",
+      "caption_match": "Hierarki Asset Kantin",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_kantin.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_lapangan_basket",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_Lapangan_basket.png",
+      "caption_match": "Asset 3D Lapangan Basket",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_Lapangan_basket.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_lapangan_basket",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_Lapangan_basket.png",
+      "caption_match": "Hierarki Asset Lapangan Basket",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_Lapangan_basket.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_lapangan_upacara",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_Lapangan_upacara.png",
+      "caption_match": "Asset 3D Lapangan Upacara",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_Lapangan_upacara.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_lapangan_upacara",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_Lapangan_upacara.png",
+      "caption_match": "Hierarki Asset Lapangan Upacara",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_Lapangan_upacara.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_parkir_belakang",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_parkir_belakang.png",
+      "caption_match": "Asset 3D Parkir Belakang",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_parkir_belakang.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_parkir_belakang",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_parkir_belakang.png",
+      "caption_match": "Hierarki Asset Parkir Belakang",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_parkir_belakang.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_parkir_depan",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_parkir_depan.png",
+      "caption_match": "Asset 3D Parkir Depan",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_parkir_depan.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_parkir_depan",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_parkir_depan.png",
+      "caption_match": "Hierarki Asset Parkir Depan",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hierarki_asset_parkir_depan.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_asset_parkir_hukum",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_parkir_hukum.png",
+      "caption_match": "Asset 3D Parkir Hukum",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/asset_parkir_hukum.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_hierarchy_parkir_hukum",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hieraki_asset_parkir_hukum.png",
+      "caption_match": "Hierarki Asset Parkir Hukum",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/hieraki_asset_parkir_hukum.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "evidence_process_blender",
+      "file": "list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/Proses_penegerjaan_asset_object.png",
+      "caption_match": "Proses Pembuatan Objek Teks 3D pada Blender",
+      "source": "images/list_prefab_gedung_&_hierarki_dan_prroses_pengerjaan/Proses_penegerjaan_asset_object.png",
+      "inject_method": "post_com"
+    },
+    {
       "id": "foto_penyerahan_pakta_upa_tik",
       "file": "foto_penyerahan_pakta_upa_tik.jpeg",
       "caption_match": "Dokumentasi Penyerahan Pakta Integritas kepada UPA TIK",
-      "source": "dokumentasi/ttd pakta integritas UPA TIK.jpeg",
+            "source": "images/foto_penyerahan_pakta_upa_tik.jpeg",
       "inject_method": "post_com"
     }
   ]

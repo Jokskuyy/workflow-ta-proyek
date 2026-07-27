@@ -1,0 +1,166 @@
+{"kind":"deck","id":"pr/x66gjr","name":"Deck"}
+{"kind":"layout","layoutId":"f9b20433-ec06-470f-906b-463f43b7c118","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"27081935-e4c7-4d99-bca7-b3781070d959","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/mtx25w","slide":1,"title":"PRESENTASI TUGAS AKHIR","textShapes":9}
+{"kind":"shape","id":"sh/bypkjqxs","slide":1,"bbox":[0,0,22,720]}
+{"kind":"textbox","id":"sh/czilcvex","slide":1,"name":"kicker","text":"PRESENTASI TUGAS AKHIR","textPreview":"PRESENTASI TUGAS AKHIR","textChars":22,"textLines":1,"bbox":[72,72,560,24]}
+{"kind":"textbox","id":"sh/d0r2l0vi","slide":1,"name":"title","text":"Pengembangan Dashboard Web, Integrasi Unity WebGL, dan Deployment","textPreview":"Pengembangan Dashboard Web, Integrasi Unity WebGL, dan Deployment","textChars":65,"textLines":1,"bbox":[72,130,720,165]}
+{"kind":"textbox","id":"sh/y103e5w3","slide":1,"name":"subtitle","text":"Sistem Denah Virtual UPNVJ Kampus Pondok Labu","textPreview":"Sistem Denah Virtual UPNVJ Kampus Pondok Labu","textChars":45,"textLines":1,"bbox":[76,330,640,76]}
+{"kind":"shape","id":"sh/z29knado","slide":1,"name":"title-panel","bbox":[820,96,350,430]}
+{"kind":"shape","id":"sh/03ilgfe9","slide":1,"bbox":[866,154,78,7]}
+{"kind":"textbox","id":"sh/l4r2p0vu","slide":1,"name":"person","text":"Muhammad Iman Nugraha","textPreview":"Muhammad Iman Nugraha","textChars":21,"textLines":1,"bbox":[866,192,270,88]}
+{"kind":"textbox","id":"sh/m503i5wf","slide":1,"name":"nim","text":"NIM 2210511129 · Informatika","textPreview":"NIM 2210511129 · Informatika","textChars":28,"textLines":1,"bbox":[866,302,270,32]}
+{"kind":"textbox","id":"sh/n694rad0","slide":1,"name":"role","text":"Full Stack Web Developer · System Integrator · DevOps Engineer","textPreview":"Full Stack Web Developer · System Integrator · DevOps Engineer","textChars":62,"textLines":1,"bbox":[866,364,270,100]}
+{"kind":"textbox","id":"sh/bylwni50","slide":1,"name":"project","text":"Proyek Denah Virtual UPNVJ Kampus Pondok Labu","textPreview":"Proyek Denah Virtual UPNVJ Kampus Pondok Labu","textChars":45,"textLines":1,"bbox":[76,606,670,24]}
+{"kind":"textbox","id":"sh/axcvud4v","slide":1,"name":"source-footer","text":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textPreview":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textChars":69,"textLines":1,"bbox":[72,688,780,18]}
+{"kind":"textbox","id":"sh/x03eps36","slide":1,"name":"year-footer","text":"UPNVJ · 2026","textPreview":"UPNVJ · 2026","textChars":12,"textLines":1,"bbox":[1030,688,178,18]}
+{"kind":"notes","id":"nt/mtx25w","slide":1,"text":""}
+{"kind":"slide","id":"sl/s6vvsr","slide":2,"title":"KONTEKS MASALAH","textShapes":9}
+{"kind":"textbox","id":"sh/itcvilkj","slide":2,"name":"eyebrow","text":"KONTEKS MASALAH","textPreview":"KONTEKS MASALAH","textChars":15,"textLines":1,"bbox":[72,42,600,22]}
+{"kind":"textbox","id":"sh/5g3et0ja","slide":2,"name":"slide-title","text":"Masalah yang diselesaikan","textPreview":"Masalah yang diselesaikan","textChars":25,"textLines":1,"bbox":[72,74,980,52]}
+{"kind":"shape","id":"sh/4fudkv2p","slide":2,"bbox":[72,138,88,5]}
+{"kind":"textbox","id":"sh/rilwva10","slide":2,"name":"source-footer","text":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textPreview":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textChars":69,"textLines":1,"bbox":[72,688,780,18]}
+{"kind":"textbox","id":"sh/qhcvm5kf","slide":2,"name":"year-footer","text":"UPNVJ · 2026","textPreview":"UPNVJ · 2026","textChars":12,"textLines":1,"bbox":[1030,688,178,18]}
+{"kind":"textbox","id":"sh/dk3ex0j6","slide":2,"name":"problem-lead","text":"Proyek membutuhkan jalur web yang mudah diakses untuk mencari fasilitas, mengelola data, dan membuka visualisasi Unity WebGL dari satu pengalaman pengguna.","textPreview":"Proyek membutuhkan jalur web yang mudah diakses untuk mencari fasilitas, mengelola data, dan membuka visualisasi Unity WebGL dari satu pe...","textChars":155,"textLines":1,"bbox":[72,180,640,100]}
+{"kind":"shape","id":"sh/sjudovil","slide":2,"name":"bullet-dot-0","bbox":[80,339,10,10]}
+{"kind":"textbox","id":"sh/fm5wza1c","slide":2,"name":"bullet-0","text":"Dashboard publik untuk pencarian dan eksplorasi.","textPreview":"Dashboard publik untuk pencarian dan eksplorasi.","textChars":48,"textLines":1,"bbox":[104,330,586,55]}
+{"kind":"shape","id":"sh/elwvq50r","slide":2,"name":"bullet-dot-1","bbox":[80,387,10,10]}
+{"kind":"textbox","id":"sh/o3ahwf65","slide":2,"name":"bullet-1","text":"Panel Admin untuk autentikasi dan CRUD data.","textPreview":"Panel Admin untuk autentikasi dan CRUD data.","textChars":44,"textLines":1,"bbox":[104,378,586,55]}
+{"kind":"shape","id":"sh/p4jyp07q","slide":2,"name":"bullet-dot-2","bbox":[80,435,10,10]}
+{"kind":"textbox","id":"sh/218zu5oz","slide":2,"name":"bullet-2","text":"API sebagai jalur pertukaran data dashboard–Unity.","textPreview":"API sebagai jalur pertukaran data dashboard–Unity.","textChars":50,"textLines":1,"bbox":[104,426,586,55]}
+{"kind":"shape","id":"sh/n21gnapk","slide":2,"name":"bullet-dot-3","bbox":[80,483,10,10]}
+{"kind":"textbox","id":"sh/crahkf6h","slide":2,"name":"bullet-3","text":"Deployment agar layanan dapat diakses melalui browser.","textPreview":"Deployment agar layanan dapat diakses melalui browser.","textChars":54,"textLines":1,"bbox":[104,474,586,55]}
+{"kind":"image","id":"im/m1076lsz","slide":2,"name":"","geometry":"roundRect","alt":"Section denah kampus pada frontend","bbox":[760,190,400,308]}
+{"kind":"notes","id":"nt/s6vvsr","slide":2,"text":""}
+{"kind":"slide","id":"sl/g3m3j1","slide":3,"title":"RUANG LINGKUP","textShapes":14}
+{"kind":"textbox","id":"sh/r21wn658","slide":3,"name":"eyebrow","text":"RUANG LINGKUP","textPreview":"RUANG LINGKUP","textChars":13,"textLines":1,"bbox":[72,42,600,22]}
+{"kind":"textbox","id":"sh/s3axgbmt","slide":3,"name":"slide-title","text":"Batas kontribusi Iman","textPreview":"Batas kontribusi Iman","textChars":21,"textLines":1,"bbox":[72,74,980,52]}
+{"kind":"shape","id":"sh/d4jepgne","slide":3,"bbox":[72,138,88,5]}
+{"kind":"textbox","id":"sh/id8fa14r","slide":3,"name":"source-footer","text":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textPreview":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textChars":69,"textLines":1,"bbox":[72,688,780,18]}
+{"kind":"textbox","id":"sh/jyhwj65c","slide":3,"name":"year-footer","text":"UPNVJ · 2026","textPreview":"UPNVJ · 2026","textChars":12,"textLines":1,"bbox":[1030,688,178,18]}
+{"kind":"shape","id":"sh/4zqxcbmx","slide":3,"bbox":[72,178,530,400]}
+{"kind":"textbox","id":"sh/50jelwni","slide":3,"name":"scope-title","text":"Fokus kontribusi","textPreview":"Fokus kontribusi","textChars":16,"textLines":1,"bbox":[106,210,320,32]}
+{"kind":"shape","id":"sh/u98v6h4v","slide":3,"name":"bullet-dot-0","bbox":[108,279,10,10]}
+{"kind":"textbox","id":"sh/vahwfm50","slide":3,"name":"bullet-0","text":"React Dashboard Publik dan Panel Admin.","textPreview":"React Dashboard Publik dan Panel Admin.","textChars":39,"textLines":1,"bbox":[132,270,416,53]}
+{"kind":"shape","id":"sh/ryds3690","slide":3,"name":"bullet-dot-1","bbox":[108,324,10,10]}
+{"kind":"textbox","id":"sh/qx4ba1sf","slide":3,"name":"bullet-1","text":"REST API pada Vercel Serverless Functions.","textPreview":"REST API pada Vercel Serverless Functions.","textChars":42,"textLines":1,"bbox":[132,315,416,53]}
+{"kind":"shape","id":"sh/d0fa5gr6","slide":3,"name":"bullet-dot-2","bbox":[108,369,10,10]}
+{"kind":"textbox","id":"sh/szmtcbal","slide":3,"name":"bullet-2","text":"Supabase Auth, CRUD, dan integrasi data.","textPreview":"Supabase Auth, CRUD, dan integrasi data.","textChars":40,"textLines":1,"bbox":[132,360,416,53]}
+{"kind":"shape","id":"sh/f2xc769w","slide":3,"name":"bullet-dot-3","bbox":[108,414,10,10]}
+{"kind":"textbox","id":"sh/e1obe1sb","slide":3,"name":"bullet-3","text":"Bridge React–Unity dan analitik aplikasi.","textPreview":"Bridge React–Unity dan analitik aplikasi.","textChars":41,"textLines":1,"bbox":[132,405,416,53]}
+{"kind":"shape","id":"sh/1ofu9gr2","slide":3,"name":"bullet-dot-4","bbox":[108,459,10,10]}
+{"kind":"textbox","id":"sh/0n6tgbah","slide":3,"name":"bullet-4","text":"Deployment serta operasional layanan web.","textPreview":"Deployment serta operasional layanan web.","textChars":41,"textLines":1,"bbox":[132,450,416,53]}
+{"kind":"shape","id":"sh/v6tsvm9s","slide":3,"bbox":[650,178,510,400]}
+{"kind":"textbox","id":"sh/u5kb2hs7","slide":3,"name":"collab-title","text":"Kolaborasi lintas peran","textPreview":"Kolaborasi lintas peran","textChars":23,"textLines":1,"bbox":[684,210,380,32]}
+{"kind":"shape","id":"sh/ylsvapcv","slide":3,"name":"bullet-dot-0","bbox":[686,279,10,10]}
+{"kind":"textbox","id":"sh/jm1w3utg","slide":3,"name":"bullet-0","text":"Dwikhi: asset 3D, skema, ERD, dan data.","textPreview":"Dwikhi: asset 3D, skema, ERD, dan data.","textChars":39,"textLines":1,"bbox":[710,270,406,57]}
+{"kind":"shape","id":"sh/knadczu1","slide":3,"name":"bullet-dot-1","bbox":[686,331,10,10]}
+{"kind":"textbox","id":"sh/loje5kb6","slide":3,"name":"bullet-1","text":"Faiz: runtime Unity, navigasi, optimasi, dan DatabaseSyncChecker.","textPreview":"Faiz: runtime Unity, navigasi, optimasi, dan DatabaseSyncChecker.","textChars":65,"textLines":1,"bbox":[710,322,406,57]}
+{"kind":"shape","id":"sh/ah8v65cj","slide":3,"name":"bullet-dot-2","bbox":[686,383,10,10]}
+{"kind":"textbox","id":"sh/bihwzat4","slide":3,"name":"bullet-2","text":"Iman mengonsumsi hasil aset/data melalui jalur web dan integrasi.","textPreview":"Iman mengonsumsi hasil aset/data melalui jalur web dan integrasi.","textChars":65,"textLines":1,"bbox":[710,374,406,57]}
+{"kind":"notes","id":"nt/g3m3j1","slide":3,"text":""}
+{"kind":"slide","id":"sl/8wjhlo","slide":4,"title":"METODE DAN PROSES","textShapes":9}
+{"kind":"textbox","id":"sh/0n2tszqt","slide":4,"name":"eyebrow","text":"METODE DAN PROSES","textPreview":"METODE DAN PROSES","textChars":17,"textLines":1,"bbox":[72,42,600,22]}
+{"kind":"textbox","id":"sh/fmtcju98","slide":4,"name":"slide-title","text":"Arsitektur aliran data","textPreview":"Arsitektur aliran data","textChars":22,"textLines":1,"bbox":[72,74,980,52]}
+{"kind":"shape","id":"sh/elkbqp8n","slide":4,"bbox":[72,138,88,5]}
+{"kind":"textbox","id":"sh/dkbuhkri","slide":4,"name":"source-footer","text":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textPreview":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textChars":69,"textLines":1,"bbox":[72,688,780,18]}
+{"kind":"textbox","id":"sh/sjitofqx","slide":4,"name":"year-footer","text":"UPNVJ · 2026","textPreview":"UPNVJ · 2026","textChars":12,"textLines":1,"bbox":[1030,688,178,18]}
+{"kind":"shape","id":"sh/6h0bm58r","slide":4,"bbox":[770,176,390,398]}
+{"kind":"textbox","id":"sh/5grad0r6","slide":4,"name":"pattern-title","text":"Pola integrasi","textPreview":"Pola integrasi","textChars":14,"textLines":1,"bbox":[804,208,250,30]}
+{"kind":"shape","id":"sh/4vitkfql","slide":4,"name":"bullet-dot-0","bbox":[806,267,10,10]}
+{"kind":"textbox","id":"sh/i5wfup4v","slide":4,"name":"bullet-0","text":"Pengguna berinteraksi melalui Dashboard Publik atau Panel Admin.","textPreview":"Pengguna berinteraksi melalui Dashboard Publik atau Panel Admin.","textChars":64,"textLines":1,"bbox":[830,258,286,77]}
+{"kind":"shape","id":"sh/jq5g3ul0","slide":4,"name":"bullet-dot-1","bbox":[806,335,10,10]}
+{"kind":"textbox","id":"sh/4rexwzml","slide":4,"name":"bullet-1","text":"API meneruskan permintaan data sesuai kebutuhan.","textPreview":"API meneruskan permintaan data sesuai kebutuhan.","textChars":48,"textLines":1,"bbox":[830,326,286,77]}
+{"kind":"shape","id":"sh/5s7y5436","slide":4,"name":"bullet-dot-2","bbox":[806,403,10,10]}
+{"kind":"textbox","id":"sh/u1wfq54j","slide":4,"name":"bullet-2","text":"Unity WebGL menerima data untuk visualisasi denah.","textPreview":"Unity WebGL menerima data untuk visualisasi denah.","textChars":50,"textLines":1,"bbox":[830,394,286,77]}
+{"kind":"shape","id":"sh/v25wzal4","slide":4,"name":"bullet-dot-3","bbox":[806,471,10,10]}
+{"kind":"textbox","id":"sh/w3exsfmp","slide":4,"name":"bullet-3","text":"Identifier lokasi menjaga pemetaan tetap konsisten.","textPreview":"Identifier lokasi menjaga pemetaan tetap konsisten.","textChars":51,"textLines":1,"bbox":[830,462,286,77]}
+{"kind":"image","id":"im/2x43ip8r","slide":4,"name":"","geometry":"roundRect","alt":"Diagram arsitektur sistem","bbox":[72,176,650,398]}
+{"kind":"notes","id":"nt/8wjhlo","slide":4,"text":""}
+{"kind":"slide","id":"sl/sdan61","slide":5,"title":"IMPLEMENTASI FRONTEND","textShapes":5}
+{"kind":"textbox","id":"sh/x4bapova","slide":5,"name":"eyebrow","text":"IMPLEMENTASI FRONTEND","textPreview":"IMPLEMENTASI FRONTEND","textChars":21,"textLines":1,"bbox":[72,42,600,22]}
+{"kind":"textbox","id":"sh/a1kru9cz","slide":5,"name":"slide-title","text":"Antarmuka publik dan Panel Admin","textPreview":"Antarmuka publik dan Panel Admin","textChars":32,"textLines":1,"bbox":[72,74,980,52]}
+{"kind":"shape","id":"sh/b2t8nedk","slide":5,"bbox":[72,138,88,5]}
+{"kind":"textbox","id":"sh/k7m90ju1","slide":5,"name":"source-footer","text":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textPreview":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textChars":69,"textLines":1,"bbox":[72,688,780,18]}
+{"kind":"textbox","id":"sh/58vatovm","slide":5,"name":"year-footer","text":"UPNVJ · 2026","textPreview":"UPNVJ · 2026","textChars":12,"textLines":1,"bbox":[1030,688,178,18]}
+{"kind":"textbox","id":"sh/0bi9ozex","slide":5,"name":"frontend-note","text":"Dua permukaan antarmuka membagi kebutuhan pengguna publik dan pengelola data. Dashboard memfasilitasi pencarian dan eksplorasi; Panel Admin mengelola record melalui autentikasi dan CRUD.","textPreview":"Dua permukaan antarmuka membagi kebutuhan pengguna publik dan pengelola data. Dashboard memfasilitasi pencarian dan eksplorasi; Panel Adm...","textChars":186,"textLines":1,"bbox":[82,568,1050,56]}
+{"kind":"image","id":"im/3epcnm5o","slide":5,"name":"","geometry":"roundRect","alt":"Tampilan section denah kampus","bbox":[72,180,532,352]}
+{"kind":"image","id":"im/2dgbuho3","slide":5,"name":"","geometry":"roundRect","alt":"Panel Admin fasilitas","bbox":[650,180,510,352]}
+{"kind":"notes","id":"nt/sdan61","slide":5,"text":""}
+{"kind":"slide","id":"sl/wl3obv","slide":6,"title":"IMPLEMENTASI BACKEND","textShapes":5}
+{"kind":"textbox","id":"sh/l0ru5032","slide":6,"name":"eyebrow","text":"IMPLEMENTASI BACKEND","textPreview":"IMPLEMENTASI BACKEND","textChars":20,"textLines":1,"bbox":[72,42,600,22]}
+{"kind":"textbox","id":"sh/yxgbu54b","slide":6,"name":"slide-title","text":"API dan integrasi Unity WebGL","textPreview":"API dan integrasi Unity WebGL","textChars":29,"textLines":1,"bbox":[72,74,980,52]}
+{"kind":"shape","id":"sh/zypc3a5w","slide":6,"bbox":[72,138,88,5]}
+{"kind":"textbox","id":"sh/cvytsvm5","slide":6,"name":"source-footer","text":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textPreview":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textChars":69,"textLines":1,"bbox":[72,688,780,18]}
+{"kind":"textbox","id":"sh/xw7u10nq","slide":6,"name":"year-footer","text":"UPNVJ · 2026","textPreview":"UPNVJ · 2026","textChars":12,"textLines":1,"bbox":[1030,688,178,18]}
+{"kind":"textbox","id":"sh/o7ytobm9","slide":6,"name":"api-note","text":"Endpoint /api/unity/data dan /api/unity/names menjadi contoh jalur yang menyediakan data untuk kebutuhan visualisasi serta pemetaan nama objek.","textPreview":"Endpoint /api/unity/data dan /api/unity/names menjadi contoh jalur yang menyediakan data untuk kebutuhan visualisasi serta pemetaan nama ...","textChars":143,"textLines":1,"bbox":[80,568,1040,54]}
+{"kind":"image","id":"im/36dgnyto","slide":6,"name":"","geometry":"roundRect","alt":"Uji endpoint data Unity","bbox":[72,180,520,350]}
+{"kind":"image","id":"im/i5kfutc3","slide":6,"name":"","geometry":"roundRect","alt":"Uji endpoint nama objek Unity","bbox":[650,180,510,350]}
+{"kind":"notes","id":"nt/wl3obv","slide":6,"text":""}
+{"kind":"slide","id":"sl/huvetx","slide":7,"title":"IMPLEMENTASI DEPLOYMENT","textShapes":9}
+{"kind":"textbox","id":"sh/wrqhs76t","slide":7,"name":"eyebrow","text":"IMPLEMENTASI DEPLOYMENT","textPreview":"IMPLEMENTASI DEPLOYMENT","textChars":23,"textLines":1,"bbox":[72,42,600,22]}
+{"kind":"textbox","id":"sh/bqx0j258","slide":7,"name":"slide-title","text":"Deployment dan kesiapan operasional","textPreview":"Deployment dan kesiapan operasional","textChars":35,"textLines":1,"bbox":[72,74,980,52]}
+{"kind":"shape","id":"sh/apozqxo3","slide":7,"bbox":[72,138,88,5]}
+{"kind":"textbox","id":"sh/lgzipcnq","slide":7,"name":"source-footer","text":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textPreview":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textChars":69,"textLines":1,"bbox":[72,688,780,18]}
+{"kind":"textbox","id":"sh/kfq1w765","slide":7,"name":"year-footer","text":"UPNVJ · 2026","textPreview":"UPNVJ · 2026","textChars":12,"textLines":1,"bbox":[1030,688,178,18]}
+{"kind":"shape","id":"sh/yt8zuhoz","slide":7,"bbox":[650,180,510,350]}
+{"kind":"textbox","id":"sh/tkjitwnm","slide":7,"name":"ops-title","text":"Artefak operasional","textPreview":"Artefak operasional","textChars":19,"textLines":1,"bbox":[686,214,300,32]}
+{"kind":"shape","id":"sh/8ja10r61","slide":7,"name":"bullet-dot-0","bbox":[688,284,10,10]}
+{"kind":"textbox","id":"sh/i1wzmp0r","slide":7,"name":"bullet-0","text":"Konfigurasi environment variables.","textPreview":"Konfigurasi environment variables.","textChars":34,"textLines":1,"bbox":[712,275,386,55]}
+{"kind":"shape","id":"sh/325gvuhc","slide":7,"name":"bullet-dot-1","bbox":[688,332,10,10]}
+{"kind":"textbox","id":"sh/43ehozix","slide":7,"name":"bullet-1","text":"Hosting Vercel dan jalur Serverless Functions.","textPreview":"Hosting Vercel dan jalur Serverless Functions.","textChars":46,"textLines":1,"bbox":[712,323,386,55]}
+{"kind":"shape","id":"sh/547yx4zi","slide":7,"name":"bullet-dot-2","bbox":[688,380,10,10]}
+{"kind":"textbox","id":"sh/q5gzqp0n","slide":7,"name":"bullet-2","text":"Aset WebGL diakses melalui aplikasi web.","textPreview":"Aset WebGL diakses melalui aplikasi web.","textChars":40,"textLines":1,"bbox":[712,371,386,55]}
+{"kind":"shape","id":"sh/rqpgzuh8","slide":7,"name":"bullet-dot-3","bbox":[688,428,10,10]}
+{"kind":"textbox","id":"sh/sryhszit","slide":7,"name":"bullet-3","text":"Analitik dan helper operasional disiapkan sebagai pendukung.","textPreview":"Analitik dan helper operasional disiapkan sebagai pendukung.","textChars":60,"textLines":1,"bbox":[712,419,386,55]}
+{"kind":"image","id":"im/2l8j2lwn","slide":7,"name":"","geometry":"roundRect","alt":"Halaman web publik","bbox":[72,180,520,350]}
+{"kind":"notes","id":"nt/huvetx","slide":7,"text":""}
+{"kind":"slide","id":"sl/a7p2db","slide":8,"title":"VALIDASI","textShapes":14}
+{"kind":"textbox","id":"sh/ut0bmlc7","slide":8,"name":"eyebrow","text":"VALIDASI","textPreview":"VALIDASI","textChars":8,"textLines":1,"bbox":[72,42,600,22]}
+{"kind":"textbox","id":"sh/hgbuh0bi","slide":8,"name":"slide-title","text":"Hasil pengujian bersama","textPreview":"Hasil pengujian bersama","textChars":23,"textLines":1,"bbox":[72,74,980,52]}
+{"kind":"shape","id":"sh/gf2t8vud","slide":8,"bbox":[72,138,88,5]}
+{"kind":"textbox","id":"sh/3itcjqto","slide":8,"name":"source-footer","text":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textPreview":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textChars":69,"textLines":1,"bbox":[72,688,780,18]}
+{"kind":"textbox","id":"sh/ihkva5c3","slide":8,"name":"year-footer","text":"UPNVJ · 2026","textPreview":"UPNVJ · 2026","textChars":12,"textLines":1,"bbox":[1030,688,178,18]}
+{"kind":"shape","id":"sh/5kbul0bu","slide":8,"name":"metric-Black Box final","bbox":[84,190,240,142]}
+{"kind":"textbox","id":"sh/4j2dcvu9","slide":8,"name":"metric-value-Black Box final","text":"24/24","textPreview":"24/24","textChars":5,"textLines":1,"bbox":[104,208,200,52]}
+{"kind":"textbox","id":"sh/jmpc76tk","slide":8,"name":"metric-label-Black Box final","text":"Black Box final","textPreview":"Black Box final","textChars":15,"textLines":1,"bbox":[104,268,200,38]}
+{"kind":"shape","id":"sh/ylgbe1cz","slide":8,"name":"metric-UAT Dashboard Publik","bbox":[350,190,240,142]}
+{"kind":"textbox","id":"sh/4nmtkz2l","slide":8,"name":"metric-value-UAT Dashboard Publik","text":"77,78%","textPreview":"77,78%","textChars":6,"textLines":1,"bbox":[370,208,200,52]}
+{"kind":"textbox","id":"sh/5ovud436","slide":8,"name":"metric-label-UAT Dashboard Publik","text":"UAT Dashboard Publik","textPreview":"UAT Dashboard Publik","textChars":20,"textLines":1,"bbox":[370,268,200,38]}
+{"kind":"shape","id":"sh/il4bip4v","slide":8,"name":"metric-UAT Dashboard Admin","bbox":[616,190,240,142]}
+{"kind":"textbox","id":"sh/3mdcbulg","slide":8,"name":"metric-value-UAT Dashboard Admin","text":"84,55%","textPreview":"84,55%","textChars":6,"textLines":1,"bbox":[636,208,200,52]}
+{"kind":"textbox","id":"sh/sr6toz2x","slide":8,"name":"metric-label-UAT Dashboard Admin","text":"UAT Dashboard Admin","textPreview":"UAT Dashboard Admin","textChars":19,"textLines":1,"bbox":[636,268,200,38]}
+{"kind":"shape","id":"sh/dsfuh43i","slide":8,"name":"metric-skor gabungan","bbox":[882,190,240,142]}
+{"kind":"textbox","id":"sh/qpobm9kr","slide":8,"name":"metric-value-skor gabungan","text":"81,50%","textPreview":"81,50%","textChars":6,"textLines":1,"bbox":[902,208,200,52]}
+{"kind":"textbox","id":"sh/rqxcfulc","slide":8,"name":"metric-label-skor gabungan","text":"skor gabungan","textPreview":"skor gabungan","textChars":13,"textLines":1,"bbox":[902,268,200,38]}
+{"kind":"textbox","id":"sh/8v2tcfmt","slide":8,"name":"testing-note","text":"Lima peserta unik memberikan dasar umpan balik untuk revisi antarmuka, navigasi, mode visualisasi, dan penyelesaian alur. Deck ini mempertahankan angka dari hasil pengujian branch Iman.","textPreview":"Lima peserta unik memberikan dasar umpan balik untuk revisi antarmuka, navigasi, mode visualisasi, dan penyelesaian alur. Deck ini memper...","textChars":185,"textLines":1,"bbox":[90,420,1020,80]}
+{"kind":"textbox","id":"sh/9wba5k3y","slide":8,"name":"testing-role","text":"Peran Iman pada hasil bersama: mengimplementasikan dan menindaklanjuti temuan pada web, integrasi, dan deployment.","textPreview":"Peran Iman pada hasil bersama: mengimplementasikan dan menindaklanjuti temuan pada web, integrasi, dan deployment.","textChars":114,"textLines":1,"bbox":[90,540,1000,48]}
+{"kind":"notes","id":"nt/a7p2db","slide":8,"text":""}
+{"kind":"slide","id":"sl/xestte","slide":9,"title":"PENUTUP","textShapes":15}
+{"kind":"textbox","id":"sh/b6pwzeh8","slide":9,"name":"eyebrow","text":"PENUTUP","textPreview":"PENUTUP","textChars":7,"textLines":1,"bbox":[72,42,600,22]}
+{"kind":"textbox","id":"sh/w7yd8zit","slide":9,"name":"slide-title","text":"Kontribusi dan langkah berikutnya","textPreview":"Kontribusi dan langkah berikutnya","textChars":33,"textLines":1,"bbox":[72,74,980,52]}
+{"kind":"shape","id":"sh/x87e14ze","slide":9,"bbox":[72,138,88,5]}
+{"kind":"textbox","id":"sh/m1wv2p0r","slide":9,"name":"source-footer","text":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textPreview":"Sumber: Tugas_Akhir.docx + Tugas_Akhir_Draft.md (origin/laporan/iman)","textChars":69,"textLines":1,"bbox":[72,688,780,18]}
+{"kind":"textbox","id":"sh/n25cvuhc","slide":9,"name":"year-footer","text":"UPNVJ · 2026","textPreview":"UPNVJ · 2026","textChars":12,"textLines":1,"bbox":[1030,688,178,18]}
+{"kind":"shape","id":"sh/o3ed4zix","slide":9,"bbox":[72,182,520,370]}
+{"kind":"textbox","id":"sh/94nux4z2","slide":9,"name":"done-title","text":"Kontribusi utama","textPreview":"Kontribusi utama","textChars":16,"textLines":1,"bbox":[108,220,300,34]}
+{"kind":"shape","id":"sh/edwvyp0f","slide":9,"name":"bullet-dot-0","bbox":[110,287,10,10]}
+{"kind":"textbox","id":"sh/ze5cruh0","slide":9,"name":"bullet-0","text":"Web publik dan Panel Admin.","textPreview":"Web publik dan Panel Admin.","textChars":27,"textLines":1,"bbox":[134,278,386,52]}
+{"kind":"shape","id":"sh/7i10b2pw","slide":9,"name":"bullet-dot-1","bbox":[110,331,10,10]}
+{"kind":"textbox","id":"sh/mhsjixob","slide":9,"name":"bullet-1","text":"API serta integrasi React–Unity.","textPreview":"API serta integrasi React–Unity.","textChars":32,"textLines":1,"bbox":[134,322,386,52]}
+{"kind":"shape","id":"sh/9kjidc7m","slide":9,"name":"bullet-dot-2","bbox":[110,375,10,10]}
+{"kind":"textbox","id":"sh/8ja1k761","slide":9,"name":"bullet-2","text":"Autentikasi, CRUD, dan analitik.","textPreview":"Autentikasi, CRUD, dan analitik.","textChars":32,"textLines":1,"bbox":[134,366,386,52]}
+{"kind":"shape","id":"sh/vml0fmps","slide":9,"name":"bullet-dot-3","bbox":[110,419,10,10]}
+{"kind":"textbox","id":"sh/ulsjmho7","slide":9,"name":"bullet-3","text":"Deployment dan operasional web.","textPreview":"Deployment dan operasional web.","textChars":31,"textLines":1,"bbox":[134,410,386,52]}
+{"kind":"shape","id":"sh/h832hc7y","slide":9,"name":"bullet-dot-4","bbox":[110,463,10,10]}
+{"kind":"textbox","id":"sh/w7u1or6d","slide":9,"name":"bullet-4","text":"Retest berbasis UAT bersama.","textPreview":"Retest berbasis UAT bersama.","textChars":28,"textLines":1,"bbox":[134,454,386,52]}
+{"kind":"shape","id":"sh/bqh03ipo","slide":9,"bbox":[650,182,510,370]}
+{"kind":"textbox","id":"sh/ap8zad83","slide":9,"name":"next-title","text":"Tindak lanjut","textPreview":"Tindak lanjut","textChars":13,"textLines":1,"bbox":[686,220,260,34]}
+{"kind":"shape","id":"sh/e5g3il8r","slide":9,"name":"bullet-dot-0","bbox":[688,287,10,10]}
+{"kind":"textbox","id":"sh/f6p4bq9c","slide":9,"name":"bullet-0","text":"Menjaga kontrak pertukaran data tetap konsisten.","textPreview":"Menjaga kontrak pertukaran data tetap konsisten.","textChars":48,"textLines":1,"bbox":[712,278,396,57]}
+{"kind":"shape","id":"sh/07ylkvqh","slide":9,"name":"bullet-dot-1","bbox":[688,339,10,10]}
+{"kind":"textbox","id":"sh/187md0r2","slide":9,"name":"bullet-1","text":"Memantau perubahan struktur dan data lokasi.","textPreview":"Memantau perubahan struktur dan data lokasi.","textChars":44,"textLines":1,"bbox":[712,330,396,57]}
+{"kind":"shape","id":"sh/61w3el8f","slide":9,"name":"bullet-dot-2","bbox":[688,391,10,10]}
+{"kind":"textbox","id":"sh/r2547q90","slide":9,"name":"bullet-2","text":"Menyelaraskan bukti integrasi dengan aset dan runtime.","textPreview":"Menyelaraskan bukti integrasi dengan aset dan runtime.","textChars":54,"textLines":1,"bbox":[712,382,396,57]}
+{"kind":"textbox","id":"sh/s3elgbql","slide":9,"name":"thanks","text":"Terima kasih","textPreview":"Terima kasih","textChars":12,"textLines":1,"bbox":[688,486,350,46]}
+{"kind":"notes","id":"nt/xestte","slide":9,"text":""}

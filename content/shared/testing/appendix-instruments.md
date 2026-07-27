@@ -52,10 +52,4 @@ R-04 | 31 dari 45 | — | Mengisi instrumen Dashboard Publik
 R-05 | — | 49 dari 55 | Mengisi instrumen Dashboard Admin
 [/TABLE]
 
-Sumber bukti pengujian dipertahankan terpisah dari narasi laporan. Rekap respons UAT berada pada `Hasil UAT/Hasil_UAT.xlsx`, sedangkan formulir individual tersimpan sebagai arsip PDF dan tidak direproduksi bersama identitas peserta pada tabel lampiran.
-
-Hasil awal 24 skenario Black Box berada pada `Hasil UAT/Hasil_BlackBox.docx`. Pengujian ulang BB-20 didukung oleh dua tangkapan layar berurutan, yaitu `BB20_1.png` dan `BB20_2.png`, yang menunjukkan kondisi sebelum dan sesudah navigasi selesai.
-
-Bukti visual tindak lanjut UAT disimpan pada `Hasil UAT/dokumentasi revisi/` dan digunakan secara selektif pada BAB III. Seluruh tangkapan layar aplikasi tidak dimasukkan kembali ke lampiran.
-
-Dokumen mentah tetap diperlakukan sebagai arsip bukti. Status lulus, persentase, dan batas klaim yang digunakan laporan mengikuti sumber kanonik pada Subbab 3.5 serta `content/shared/testing/results.json`.
+Ringkasan hasil UAT dan *Black Box Testing* pada lampiran ini mengikuti data pengujian bersama yang digunakan oleh ketiga laporan. Identitas peserta tidak ditampilkan pada rekap. Angka hasil, status skenario, dan batas klaim mengikuti sumber kanonik pada Subbab 3.5 serta `content/shared/testing/results.json`.
