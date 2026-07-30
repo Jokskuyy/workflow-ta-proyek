@@ -1,12 +1,16 @@
 @startuml gambar-2-10-tahap-pengembangan
-' Gambar 2.10 - Tahap Pengembangan (Model Prototyping, iteratif)
+' Tahapan Metode Prototyping pada Pengembangan Sistem
 ' Sumber: BAB II - 2.3.1 Rencana Pengembangan
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
-skinparam defaultFontSize 13
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
 skinparam ArrowColor #444444
+skinparam linetype ortho
+skinparam nodesep 14
+skinparam ranksep 20
+skinparam Padding 5
 skinparam ActivityBorderColor #555555
 skinparam ActivityBackgroundColor #F2F2F2
 skinparam ActivityDiamondBackgroundColor #ECECEC
@@ -14,44 +18,43 @@ skinparam ActivityDiamondBorderColor #555555
 skinparam NoteBackgroundColor #FAFAFA
 skinparam NoteBorderColor #BBBBBB
 
-
 start
 
-:1. Pengumpulan Kebutuhan\n(Requirement Gathering);
+:1. Pengumpulan Kebutuhan;
 note right
-  Wawancara pemangku kepentingan & survei awal
-  untuk memetakan fungsionalitas
-  Full Stack API dan dashboard.
+  Tim memetakan masalah pengguna,
+  batas data, dan kebutuhan tiap peran.
+end note
+
+:2. Perancangan Cepat;
+note right
+  Antarmuka, data, aset 3D, Unity,
+  API, dan kontrak integrasi dirancang.
 end note
 
 repeat
-  :2. Membangun Prototyping Awal\n(Quick Design);
+  :3. Pembangunan Prototipe per Peran;
   note right
-    Kontrak antarmuka dan API dari
-    rancangan data bersama, serta
-    mockup dashboard admin & publik.
+    Web dan Denah 2D, data dan aset,
+    serta Unity dibangun sesuai ownership.
   end note
 
-  :3. Evaluasi Prototipe\n(Evaluation & Testing);
+  :4. Integrasi dan Evaluasi Prototipe;
   note right
-    Pengujian backend API & dashboard
-    via Black Box Testing dan
-    validasi internal.
+    Komponen disatukan melalui kode lokasi,
+    API, file hasil build, Black Box, dan UAT.
   end note
 
-  if (Kriteria evaluasi terpenuhi?) then (Belum)
-    :4. Iterasi Perbaikan\n(Iteration);
+  if (Kriteria fungsi dan integrasi terpenuhi?) then (Belum)
+    :5. Perbaikan Berulang;
     note right
-      Perbaikan antarmuka, API,
-      operasi CRUD, atau koneksi
-      integrasi berdasarkan evaluasi.
+      Temuan dikembalikan kepada pemilik
+      komponen, lalu hasilnya diintegrasikan ulang.
     end note
   endif
-repeat while (Perlu perbaikan?) is (Ya) not (Tidak)
-->Kriteria evaluasi terpenuhi;
+repeat while (Masih memerlukan perbaikan?) is (Ya) not (Tidak)
 
-:Sistem siap rilis;
-
+:Sistem terintegrasi setelah evaluasi dan perbaikan;
 stop
 
 @enduml

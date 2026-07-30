@@ -16,6 +16,36 @@
   </w:p>
   <w:p>
     <w:r>
+      <w:t xml:space="preserve">Chandralekha, C. S., dan Raghunandana, M. (2023). Analysis of information architecture for university library websites: An Indian perspective. </w:t>
+    </w:r>
+    <w:r>
+      <w:rPr>
+        <w:i/>
+        <w:iCs/>
+      </w:rPr>
+      <w:t>International Journal of Information Dissemination and Technology</w:t>
+    </w:r>
+    <w:r>
+      <w:t>, 13(3), 111–115. https://doi.org/10.5958/2249-5576.2023.00021.3</w:t>
+    </w:r>
+  </w:p>
+  <w:p>
+    <w:r>
+      <w:t xml:space="preserve">Dalimunthe, S., Hasri Putra, E., dan Fadhly Ridha, M. A. (2023). Restful API security using JSON Web Token (JWT) with HMAC-SHA512 algorithm in session management. </w:t>
+    </w:r>
+    <w:r>
+      <w:rPr>
+        <w:i/>
+        <w:iCs/>
+      </w:rPr>
+      <w:t>IT Journal Research and Development</w:t>
+    </w:r>
+    <w:r>
+      <w:t>, 8(1), 81–94. https://doi.org/10.25299/itjrd.2023.12029</w:t>
+    </w:r>
+  </w:p>
+  <w:p>
+    <w:r>
       <w:t xml:space="preserve">Jamaludin, J., dan Saepuloh, L. (2024). Tren riset twin digital smart campus. </w:t>
     </w:r>
     <w:r>
@@ -31,17 +61,17 @@
   </w:p>
   <w:p>
     <w:r>
-      <w:t xml:space="preserve">Kurniawan, T. A. (2018). Pemodelan Use Case (UML): Evaluasi terhadap beberapa kesalahan dalam praktik. </w:t>
+      <w:t xml:space="preserve">Li, Z., Guo, L., Cheng, J., Chen, Q., He, B., dan Guo, M. (2022). The serverless computing survey: A technical primer for design architecture. </w:t>
     </w:r>
     <w:r>
       <w:rPr>
         <w:i/>
         <w:iCs/>
       </w:rPr>
-      <w:t>Jurnal Teknologi Informasi dan Ilmu Komputer (JTIIK)</w:t>
+      <w:t>ACM Computing Surveys</w:t>
     </w:r>
     <w:r>
-      <w:t>, 5(1), 77–86. https://doi.org/10.25126/jtiik.201851610</w:t>
+      <w:t>, 54(10s), Article 220, 1–34. https://doi.org/10.1145/3508360</w:t>
     </w:r>
   </w:p>
   <w:p>
@@ -61,6 +91,21 @@
   </w:p>
   <w:p>
     <w:r>
+      <w:t xml:space="preserve">McGill, T., Bamgboye, O., Liu, X., dan Kalutharage, C. S. (2023). Towards improving accessibility of web auditing with Google Lighthouse. In </w:t>
+    </w:r>
+    <w:r>
+      <w:rPr>
+        <w:i/>
+        <w:iCs/>
+      </w:rPr>
+      <w:t>2023 IEEE 47th Annual Computers, Software, and Applications Conference (COMPSAC)</w:t>
+    </w:r>
+    <w:r>
+      <w:t xml:space="preserve"> (pp. 1594–1599). IEEE Computer Society. https://doi.org/10.1109/COMPSAC57700.2023.00246</w:t>
+    </w:r>
+  </w:p>
+  <w:p>
+    <w:r>
       <w:t xml:space="preserve">Muharam, Y., Anggara, M. B., dan Hanafi, T. J. (2023). Implementasi peta 3 dimensi menggunakan metode IMSDD (Interactive Multimedia System Design and Development) dan WebGL API berbasis web (Studi kasus di SMP Karya Pembangunan 2 Majalaya). </w:t>
     </w:r>
     <w:r>
@@ -72,21 +117,6 @@
     </w:r>
     <w:r>
       <w:t>, 10, 20–30. https://doi.org/10.55222/computing.v10i01.1155</w:t>
-    </w:r>
-  </w:p>
-  <w:p>
-    <w:r>
-      <w:t xml:space="preserve">Pricillia, T., dan Zulfachmi (2021). Perbandingan metode pengembangan perangkat lunak (Waterfall, Prototype, RAD). </w:t>
-    </w:r>
-    <w:r>
-      <w:rPr>
-        <w:i/>
-        <w:iCs/>
-      </w:rPr>
-      <w:t>Jurnal Bangkit Indonesia</w:t>
-    </w:r>
-    <w:r>
-      <w:t>, 10(1), 6–12. https://doi.org/10.52771/bangkitindonesia.v10i1.153</w:t>
     </w:r>
   </w:p>
   <w:p>
@@ -152,6 +182,41 @@
   <w:p>
     <w:r>
       <w:t>UPNVJ. (2026). Rapat koordinasi Humas UPNVJ 2026: Fokus strategi komunikasi digital dan media sosial perguruan tinggi. https://www.upnvj.ac.id/id/berita/2026/02/rapat-koordinasi-humas-upnvj-2026-fokus-strategi-komunikasi-digital-dan-media-sosial-perguruan-tinggi.html</w:t>
+    </w:r>
+  </w:p>
+  <w:p>
+    <w:r>
+      <w:t>W3C. (2024). Web Content Accessibility Guidelines (WCAG) 2.2. https://www.w3.org/TR/WCAG22/</w:t>
+    </w:r>
+  </w:p>
+  <w:p>
+    <w:r>
+      <w:t xml:space="preserve">Wang, H., Lou, S., Jing, J., Wang, Y., Liu, W., dan Liu, T. (2022). The EBS-A* algorithm: An improved A* algorithm for path planning. </w:t>
+    </w:r>
+    <w:r>
+      <w:rPr>
+        <w:i/>
+        <w:iCs/>
+      </w:rPr>
+      <w:t>PLOS ONE</w:t>
+    </w:r>
+    <w:r>
+      <w:t>, 17(2), e0263841. https://doi.org/10.1371/journal.pone.0263841</w:t>
+    </w:r>
+  </w:p>
+  <w:p>
+    <w:r>
+      <w:t xml:space="preserve">Wayahdi, M. R., dan Ruziq, F. (2023). Pemodelan sistem penerimaan anggota baru dengan Unified Modeling Language (UML) (Studi kasus: Programmer Association of Battuta). </w:t>
+    </w:r>
+    <w:r>
+      <w:rPr>
+        <w:i/>
+        <w:iCs/>
+      </w:rPr>
+      <w:t>Jurnal Minfo Polgan</w:t>
+    </w:r>
+    <w:r>
+      <w:t>, 12(1), 1514–1521. https://doi.org/10.33395/jmp.v12i1.12870</w:t>
     </w:r>
   </w:p>
 </w:bibliography>

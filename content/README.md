@@ -10,6 +10,21 @@ Direktori ini adalah sumber konten yang dapat dikomposisikan ke `Tugas_Akhir_Dra
 | `content/roles/<role>/` | Pemilik branch | Analisis, implementasi, bukti, dan kontribusi yang khusus terhadap satu peran |
 | `Tugas_Akhir_Draft.md` | Pemilik branch | Struktur heading, urutan komposisi, identitas, judul, dan narasi personal |
 
+Front matter laporan Iman disimpan pada `content/roles/iman/front-matter.json`.
+Sumber ini bersifat khusus peran dan digunakan pipeline untuk membentuk halaman
+pernyataan, placeholder lembar persetujuan, abstrak, abstract, dan kata pengantar
+sebelum Daftar Isi. Konten tersebut tidak boleh dipindahkan ke `content/shared/`.
+
+Profil build aktif didefinisikan pada `content/report-profiles.json`. Profil
+`iman` tetap menggunakan `Tugas_Akhir_Draft.md`, sedangkan profil `dwikhi`
+menggunakan `Tugas_Akhir_Dwikhi_Draft.md`, front matter, manifest, rekonsiliasi,
+dan root aset terpisah. Laporan Dwikhi dapat dibangun tanpa mengubah draf Iman
+dengan perintah berikut:
+
+```powershell
+C:\Python312\python.exe skills/scripts/build_pipeline.py --profile dwikhi --output Tugas_Akhir_Dwikhi_Formatted.docx
+```
+
 Konten bersama tidak boleh memuat nama, NIM, tanda tangan, judul personal, atau klaim kontribusi satu anggota. Dokumen bukti mentah yang memuat identitas responden tidak otomatis menjadi konten bersama. Ringkasan anonim yang telah diverifikasi dapat ditempatkan di `content/shared/`.
 
 ## Sintaks include
@@ -27,7 +42,7 @@ Fragment yang ditempatkan setelah heading sebaiknya tidak mengulang heading ters
 ## Aturan konsistensi tiga laporan
 
 1. Angka Black Box, UAT, fakta proyek, istilah, dan status produk hanya memiliki satu sumber bersama.
-2. File peran tidak boleh menyalin ulang angka hasil pengujian. File peran hanya menjelaskan kontribusi terhadap temuan atau perbaikannya.
+2. File peran tidak boleh menyalin ulang angka hasil pengujian. File peran hanya menjelaskan kontribusi terhadap temuan atau perbaikannya. Hasil UAT awal tetap dimasukkan dari fragment bersama, sedangkan tindak lanjut dapat dikomposisikan dari fragment peran selama ID temuan, fakta, dan status produknya tetap mengacu pada sumber bersama.
 3. Latar belakang menggunakan konteks proyek bersama, kemudian dilanjutkan narasi fokus peran pada draf atau `content/roles/<role>/`.
 4. Solusi aktual boleh berbeda dari redaksi saran UAT jika memecahkan masalah pengguna yang sama. Hubungan tersebut wajib dicatat sebagai masalah, solusi aktual, bukti, status, dan hasil retest.
 5. Judul laporan, identitas, rumusan masalah khusus, batasan peran, implementasi, dan kesimpulan kontribusi tidak boleh dipindahkan ke `content/shared/`.
@@ -48,9 +63,14 @@ Perintah tersebut hanya memperluas include, mem-parse Markdown, dan memeriksa ma
 | Bagian laporan | Fragment kanonik |
 |---|---|
 | 1.1 konteks umum Latar Belakang | `content/shared/bab1/latar-belakang-umum.md` |
+| 2.1 pengantar Observasi dan Analisis Kebutuhan Awal | `content/shared/bab2/observasi-dan-analisis-kebutuhan.md` |
+| 2.1.1 sumber data dan batas observasi | `content/shared/bab2/sumber-data-dan-batas-observasi.md` |
+| 2.1.2 analisis kebutuhan dan sistem yang berjalan | `content/shared/bab2/analisis-kebutuhan-dan-sistem-berjalan.md` |
+| 2.1.3 wawancara dan implikasi kebutuhan | `content/shared/bab2/wawancara-dan-implikasi-kebutuhan.md` |
 | 3.5.1 Black Box Testing | `content/shared/testing/blackbox.md` |
 | 3.5.3 User Acceptance Test | `content/shared/testing/uat.md` |
-| 3.5.4 Implementasi Hasil UAT | `content/shared/testing/uat-revisions.md` |
+| Sumber kanonik masalah, solusi, bukti, dan status tindak lanjut UAT | `content/shared/testing/uat-revisions.md` |
+| 3.5.5 Tindak lanjut UAT khusus laporan Iman | `content/roles/iman/uat-revisions.md` |
 | Lampiran instrumen dan indeks bukti pengujian | `content/shared/testing/appendix-instruments.md` |
 
 Angka dan status terstruktur yang mendasari fragment pengujian berada di `content/shared/testing/results.json`. `project_facts.json` pada setiap branch boleh memuat salinan yang diperlukan generator per-role, tetapi tidak boleh bertentangan dengan hasil bersama tersebut.

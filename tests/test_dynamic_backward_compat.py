@@ -22,6 +22,7 @@ The existing image-injection suite is NOT modified; this is a brand-new file.
 """
 import filecmp
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -43,7 +44,9 @@ sys.path.insert(0, str(SKILLS))
 import capture_reference_baseline as cap  # noqa: E402  (scratch/)
 import format_ta_proyek as fmt  # noqa: E402  (skills/scripts/)
 
-CURRENT_DOCX = ROOT / "Tugas_Akhir_Formatted.docx"
+CURRENT_DOCX = Path(
+    os.environ.get("TA_DOCX_PATH", ROOT / "Tugas_Akhir_Formatted.docx")
+)
 DRAFT = ROOT / "Tugas_Akhir_Draft.md"
 IMAGE_MANIFEST = ROOT / "images" / "manifest.json"
 # ``skills/scripts`` is the tracked source of truth.  The scratch copy is

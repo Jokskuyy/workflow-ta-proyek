@@ -1,0 +1,91 @@
+@startuml
+title ERD Tabel Pendukung dan Hubungan Akses Logis Administrator
+left to right direction
+skinparam backgroundColor white
+skinparam defaultFontName "Arial"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 28
+skinparam ranksep 36
+skinparam entity {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  FontColor #0F172A
+}
+skinparam object {
+  BackgroundColor #FFF7ED
+  BorderColor #9A3412
+  FontColor #431407
+}
+
+entity "admin_users" as admin_users {
+  * id : SERIAL <<PK>>
+  --
+  * username : VARCHAR(100) <<UQ>>
+  * password_hash : TEXT
+  o nama_lengkap : VARCHAR(255)
+  o role : VARCHAR(50) = 'admin'
+  o created_at : TIMESTAMP = CURRENT_TIMESTAMP
+}
+
+entity "audit_logs" as audit_logs {
+  * id : BIGSERIAL <<PK>>
+  --
+  o actor_id : UUID
+  o actor_email : TEXT
+  * action : TEXT
+  * table_name : TEXT
+  o record_id : TEXT
+  o old_data : JSONB
+  o new_data : JSONB
+  o created_at : TIMESTAMP = CURRENT_TIMESTAMP
+}
+
+entity "web_analytics_log" as web_analytics_log {
+  * id : SERIAL <<PK>>
+  --
+  o visitor_hash : VARCHAR(255)
+  * page_path : VARCHAR(255)
+  o device_type : VARCHAR(100)
+  o visited_at : TIMESTAMP = CURRENT_TIMESTAMP
+}
+
+package "Tabel data yang dikelola\n(referensi dari ERD utama)" {
+  object "gedung" as ref_gedung
+  object "fasilitas" as ref_fasilitas
+  object "fakultas" as ref_fakultas
+  object "program_studi" as ref_program_studi
+  object "campus_map_*" as ref_campus_map
+
+  ref_gedung -[hidden]down- ref_fasilitas
+  ref_fasilitas -[hidden]down- ref_fakultas
+  ref_fakultas -[hidden]down- ref_program_studi
+  ref_program_studi -[hidden]down- ref_campus_map
+}
+
+admin_users ..> ref_gedung
+admin_users ..> ref_fasilitas
+admin_users ..> ref_fakultas
+admin_users ..> ref_program_studi
+admin_users ..> ref_campus_map
+admin_users ..> audit_logs : aktivitas perubahan dicatat\nmelalui layanan aplikasi
+admin_users ..> web_analytics_log : meninjau ringkasan\nanalitik
+
+note bottom of admin_users
+Garis putus-putus ke tabel data menunjukkan
+kewenangan CRUD melalui Panel Admin.
+Hubungan akses ini bukan foreign key.
+end note
+
+note bottom of audit_logs
+actor_id adalah UUID biasa.
+SQL tidak mendefinisikan foreign key
+ke admin_users atau auth.users.
+end note
+
+note bottom of web_analytics_log
+Relasi fisik tetap mengikuti ERD utama.
+end note
+
+@enduml

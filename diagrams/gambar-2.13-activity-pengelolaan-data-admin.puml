@@ -1,12 +1,16 @@
 @startuml gambar-2-13-activity-pengelolaan-data-admin
-' Gambar 2.13 - Activity Diagram: Pengelolaan Data oleh Admin
+' Activity Diagram Pengelolaan Data oleh Administrator
 ' Sumber: BAB II - 2.3.3 Activity Diagram
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
-skinparam defaultFontSize 13
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
 skinparam ArrowColor #444444
+skinparam linetype ortho
+skinparam nodesep 12
+skinparam ranksep 18
+skinparam Padding 4
 skinparam ActivityBorderColor #555555
 skinparam ActivityBackgroundColor #F2F2F2
 skinparam ActivityDiamondBackgroundColor #ECECEC
@@ -14,56 +18,54 @@ skinparam ActivityDiamondBorderColor #555555
 skinparam SwimlaneTitleFontColor #333333
 skinparam SwimlaneBorderColor #999999
 
-
 |Administrator|
 start
-:Membuka halaman Login Admin;
-:Memasukkan kredensial;
+:Membuka halaman masuk\ndan memasukkan kredensial;
 
-|React SPA|
-:Kirim kredensial langsung ke Supabase Auth;
+|Antarmuka React|
+:Mengirim kredensial;
 
-|Supabase|
-:Verifikasi kredensial;
+|Supabase Auth dan Database|
+:Memverifikasi kredensial;
 if (Kredensial valid?) then (Tidak)
-  |React SPA|
-  :Tampilkan pesan kesalahan;
+  |Antarmuka React|
+  :Menampilkan pesan kesalahan;
   stop
 else (Ya)
-  |React SPA|
-  :Buka akses Admin Dashboard;
+  |Antarmuka React|
+  :Membuka Panel Admin;
 endif
 
 |Administrator|
 :Memilih modul dan operasi data;
-:Mengisi formulir atau mengonfirmasi penghapusan;
+:Mengisi formulir atau\nmengonfirmasi penghapusan;
 
-|React SPA|
-:Validasi input dan konfirmasi;
-if (Input valid dan operasi dikonfirmasi?) then (Tidak)
-  :Tampilkan validasi atau batalkan operasi;
+|Antarmuka React|
+:Memeriksa isian dan konfirmasi;
+if (Isian dan konfirmasi valid?) then (Tidak)
+  :Menampilkan validasi\natau membatalkan operasi;
   stop
 else (Ya)
-  :Jalankan query/CRUD melalui Supabase SDK;
+  :Mengirim operasi data\nmenggunakan sesi admin;
 endif
 
-|Supabase|
-:Terapkan sesi Auth dan kebijakan RLS;
-:Jalankan operasi database;
+|Supabase Auth dan Database|
+:Memeriksa sesi dan RLS;
+:Menjalankan operasi data;
 if (Operasi berhasil?) then (Tidak)
-  |React SPA|
-  :Tampilkan respons kesalahan;
+  |Antarmuka React|
+  :Menampilkan respons kesalahan;
   stop
 else (Ya)
-  |React SPA|
+  |Antarmuka React|
   if (Operasi mengubah data?) then (Ya)
-    :Panggil service pencatatan audit aplikasi;
-    |Supabase|
-    :Simpan audit log sesuai akses yang tersedia;
-    |React SPA|
+    :Mencatat riwayat melalui\nlayanan aplikasi;
+    |Supabase Auth dan Database|
+    :Menyimpan riwayat perubahan;
   endif
-  :Perbarui cache dan tabel;
-  :Tampilkan notifikasi berhasil;
+  |Antarmuka React|
+  :Memuat ulang tabel tampilan;
+  :Menampilkan notifikasi berhasil;
 endif
 
 stop

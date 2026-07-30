@@ -1,4 +1,4 @@
-# Laporan TA — Muammar Faiz Khairul Anam (3D Simulator & Engine Developer)
+# Laporan TA — Muammar Faiz Khairul Anam Setiawan (3D Simulator & Engine Developer)
 
 **Branch:** `laporan/faiz` — tulis laporan di `Tugas_Akhir_Draft.md` (root repo) saat berada di branch ini.
 

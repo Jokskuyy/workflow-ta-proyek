@@ -28,7 +28,7 @@ def qn(namespace, name):
     return f"{{{namespace}}}{name}"
 
 
-def make_body(*, height=5_000_000, drawing_keep=True, caption_keep=True):
+def make_body(*, width=5_000_000, height=5_000_000, drawing_keep=True, caption_keep=True):
     body = ET.Element(qn(W, "body"))
 
     drawing_p = ET.SubElement(body, qn(W, "p"))
@@ -39,7 +39,7 @@ def make_body(*, height=5_000_000, drawing_keep=True, caption_keep=True):
     run = ET.SubElement(drawing_p, qn(W, "r"))
     drawing = ET.SubElement(run, qn(W, "drawing"))
     inline = ET.SubElement(drawing, qn(WP, "inline"))
-    ET.SubElement(inline, qn(WP, "extent"), cx="5000000", cy=str(height))
+    ET.SubElement(inline, qn(WP, "extent"), cx=str(width), cy=str(height))
     ET.SubElement(inline, qn(WP, "docPr"), id="1", name="FIGURE:arsitektur")
 
     caption_p = ET.SubElement(body, qn(W, "p"))
@@ -75,6 +75,13 @@ def test_same_page_contract_rejects_pair_taller_than_printable_height():
         make_body(height=height), printable
     )
     assert any("[C4]" in error and "caption reserve" in error for error in errors)
+
+
+def test_same_page_contract_rejects_figure_wider_than_printable_width():
+    errors = validator.collect_figure_same_page_errors(
+        make_body(width=validator.MAX_WIDTH_EMU + 1), 8_000_000
+    )
+    assert any("[C4]" in error and "printable width" in error for error in errors)
 
 
 def test_same_page_contract_rejects_nonadjacent_caption():

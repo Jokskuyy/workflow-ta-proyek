@@ -144,6 +144,12 @@ def _resolve_include_path(raw_path, workspace_root):
 def infer_workspace_root(md_path):
     """Infer a repository root for direct parsing of a draft or wrapper file."""
     source = Path(md_path).resolve()
+    # A standalone draft commonly sits beside its own ``content/`` tree. Give
+    # that local composition root precedence even when the draft is created in
+    # a temporary directory nested inside another repository (as in tests or
+    # an isolated review copy).
+    if (source.parent / "content").is_dir():
+        return source.parent
     for candidate in (source.parent, *source.parents):
         if (candidate / ".git").exists() or (candidate / "AGENTS.md").is_file():
             return candidate
@@ -692,6 +698,81 @@ class InlineToken:
     bold: bool = False
     italic: bool = False
     url: "str | None" = None
+
+
+def _find_term_registry():
+    """Locate ``term_registry.json`` from canonical or runtime script copies."""
+    script_path = Path(__file__).resolve()
+    for parent in script_path.parents:
+        candidate = parent / 'term_registry.json'
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def load_technical_italic_terms(registry_path=None):
+    """Return longest-first technical terms configured for italic rendering."""
+    path = Path(registry_path) if registry_path else _find_term_registry()
+    if path is None or not path.is_file():
+        return ()
+    try:
+        payload = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return ()
+    terms = payload.get('italic_terms', [])
+    if not isinstance(terms, list):
+        return ()
+    cleaned = {
+        term.strip()
+        for term in terms
+        if isinstance(term, str) and term.strip()
+    }
+    return tuple(sorted(cleaned, key=lambda term: (-len(term), term.casefold())))
+
+
+TECHNICAL_ITALIC_TERMS = load_technical_italic_terms()
+
+
+def italicize_technical_terms(tokens, terms=None):
+    """Split plain TEXT tokens so configured technical terms become italic.
+
+    Explicit Markdown emphasis remains authoritative. Inline-code, hyperlink,
+    and already-italic tokens are left intact.
+    """
+    configured = TECHNICAL_ITALIC_TERMS if terms is None else tuple(terms)
+    if not configured:
+        return list(tokens)
+    pattern = re.compile(
+        r'(?<!\w)(?:' + '|'.join(re.escape(term) for term in configured) + r')(?!\w)',
+        re.IGNORECASE,
+    )
+    result = []
+    for token in tokens:
+        if token.kind != TokenKind.TEXT or token.italic or not token.text:
+            result.append(token)
+            continue
+        cursor = 0
+        for match in pattern.finditer(token.text):
+            if match.start() > cursor:
+                result.append(InlineToken(
+                    TokenKind.TEXT,
+                    token.text[cursor:match.start()],
+                    bold=token.bold,
+                ))
+            result.append(InlineToken(
+                TokenKind.TEXT,
+                match.group(0),
+                bold=token.bold,
+                italic=True,
+            ))
+            cursor = match.end()
+        if cursor < len(token.text):
+            result.append(InlineToken(
+                TokenKind.TEXT,
+                token.text[cursor:],
+                bold=token.bold,
+            ))
+    return result
 
 
 # Hyperlink pattern: [text](url). Greedy-free inner classes per design §1.
@@ -1354,7 +1435,8 @@ def emit_runs(p_elem, tokens, default_rPr=None, rel_manager=None):
 
     TEXT tokens replicate the baseline rPr byte-for-byte (Times New Roman,
     sz/szCs 24, optional w:b/bCs and w:i/iCs) so balanced/plain text is
-    identical to the frozen oracle. CODE tokens use Consolas. LINK tokens wrap a
+    identical to the frozen oracle. CODE tokens use 12 pt Times New Roman
+    italic so technical identifiers follow the report typography. LINK tokens wrap a
     run inside a ``w:hyperlink`` carrying an r:id allocated by ``rel_manager``
     (falls back to a plain run when no rel_manager is supplied).
     """
@@ -1378,11 +1460,15 @@ def emit_runs(p_elem, tokens, default_rPr=None, rel_manager=None):
             r = lxml.etree.Element(f'{{{ns_uri}}}r')
             rPr = lxml.etree.SubElement(r, f'{{{ns_uri}}}rPr')
             lxml.etree.SubElement(rPr, f'{{{ns_uri}}}rFonts', {
-                f'{{{ns_uri}}}ascii': 'Consolas',
-                f'{{{ns_uri}}}hAnsi': 'Consolas'
+                f'{{{ns_uri}}}ascii': 'Times New Roman',
+                f'{{{ns_uri}}}hAnsi': 'Times New Roman',
+                f'{{{ns_uri}}}eastAsia': 'Times New Roman',
+                f'{{{ns_uri}}}cs': 'Times New Roman'
             })
-            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '18'})
-            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '18'})
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '24'})
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '24'})
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}i')
+            lxml.etree.SubElement(rPr, f'{{{ns_uri}}}iCs')
             t = lxml.etree.SubElement(r, f'{{{ns_uri}}}t')
             t.text = tok.text
             if tok.text.startswith(' ') or tok.text.endswith(' '):
@@ -1428,7 +1514,8 @@ def add_formatted_text(p_elem, text, default_rPr=None, rel_manager=None):
     balanced ``**``/``*``) the emitted runs are byte-identical to the frozen
     oracle ``add_formatted_text``.
     """
-    emit_runs(p_elem, tokenize_inline(text), default_rPr, rel_manager)
+    tokens = italicize_technical_terms(tokenize_inline(text))
+    emit_runs(p_elem, tokens, default_rPr, rel_manager)
 
 
 _HTML_BREAK_RE = re.compile(r'<br\s*/?>', re.IGNORECASE)
@@ -1604,7 +1691,7 @@ def build_code_block_elements(item):
     for line in item['lines']:
         p = lxml.etree.Element(f'{{{ns_uri}}}p')
         pPr = lxml.etree.SubElement(p, f'{{{ns_uri}}}pPr')
-        lxml.etree.SubElement(pPr, f'{{{ns_uri}}}pStyle', {f'{{{ns_uri}}}val': 'Normal'})
+        lxml.etree.SubElement(pPr, f'{{{ns_uri}}}pStyle', {f'{{{ns_uri}}}val': 'CodeBlock'})
         lxml.etree.SubElement(pPr, f'{{{ns_uri}}}jc', {f'{{{ns_uri}}}val': 'left'})
         
         lxml.etree.SubElement(pPr, f'{{{ns_uri}}}ind', {
@@ -1623,11 +1710,15 @@ def build_code_block_elements(item):
         rPr = lxml.etree.SubElement(r, f'{{{ns_uri}}}rPr')
         
         lxml.etree.SubElement(rPr, f'{{{ns_uri}}}rFonts', {
-            f'{{{ns_uri}}}ascii': 'Consolas',
-            f'{{{ns_uri}}}hAnsi': 'Consolas'
+            f'{{{ns_uri}}}ascii': 'Courier New',
+            f'{{{ns_uri}}}hAnsi': 'Courier New',
+            f'{{{ns_uri}}}eastAsia': 'Courier New',
+            f'{{{ns_uri}}}cs': 'Courier New'
         })
-        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '18'})
-        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '18'})
+        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}sz', {f'{{{ns_uri}}}val': '24'})
+        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}szCs', {f'{{{ns_uri}}}val': '24'})
+        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}i')
+        lxml.etree.SubElement(rPr, f'{{{ns_uri}}}iCs')
         
         t = lxml.etree.SubElement(r, f'{{{ns_uri}}}t')
         t.text = line
@@ -2259,9 +2350,12 @@ def main(argv=None):
         sys.exit(1)
     print(f"Parsed {len(items)} items from Markdown.")
 
-    marker_errors = validate_figure_markers(
-        items, workspace_root / "images" / "manifest.json"
+    manifest_arg = os.environ.get(
+        "TA_IMAGE_MANIFEST_PATH",
+        os.path.join("images", "manifest.json"),
     )
+    manifest_path = resolve_path(manifest_arg, workspace_root)
+    marker_errors = validate_figure_markers(items, manifest_path)
     if marker_errors:
         print(
             "Error: invalid semantic figure/table markers or references; "

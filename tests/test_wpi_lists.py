@@ -94,7 +94,7 @@ def _draft_list_indents():
     onward, skipping code blocks and [TABLE] blocks) so the sequence lines up
     1:1 with the parsed list_items and the captured baseline.
     """
-    lines = DRAFT.read_text(encoding="utf-8").splitlines(keepends=True)
+    lines = mrg._load_draft_text(str(DRAFT)).splitlines(keepends=True)
     indents = []
     started = False
     in_code = False

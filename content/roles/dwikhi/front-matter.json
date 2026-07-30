@@ -1,0 +1,110 @@
+{
+  "cover": {
+    "title": "PERANCANGAN ASSET 3D DAN PENGELOLAAN DATABASE PADA SISTEM DENAH VIRTUAL UPNVJ KAMPUS PONDOK LABU",
+    "author": "Dwikhi Deandra Purnianto",
+    "nim": "2210511131",
+    "year": "2026"
+  },
+  "report_title_page": {
+    "heading": "LAPORAN PROYEK",
+    "title": "PERANCANGAN ASSET 3D DAN PENGELOLAAN DATABASE PADA SISTEM DENAH VIRTUAL UPNVJ KAMPUS PONDOK LABU",
+    "author": "DWIKHI DEANDRA PURNIANTO",
+    "nim": "2210511131",
+    "program_study": "INFORMATIKA",
+    "faculty": "FAKULTAS ILMU KOMPUTER",
+    "university": "UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAKARTA",
+    "city": "JAKARTA",
+    "year": "2026"
+  },
+  "authenticity_statement": {
+    "heading": "SURAT PERNYATAAN KEASLIAN",
+    "intro": "Yang bertanda tangan di bawah ini:",
+    "identity": {
+      "Nama": "Dwikhi Deandra Purnianto",
+      "NIM": "2210511131",
+      "Program Studi": "S-1 Informatika",
+      "Judul Proyek": "Perancangan Asset 3D dan Pengelolaan Database pada Sistem Denah Virtual UPNVJ Kampus Pondok Labu"
+    },
+    "paragraphs": [
+      "Menyatakan bahwa laporan tugas akhir proyek ini disusun oleh penulis berdasarkan hasil pekerjaan, pemikiran, dan pengembangan dalam lingkup kontribusi penulis sebagaimana dijelaskan di dalam laporan. Bagian yang merupakan hasil kolaborasi tim, kutipan, data, gambar, atau informasi dari pihak lain telah dinyatakan dan dirujuk dengan benar.",
+      "Demikian surat pernyataan ini dibuat dengan sebenar-benarnya. Apabila kemudian ditemukan penyimpangan atau ketidaksesuaian dalam pernyataan ini, penulis bersedia menerima konsekuensi dan diproses sesuai dengan aturan serta ketentuan yang berlaku."
+    ],
+    "date": "Jakarta, 23 Juli 2026",
+    "declarant_label": "Yang menyatakan,",
+    "signature_space_lines": 4,
+    "author": "Dwikhi Deandra Purnianto",
+    "requires_physical_stamp": true
+  },
+  "declaration": {
+    "heading": "PERNYATAAN MENGENAI SKRIPSI DAN SUMBER INFORMASI SERTA PELIMPAHAN HAK CIPTA",
+    "paragraphs": [
+      "Dengan ini saya menyatakan bahwa skripsi dengan judul “Perancangan Asset 3D dan Pengelolaan Database pada Sistem Denah Virtual UPNVJ Kampus Pondok Labu” adalah karya saya dengan arahan dari dosen pembimbing dan belum diajukan dalam bentuk apa pun kepada perguruan tinggi mana pun. Sumber informasi yang berasal atau dikutip dari karya yang diterbitkan maupun tidak diterbitkan dari penulis lain telah disebutkan dalam teks dan dicantumkan dalam Daftar Pustaka di bagian akhir skripsi ini.",
+      "Dengan ini saya melimpahkan hak cipta dari karya tulis saya kepada Universitas Pembangunan Nasional “Veteran” Jakarta."
+    ],
+    "date": "Jakarta, 23 Juli 2026",
+    "signature_space_lines": 3,
+    "author": "Dwikhi Deandra Purnianto",
+    "nim": "2210511131"
+  },
+  "approval_scan": {
+    "image": "images/dwikhi/front-matter/approval-scan.jpeg",
+    "width_cm": 14.0,
+    "alt_text": "Lembar Persetujuan Dwikhi Deandra Purnianto yang telah ditandatangani"
+  },
+  "abstract_id": {
+    "heading": "ABSTRAK",
+    "body": "Kuesioner awal menunjukkan bahwa 14 dari 21 responden pernah mengalami kesulitan menemukan lokasi di Kampus UPNVJ Pondok Labu. Tugas akhir ini bertujuan merancang skema dan Entity Relationship Diagram (ERD), menyusun kebijakan Row Level Security (RLS), mengelola data awal, membuat serta menata asset 3D gedung dan fasilitas, dan menerapkan kode lokasi yang sama pada database serta objek tujuan di Unity. Pengerjaan menggunakan metode prototyping melalui pengumpulan kebutuhan, pembuatan rancangan awal, pemeriksaan, dan perbaikan berulang. Skema akhir yang didokumentasikan terdiri atas 11 tabel untuk data kampus, Denah 2D, administrasi, audit, dan analitik beserta 10 foreign key. Empat tabel Denah 2D ditambahkan pada skema akhir setelah tahap pengembangan dan tindak lanjut UAT sehingga tidak diposisikan sebagai kebutuhan awal. SQL lengkap disimpan sebagai artefak dokumentasi dan tidak dijalankan saat penyusunan laporan karena memuat operasi penghapusan tabel. Proses asset dimulai dari pengambilan foto referensi, pembuatan visual pada Unity Editor dan Blender, penyusunan prefab, pembuatan Pointer, serta penyamaan kode lokasi. Hasilnya meliputi 19 asset gedung dan satu asset fasilitas Masjid, ERD lengkap 11 tabel, rancangan RLS, serta data awal berisi 19 entitas gedung dan 311 fasilitas. Berkas SQL tidak memuat definisi trigger sehingga laporan tidak mengklaim trigger audit aktif. Pada tingkat produk bersama, pengujian fungsional akhir menghasilkan 24 dari 24 skenario lulus dan UAT memperoleh nilai gabungan 81,50 persen. Hasil tersebut menunjukkan bahwa kontribusi penulis menyediakan dasar visual, struktur data, dan aturan akses bagi sistem denah virtual, dengan pembaruan informasi lapangan serta pemeriksaan pemetaan tetap diperlukan ketika data berubah.",
+    "keywords_label": "Kata kunci:",
+    "keywords": [
+      "asset 3D",
+      "database",
+      "ERD",
+      "Row Level Security",
+      "denah virtual"
+    ]
+  },
+  "abstract_en": {
+    "heading": "ABSTRACT",
+    "body": "The initial questionnaire showed that 14 of 21 respondents had difficulty finding locations on the UPNVJ Pondok Labu Campus. This project aimed to design a database schema and Entity Relationship Diagram (ERD), define Row Level Security (RLS) policies, manage initial data, create and arrange 3D assets for buildings and facilities, and apply the same location code to database records and destination objects in Unity. The work used a prototyping method involving requirements collection, initial design, inspection, and iterative improvement. The documented final schema contains 11 tables for campus data, the 2D map, administration, auditing, and analytics, connected by 10 foreign keys. Four 2D-map tables entered the final schema after development and UAT follow-up, so they are not presented as initial requirements. The complete SQL is retained as a documentation artifact and was not executed while preparing the report because it contains table-removal commands. The asset workflow covered reference photography, visual creation in the Unity Editor and Blender, prefab arrangement, Pointer creation, and location-code alignment. The results comprise 19 building assets and one Masjid facility asset, a complete 11-table ERD, an RLS design, and initial data containing 19 building entities and 311 facilities. The SQL contains no trigger definition; therefore, the report does not claim that an audit trigger is active. At the shared-product level, the final functional test passed 24 of 24 scenarios, and the combined UAT score was 81.50 percent. These results show that the author's contribution provides the visual, data-structure, and access-rule foundations for the virtual map, while field updates and mapping checks remain necessary whenever the data change.",
+    "keywords_label": "Keywords:",
+    "keywords": [
+      "3D asset",
+      "database",
+      "ERD",
+      "Row Level Security",
+      "virtual map"
+    ]
+  },
+  "preface": {
+    "heading": "KATA PENGANTAR",
+    "opening": [
+      "Puji syukur kehadirat Tuhan Yang Maha Esa atas rahmat dan karunia-Nya sehingga penulis dapat menyelesaikan laporan tugas akhir yang berjudul “Perancangan Asset 3D dan Pengelolaan Database pada Sistem Denah Virtual UPNVJ Kampus Pondok Labu”.",
+      "Penyusunan proyek dan laporan ini tidak lepas dari doa, dukungan, arahan, serta bantuan dari berbagai pihak sejak tahap perencanaan hingga penyelesaian. Oleh karena itu, penulis menyampaikan rasa terima kasih dan penghargaan yang setinggi-tingginya kepada:"
+    ],
+    "acknowledgements": [
+      "Keluarga penulis, yang selalu memberikan doa, dukungan moril, semangat, dan perhatian penuh selama pelaksanaan tugas akhir.",
+      "Erly Krisnanik, S.Kom., M.M., yang senantiasa memberikan dukungan dan dorongan moral kepada penulis selama proses pengerjaan tugas akhir.",
+      "Dr. Ridwan Raafi’udin, S.Kom., M.Kom. dan Novi Trisman Hadi, S.Pd., M.Kom., selaku Dosen Pembimbing yang telah meluangkan waktu, memberikan arahan, masukan, serta bimbingan yang sangat berharga dalam pengerjaan proyek dan penyusunan laporan ini.",
+      "Mochamad Fariz Satyawan, S.Kom., selaku Staf Program Studi yang telah membantu dan memfasilitasi kelancaran proses hingga pelaksanaan sidang.",
+      "Reyhan Mahendra, S.I.Kom., selaku Pengelola Majalah & Desain Humas Biro AKK UPN Veteran Jakarta, yang telah memberikan kemudahan serta bantuan teknis selama pengerjaan proyek ini.",
+      "Muamar Faiz Khairul Anam Setiawan dan Muhammad Iman Nugraha, selaku rekan satu tim yang telah bekerja sama dengan baik melalui diskusi, pembagian tugas, dan pengembangan setiap komponen pada sistem denah virtual.",
+      "Rekan-rekan Discord NYPD dan Dimari Aje Cuyy, khususnya mtgim, Semua Baik, whychucksaysnah, serta marqui de natra666, yang telah memberikan hiburan dan dukungan semangat selama proses pengerjaan.",
+      "Podcast Seminggu, Bang Awwe, dan Abah Pican yang menjadi sumber hiburan dan menemani penulis selama penyusunan proyek dan laporan ini.",
+      "Diri sendiri, yang telah berjuang, bertahan, dan konsisten belajar hingga mampu menyelesaikan tugas akhir ini dengan baik."
+    ],
+    "closing": [
+      "Penulis menyadari bahwa laporan ini masih memiliki kekurangan. Oleh karena itu, kritik dan saran yang membangun sangat diharapkan demi penyempurnaan karya ini. Semoga proyek dan laporan tugas akhir ini dapat memberikan manfaat serta panduan berguna bagi pengembangan sistem denah virtual kampus di masa mendatang."
+    ],
+    "date": "Jakarta, 23 Juli 2026",
+    "author": "Dwikhi Deandra Purnianto",
+    "nim": "2210511131"
+  },
+  "identity_footer": {
+    "author_year": "Dwikhi Deandra Purnianto, 2026",
+    "title": "PERANCANGAN ASSET 3D DAN PENGELOLAAN DATABASE PADA SISTEM DENAH VIRTUAL UPNVJ KAMPUS PONDOK LABU",
+    "institution": "UPN Veteran Jakarta, Fakultas Ilmu Komputer, S1 Informatika",
+    "links": "[www.upnvj.ac.id-www.library.upnvj.ac.id-www.repository.upnvj.ac.id]",
+    "font": "Times New Roman",
+    "size_pt": 8
+  }
+}

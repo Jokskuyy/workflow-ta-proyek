@@ -14,12 +14,12 @@ A_NS = 'http://schemas.openxmlformats.org/drawingml/2006/main'
 WP_NS = 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing'
 PACKAGE_REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships'
 CONTENT_TYPES_NS = 'http://schemas.openxmlformats.org/package/2006/content-types'
-MAX_WIDTH_EMU = 5400000
+MAX_WIDTH_EMU = 5040000  # 14 cm printable width: A4 minus 4 cm left and 3 cm right
 EMU_PER_TWIP = 635  # printable page-height threshold uses twips * 635 (matches injector)
 FIGURE_CAPTION_RESERVE_EMU = 1080000  # 3 cm; must match inject_all_images.py
 
 # Canonical UPNVJ FIK page geometry (OOXML twips): A4 portrait with a 4 cm
-# binding margin on the left and 3 cm on the top, right, and bottom.
+# margin on the left and 3 cm margins on the top/right/bottom.
 EXPECTED_PAGE_SIZE_DXA = {'w': 11906, 'h': 16838}
 EXPECTED_MARGINS_DXA = {
     'top': 1701,
@@ -58,6 +58,1651 @@ APPENDIX_HEADING_RE = re.compile(r'^LAMPIRAN\s+\d+\.', re.IGNORECASE)
 def is_appendix_heading_text(text):
     """Return True only for the canonical ``LAMPIRAN N.`` heading form."""
     return bool(APPENDIX_HEADING_RE.match(text.strip()))
+
+
+def _run_property_is_on(run_properties, name):
+    if run_properties is None:
+        return False
+    element = run_properties.find(f'{{{W_NS}}}{name}')
+    if element is None:
+        return False
+    return element.get(f'{{{W_NS}}}val', '1').lower() not in {
+        '0', 'false', 'off', 'none',
+    }
+
+
+def _validate_iman_front_matter_legacy(doc_root, styles_root):
+    """Validate the ordered, role-specific front matter and its typography."""
+    paragraphs = list(doc_root.findall(f'.//{{{W_NS}}}p'))
+    texts = [
+        ''.join(node.text or '' for node in paragraph.findall(f'.//{{{W_NS}}}t')).strip()
+        for paragraph in paragraphs
+    ]
+    findings = []
+    required = [
+        'LAPORAN PROYEK',
+        'SURAT PERNYATAAN KEASLIAN',
+        'PERNYATAAN MENGENAI SKRIPSI DAN SUMBER INFORMASI SERTA PELIMPAHAN HAK CIPTA',
+        'ABSTRAK',
+        'ABSTRACT',
+        'KATA PENGANTAR',
+        'DAFTAR ISI',
+    ]
+    positions = []
+    for heading in required:
+        try:
+            positions.append(texts.index(heading))
+        except ValueError:
+            findings.append(f"[front-matter] heading {heading!r} is missing.")
+    if len(positions) == len(required) and positions != sorted(positions):
+        findings.append(
+            '[front-matter] project title page, authenticity statement, '
+            'declaration, approval scan, abstracts, preface, and Daftar Isi '
+            'are not in the required order.'
+        )
+
+    visible_text = '\n'.join(texts)
+    expected_title = (
+        'Pengembangan Dashboard Web, Integrasi Unity WebGL, dan Deployment '
+        'Sistem Denah Virtual UPNVJ Kampus Pondok Labu'
+    )
+    if expected_title not in visible_text:
+        findings.append('[front-matter] the active report title is missing.')
+    title_paragraphs = [
+        paragraph for paragraph, text in zip(paragraphs, texts)
+        if expected_title in text
+    ]
+    if any(
+        _run_property_is_on(run.find(f'{{{W_NS}}}rPr'), 'i')
+        or _run_property_is_on(run.find(f'{{{W_NS}}}rPr'), 'iCs')
+        for paragraph in title_paragraphs
+        for run in paragraph.findall(f'.//{{{W_NS}}}r')
+    ):
+        findings.append(
+            '[front-matter] the active report title must not contain italic text.'
+        )
+    if 'RANCANG BANGUN SISTEM REPOSITORI' in visible_text.upper():
+        findings.append('[front-matter] the obsolete repository-system title remains visible.')
+    if 'SURAT PENGESAHAN' in visible_text.upper():
+        findings.append('[front-matter] the obsolete Surat Pengesahan remains visible.')
+
+    signature_drawings = [
+        element for element in doc_root.findall(f'.//{{{WP_NS}}}docPr')
+        if element.get('name') == 'PREFACE_SIGNATURE:iman'
+    ]
+    if len(signature_drawings) != 1:
+        findings.append(
+            '[front-matter] Kata Pengantar must contain exactly one '
+            f'PREFACE_SIGNATURE:iman drawing, found {len(signature_drawings)}.'
+        )
+    else:
+        signature_paragraph = next(
+            (
+                paragraph for paragraph in paragraphs
+                if signature_drawings[0] in paragraph.iter()
+            ),
+            None,
+        )
+        signature_index = (
+            paragraphs.index(signature_paragraph)
+            if signature_paragraph is not None else -1
+        )
+        preface_index = (
+            texts.index('KATA PENGANTAR')
+            if 'KATA PENGANTAR' in texts else -1
+        )
+        toc_index = (
+            texts.index('DAFTAR ISI')
+            if 'DAFTAR ISI' in texts else len(paragraphs)
+        )
+        preface_dates = [
+            index for index in range(preface_index + 1, toc_index)
+            if texts[index] == 'Jakarta, 23 Juli 2026'
+        ] if preface_index >= 0 else []
+        preface_authors = [
+            index for index in range(preface_index + 1, toc_index)
+            if texts[index] == 'Muhammad Iman Nugraha'
+        ] if preface_index >= 0 else []
+        if (
+            not preface_dates
+            or not preface_authors
+            or not preface_dates[-1] < signature_index < preface_authors[-1]
+        ):
+            findings.append(
+                '[front-matter] Kata Pengantar signature must appear between '
+                'the closing date and author name.'
+            )
+        if signature_paragraph is not None:
+            justification = signature_paragraph.find(
+                f'{{{W_NS}}}pPr/{{{W_NS}}}jc'
+            )
+            if (
+                justification is None
+                or justification.get(f'{{{W_NS}}}val') != 'right'
+            ):
+                findings.append(
+                    '[front-matter] Kata Pengantar signature must be right-aligned.'
+                )
+        if not signature_drawings[0].get('descr'):
+            findings.append(
+                '[front-matter] Kata Pengantar signature must have alt text.'
+            )
+    approval_index = texts.index('LEMBAR PERSETUJUAN') if 'LEMBAR PERSETUJUAN' in texts else -1
+    authenticity_index = (
+        texts.index('SURAT PERNYATAAN KEASLIAN')
+        if 'SURAT PERNYATAAN KEASLIAN' in texts else -1
+    )
+    abstract_index = texts.index('ABSTRAK') if 'ABSTRAK' in texts else -1
+    approval_paragraphs = (
+        paragraphs[approval_index + 1:authenticity_index]
+        if 0 <= approval_index < authenticity_index else []
+    )
+    approval_visible_text = '\n'.join(
+        ''.join(node.text or '' for node in paragraph.findall(f'.//{{{W_NS}}}t')).strip()
+        for paragraph in approval_paragraphs
+    )
+    approval_required = (
+        'Yang bertanda tangan di bawah ini:',
+        'Nama',
+        'NIM.',
+        'Program Studi',
+        'Informatika Program Sarjana/Sistem Informasi Program Sarjana/Sains Data Program Sarjana/Sistem Informasi Program Diploma (*Coret yang tidak perlu)',
+        'Judul Tugas Akhir:',
+        'Dinyatakan telah memenuhi syarat dan menyetujui untuk mengikuti ujian sidang Tugas Akhir.',
+        'Jakarta, ........................ 20......',
+        'Menyetujui,',
+        'Dosen Pembimbing I,',
+        'Dosen Pembimbing II,',
+        'Dr. Ridwan Raafi’udin, S.Kom., M.Kom.',
+        'Novi Trisman Hadi, S.Pd., M.Kom.',
+        'Mengetahui,',
+        'Koordinator Program Studi,',
+        'Anita Muliawati, S.Kom., M.T.I.',
+    )
+    for required_text in approval_required:
+        if required_text not in approval_visible_text:
+            findings.append(
+                f'[front-matter] approval-page text {required_text!r} is missing.'
+            )
+    if 'Lembar persetujuan resmi belum tersedia pada draf ini' in approval_visible_text:
+        findings.append('[front-matter] the obsolete approval-page placeholder remains visible.')
+    for forbidden_text in (
+        'Muhammad Iman Nugraha',
+        '2210511129',
+        expected_title,
+    ):
+        if forbidden_text in approval_visible_text:
+            findings.append(
+                f'[front-matter] approval-page field {forbidden_text!r} must remain blank.'
+            )
+
+    dotted_lines = 0
+    for paragraph in approval_paragraphs:
+        tabs = paragraph.findall(f'{{{W_NS}}}pPr/{{{W_NS}}}tabs/{{{W_NS}}}tab')
+        if any(tab.get(f'{{{W_NS}}}leader') == 'dot' for tab in tabs):
+            dotted_lines += 1
+    if dotted_lines != 7:
+        findings.append(
+            '[front-matter] approval page must contain exactly seven dotted '
+            f'form lines, found {dotted_lines}.'
+        )
+
+    authenticity_paragraphs = (
+        paragraphs[authenticity_index + 1:abstract_index]
+        if 0 <= authenticity_index < abstract_index else []
+    )
+    authenticity_visible_text = '\n'.join(
+        ''.join(
+            node.text or ''
+            for node in paragraph.findall(f'.//{{{W_NS}}}t')
+        ).strip()
+        for paragraph in authenticity_paragraphs
+    )
+    authenticity_required = (
+        'Yang bertanda tangan di bawah ini:',
+        'Nama',
+        'Muhammad Iman Nugraha',
+        'NIM',
+        '2210511129',
+        'Program Studi',
+        'S-1 Informatika',
+        'Judul Proyek',
+        expected_title,
+        'Menyatakan bahwa laporan tugas akhir proyek ini disusun oleh penulis '
+        'berdasarkan hasil pekerjaan, pemikiran, dan pengembangan dalam '
+        'lingkup kontribusi penulis sebagaimana dijelaskan di dalam laporan.',
+        'Bagian yang merupakan hasil kolaborasi tim, kutipan, data, gambar, '
+        'atau informasi dari pihak lain telah dinyatakan dan dirujuk dengan benar.',
+        'Demikian surat pernyataan ini dibuat dengan sebenar-benarnya.',
+        'Jakarta, 23 Juli 2026',
+        'Yang menyatakan,',
+    )
+    for required_text in authenticity_required:
+        if required_text not in authenticity_visible_text:
+            findings.append(
+                '[front-matter] authenticity-statement text '
+                f'{required_text!r} is missing.'
+            )
+
+    authenticity_drawings = [
+        element for element in doc_root.findall(f'.//{{{WP_NS}}}docPr')
+        if element.get('name') == 'AUTHENTICITY_SIGNATURE:iman'
+    ]
+    if len(authenticity_drawings) != 1:
+        findings.append(
+            '[front-matter] Surat Pernyataan Keaslian must contain exactly one '
+            'AUTHENTICITY_SIGNATURE:iman drawing, '
+            f'found {len(authenticity_drawings)}.'
+        )
+    else:
+        signature_paragraph = next(
+            (
+                paragraph for paragraph in authenticity_paragraphs
+                if authenticity_drawings[0] in paragraph.iter()
+            ),
+            None,
+        )
+        signature_index = (
+            paragraphs.index(signature_paragraph)
+            if signature_paragraph is not None else -1
+        )
+        declarant_indices = [
+            index for index in range(authenticity_index + 1, abstract_index)
+            if texts[index] == 'Yang menyatakan,'
+        ] if authenticity_index >= 0 else []
+        author_indices = [
+            index for index in range(authenticity_index + 1, abstract_index)
+            if texts[index] == 'Muhammad Iman Nugraha'
+        ] if authenticity_index >= 0 else []
+        if (
+            not declarant_indices
+            or not author_indices
+            or not declarant_indices[-1] < signature_index < author_indices[-1]
+        ):
+            findings.append(
+                '[front-matter] Surat Pernyataan Keaslian signature must '
+                'appear between "Yang menyatakan," and the author name.'
+            )
+        if signature_paragraph is not None:
+            justification = signature_paragraph.find(
+                f'{{{W_NS}}}pPr/{{{W_NS}}}jc'
+            )
+            if (
+                justification is None
+                or justification.get(f'{{{W_NS}}}val') != 'right'
+            ):
+                findings.append(
+                    '[front-matter] Surat Pernyataan Keaslian signature '
+                    'must be right-aligned.'
+                )
+        expected_alt = (
+            'Tanda tangan Muhammad Iman Nugraha pada '
+            'Surat Pernyataan Keaslian'
+        )
+        if authenticity_drawings[0].get('descr') != expected_alt:
+            findings.append(
+                '[front-matter] Surat Pernyataan Keaslian signature '
+                'has missing or incorrect alt text.'
+            )
+
+    style = styles_root.find(
+        f"{{{W_NS}}}style[@{{{W_NS}}}styleId='FrontMatterHeading']"
+    )
+    if style is None:
+        findings.append('[front-matter] FrontMatterHeading style is missing.')
+    else:
+        based_on = style.find(f'{{{W_NS}}}basedOn')
+        run_properties = style.find(f'{{{W_NS}}}rPr')
+        if based_on is None or based_on.get(f'{{{W_NS}}}val') != 'Normal':
+            findings.append('[front-matter] FrontMatterHeading must be based on Normal.')
+        fonts = (
+            run_properties.find(f'{{{W_NS}}}rFonts')
+            if run_properties is not None else None
+        )
+        size = (
+            run_properties.find(f'{{{W_NS}}}sz')
+            if run_properties is not None else None
+        )
+        if fonts is None or any(
+            fonts.get(f'{{{W_NS}}}{name}') != 'Times New Roman'
+            for name in ('ascii', 'hAnsi', 'eastAsia', 'cs')
+        ):
+            findings.append('[front-matter] FrontMatterHeading must use Times New Roman.')
+        if size is None or size.get(f'{{{W_NS}}}val') != '24':
+            findings.append('[front-matter] FrontMatterHeading must use 12 pt text.')
+        if not _run_property_is_on(run_properties, 'b'):
+            findings.append('[front-matter] FrontMatterHeading must be bold.')
+
+    for heading, label in (('ABSTRAK', 'Kata kunci:'), ('ABSTRACT', 'Keywords:')):
+        if heading not in texts:
+            continue
+        heading_index = texts.index(heading)
+        content = [
+            (index, paragraphs[index], texts[index])
+            for index in range(heading_index + 1, len(paragraphs))
+            if texts[index]
+        ]
+        if len(content) < 2:
+            findings.append(f'[front-matter] {heading} body or keyword line is missing.')
+            continue
+        body_index, body_paragraph, _ = content[0]
+        keyword_index, keyword_paragraph, keyword_text = content[1]
+        if label not in keyword_text:
+            findings.append(f'[front-matter] {heading} keyword label {label!r} is missing.')
+        for run in body_paragraph.findall(f'{{{W_NS}}}r'):
+            if not ''.join(node.text or '' for node in run.findall(f'{{{W_NS}}}t')):
+                continue
+            run_properties = run.find(f'{{{W_NS}}}rPr')
+            fonts = (
+                run_properties.find(f'{{{W_NS}}}rFonts')
+                if run_properties is not None else None
+            )
+            size = (
+                run_properties.find(f'{{{W_NS}}}sz')
+                if run_properties is not None else None
+            )
+            if fonts is None or fonts.get(f'{{{W_NS}}}ascii') != 'Times New Roman':
+                findings.append(f'[front-matter] {heading} body must use Times New Roman.')
+            if size is None or size.get(f'{{{W_NS}}}val') != '24':
+                findings.append(f'[front-matter] {heading} body must use 12 pt text.')
+            if _run_property_is_on(run_properties, 'b'):
+                findings.append(f'[front-matter] {heading} body must remain regular.')
+        keyword_runs = [
+            run for run in keyword_paragraph.findall(f'{{{W_NS}}}r')
+            if ''.join(node.text or '' for node in run.findall(f'{{{W_NS}}}t'))
+        ]
+        if len(keyword_runs) < 2:
+            findings.append(f'[front-matter] {heading} keyword line must separate label and values.')
+            continue
+        if not _run_property_is_on(keyword_runs[0].find(f'{{{W_NS}}}rPr'), 'b'):
+            findings.append(f'[front-matter] {label} must be bold.')
+        for run in keyword_runs[1:]:
+            if _run_property_is_on(run.find(f'{{{W_NS}}}rPr'), 'b'):
+                findings.append(f'[front-matter] {heading} keyword values must remain regular.')
+        if keyword_index <= body_index:
+            findings.append(f'[front-matter] {heading} keyword line must follow its body.')
+
+    return findings
+
+
+def _validate_preface_indentation(
+        paragraphs, texts, *, expected_acknowledgements=8,
+        expected_opening=2, expected_closing=1):
+    """Validate the final post-COM indentation groups in Kata Pengantar."""
+    findings = []
+    try:
+        heading_index = texts.index('KATA PENGANTAR')
+        boundary_index = texts.index('DAFTAR ISI', heading_index + 1)
+    except ValueError:
+        return findings
+
+    content = [
+        (index, paragraphs[index], texts[index])
+        for index in range(heading_index + 1, boundary_index)
+        if texts[index]
+    ]
+    acknowledgement_positions = [
+        position for position, (_, _, text) in enumerate(content)
+        if re.match(r'^\d+\.\s+', text)
+    ]
+    labels = [
+        int(re.match(r'^(\d+)\.', content[position][2]).group(1))
+        for position in acknowledgement_positions
+    ]
+    if (
+        labels != list(range(1, expected_acknowledgements + 1))
+        or not acknowledgement_positions
+        or acknowledgement_positions != list(range(
+            acknowledgement_positions[0],
+            acknowledgement_positions[0] + expected_acknowledgements,
+        ))
+    ):
+        return [
+            '[front-matter] Kata Pengantar must contain acknowledgements '
+            f'1-{expected_acknowledgements} '
+            'as one consecutive paragraph group.'
+        ]
+
+    first_acknowledgement = acknowledgement_positions[0]
+    last_acknowledgement = acknowledgement_positions[-1]
+    opening = content[:first_acknowledgement]
+    acknowledgements = [content[position] for position in acknowledgement_positions]
+    trailing = content[last_acknowledgement + 1:]
+    if (
+        len(opening) != expected_opening
+        or len(trailing) != expected_closing + 3
+    ):
+        return [
+            '[front-matter] Kata Pengantar must contain '
+            f'{expected_opening} opening paragraph(s), '
+            f'{expected_closing} closing paragraph(s), and three sign-off lines.'
+        ]
+
+    groups = (
+        ('opening', opening, '0', '567'),
+        (
+            f'acknowledgements 1-{expected_acknowledgements}',
+            acknowledgements,
+            '0',
+            '0',
+        ),
+        ('closing', trailing[:expected_closing], '0', '567'),
+    )
+    for label, group, expected_left, expected_first_line in groups:
+        invalid = []
+        for index, paragraph, _ in group:
+            indent = paragraph.find(f'{{{W_NS}}}pPr/{{{W_NS}}}ind')
+            if (
+                indent is None
+                or indent.get(f'{{{W_NS}}}left') != expected_left
+                or indent.get(f'{{{W_NS}}}firstLine') != expected_first_line
+                or indent.get(f'{{{W_NS}}}hanging') is not None
+            ):
+                invalid.append(index)
+        if invalid:
+            findings.append(
+                f'[front-matter] Kata Pengantar {label} must use left='
+                f'{expected_left}, firstLine={expected_first_line}, and no '
+                f'hanging indent; invalid paragraph indices: {invalid}.'
+            )
+
+    for index, paragraph, _ in trailing[expected_closing:]:
+        justification = paragraph.find(f'{{{W_NS}}}pPr/{{{W_NS}}}jc')
+        if (
+            justification is None
+            or justification.get(f'{{{W_NS}}}val') != 'right'
+        ):
+            findings.append(
+                '[front-matter] Kata Pengantar date, author, and NIM must be '
+                f'right-aligned; invalid paragraph index: {index}.'
+            )
+    return findings
+
+
+def _validate_iman_front_matter_obsolete(doc_root, styles_root):
+    """Validate Iman's front matter against the latest signed DOCX."""
+    paragraphs = list(doc_root.findall(f'.//{{{W_NS}}}p'))
+    texts = [
+        ''.join(
+            node.text or ''
+            for node in paragraph.findall(f'.//{{{W_NS}}}t')
+        ).strip()
+        for paragraph in paragraphs
+    ]
+    findings = []
+    expected_title = (
+        'Pengembangan Dashboard Web, Integrasi Unity WebGL, dan Deployment '
+        'Sistem Denah Virtual UPNVJ Kampus Pondok Labu'
+    )
+    declaration_heading = (
+        'PERNYATAAN MENGENAI SKRIPSI DAN SUMBER INFORMASI SERTA '
+        'PELIMPAHAN HAK CIPTA'
+    )
+    required_headings = [
+        'LAPORAN PROYEK',
+        'SURAT PERNYATAAN KEASLIAN',
+        declaration_heading,
+        'ABSTRAK',
+        'ABSTRACT',
+        'KATA PENGANTAR',
+        'DAFTAR ISI',
+    ]
+    positions = {}
+    for heading in required_headings:
+        try:
+            positions[heading] = texts.index(heading)
+        except ValueError:
+            findings.append(f"[front-matter] heading {heading!r} is missing.")
+    if (
+        len(positions) == len(required_headings)
+        and [positions[item] for item in required_headings]
+        != sorted(positions.values())
+    ):
+        findings.append(
+            '[front-matter] project title page, authenticity statement, '
+            'declaration, signed approval scan, abstracts, preface, and '
+            'Daftar Isi are not in the required order.'
+        )
+
+    findings.extend(_validate_preface_indentation(paragraphs, texts))
+
+    visible_text = '\n'.join(texts)
+    if 'RANCANG BANGUN SISTEM REPOSITORI' in visible_text.upper():
+        findings.append(
+            '[front-matter] the obsolete repository-system title remains visible.'
+        )
+    if 'SURAT PENGESAHAN' in visible_text.upper():
+        findings.append('[front-matter] the obsolete Surat Pengesahan remains visible.')
+    if 'LEMBAR PERSETUJUAN' in texts:
+        findings.append(
+            '[front-matter] obsolete editable approval template remains visible.'
+        )
+    if 'ERROR! BOOKMARK NOT DEFINED.' in visible_text.upper():
+        findings.append(
+            '[front-matter] a Word field displays "Error! Bookmark not defined."'
+        )
+    bookmark_names = {
+        bookmark.get(f'{{{W_NS}}}name')
+        for bookmark in doc_root.findall(f'.//{{{W_NS}}}bookmarkStart')
+        if bookmark.get(f'{{{W_NS}}}name')
+    }
+    daftar_isi_toc_entries = [
+        paragraph for paragraph, text in zip(paragraphs, texts)
+        if text.startswith('DAFTAR ISI')
+        and paragraph.find(
+            f'{{{W_NS}}}pPr/{{{W_NS}}}pStyle'
+        ) is not None
+        and (
+            paragraph.find(
+                f'{{{W_NS}}}pPr/{{{W_NS}}}pStyle'
+            ).get(f'{{{W_NS}}}val', '').startswith('TOC')
+        )
+    ]
+    for paragraph in daftar_isi_toc_entries:
+        targets = []
+        for instruction in paragraph.findall(f'.//{{{W_NS}}}instrText'):
+            match = re.search(r'\bPAGEREF\s+(\S+)', instruction.text or '')
+            if match:
+                targets.append(match.group(1))
+        if not targets:
+            findings.append(
+                '[front-matter] Daftar Isi TOC entry is missing its PAGEREF field.'
+            )
+        elif any(target not in bookmark_names for target in targets):
+            findings.append(
+                '[front-matter] Daftar Isi TOC entry references an undefined '
+                f'bookmark: {targets!r}.'
+            )
+
+    title_paragraphs = [
+        paragraph for paragraph, text in zip(paragraphs, texts)
+        if expected_title in text
+    ]
+    if not title_paragraphs:
+        findings.append('[front-matter] the active report title is missing.')
+    if any(
+        _run_property_is_on(run.find(f'{{{W_NS}}}rPr'), 'i')
+        or _run_property_is_on(run.find(f'{{{W_NS}}}rPr'), 'iCs')
+        for paragraph in title_paragraphs
+        for run in paragraph.findall(f'.//{{{W_NS}}}r')
+    ):
+        findings.append(
+            '[front-matter] the active report title must not contain italic text.'
+        )
+
+    title_index = positions.get('LAPORAN PROYEK', -1)
+    authenticity_index = positions.get('SURAT PERNYATAAN KEASLIAN', -1)
+    declaration_index = positions.get(declaration_heading, -1)
+    abstract_index = positions.get('ABSTRAK', -1)
+    if 0 <= title_index < authenticity_index:
+        title_page_text = '\n'.join(texts[title_index + 1:authenticity_index])
+        for required_text in (
+            expected_title,
+            'MUHAMMAD IMAN NUGRAHA',
+            '2210511129',
+            'S1 INFORMATIKA',
+            'FAKULTAS ILMU KOMPUTER',
+            'UNIVERSITAS PEMBANGUNAN NASIONAL “VETERAN” JAKARTA',
+            'JAKARTA',
+            '2026',
+        ):
+            if required_text not in title_page_text:
+                findings.append(
+                    '[front-matter] project-title-page text '
+                    f'{required_text!r} is missing.'
+                )
+
+    authenticity_paragraphs = (
+        paragraphs[authenticity_index + 1:declaration_index]
+        if 0 <= authenticity_index < declaration_index else []
+    )
+    authenticity_text = '\n'.join(
+        ''.join(
+            node.text or ''
+            for node in paragraph.findall(f'.//{{{W_NS}}}t')
+        ).strip()
+        for paragraph in authenticity_paragraphs
+    )
+    for required_text in (
+        'Yang bertanda tangan di bawah ini:',
+        'Nama',
+        'Muhammad Iman Nugraha',
+        'NIM',
+        '2210511129',
+        'Program Studi',
+        'S-1 Informatika',
+        'Judul Proyek',
+        expected_title,
+        'Menyatakan bahwa laporan tugas akhir proyek ini disusun oleh penulis '
+        'berdasarkan hasil pekerjaan, pemikiran, dan pengembangan dalam '
+        'lingkup kontribusi penulis sebagaimana dijelaskan di dalam laporan.',
+        'Bagian yang merupakan hasil kolaborasi tim, kutipan, data, gambar, '
+        'atau informasi dari pihak lain telah dinyatakan dan dirujuk dengan benar.',
+        'Demikian surat pernyataan ini dibuat dengan sebenar-benarnya.',
+        'Jakarta, 24 Juli 2026',
+        'Yang menyatakan,',
+    ):
+        if required_text not in authenticity_text:
+            findings.append(
+                '[front-matter] authenticity-statement text '
+                f'{required_text!r} is missing.'
+            )
+
+    drawings = list(doc_root.findall(f'.//{{{WP_NS}}}docPr'))
+    obsolete_drawings = [
+        drawing.get('name')
+        for drawing in drawings
+        if drawing.get('name') in {
+            'PREFACE_SIGNATURE:iman',
+            'AUTHENTICITY_SIGNATURE:iman',
+        }
+    ]
+    if obsolete_drawings:
+        findings.append(
+            '[front-matter] obsolete preface/authenticity signature drawing(s) '
+            f'remain: {obsolete_drawings!r}.'
+        )
+
+    def drawing_paragraph(drawing):
+        return next(
+            (
+                paragraph for paragraph in paragraphs
+                if drawing in paragraph.iter()
+            ),
+            None,
+        )
+
+    declaration_drawings = [
+        drawing for drawing in drawings
+        if drawing.get('name') == 'DECLARATION_SIGNATURE:iman'
+    ]
+    declaration_end = abstract_index if abstract_index >= 0 else len(paragraphs)
+    if len(declaration_drawings) != 1:
+        findings.append(
+            '[front-matter] copyright declaration must contain exactly one '
+            'DECLARATION_SIGNATURE:iman drawing, '
+            f'found {len(declaration_drawings)}.'
+        )
+    else:
+        signature_paragraph = drawing_paragraph(declaration_drawings[0])
+        signature_index = (
+            paragraphs.index(signature_paragraph)
+            if signature_paragraph is not None else -1
+        )
+        date_indices = [
+            index for index in range(declaration_index + 1, declaration_end)
+            if texts[index] == 'Jakarta, 23 Juli 2026'
+        ] if declaration_index >= 0 else []
+        author_indices = [
+            index for index in range(declaration_index + 1, declaration_end)
+            if texts[index] == 'Muhammad Iman Nugraha'
+        ] if declaration_index >= 0 else []
+        nim_indices = [
+            index for index in range(declaration_index + 1, declaration_end)
+            if texts[index] == '2210511129'
+        ] if declaration_index >= 0 else []
+        if (
+            not date_indices
+            or not author_indices
+            or not nim_indices
+            or not date_indices[-1] < signature_index
+            < author_indices[-1] < nim_indices[-1]
+        ):
+            findings.append(
+                '[front-matter] declaration signature must appear between '
+                'the declaration date and author identity.'
+            )
+        if signature_paragraph is not None:
+            justification = signature_paragraph.find(
+                f'{{{W_NS}}}pPr/{{{W_NS}}}jc'
+            )
+            if (
+                justification is None
+                or justification.get(f'{{{W_NS}}}val') != 'right'
+            ):
+                findings.append(
+                    '[front-matter] declaration signature must be right-aligned.'
+                )
+        expected_alt = (
+            'Tanda tangan Muhammad Iman Nugraha pada Pernyataan Hak Cipta'
+        )
+        if declaration_drawings[0].get('descr') != expected_alt:
+            findings.append(
+                '[front-matter] declaration signature has missing or '
+                'incorrect alt text.'
+            )
+
+    approval_drawings = [
+        drawing for drawing in drawings
+        if drawing.get('name') == 'APPROVAL_SCAN:iman'
+    ]
+    if len(approval_drawings) != 1:
+        findings.append(
+            '[front-matter] signed approval page must contain exactly one '
+            f'APPROVAL_SCAN:iman drawing, found {len(approval_drawings)}.'
+        )
+    else:
+        approval_paragraph = drawing_paragraph(approval_drawings[0])
+        approval_index = (
+            paragraphs.index(approval_paragraph)
+            if approval_paragraph is not None else -1
+        )
+        if (
+            declaration_index < 0
+            or abstract_index < 0
+            or not declaration_index < approval_index < abstract_index
+        ):
+            findings.append(
+                '[front-matter] signed approval scan must appear after the '
+                'declaration and before ABSTRAK.'
+            )
+        if approval_paragraph is not None:
+            justification = approval_paragraph.find(
+                f'{{{W_NS}}}pPr/{{{W_NS}}}jc'
+            )
+            if (
+                justification is None
+                or justification.get(f'{{{W_NS}}}val') != 'center'
+            ):
+                findings.append(
+                    '[front-matter] signed approval scan must be centered.'
+                )
+            if approval_paragraph.find(
+                f'{{{W_NS}}}pPr/{{{W_NS}}}pageBreakBefore'
+            ) is None:
+                findings.append(
+                    '[front-matter] signed approval scan must start on a new page.'
+                )
+            extent = approval_paragraph.find(f'.//{{{WP_NS}}}extent')
+            if (
+                extent is None
+                or extent.get('cx') != '5040000'
+                or extent.get('cy') != '6701632'
+            ):
+                findings.append(
+                    '[front-matter] signed approval scan must preserve its '
+                    '14 cm aspect-locked extent.'
+                )
+        expected_alt = (
+            'Lembar Persetujuan Muhammad Iman Nugraha yang telah ditandatangani'
+        )
+        if approval_drawings[0].get('descr') != expected_alt:
+            findings.append(
+                '[front-matter] signed approval scan has missing or incorrect '
+                'alt text.'
+            )
+
+    style = styles_root.find(
+        f"{{{W_NS}}}style[@{{{W_NS}}}styleId='FrontMatterHeading']"
+    )
+    if style is None:
+        findings.append('[front-matter] FrontMatterHeading style is missing.')
+    else:
+        based_on = style.find(f'{{{W_NS}}}basedOn')
+        run_properties = style.find(f'{{{W_NS}}}rPr')
+        if based_on is None or based_on.get(f'{{{W_NS}}}val') != 'Normal':
+            findings.append('[front-matter] FrontMatterHeading must be based on Normal.')
+        fonts = (
+            run_properties.find(f'{{{W_NS}}}rFonts')
+            if run_properties is not None else None
+        )
+        size = (
+            run_properties.find(f'{{{W_NS}}}sz')
+            if run_properties is not None else None
+        )
+        if fonts is None or any(
+            fonts.get(f'{{{W_NS}}}{name}') != 'Times New Roman'
+            for name in ('ascii', 'hAnsi', 'eastAsia', 'cs')
+        ):
+            findings.append('[front-matter] FrontMatterHeading must use Times New Roman.')
+        if size is None or size.get(f'{{{W_NS}}}val') != '24':
+            findings.append('[front-matter] FrontMatterHeading must use 12 pt text.')
+        if not _run_property_is_on(run_properties, 'b'):
+            findings.append('[front-matter] FrontMatterHeading must be bold.')
+
+    for heading, label in (
+        ('ABSTRAK', 'Kata kunci:'),
+        ('ABSTRACT', 'Keywords:'),
+    ):
+        if heading not in texts:
+            continue
+        heading_index = texts.index(heading)
+        content = [
+            (index, paragraphs[index], texts[index])
+            for index in range(heading_index + 1, len(paragraphs))
+            if texts[index]
+        ]
+        if len(content) < 2:
+            findings.append(
+                f'[front-matter] {heading} body or keyword line is missing.'
+            )
+            continue
+        body_index, body_paragraph, _ = content[0]
+        keyword_index, keyword_paragraph, keyword_text = content[1]
+        if label not in keyword_text:
+            findings.append(
+                f'[front-matter] {heading} keyword label {label!r} is missing.'
+            )
+        for run in body_paragraph.findall(f'{{{W_NS}}}r'):
+            if not ''.join(
+                node.text or '' for node in run.findall(f'{{{W_NS}}}t')
+            ):
+                continue
+            run_properties = run.find(f'{{{W_NS}}}rPr')
+            fonts = (
+                run_properties.find(f'{{{W_NS}}}rFonts')
+                if run_properties is not None else None
+            )
+            size = (
+                run_properties.find(f'{{{W_NS}}}sz')
+                if run_properties is not None else None
+            )
+            if (
+                fonts is None
+                or fonts.get(f'{{{W_NS}}}ascii') != 'Times New Roman'
+            ):
+                findings.append(
+                    f'[front-matter] {heading} body must use Times New Roman.'
+                )
+            if size is None or size.get(f'{{{W_NS}}}val') != '24':
+                findings.append(
+                    f'[front-matter] {heading} body must use 12 pt text.'
+                )
+            if _run_property_is_on(run_properties, 'b'):
+                findings.append(
+                    f'[front-matter] {heading} body must remain regular.'
+                )
+        keyword_runs = [
+            run for run in keyword_paragraph.findall(f'{{{W_NS}}}r')
+            if ''.join(
+                node.text or '' for node in run.findall(f'{{{W_NS}}}t')
+            )
+        ]
+        if len(keyword_runs) < 2:
+            findings.append(
+                f'[front-matter] {heading} keyword line must separate '
+                'label and values.'
+            )
+            continue
+        if not _run_property_is_on(
+            keyword_runs[0].find(f'{{{W_NS}}}rPr'), 'b'
+        ):
+            findings.append(f'[front-matter] {label} must be bold.')
+        for run in keyword_runs[1:]:
+            if _run_property_is_on(run.find(f'{{{W_NS}}}rPr'), 'b'):
+                findings.append(
+                    f'[front-matter] {heading} keyword values must remain regular.'
+                )
+        if keyword_index <= body_index:
+            findings.append(
+                f'[front-matter] {heading} keyword line must follow its body.'
+            )
+
+    return findings
+
+
+def validate_iman_front_matter(doc_root, styles_root):
+    """Validate the editable front matter synchronized from Iman's final DOCX."""
+    paragraphs = list(doc_root.findall(f'.//{{{W_NS}}}p'))
+    texts = [
+        ''.join(
+            node.text or ''
+            for node in paragraph.findall(f'.//{{{W_NS}}}t')
+        ).strip()
+        for paragraph in paragraphs
+    ]
+    findings = []
+    expected_title = (
+        'Pengembangan Dashboard Web, Integrasi Unity WebGL, dan Deployment '
+        'Sistem Denah Virtual UPNVJ Kampus Pondok Labu'
+    )
+    publication_heading = (
+        'PERNYATAAN PERSETUJUAN PUBLIKASI TUGAS AKHIR UNTUK '
+        'KEPENTINGAN AKADEMIK'
+    )
+    expected_signed_scans = {
+        'FRONT_MATTER_SCAN:iman:approval': 'LEMBAR PENGESAHAN',
+        'FRONT_MATTER_SCAN:iman:authenticity': (
+            'SURAT PERNYATAAN KEASLIAN'
+        ),
+        'FRONT_MATTER_SCAN:iman:publication': publication_heading,
+    }
+    drawings = list(doc_root.findall(f'.//{{{WP_NS}}}docPr'))
+    drawing_names = [drawing.get('name') for drawing in drawings]
+    uses_signed_scans = any(
+        (name or '').startswith('FRONT_MATTER_SCAN:iman:')
+        for name in drawing_names
+    )
+    required_headings = [
+        'LAPORAN PROYEK',
+        'LEMBAR PENGESAHAN',
+        'SURAT PERNYATAAN KEASLIAN',
+        publication_heading,
+        'ABSTRAK',
+        'ABSTRACT',
+        'KATA PENGANTAR',
+        'DAFTAR ISI',
+    ]
+    positions = {}
+    for heading in required_headings:
+        try:
+            positions[heading] = texts.index(heading)
+        except ValueError:
+            findings.append(f"[front-matter] heading {heading!r} is missing.")
+    if (
+        len(positions) == len(required_headings)
+        and [positions[item] for item in required_headings]
+        != sorted(positions.values())
+    ):
+        findings.append(
+            '[front-matter] project title page, editable approval page, '
+            'authenticity statement, publication permission, abstracts, '
+            'preface, and Daftar Isi are not in the required order.'
+        )
+
+    if uses_signed_scans:
+        missing_scans = sorted(
+            name for name in expected_signed_scans
+            if drawing_names.count(name) != 1
+        )
+        if missing_scans:
+            findings.append(
+                '[front-matter] signed scan drawing set is incomplete or '
+                f'duplicated: {missing_scans!r}.'
+            )
+        for drawing_name, heading in expected_signed_scans.items():
+            scan_paragraph = next(
+                (
+                    paragraph for paragraph in paragraphs
+                    if any(
+                        drawing.get('name') == drawing_name
+                        for drawing in paragraph.findall(f'.//{{{WP_NS}}}docPr')
+                    )
+                ),
+                None,
+            )
+            if scan_paragraph is None:
+                continue
+            scan_paragraph_index = paragraphs.index(scan_paragraph)
+            scan_anchor = (
+                paragraphs[scan_paragraph_index - 1]
+                if scan_paragraph_index > 0 else None
+            )
+            hidden_heading = next(
+                (
+                    run for run in (
+                        scan_anchor.findall(f'{{{W_NS}}}r')
+                        if scan_anchor is not None else []
+                    )
+                    if ''.join(
+                        node.text or ''
+                        for node in run.findall(f'{{{W_NS}}}t')
+                    ) == heading
+                ),
+                None,
+            )
+            if (
+                hidden_heading is None
+                or hidden_heading.find(
+                    f'{{{W_NS}}}rPr/{{{W_NS}}}color'
+                ) is None
+                or hidden_heading.find(
+                    f'{{{W_NS}}}rPr/{{{W_NS}}}color'
+                ).get(f'{{{W_NS}}}val') != 'FFFFFF'
+                or hidden_heading.find(
+                    f'{{{W_NS}}}rPr/{{{W_NS}}}sz'
+                ) is None
+                or hidden_heading.find(
+                    f'{{{W_NS}}}rPr/{{{W_NS}}}sz'
+                ).get(f'{{{W_NS}}}val') != '2'
+            ):
+                findings.append(
+                    f'[front-matter] signed scan {drawing_name!r} is missing '
+                    'its 1 pt white heading label.'
+                )
+            scan_style = scan_paragraph.find(
+                f'{{{W_NS}}}pPr/{{{W_NS}}}pStyle'
+            )
+            if scan_anchor is not None:
+                scan_style = scan_anchor.find(
+                    f'{{{W_NS}}}pPr/{{{W_NS}}}pStyle'
+                )
+            if (
+                scan_style is None
+                or scan_style.get(f'{{{W_NS}}}val') != 'FrontMatterHeading'
+            ):
+                findings.append(
+                    f'[front-matter] signed scan {drawing_name!r} is missing '
+                    'its FrontMatterHeading TOC style.'
+                )
+            extent = scan_paragraph.find(f'.//{{{WP_NS}}}extent')
+            if (
+                extent is None
+                or int(extent.get('cx', '0')) <= 0
+                or int(extent.get('cy', '0')) <= 0
+            ):
+                findings.append(
+                    f'[front-matter] signed scan {drawing_name!r} has invalid '
+                    'drawing geometry.'
+                )
+    findings.extend(_validate_preface_indentation(paragraphs, texts))
+
+    visible_text = '\n'.join(texts)
+    obsolete_markers = (
+        'PERNYATAAN MENGENAI SKRIPSI DAN SUMBER INFORMASI SERTA '
+        'PELIMPAHAN HAK CIPTA',
+        'LEMBAR PERSETUJUAN',
+        'RANCANG BANGUN SISTEM REPOSITORI',
+    )
+    for marker in obsolete_markers:
+        if marker in visible_text.upper():
+            findings.append(
+                f'[front-matter] obsolete content remains visible: {marker!r}.'
+            )
+    if 'ERROR! BOOKMARK NOT DEFINED.' in visible_text.upper():
+        findings.append(
+            '[front-matter] a Word field displays "Error! Bookmark not defined."'
+        )
+
+    bookmark_names = {
+        bookmark.get(f'{{{W_NS}}}name')
+        for bookmark in doc_root.findall(f'.//{{{W_NS}}}bookmarkStart')
+        if bookmark.get(f'{{{W_NS}}}name')
+    }
+    daftar_isi_toc_entries = [
+        paragraph for paragraph, text in zip(paragraphs, texts)
+        if text.startswith('DAFTAR ISI')
+        and paragraph.find(
+            f'{{{W_NS}}}pPr/{{{W_NS}}}pStyle'
+        ) is not None
+        and paragraph.find(
+            f'{{{W_NS}}}pPr/{{{W_NS}}}pStyle'
+        ).get(f'{{{W_NS}}}val', '').startswith('TOC')
+    ]
+    for paragraph in daftar_isi_toc_entries:
+        targets = []
+        for instruction in paragraph.findall(f'.//{{{W_NS}}}instrText'):
+            match = re.search(r'\bPAGEREF\s+(\S+)', instruction.text or '')
+            if match:
+                targets.append(match.group(1))
+        if not targets:
+            findings.append(
+                '[front-matter] Daftar Isi TOC entry is missing its PAGEREF field.'
+            )
+        elif any(target not in bookmark_names for target in targets):
+            findings.append(
+                '[front-matter] Daftar Isi TOC entry references an undefined '
+                f'bookmark: {targets!r}.'
+            )
+
+    def toc_entry_label(paragraph):
+        chunks = []
+        for node in paragraph.iter():
+            if node.tag == f'{{{W_NS}}}tab':
+                break
+            if node.tag == f'{{{W_NS}}}t':
+                chunks.append(node.text or '')
+        return ''.join(chunks).strip()
+
+    toc_level_one_texts = {
+        toc_entry_label(paragraph)
+        for paragraph in paragraphs
+        if paragraph.find(
+            f'{{{W_NS}}}pPr/{{{W_NS}}}pStyle'
+        ) is not None
+        and paragraph.find(
+            f'{{{W_NS}}}pPr/{{{W_NS}}}pStyle'
+        ).get(f'{{{W_NS}}}val', '') == 'TOC1'
+    }
+    expected_front_toc_entries = {
+        'LAPORAN PROYEK',
+        'LEMBAR PENGESAHAN',
+        'SURAT PERNYATAAN KEASLIAN',
+        publication_heading,
+        'ABSTRAK',
+        'ABSTRACT',
+        'KATA PENGANTAR',
+        'DAFTAR ISI',
+        'DAFTAR GAMBAR',
+        'DAFTAR TABEL',
+        'DAFTAR LAMPIRAN',
+    }
+    missing_front_toc_entries = sorted(
+        expected_front_toc_entries - toc_level_one_texts
+    )
+    if missing_front_toc_entries:
+        findings.append(
+            '[front-matter] Daftar Isi is missing front-matter entries: '
+            f'{missing_front_toc_entries!r}.'
+        )
+
+    title_paragraphs = [
+        paragraph for paragraph, text in zip(paragraphs, texts)
+        if expected_title in text
+    ]
+    if not title_paragraphs:
+        findings.append('[front-matter] the active report title is missing.')
+    if any(
+        _run_property_is_on(run.find(f'{{{W_NS}}}rPr'), 'i')
+        or _run_property_is_on(run.find(f'{{{W_NS}}}rPr'), 'iCs')
+        for paragraph in title_paragraphs
+        for run in paragraph.findall(f'.//{{{W_NS}}}r')
+    ):
+        findings.append(
+            '[front-matter] the active report title must not contain italic text.'
+        )
+
+    title_index = positions.get('LAPORAN PROYEK', -1)
+    approval_index = positions.get('LEMBAR PENGESAHAN', -1)
+    authenticity_index = positions.get('SURAT PERNYATAAN KEASLIAN', -1)
+    publication_index = positions.get(publication_heading, -1)
+    abstract_index = positions.get('ABSTRAK', -1)
+    if 0 <= title_index < approval_index:
+        title_page_text = '\n'.join(texts[title_index + 1:approval_index])
+        for required_text in (
+            expected_title,
+            'MUHAMMAD IMAN NUGRAHA',
+            '2210511129',
+            'S1 INFORMATIKA',
+            'FAKULTAS ILMU KOMPUTER',
+            'UNIVERSITAS PEMBANGUNAN NASIONAL “VETERAN” JAKARTA',
+            'JAKARTA',
+            '2026',
+        ):
+            if required_text not in title_page_text:
+                findings.append(
+                    '[front-matter] project-title-page text '
+                    f'{required_text!r} is missing.'
+                )
+
+    approval_tables = []
+    for table in doc_root.findall(f'.//{{{W_NS}}}tbl'):
+        caption = table.find(
+            f'{{{W_NS}}}tblPr/{{{W_NS}}}tblCaption'
+        )
+        if (
+            caption is not None
+            and caption.get(f'{{{W_NS}}}val') == 'FRONT_MATTER_APPROVAL'
+        ):
+            approval_tables.append(table)
+    if uses_signed_scans and approval_tables:
+        findings.append(
+            '[front-matter] editable approval table remains beside the '
+            'signed approval scan.'
+        )
+    elif not uses_signed_scans and len(approval_tables) != 1:
+        findings.append(
+            '[front-matter] editable approval table count is '
+            f'{len(approval_tables)}; expected 1.'
+        )
+    elif not uses_signed_scans:
+        table = approval_tables[0]
+        table_text = '\n'.join(
+            node.text or '' for node in table.findall(f'.//{{{W_NS}}}t')
+        )
+        for required_text in (
+            'Judul',
+            expected_title,
+            'Nama',
+            'Muhammad Iman Nugraha',
+            'NIM',
+            '2210511129',
+            'Program Studi',
+            'S1 Informatika',
+            'Disetujui oleh:',
+            'Penguji 1:',
+            'Dr. Widya Cholil, M.I.T',
+            'Penguji 2:',
+            'Kharisma Wiati Gusti, M.T.',
+            'Pembimbing 1:',
+            'Dr. Ridwan Raafi’udin, S.Kom, M.Kom.',
+            'Pembimbing 2:',
+            'Novi Trisman Hadi, S.Pd., M.Kom.',
+            'Diketahui oleh:',
+            'Koordinator Program Studi:',
+            'NIP. 198805022021211001',
+            'Dekan Fakultas Ilmu Komputer:',
+            'Prof. Dr. Ir. Supriyanto, M.Sc., IPM.',
+            'NIP. 197605082003121002',
+            'Tanggal Ujian Tugas Akhir:',
+            '24 Juli 2026',
+        ):
+            if required_text not in table_text:
+                findings.append(
+                    '[front-matter] editable approval table text '
+                    f'{required_text!r} is missing.'
+                )
+        if len(table.findall(f'{{{W_NS}}}tr')) != 13:
+            findings.append(
+                '[front-matter] editable approval table must contain 13 rows.'
+            )
+        for border in table.findall(
+            f'.//{{{W_NS}}}tcBorders/*'
+        ):
+            if border.get(f'{{{W_NS}}}val') != 'nil':
+                findings.append(
+                    '[front-matter] editable approval table must remain borderless.'
+                )
+                break
+
+    authenticity_paragraphs = (
+        paragraphs[authenticity_index + 1:publication_index]
+        if 0 <= authenticity_index < publication_index else []
+    )
+    authenticity_text = '\n'.join(
+        ''.join(
+            node.text or ''
+            for node in paragraph.findall(f'.//{{{W_NS}}}t')
+        ).strip()
+        for paragraph in authenticity_paragraphs
+    )
+    for required_text in (() if uses_signed_scans else (
+        'Yang bertanda tangan di bawah ini:',
+        'Nama',
+        'Muhammad Iman Nugraha',
+        'NIM',
+        '2210511129',
+        'Program Studi',
+        'S-1 Informatika',
+        'Judul Proyek',
+        expected_title,
+        'Menyatakan bahwa laporan tugas akhir proyek ini disusun oleh penulis',
+        'Bagian yang merupakan hasil kolaborasi tim',
+        'Demikian surat pernyataan ini dibuat dengan sebenar-benarnya.',
+        'Jakarta, 24 Juli 2026',
+        'Yang menyatakan,',
+    )):
+        if required_text not in authenticity_text:
+            findings.append(
+                '[front-matter] authenticity-statement text '
+                f'{required_text!r} is missing.'
+            )
+
+    publication_paragraphs = (
+        paragraphs[publication_index + 1:abstract_index]
+        if 0 <= publication_index < abstract_index else []
+    )
+    publication_text = '\n'.join(
+        ''.join(
+            node.text or ''
+            for node in paragraph.findall(f'.//{{{W_NS}}}t')
+        ).strip()
+        for paragraph in publication_paragraphs
+    )
+    for required_text in (() if uses_signed_scans else (
+        'Sebagai civitas akademik Universitas Pembangunan Nasional Veteran '
+        'Jakarta, saya yang bertanda tangan di bawah ini:',
+        'Nama',
+        'NIM',
+        'Program Studi',
+        'Fakultas',
+        'Hak Bebas Royalti Non-eksklusif',
+        'Non-exclusive Royalty Free Right',
+        'mengalih media/memformatkan',
+        'Jakarta, 24 Juli 2026',
+        'Muhammad Iman Nugraha',
+        '2210511129',
+    )):
+        if required_text not in publication_text:
+            findings.append(
+                '[front-matter] publication-permission text '
+                f'{required_text!r} is missing.'
+            )
+    dot_leader_count = 0
+    for paragraph in publication_paragraphs:
+        for tab in paragraph.findall(
+            f'{{{W_NS}}}pPr/{{{W_NS}}}tabs/{{{W_NS}}}tab'
+        ):
+            if tab.get(f'{{{W_NS}}}leader') == 'dot':
+                dot_leader_count += 1
+    if not uses_signed_scans and dot_leader_count != 7:
+        findings.append(
+            '[front-matter] publication permission must contain seven '
+            f'dotted fields, found {dot_leader_count}.'
+        )
+
+    obsolete_drawings = [
+        drawing.get('name')
+        for drawing in drawings
+        if drawing.get('name') in {
+            'PREFACE_SIGNATURE:iman',
+            'AUTHENTICITY_SIGNATURE:iman',
+            'DECLARATION_SIGNATURE:iman',
+            'APPROVAL_SCAN:iman',
+        }
+    ]
+    if obsolete_drawings:
+        findings.append(
+            '[front-matter] obsolete front-matter drawing(s) remain: '
+            f'{obsolete_drawings!r}.'
+        )
+
+    style = styles_root.find(
+        f"{{{W_NS}}}style[@{{{W_NS}}}styleId='FrontMatterHeading']"
+    )
+    if style is None:
+        findings.append('[front-matter] FrontMatterHeading style is missing.')
+    else:
+        based_on = style.find(f'{{{W_NS}}}basedOn')
+        run_properties = style.find(f'{{{W_NS}}}rPr')
+        if based_on is None or based_on.get(f'{{{W_NS}}}val') != 'Normal':
+            findings.append(
+                '[front-matter] FrontMatterHeading must be based on Normal.'
+            )
+        fonts = (
+            run_properties.find(f'{{{W_NS}}}rFonts')
+            if run_properties is not None else None
+        )
+        size = (
+            run_properties.find(f'{{{W_NS}}}sz')
+            if run_properties is not None else None
+        )
+        if fonts is None or any(
+            fonts.get(f'{{{W_NS}}}{name}') != 'Times New Roman'
+            for name in ('ascii', 'hAnsi', 'eastAsia', 'cs')
+        ):
+            findings.append(
+                '[front-matter] FrontMatterHeading must use Times New Roman.'
+            )
+        if size is None or size.get(f'{{{W_NS}}}val') != '24':
+            findings.append(
+                '[front-matter] FrontMatterHeading must use 12 pt text.'
+            )
+        if not _run_property_is_on(run_properties, 'b'):
+            findings.append('[front-matter] FrontMatterHeading must be bold.')
+
+    for heading, label in (
+        ('ABSTRAK', 'Kata kunci:'),
+        ('ABSTRACT', 'Keywords:'),
+    ):
+        if heading not in texts:
+            continue
+        heading_index = texts.index(heading)
+        content = [
+            (index, paragraphs[index], texts[index])
+            for index in range(heading_index + 1, len(paragraphs))
+            if texts[index]
+        ]
+        if len(content) < 2:
+            findings.append(
+                f'[front-matter] {heading} body or keyword line is missing.'
+            )
+            continue
+        body_index, body_paragraph, _ = content[0]
+        keyword_index, keyword_paragraph, keyword_text = content[1]
+        if label not in keyword_text:
+            findings.append(
+                f'[front-matter] {heading} keyword label {label!r} is missing.'
+            )
+        for run in body_paragraph.findall(f'{{{W_NS}}}r'):
+            if not ''.join(
+                node.text or '' for node in run.findall(f'{{{W_NS}}}t')
+            ):
+                continue
+            run_properties = run.find(f'{{{W_NS}}}rPr')
+            fonts = (
+                run_properties.find(f'{{{W_NS}}}rFonts')
+                if run_properties is not None else None
+            )
+            size = (
+                run_properties.find(f'{{{W_NS}}}sz')
+                if run_properties is not None else None
+            )
+            if (
+                fonts is None
+                or fonts.get(f'{{{W_NS}}}ascii') != 'Times New Roman'
+            ):
+                findings.append(
+                    f'[front-matter] {heading} body must use Times New Roman.'
+                )
+            if size is None or size.get(f'{{{W_NS}}}val') != '24':
+                findings.append(
+                    f'[front-matter] {heading} body must use 12 pt text.'
+                )
+            if _run_property_is_on(run_properties, 'b'):
+                findings.append(
+                    f'[front-matter] {heading} body must remain regular.'
+                )
+        keyword_runs = [
+            run for run in keyword_paragraph.findall(f'{{{W_NS}}}r')
+            if ''.join(
+                node.text or '' for node in run.findall(f'{{{W_NS}}}t')
+            )
+        ]
+        if len(keyword_runs) < 2:
+            findings.append(
+                f'[front-matter] {heading} keyword line must separate '
+                'label and values.'
+            )
+            continue
+        if not _run_property_is_on(
+            keyword_runs[0].find(f'{{{W_NS}}}rPr'), 'b'
+        ):
+            findings.append(f'[front-matter] {label} must be bold.')
+        for run in keyword_runs[1:]:
+            if _run_property_is_on(run.find(f'{{{W_NS}}}rPr'), 'b'):
+                findings.append(
+                    f'[front-matter] {heading} keyword values must remain regular.'
+                )
+        if keyword_index <= body_index:
+            findings.append(
+                f'[front-matter] {heading} keyword line must follow its body.'
+            )
+
+    return findings
+
+
+def validate_profile_front_matter(doc_root, styles_root, config, profile):
+    """Validate role-specific front matter without inventing missing signatures."""
+    if profile == 'iman':
+        return validate_iman_front_matter(doc_root, styles_root)
+
+    paragraphs = list(doc_root.findall(f'.//{{{W_NS}}}p'))
+    texts = [
+        ''.join(
+            node.text or ''
+            for node in paragraph.findall(f'.//{{{W_NS}}}t')
+        ).strip()
+        for paragraph in paragraphs
+    ]
+    findings = []
+    title_page = config['report_title_page']
+    authenticity = config['authenticity_statement']
+    declaration = config['declaration']
+    abstract_id = config['abstract_id']
+    abstract_en = config['abstract_en']
+    preface = config['preface']
+    required_headings = [
+        title_page['heading'],
+        authenticity['heading'],
+        declaration['heading'],
+        abstract_id['heading'],
+        abstract_en['heading'],
+        preface['heading'],
+        'DAFTAR ISI',
+    ]
+    positions = {}
+    for heading in required_headings:
+        if heading not in texts:
+            findings.append(f"[front-matter] heading {heading!r} is missing.")
+        else:
+            positions[heading] = texts.index(heading)
+    ordered_positions = [
+        positions.get(heading, -1) for heading in required_headings
+    ]
+    if all(index >= 0 for index in ordered_positions) and (
+        ordered_positions != sorted(ordered_positions)
+    ):
+        findings.append(
+            '[front-matter] project title page, authenticity statement, '
+            'declaration, approval page, abstracts, preface, and Daftar Isi '
+            'must remain in the configured order.'
+        )
+
+    expected_values = [
+        config['cover']['title'],
+        title_page['author'],
+        title_page['nim'],
+        title_page['program_study'],
+        title_page['faculty'],
+        title_page['university'],
+        title_page['city'],
+        title_page['year'],
+        authenticity['identity']['Nama'],
+        authenticity['identity']['NIM'],
+        declaration['author'],
+        declaration['nim'],
+        preface['date'],
+        preface['author'],
+        preface['nim'],
+    ]
+    visible_text = '\n'.join(texts)
+    for expected in expected_values:
+        if expected not in visible_text:
+            findings.append(
+                f'[front-matter] configured text {expected!r} is missing.'
+            )
+
+    findings.extend(_validate_preface_indentation(
+        paragraphs,
+        texts,
+        expected_acknowledgements=len(preface['acknowledgements']),
+        expected_opening=len(preface['opening']),
+        expected_closing=len(preface['closing']),
+    ))
+
+    drawings = list(doc_root.findall(f'.//{{{WP_NS}}}docPr'))
+    signature_name = f'DECLARATION_SIGNATURE:{profile}'
+    signature_drawings = [
+        drawing for drawing in drawings
+        if drawing.get('name') == signature_name
+    ]
+    signature_config = declaration.get('signature')
+    expected_signature_count = 1 if signature_config else 0
+    if len(signature_drawings) != expected_signature_count:
+        findings.append(
+            f'[front-matter] {signature_name} drawing count is '
+            f'{len(signature_drawings)}; expected {expected_signature_count}.'
+        )
+
+    approval_config = config.get('approval_scan')
+    approval_name = f'APPROVAL_SCAN:{profile}'
+    approval_drawings = [
+        drawing for drawing in drawings
+        if drawing.get('name') == approval_name
+    ]
+    expected_approval_count = 1 if approval_config else 0
+    if len(approval_drawings) != expected_approval_count:
+        findings.append(
+            f'[front-matter] {approval_name} drawing count is '
+            f'{len(approval_drawings)}; expected {expected_approval_count}.'
+        )
+    elif approval_drawings:
+        approval_drawing = approval_drawings[0]
+        if approval_drawing.get('descr') != approval_config.get('alt_text'):
+            findings.append(
+                '[front-matter] approval scan alt text differs from the '
+                'profile configuration.'
+            )
+        approval_paragraph = next(
+            (
+                paragraph for paragraph in paragraphs
+                if approval_drawing in paragraph.iter()
+            ),
+            None,
+        )
+        if approval_paragraph is None:
+            findings.append(
+                '[front-matter] approval scan is not contained in a paragraph.'
+            )
+        else:
+            justification = approval_paragraph.find(
+                f'{{{W_NS}}}pPr/{{{W_NS}}}jc'
+            )
+            if (
+                justification is None
+                or justification.get(f'{{{W_NS}}}val') != 'center'
+            ):
+                findings.append(
+                    '[front-matter] approval scan must be centered.'
+                )
+            if approval_paragraph.find(
+                f'{{{W_NS}}}pPr/{{{W_NS}}}pageBreakBefore'
+            ) is None:
+                findings.append(
+                    '[front-matter] approval scan must start on a new page.'
+                )
+            extent = approval_paragraph.find(f'.//{{{WP_NS}}}extent')
+            expected_width = str(round(
+                float(approval_config.get('width_cm', 14.0)) * 360000
+            ))
+            if extent is None or extent.get('cx') != expected_width:
+                findings.append(
+                    '[front-matter] approval scan width does not match the '
+                    'profile configuration.'
+                )
+
+    style = styles_root.find(
+        f"{{{W_NS}}}style[@{{{W_NS}}}styleId='FrontMatterHeading']"
+    )
+    if style is None:
+        findings.append('[front-matter] FrontMatterHeading style is missing.')
+
+    for heading, label in (
+        (abstract_id['heading'], abstract_id['keywords_label']),
+        (abstract_en['heading'], abstract_en['keywords_label']),
+    ):
+        if heading not in texts:
+            continue
+        heading_index = texts.index(heading)
+        content = [
+            (index, paragraphs[index], texts[index])
+            for index in range(heading_index + 1, len(paragraphs))
+            if texts[index]
+        ]
+        if len(content) < 2:
+            findings.append(
+                f'[front-matter] {heading} body or keyword line is missing.'
+            )
+            continue
+        _, body_paragraph, _ = content[0]
+        _, keyword_paragraph, keyword_text = content[1]
+        if label not in keyword_text:
+            findings.append(
+                f'[front-matter] {heading} keyword label {label!r} is missing.'
+            )
+        for run in body_paragraph.findall(f'{{{W_NS}}}r'):
+            if not ''.join(
+                node.text or '' for node in run.findall(f'{{{W_NS}}}t')
+            ):
+                continue
+            run_properties = run.find(f'{{{W_NS}}}rPr')
+            if _run_property_is_on(run_properties, 'b'):
+                findings.append(
+                    f'[front-matter] {heading} body must remain regular.'
+                )
+        keyword_runs = [
+            run for run in keyword_paragraph.findall(f'{{{W_NS}}}r')
+            if ''.join(
+                node.text or '' for node in run.findall(f'{{{W_NS}}}t')
+            )
+        ]
+        if len(keyword_runs) < 2:
+            findings.append(
+                f'[front-matter] {heading} keyword line must separate '
+                'the label and values.'
+            )
+        elif not _run_property_is_on(
+            keyword_runs[0].find(f'{{{W_NS}}}rPr'), 'b'
+        ):
+            findings.append(f'[front-matter] {label} must be bold.')
+        for run in keyword_runs[1:]:
+            if _run_property_is_on(run.find(f'{{{W_NS}}}rPr'), 'b'):
+                findings.append(
+                    f'[front-matter] {heading} keyword values must remain regular.'
+                )
+
+    return findings
 
 
 def validate_page_layout(doc_root):
@@ -284,7 +1929,16 @@ def validate_page_numbering(doc_root, rels_root, page_parts):
         return ['[page-number] document body is missing.']
 
     numbered_chapters = 0
+    has_appendix_section = False
+    signed_scan_count = 0
     for paragraph in body.findall(f'{{{W_NS}}}p'):
+        if any(
+            (drawing.get('name') or '').startswith(
+                'FRONT_MATTER_SCAN:iman:'
+            )
+            for drawing in paragraph.findall(f'.//{{{WP_NS}}}docPr')
+        ):
+            signed_scan_count += 1
         p_pr = paragraph.find(f'{{{W_NS}}}pPr')
         if p_pr is None:
             continue
@@ -296,6 +1950,19 @@ def validate_page_numbering(doc_root, rels_root, page_parts):
             and num_pr is not None
         ):
             numbered_chapters += 1
+        style_value = (
+            p_style.get(f'{{{W_NS}}}val', '').lower()
+            if p_style is not None else ''
+        )
+        paragraph_text = ''.join(
+            node.text or ''
+            for node in paragraph.findall(f'.//{{{W_NS}}}t')
+        ).strip().upper()
+        if (
+            style_value == 'taappendixheading'
+            and paragraph_text.startswith('LAMPIRAN 1.')
+        ):
+            has_appendix_section = True
 
     # Unit-test fixtures and partial documents do not necessarily model a full
     # report. Enforce this contract only when numbered BAB headings are present.
@@ -360,10 +2027,18 @@ def validate_page_numbering(doc_root, rels_root, page_parts):
                 f"[page-number] {label} must not contain a PAGE field."
             )
 
-    if len(sections) != numbered_chapters + 1:
+    front_section_count = signed_scan_count + 2 if signed_scan_count else 1
+    expected_section_count = (
+        numbered_chapters
+        + front_section_count
+        + int(has_appendix_section)
+    )
+    if len(sections) != expected_section_count:
         findings.append(
             f'[page-number] found {numbered_chapters} numbered BAB heading(s) but '
-            f'{len(sections)} section(s); expected one front section plus one per BAB.'
+            f'{len(sections)} section(s); expected {front_section_count} front '
+            'section(s), one per BAB'
+            f'{" and one appendix section" if has_appendix_section else ""}.'
         )
 
     front = sections[0]
@@ -387,7 +2062,103 @@ def validate_page_numbering(doc_root, rels_root, page_parts):
     require_page(front_default_footer, 'right', 'front-matter default footer')
     require_blank(front_first_footer, 'front-matter first-page footer')
 
-    for body_index, section in enumerate(sections[1:], start=1):
+    if signed_scan_count:
+        for scan_index, scan_section in enumerate(
+            sections[1:1 + signed_scan_count],
+            start=1,
+        ):
+            label = f'signed front-matter scan section {scan_index}'
+            pg_num = scan_section.find(f'{{{W_NS}}}pgNumType')
+            fmt = (
+                pg_num.get(f'{{{W_NS}}}fmt')
+                if pg_num is not None else None
+            )
+            start = (
+                pg_num.get(f'{{{W_NS}}}start')
+                if pg_num is not None else None
+            )
+            if fmt != 'lowerRoman' or start is not None:
+                findings.append(
+                    f'[page-number] {label} has fmt={fmt!r}, '
+                    f'start={start!r}; expected continuing lowerRoman.'
+                )
+            if scan_section.find(f'{{{W_NS}}}titlePg') is not None:
+                findings.append(
+                    f'[page-number] {label} must not use w:titlePg.'
+                )
+            scan_default_header = page_part(
+                scan_section, 'headerReference', 'default', label,
+            )
+            scan_first_header = page_part(
+                scan_section, 'headerReference', 'first', label,
+            )
+            scan_default_footer = page_part(
+                scan_section, 'footerReference', 'default', label,
+            )
+            scan_first_footer = page_part(
+                scan_section, 'footerReference', 'first', label,
+            )
+            require_blank(scan_default_header, f'{label} default header')
+            require_blank(scan_first_header, f'{label} first-page header')
+            require_blank(scan_default_footer, f'{label} default footer')
+            require_blank(scan_first_footer, f'{label} first-page footer')
+
+        trailing_front = sections[1 + signed_scan_count]
+        trailing_num = trailing_front.find(f'{{{W_NS}}}pgNumType')
+        trailing_fmt = (
+            trailing_num.get(f'{{{W_NS}}}fmt')
+            if trailing_num is not None else None
+        )
+        trailing_start = (
+            trailing_num.get(f'{{{W_NS}}}start')
+            if trailing_num is not None else None
+        )
+        if trailing_fmt != 'lowerRoman' or trailing_start is not None:
+            findings.append(
+                '[page-number] trailing front matter must continue '
+                f'lowerRoman numbering; fmt={trailing_fmt!r}, '
+                f'start={trailing_start!r}.'
+            )
+        if trailing_front.find(f'{{{W_NS}}}titlePg') is not None:
+            findings.append(
+                '[page-number] trailing front matter must not suppress its '
+                'first printed Roman page number.'
+            )
+        trailing_default_header = page_part(
+            trailing_front, 'headerReference', 'default',
+            'trailing front matter',
+        )
+        trailing_first_header = page_part(
+            trailing_front, 'headerReference', 'first',
+            'trailing front matter',
+        )
+        trailing_default_footer = page_part(
+            trailing_front, 'footerReference', 'default',
+            'trailing front matter',
+        )
+        trailing_first_footer = page_part(
+            trailing_front, 'footerReference', 'first',
+            'trailing front matter',
+        )
+        require_blank(
+            trailing_default_header, 'trailing front-matter default header',
+        )
+        require_blank(
+            trailing_first_header, 'trailing front-matter first-page header',
+        )
+        require_page(
+            trailing_default_footer,
+            'right',
+            'trailing front-matter default footer',
+        )
+        require_blank(
+            trailing_first_footer, 'trailing front-matter first-page footer',
+        )
+
+    body_sections = sections[
+        front_section_count:front_section_count + numbered_chapters
+    ]
+    for body_index, section in enumerate(body_sections, start=1):
         label = f'BAB section {body_index}'
         pg_num = section.find(f'{{{W_NS}}}pgNumType')
         fmt = pg_num.get(f'{{{W_NS}}}fmt') if pg_num is not None else None
@@ -419,6 +2190,227 @@ def validate_page_numbering(doc_root, rels_root, page_parts):
         require_blank(default_footer, f'{label} continuation footer')
         require_page(first_footer, 'center', f'{label} opening-page footer')
 
+    if has_appendix_section and len(sections) >= expected_section_count:
+        appendix = sections[-1]
+        label = 'appendix section'
+        pg_num = appendix.find(f'{{{W_NS}}}pgNumType')
+        fmt = pg_num.get(f'{{{W_NS}}}fmt') if pg_num is not None else None
+        start = pg_num.get(f'{{{W_NS}}}start') if pg_num is not None else None
+        if fmt not in (None, 'decimal'):
+            findings.append(
+                f"[page-number] {label} has fmt={fmt!r}; expected decimal."
+            )
+        if start is not None:
+            findings.append(
+                f"[page-number] {label} unexpectedly restarts at {start!r}."
+            )
+        if appendix.find(f'{{{W_NS}}}titlePg') is not None:
+            findings.append(
+                '[page-number] appendix section must not use w:titlePg; '
+                'its first page keeps the top-right continuation number.'
+            )
+        default_header = page_part(
+            appendix, 'headerReference', 'default', label
+        )
+        first_header = page_part(
+            appendix, 'headerReference', 'first', label
+        )
+        default_footer = page_part(
+            appendix, 'footerReference', 'default', label
+        )
+        first_footer = page_part(
+            appendix, 'footerReference', 'first', label
+        )
+        require_page(default_header, 'right', f'{label} default header')
+        require_page(first_header, 'right', f'{label} first-page header')
+        require_blank(default_footer, f'{label} default footer')
+        require_blank(first_footer, f'{label} first-page footer')
+
+    return findings
+
+
+def validate_identity_footer(
+        doc_root, rels_root, page_parts, identity_footer):
+    """Validate the UPNVJ identity footer range and its 8 pt typography."""
+    if not identity_footer:
+        return []
+    body = doc_root.find(f'{{{W_NS}}}body')
+    if body is None:
+        return ['[identity-footer] document body is missing.']
+
+    author_year = identity_footer['author_year']
+    title = identity_footer['title']
+    institution = identity_footer['institution']
+    links = identity_footer['links']
+    expected_font = identity_footer.get('font', 'Times New Roman')
+    expected_size = str(round(float(identity_footer.get('size_pt', 8)) * 2))
+    findings = []
+    sections = list(body.iter(f'{{{W_NS}}}sectPr'))
+    rel_targets = {}
+    if rels_root is not None:
+        for relationship in rels_root:
+            rid = relationship.get('Id')
+            target = relationship.get('Target')
+            if rid and target:
+                rel_targets[rid] = posixpath.normpath(
+                    posixpath.join('word', target)
+                )
+
+    def referenced_part(section, ref_type):
+        reference = next(
+            (
+                item for item in section.findall(
+                    f'{{{W_NS}}}footerReference'
+                )
+                if item.get(f'{{{W_NS}}}type') == ref_type
+            ),
+            None,
+        )
+        if reference is None:
+            return None
+        return page_parts.get(
+            rel_targets.get(reference.get(f'{{{R_NS}}}id'))
+        )
+
+    def part_text(part):
+        if part is None:
+            return ''
+        return '\n'.join(
+            node.text or '' for node in part.findall(f'.//{{{W_NS}}}t')
+        )
+
+    if title != title.upper():
+        findings.append(
+            '[identity-footer] configured main title must be uppercase.'
+        )
+
+    if len(sections) < 3:
+        findings.append(
+            '[identity-footer] expected front matter, BAB, and appendix sections.'
+        )
+        return findings
+
+    numbered_chapters = sum(
+        1
+        for paragraph in body.findall(f'{{{W_NS}}}p')
+        if (
+            paragraph.find(
+                f'{{{W_NS}}}pPr/{{{W_NS}}}pStyle'
+            ) is not None
+            and paragraph.find(
+                f'{{{W_NS}}}pPr/{{{W_NS}}}pStyle'
+            ).get(f'{{{W_NS}}}val', '').lower() == 'heading1'
+            and paragraph.find(
+                f'{{{W_NS}}}pPr/{{{W_NS}}}numPr'
+            ) is not None
+        )
+    )
+    front_section_count = len(sections) - numbered_chapters - 1
+    if front_section_count < 1:
+        findings.append(
+            '[identity-footer] could not resolve the front-matter section range.'
+        )
+        return findings
+
+    non_bab_sections = [
+        (f'front matter section {index}', section)
+        for index, section in enumerate(
+            sections[:front_section_count],
+            start=1,
+        )
+    ]
+    non_bab_sections.append(('appendix', sections[-1]))
+    for label, section in non_bab_sections:
+        for ref_type in ('default', 'first'):
+            text_value = part_text(referenced_part(section, ref_type))
+            if any(
+                    expected in text_value
+                    for expected in (author_year, title, institution, links)):
+                findings.append(
+                    f'[identity-footer] {label} {ref_type} footer must not '
+                    'contain the BAB identity footer.'
+                )
+
+    for section_index, section in enumerate(
+        sections[front_section_count:-1],
+        start=1,
+    ):
+        for ref_type in ('default', 'first'):
+            part = referenced_part(section, ref_type)
+            text_value = part_text(part)
+            label = f'BAB section {section_index} {ref_type} footer'
+            if author_year not in text_value:
+                findings.append(
+                    f'[identity-footer] {label} is missing {author_year!r}.'
+                )
+            if title not in text_value:
+                findings.append(
+                    f'[identity-footer] {label} is missing the configured title.'
+                )
+            if institution not in text_value:
+                findings.append(
+                    f'[identity-footer] {label} is missing the institution line.'
+                )
+            if links not in text_value:
+                findings.append(
+                    f'[identity-footer] {label} is missing the website line.'
+                )
+            for expected_text, bold, italic in (
+                (author_year, True, False),
+                (title, True, True),
+                (institution, False, False),
+                (links, False, False),
+            ):
+                run = next(
+                    (
+                        item for item in (
+                            part.findall(f'.//{{{W_NS}}}r')
+                            if part is not None else []
+                        )
+                        if ''.join(
+                            node.text or ''
+                            for node in item.findall(f'{{{W_NS}}}t')
+                        ) == expected_text
+                    ),
+                    None,
+                )
+                run_pr = run.find(f'{{{W_NS}}}rPr') if run is not None else None
+                fonts = (
+                    run_pr.find(f'{{{W_NS}}}rFonts')
+                    if run_pr is not None else None
+                )
+                size = (
+                    run_pr.find(f'{{{W_NS}}}sz')
+                    if run_pr is not None else None
+                )
+                if (
+                    fonts is None
+                    or any(
+                        fonts.get(f'{{{W_NS}}}{name}') != expected_font
+                        for name in ('ascii', 'hAnsi', 'eastAsia', 'cs')
+                    )
+                ):
+                    findings.append(
+                        f'[identity-footer] {label} text {expected_text!r} '
+                        f'must use {expected_font}.'
+                    )
+                if size is None or size.get(f'{{{W_NS}}}val') != expected_size:
+                    findings.append(
+                        f'[identity-footer] {label} text {expected_text!r} '
+                        f'must use {identity_footer.get("size_pt", 8)} pt.'
+                    )
+                actual_bold = _run_property_is_on(run_pr, 'b')
+                if actual_bold != bold:
+                    findings.append(
+                        f'[identity-footer] {label} text {expected_text!r} '
+                        f'bold={actual_bold}; expected {bold}.'
+                    )
+                actual_italic = _run_property_is_on(run_pr, 'i')
+                if actual_italic != italic:
+                    findings.append(
+                        f'[identity-footer] {label} text {expected_text!r} '
+                        f'italic={actual_italic}; expected {italic}.'
+                    )
     return findings
 
 
@@ -674,8 +2666,10 @@ def collect_figure_same_page_errors(body, printable_height_emu):
 
         ext = drawing.find(f'.//{{{WP_NS}}}extent')
         try:
+            rendered_width = int(ext.get('cx')) if ext is not None else None
             rendered_height = int(ext.get('cy')) if ext is not None else None
         except (TypeError, ValueError):
+            rendered_width = None
             rendered_height = None
         drawing_p_pr = drawing_p.find(f'{{{W_NS}}}pPr')
         has_page_break_before = bool(
@@ -710,6 +2704,16 @@ def collect_figure_same_page_errors(body, printable_height_emu):
             continue
 
         figure_name = identity or next_text or f'paragraph {idx}'
+        if rendered_width is None:
+            findings.append(
+                f"[C4] {figure_name!r} has no valid rendered width; fit within "
+                "the printable page width cannot be validated."
+            )
+        elif rendered_width > MAX_WIDTH_EMU:
+            findings.append(
+                f"[C4] {figure_name!r} width {rendered_width} EMU exceeds the "
+                f"14 cm printable width {MAX_WIDTH_EMU} EMU."
+            )
         if not next_is_caption:
             findings.append(
                 f"[C4] {figure_name!r} is not immediately followed by its Gambar "
@@ -918,6 +2922,30 @@ def _run_writing_guards(errors_found):
 def main():
     # Force UTF-8 encoding for stdout
     sys.stdout.reconfigure(encoding='utf-8')
+    report_profile = os.environ.get('TA_REPORT_PROFILE', 'iman')
+    front_matter_path = os.environ.get(
+        'TA_FRONT_MATTER_PATH',
+        os.path.join('content', 'roles', 'iman', 'front-matter.json'),
+    )
+    image_root = os.environ.get('TA_IMAGE_ROOT', 'images')
+    manifest_path = os.environ.get(
+        'TA_IMAGE_MANIFEST_PATH',
+        os.path.join(image_root, 'manifest.json'),
+    )
+    reconcile_path = os.environ.get(
+        'TA_IMAGE_RECONCILE_PATH',
+        os.path.join(image_root, 'manifest_reconcile.json'),
+    )
+    front_matter_config = None
+    if os.path.isfile(front_matter_path):
+        with open(front_matter_path, 'r', encoding='utf-8') as config_file:
+            front_matter_config = json.load(config_file)
+    elif report_profile != 'iman':
+        print(
+            f"Error: front-matter config for profile '{report_profile}' "
+            f"not found: {front_matter_path}"
+        )
+        sys.exit(1)
     
     docx_path = "Tugas_Akhir_Formatted.docx"
     if len(sys.argv) > 1:
@@ -1019,6 +3047,16 @@ def main():
     print("Iterating paragraphs for structure validation...")
     
     errors_found = []
+    print("Checking ordered front matter and abstract typography...")
+    if front_matter_config is None:
+        errors_found.extend(validate_iman_front_matter(doc_root, styles_root))
+    else:
+        errors_found.extend(validate_profile_front_matter(
+            doc_root,
+            styles_root,
+            front_matter_config,
+            report_profile,
+        ))
     print("Checking A4 page size and campus margins on every section...")
     layout_errors = validate_page_layout(doc_root)
     errors_found.extend(layout_errors)
@@ -1034,6 +3072,14 @@ def main():
         page_parts,
     )
     errors_found.extend(page_number_errors)
+    if front_matter_config is not None:
+        print("Checking UPNVJ identity footer range and typography...")
+        errors_found.extend(validate_identity_footer(
+            doc_root,
+            document_rels_root,
+            page_parts,
+            front_matter_config.get('identity_footer'),
+        ))
     if not page_number_errors:
         print(
             "SUCCESS: Roman pages are bottom-right; BAB opening pages are "
@@ -1228,7 +3274,7 @@ def main():
                 errors_found.append(f"Gambar caption {idx} '{text}' is missing w:keepLines (caption may split across pages)")
     
     # H. Check for orphan code text outside code-styled paragraphs
-    # After font normalization, code blocks have: sz=18 (9pt) + ind left=720, no Consolas
+    # After font normalization, code blocks have: sz=24 (12pt) + ind left=720, no Consolas
     print("Checking for orphan code text outside code blocks...")
     code_markers = ['$$ LANGUAGE plpgsql', 'CREATE TRIGGER', 'CREATE OR REPLACE FUNCTION',
                     'EXECUTE FUNCTION', 'RETURNS TRIGGER AS $$']
@@ -1242,13 +3288,13 @@ def main():
         pStyle_val = pStyle.get(f'{{{ns_w}}}val') if pStyle is not None else ""
         if 'code' in pStyle_val.lower():
             continue
-        # Detect code block by sz=18 (9pt) + ind left=720
+        # Detect code block by sz=24 (12pt) + ind left=720
         is_code_block = False
         ind_elem = pPr.find('w:ind', namespaces) if pPr is not None else None
         left_val = ind_elem.get(f'{{{ns_w}}}left', '0') if ind_elem is not None else '0'
         if left_val == '720':
             for sz_el in p.findall('.//w:sz', namespaces):
-                if sz_el.get(f'{{{ns_w}}}val') == '18':
+                if sz_el.get(f'{{{ns_w}}}val') == '24':
                     is_code_block = True
                     break
         # Also check for Consolas font (pre-normalization)
@@ -1276,8 +3322,6 @@ def main():
     print("Checking content-level figure invariants (C1 uniqueness, C2 resolution, C3 integrity, C4 page-split)...")
 
     # Load the manifest + reconciliation allow-lists (BOM tolerant, utf-8-sig).
-    manifest_path = os.path.join("images", "manifest.json")
-    reconcile_path = os.path.join("images", "manifest_reconcile.json")
     post_com_items = []
     duplicate_allow_groups = []
     unresolved_allow = set()
@@ -1344,7 +3388,7 @@ def main():
         item_id = item.get("id", item.get("file", "<unknown>"))
         caption_match = item.get("caption_match", "")
         img_file = item.get("file", "")
-        src_path = os.path.join("images", img_file)
+        src_path = os.path.join(image_root, img_file)
 
         children, identity_matches = _resolve_figure_identity_content(body_el, item_id)
         _caption_children, caption_matches = _resolve_caption_indices_content(

@@ -1,13 +1,16 @@
 @startuml gambar-2-14-activity-integrasi-data-denah
-' Gambar 2.14 - Activity Diagram: Integrasi Data Denah
-' Alur aktual pemilihan Denah 2D/3D dan integrasi React-Unity
+' Activity Diagram Integrasi Denah 2D dan 3D
 ' Sumber: BAB II - 2.2 & 2.3.3 Activity Diagram
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
-skinparam defaultFontSize 13
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
 skinparam ArrowColor #444444
+skinparam linetype ortho
+skinparam nodesep 12
+skinparam ranksep 18
+skinparam Padding 4
 skinparam ActivityBorderColor #555555
 skinparam ActivityBackgroundColor #F2F2F2
 skinparam ActivityDiamondBackgroundColor #ECECEC
@@ -15,41 +18,40 @@ skinparam ActivityDiamondBorderColor #555555
 skinparam SwimlaneTitleFontColor #333333
 skinparam SwimlaneBorderColor #999999
 
-
-|Pengguna|
+|Pengguna Publik|
 start
-:Mengakses Public Dashboard;
+:Mengakses Dashboard Publik;
 
-|React SPA|
-:Muat antarmuka dan data publik dari Supabase;
+|Antarmuka React|
+:Memuat informasi dan data lokasi;
 
-|Pengguna|
+|Pengguna Publik|
 :Membuka pemilih mode denah;
 if (Mode yang dipilih?) then (Denah 2D)
-  :Pilih gedung awal dan tujuan;
-  |React SPA|
-  :Muat node, edge, marker, dan entrance;
-  :Hitung rute A*;
-  :Tampilkan garis rute 2D;
+  :Memilih gedung awal dan tujuan;
+  |Antarmuka React|
+  :Memuat jaringan jalur\ndan pintu masuk gedung;
+  :Menghitung rute A*;
+  :Menampilkan garis rute 2D;
 else (Denah 3D)
-  |React SPA|
-  :Muat artefak Unity WebGL dari Vercel;
-  |Unity Runtime|
-  :GET /api/unity/data;
-  :Petakan unity_object_name ke GameObject;
-  |Pengguna|
-  :Pilih lokasi awal dan tujuan;
-  |React SPA|
-  :SendMessage NavigationReceiver.NavigateTo;
-  |Unity Runtime|
-  :Jalankan navigasi menuju target;
-  if (Tiba melalui completion normal?) then (Ya)
-    :CompleteNavigation mengirim\nOnNavigationCompleted JSON;
-    |React SPA|
-    :Validasi unity_object_name terhadap\nactiveNavigationRef;
-    :Tampilkan notifikasi tiba;
-  else (Dibatalkan atau target berubah)
-    :Hentikan atau ganti navigasi\ntanpa callback tiba;
+  |Antarmuka React|
+  :Memuat file hasil build\nUnity WebGL;
+  |Unity WebGL|
+  :Mengambil data lokasi melalui API;
+  :Mencocokkan kode lokasi\ndengan objek tujuan;
+  |Pengguna Publik|
+  :Memilih lokasi awal dan tujuan;
+  |Antarmuka React|
+  :Mengirim kode tujuan ke Unity;
+  |Unity WebGL|
+  :Menjalankan navigasi;
+  if (Tujuan tercapai secara normal?) then (Ya)
+    :Mengirim pesan kedatangan;
+    |Antarmuka React|
+    :Memvalidasi tujuan aktif;
+    :Menampilkan notifikasi tiba;
+  else (Tidak)
+    :Menghentikan atau mengganti navigasi\ntanpa notifikasi kedatangan;
   endif
 endif
 

@@ -1,14 +1,17 @@
 @startuml gambar-2-15-sequence-autentikasi-admin
-' Gambar 2.15 - Sequence Diagram: Autentikasi Administrator
+' Sequence Diagram Autentikasi Administrator
 ' Sumber: BAB II - 2.3.3 Sequence Diagram (a)
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
-skinparam defaultFontSize 13
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
 skinparam sequenceArrowColor #444444
 skinparam sequenceLifeLineBorderColor #555555
 skinparam sequenceLifeLineBackgroundColor #F2F2F2
+skinparam ParticipantPadding 10
+skinparam BoxPadding 4
+skinparam Padding 4
 skinparam participant {
   BackgroundColor #F2F2F2
   BorderColor #555555
@@ -18,30 +21,31 @@ skinparam actor {
   BorderColor #555555
 }
 
+hide footbox
 
 actor "Administrator" as Admin
-participant "Frontend React\n(Admin Dashboard)" as FE
+participant "Antarmuka React\n(Panel Admin)" as FE
 participant "Supabase Auth" as Auth
-participant "Router Admin\n(Protected Route)" as Router
+participant "Pemeriksa Akses\nPanel Admin" as Router
 
-Admin -> FE : Memasukkan username & kata sandi
+Admin -> FE : Memasukkan nama pengguna dan kata sandi
 activate FE
-FE -> Auth : signInWithPassword(kredensial)
+FE -> Auth : Mengirim kredensial
 activate Auth
 
 alt Kredensial valid
-  Auth -->> FE : Sesi + token JWT
+  Auth -->> FE : Sesi autentikasi
   deactivate Auth
-  FE -> FE : Simpan sesi Supabase
+  FE -> FE : Menyimpan sesi pengguna
   FE -> Router : Validasi sesi
   activate Router
-  Router -->> FE : Render Admin Dashboard
+  Router -->> FE : Izin membuka Panel Admin
   deactivate Router
-  FE -->> Admin : Menampilkan halaman dashboard admin
+  FE -->> Admin : Menampilkan Panel Admin
 else Kredensial tidak valid
   Auth -->> FE : Kesalahan autentikasi
   deactivate Auth
-  FE -->> Admin : Menampilkan pesan error login
+  FE -->> Admin : Menampilkan pesan kesalahan
 end
 deactivate FE
 

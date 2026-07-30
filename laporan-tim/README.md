@@ -8,9 +8,12 @@ Folder ini berisi **panduan & kerangka laporan** untuk tiap anggota tim. Penulis
 |---|---|---|
 | **Muhammad Iman Nugraha** (2210511129) | Full Stack Web Developer, System Integrator, dan DevOps Engineer | `laporan/iman` |
 | **Muhammad Dwikhi Deandra Purnianto** | 3D Asset Designer & Database Schema Designer | `laporan/dwikhi` |
-| **Muammar Faiz Khairul Anam** | 3D Simulator & Engine Developer | `laporan/faiz` |
+| **Muammar Faiz Khairul Anam Setiawan** | 3D Simulator & Engine Developer | `laporan/faiz` |
 
 ## Isi Folder
+
+- `HANDOFF-MANUAL-SINKRONISASI-LAPORAN.md` — fakta dan konten proyek bersama yang harus diselaraskan secara manual
+- `HANDOFF-MANUAL-TIPOGRAFI-DAN-BAHASA.md` — aturan bahasa, tipografi Word, caption, kode, dan bibliografi untuk sinkronisasi lintas branch
 
 - `iman-fullstack-integrator/` — panduan & lingkup peran Iman
 - `dwikhi-3d-asset-database/` — panduan + `outline-laporan.md` peran Dwikhi
@@ -36,7 +39,7 @@ AI agent pada branch mana pun harus mulai dari `../AGENTS.md`. Jika `Tugas_Akhir
 |---|:---:|:---:|:---:|
 | 2.9 Arsitektur Sistem | ✅ | ✅ | ✅ |
 | 2.11 Legenda Use Case | ✅ | ✅ | ✅ |
-| 2.12 Use Case Diagram | ✅ | ✅ | ✅ |
+| 2.12 Use Case Diagram Sistem Denah Virtual UPNVJ | ✅ | ✅ | ✅ |
 | 2.13 Activity: Pengelolaan Data Admin | ✅ | ✅ | |
 | 2.14 Activity: Integrasi Data Denah | ✅ | | ✅ |
 | 2.15 Sequence: Autentikasi Admin | ✅ | | |

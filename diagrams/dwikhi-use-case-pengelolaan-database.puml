@@ -1,0 +1,76 @@
+@startuml dwikhi-use-case-pengelolaan-database
+title Use Case Pengelolaan Database melalui Panel Admin
+top to bottom direction
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 16
+skinparam ArrowColor #475569
+skinparam linetype ortho
+skinparam nodesep 28
+skinparam ranksep 34
+skinparam Padding 7
+skinparam usecase {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  FontColor #0F172A
+  ArrowColor #475569
+}
+skinparam actor {
+  BackgroundColor #E2E8F0
+  BorderColor #334155
+  FontColor #0F172A
+}
+
+actor "Administrator" as Admin
+
+rectangle "Sistem Pengelolaan Data Denah Virtual" {
+  usecase "Masuk ke\nPanel Admin" as UCLogin
+  usecase "Mengelola Data\nDenah Virtual" as UCManage
+  usecase "Memilih Modul Data:\nGedung, Fasilitas,\nProgram Studi, atau Denah 2D" as UCSelectTable
+
+  usecase "Melihat Data" as UCRead
+  usecase "Menambah Data" as UCCreate
+  usecase "Mengubah Data" as UCUpdate
+  usecase "Menghapus Data" as UCDelete
+
+  usecase "Memvalidasi Isian,\nRelasi, dan Kode Lokasi" as UCValidate
+  usecase "Memeriksa Sesi\ndan Kebijakan RLS" as UCAccess
+  usecase "Menyimpan Perubahan\nke Database" as UCSave
+  usecase "Mencatat Riwayat melalui\nLayanan Aplikasi" as UCAudit
+
+  UCLogin -[hidden]right- UCManage
+  UCManage -[hidden]down- UCSelectTable
+  UCSelectTable -[hidden]down- UCRead
+  UCRead -[hidden]right- UCCreate
+  UCCreate -[hidden]down- UCUpdate
+  UCRead -[hidden]down- UCDelete
+  UCValidate -[hidden]down- UCAccess
+  UCAccess -[hidden]down- UCSave
+  UCSave -[hidden]down- UCAudit
+}
+
+Admin -- UCLogin
+Admin -- UCManage
+
+UCLogin --> UCAccess : <<include>>
+UCManage --> UCSelectTable : <<include>>
+UCManage --> UCRead : <<include>>
+UCManage --> UCCreate : <<include>>
+UCManage --> UCUpdate : <<include>>
+UCManage --> UCDelete : <<include>>
+UCManage --> UCAccess : <<include>>
+
+UCCreate --> UCValidate : <<include>>
+UCUpdate --> UCValidate : <<include>>
+UCDelete --> UCSave : <<include>>
+UCValidate --> UCSave : <<include>>
+UCSave --> UCAudit : <<include>>
+
+note bottom of UCAudit
+Riwayat perubahan ditulis oleh layanan aplikasi.
+Diagram tidak menyatakan adanya trigger audit database.
+end note
+
+@enduml

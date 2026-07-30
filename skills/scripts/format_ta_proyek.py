@@ -1,12 +1,13 @@
 import lxml.etree
 import copy
 import hashlib
+import json
 import os
 import re
 import sys
 
 # Canonical UPNVJ FIK page geometry. OOXML stores these values in twips
-# (1 cm ~= 567 twips): A4 portrait, 4 cm left, and 3 cm on the other sides.
+# (1 cm ~= 567 twips): A4 portrait, 4 cm left, and 3 cm top/right/bottom.
 # Keep layout writes and width calculations tied to these constants so a future
 # formatting change cannot silently make tables use different page geometry.
 A4_PAGE_WIDTH_DXA = 11906
@@ -505,6 +506,47 @@ def set_child_element(parent, tag_name, attribs=None):
     return elem
 
 
+def set_run_typography(run, *, bold=False, italic=False, size='24'):
+    """Apply explicit Times New Roman typography to a Word run.
+
+    Field result runs need direct formatting because Microsoft Word may rebuild
+    their visible text without preserving the surrounding paragraph style.
+    """
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    namespaces = {'w': ns_uri}
+    r_pr = run.find('w:rPr', namespaces)
+    if r_pr is None:
+        r_pr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+        run.insert(0, r_pr)
+
+    set_child_element(r_pr, 'rFonts', {
+        'ascii': 'Times New Roman',
+        'hAnsi': 'Times New Roman',
+        'eastAsia': 'Times New Roman',
+        'cs': 'Times New Roman',
+    })
+    set_child_element(r_pr, 'color', {'val': '000000'})
+    set_child_element(r_pr, 'sz', {'val': str(size)})
+    set_child_element(r_pr, 'szCs', {'val': str(size)})
+
+    for tag_name, enabled in (
+            ('b', bold), ('bCs', bold), ('i', italic), ('iCs', italic)):
+        element = r_pr.find(f'w:{tag_name}', namespaces)
+        if enabled:
+            if element is None:
+                set_child_element(r_pr, tag_name, {})
+            elif f'{{{ns_uri}}}val' in element.attrib:
+                del element.attrib[f'{{{ns_uri}}}val']
+        else:
+            # Word may rebuild a REF field from its bold caption bookmark.
+            # Explicitly disabling emphasis prevents inherited caption
+            # formatting from reappearing after a field refresh.
+            if element is None:
+                element = set_child_element(r_pr, tag_name, {})
+            element.set(f'{{{ns_uri}}}val', '0')
+    return r_pr
+
+
 def build_page_number_part(kind, alignment, include_page):
     """Build a deterministic header/footer part for one page-number role."""
     if kind not in ('header', 'footer'):
@@ -552,7 +594,100 @@ def build_page_number_part(kind, alignment, include_page):
     return root
 
 
-def ensure_page_number_parts(unpacked_dir):
+def _append_page_field(paragraph, *, size='24'):
+    """Append a Word PAGE field with deterministic Times New Roman typography."""
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    begin_run = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}r')
+    set_child_element(begin_run, 'fldChar', {'fldCharType': 'begin'})
+    instr_run = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}r')
+    instr = set_child_element(instr_run, 'instrText', {'space': 'preserve'})
+    instr.text = ' PAGE '
+    separate_run = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}r')
+    set_child_element(separate_run, 'fldChar', {'fldCharType': 'separate'})
+    value_run = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}r')
+    value_r_pr = lxml.etree.SubElement(value_run, f'{{{ns_uri}}}rPr')
+    set_child_element(
+        value_r_pr,
+        'rFonts',
+        {
+            'ascii': 'Times New Roman',
+            'hAnsi': 'Times New Roman',
+            'eastAsia': 'Times New Roman',
+            'cs': 'Times New Roman',
+        },
+    )
+    set_child_element(value_r_pr, 'sz', {'val': str(size)})
+    set_child_element(value_r_pr, 'szCs', {'val': str(size)})
+    value_text = lxml.etree.SubElement(value_run, f'{{{ns_uri}}}t')
+    value_text.text = '1'
+    end_run = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}r')
+    set_child_element(end_run, 'fldChar', {'fldCharType': 'end'})
+
+
+def build_identity_footer_part(identity_footer, *, include_page):
+    """Build the UPNVJ repository identity footer for BAB–Daftar Pustaka."""
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    root = lxml.etree.Element(f'{{{ns_uri}}}ftr', nsmap={'w': ns_uri})
+    if include_page:
+        page_paragraph = lxml.etree.SubElement(root, f'{{{ns_uri}}}p')
+        page_p_pr = lxml.etree.SubElement(
+            page_paragraph, f'{{{ns_uri}}}pPr'
+        )
+        set_child_element(page_p_pr, 'pStyle', {'val': 'Footer'})
+        set_child_element(page_p_pr, 'jc', {'val': 'center'})
+        set_child_element(
+            page_p_pr,
+            'spacing',
+            {'before': '0', 'after': '0', 'line': '200', 'lineRule': 'auto'},
+        )
+        sort_element_children(page_p_pr, PPR_ORDER)
+        _append_page_field(page_paragraph, size='24')
+
+    size = str(round(float(identity_footer.get('size_pt', 8)) * 2))
+    font = identity_footer.get('font', 'Times New Roman')
+    for text, bold, italic in (
+        (identity_footer['author_year'], True, False),
+        (identity_footer['title'], True, True),
+        (identity_footer['institution'], False, False),
+        (identity_footer['links'], False, False),
+    ):
+        paragraph = lxml.etree.SubElement(root, f'{{{ns_uri}}}p')
+        p_pr = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}pPr')
+        set_child_element(p_pr, 'pStyle', {'val': 'Footer'})
+        set_child_element(p_pr, 'jc', {'val': 'left'})
+        set_child_element(
+            p_pr,
+            'spacing',
+            {'before': '0', 'after': '0', 'line': '160', 'lineRule': 'exact'},
+        )
+        set_child_element(p_pr, 'ind', {'left': '0', 'firstLine': '0'})
+        sort_element_children(p_pr, PPR_ORDER)
+        run = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}r')
+        run_pr = lxml.etree.SubElement(run, f'{{{ns_uri}}}rPr')
+        set_child_element(
+            run_pr,
+            'rFonts',
+            {
+                'ascii': font,
+                'hAnsi': font,
+                'eastAsia': font,
+                'cs': font,
+            },
+        )
+        if bold:
+            set_child_element(run_pr, 'b', {})
+            set_child_element(run_pr, 'bCs', {})
+        if italic:
+            set_child_element(run_pr, 'i', {})
+            set_child_element(run_pr, 'iCs', {})
+        set_child_element(run_pr, 'sz', {'val': size})
+        set_child_element(run_pr, 'szCs', {'val': size})
+        text_element = lxml.etree.SubElement(run, f'{{{ns_uri}}}t')
+        text_element.text = text
+    return root
+
+
+def ensure_page_number_parts(unpacked_dir, identity_footer=None):
     """Create/reuse page-number parts and return their document rIds.
 
     Fixed role-based part names make this helper idempotent. The parts are
@@ -581,9 +716,43 @@ def ensure_page_number_parts(unpacked_dir):
             FOOTER_REL_TYPE, FOOTER_CONTENT_TYPE,
         ),
     }
+    if identity_footer:
+        specs.update({
+            'body_identity_footer': (
+                'ta-footer-body-identity.xml', 'footer', 'left', False,
+                FOOTER_REL_TYPE, FOOTER_CONTENT_TYPE,
+            ),
+            'body_first_identity_footer': (
+                'ta-footer-body-first-identity.xml', 'footer', 'center', True,
+                FOOTER_REL_TYPE, FOOTER_CONTENT_TYPE,
+            ),
+        })
     rels_path = os.path.join(unpacked_dir, 'word', '_rels', 'document.xml.rels')
     content_types_path = os.path.join(unpacked_dir, '[Content_Types].xml')
     parser = lxml.etree.XMLParser(remove_blank_text=False)
+    if not os.path.exists(rels_path):
+        os.makedirs(os.path.dirname(rels_path), exist_ok=True)
+        rels_root = lxml.etree.Element(
+            f'{{{PACKAGE_REL_NS}}}Relationships',
+            nsmap={None: PACKAGE_REL_NS},
+        )
+        lxml.etree.ElementTree(rels_root).write(
+            rels_path,
+            encoding='utf-8',
+            xml_declaration=True,
+            standalone=True,
+        )
+    if not os.path.exists(content_types_path):
+        content_types_root = lxml.etree.Element(
+            f'{{{CONTENT_TYPES_NS}}}Types',
+            nsmap={None: CONTENT_TYPES_NS},
+        )
+        lxml.etree.ElementTree(content_types_root).write(
+            content_types_path,
+            encoding='utf-8',
+            xml_declaration=True,
+            standalone=True,
+        )
     rels_tree = lxml.etree.parse(rels_path, parser)
     rels_root = rels_tree.getroot()
     content_types_tree = lxml.etree.parse(content_types_path, parser)
@@ -599,7 +768,13 @@ def ensure_page_number_parts(unpacked_dir):
     reference_ids = {}
     for role, (target, kind, alignment, include_page, rel_type, content_type) in specs.items():
         part_path = os.path.join(unpacked_dir, 'word', target)
-        part_root = build_page_number_part(kind, alignment, include_page)
+        if role in {'body_identity_footer', 'body_first_identity_footer'}:
+            part_root = build_identity_footer_part(
+                identity_footer,
+                include_page=(role == 'body_first_identity_footer'),
+            )
+        else:
+            part_root = build_page_number_part(kind, alignment, include_page)
         lxml.etree.ElementTree(part_root).write(
             part_path,
             encoding='utf-8',
@@ -669,14 +844,24 @@ def _is_numbered_chapter_heading(paragraph, namespaces):
     return ilvl is None or ilvl.get(f'{{{ns_uri}}}val', '0') == '0'
 
 
-def _apply_page_number_section(sect_pr, reference_ids, *, front, start, next_page):
+def _apply_page_number_section(
+        sect_pr, reference_ids, *, front, start, next_page, appendix=False,
+        front_scan=False, title_page=None):
     """Apply header/footer roles and numbering rules to one section."""
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
     for tag_name in ('headerReference', 'footerReference'):
         for existing in list(sect_pr.findall(f'{{{ns_uri}}}{tag_name}')):
             sect_pr.remove(existing)
 
-    if front:
+    if front and front_scan:
+        refs = (
+            ('headerReference', 'default', reference_ids['blank_header']),
+            ('headerReference', 'first', reference_ids['blank_header']),
+            ('footerReference', 'default', reference_ids['blank_footer']),
+            ('footerReference', 'first', reference_ids['blank_footer']),
+        )
+        number_format = 'lowerRoman'
+    elif front:
         refs = (
             ('headerReference', 'default', reference_ids['blank_header']),
             ('headerReference', 'first', reference_ids['blank_header']),
@@ -684,12 +869,28 @@ def _apply_page_number_section(sect_pr, reference_ids, *, front, start, next_pag
             ('footerReference', 'first', reference_ids['blank_footer']),
         )
         number_format = 'lowerRoman'
+    elif appendix:
+        refs = (
+            ('headerReference', 'default', reference_ids['body_default_header']),
+            ('headerReference', 'first', reference_ids['body_default_header']),
+            ('footerReference', 'default', reference_ids['blank_footer']),
+            ('footerReference', 'first', reference_ids['blank_footer']),
+        )
+        number_format = 'decimal'
     else:
+        default_footer = reference_ids.get(
+            'body_identity_footer',
+            reference_ids['blank_footer'],
+        )
+        first_footer = reference_ids.get(
+            'body_first_identity_footer',
+            reference_ids['body_first_footer'],
+        )
         refs = (
             ('headerReference', 'default', reference_ids['body_default_header']),
             ('headerReference', 'first', reference_ids['blank_header']),
-            ('footerReference', 'default', reference_ids['blank_footer']),
-            ('footerReference', 'first', reference_ids['body_first_footer']),
+            ('footerReference', 'default', default_footer),
+            ('footerReference', 'first', first_footer),
         )
         number_format = 'decimal'
 
@@ -712,7 +913,14 @@ def _apply_page_number_section(sect_pr, reference_ids, *, front, start, next_pag
         pg_num_type.attrib.pop(start_attr, None)
     else:
         pg_num_type.set(start_attr, str(start))
-    set_child_element(sect_pr, 'titlePg', {})
+    if title_page is None:
+        title_page = not appendix
+    if title_page:
+        set_child_element(sect_pr, 'titlePg', {})
+    else:
+        title_page_element = sect_pr.find(f'{{{ns_uri}}}titlePg')
+        if title_page_element is not None:
+            sect_pr.remove(title_page_element)
     apply_upnvj_page_layout(sect_pr)
     sort_element_children(sect_pr, SECTPR_ORDER)
 
@@ -723,8 +931,10 @@ def configure_report_sections(
     original_sect_pr,
     reference_ids,
     chapter_paragraphs=None,
+    *,
+    split_appendix=False,
 ):
-    """Create one front-matter section and one section per numbered BAB.
+    """Create front matter, numbered BAB sections, and an optional appendix.
 
     The first page of every BAB uses a centered footer page number, later pages
     use a right-aligned header, Roman front matter uses a right-aligned footer,
@@ -769,12 +979,116 @@ def configure_report_sections(
         raise RuntimeError('Cannot configure page numbering: no BAB heading found.')
 
     chapter_set = set(chapters)
+    scan_paragraphs = {
+        child for child in children
+        if child.tag == f'{{{ns_uri}}}p'
+        and any(
+            (drawing.get('name') or '').startswith('FRONT_MATTER_SCAN:')
+            for drawing in child.findall(
+                './/wp:docPr',
+                {
+                    'wp': (
+                        'http://schemas.openxmlformats.org/drawingml/'
+                        '2006/wordprocessingDrawing'
+                    ),
+                },
+            )
+        )
+    }
+    scan_heading_paragraphs = {
+        children[index - 1]
+        for index, child in enumerate(children)
+        if (
+            child in scan_paragraphs
+            and index > 0
+            and children[index - 1].tag == f'{{{ns_uri}}}p'
+            and (
+                _paragraph_style(children[index - 1], namespaces) or ''
+            ) == 'FrontMatterHeading'
+        )
+    }
+    appendix_heading = None
+    if split_appendix:
+        appendix_heading = next(
+            (
+                child for child in children
+                if child.tag == f'{{{ns_uri}}}p'
+                and (
+                    (_paragraph_style(child, namespaces) or '').lower()
+                    == 'taappendixheading'
+                    or _paragraph_text(child, namespaces).upper().startswith(
+                        'LAMPIRAN 1.'
+                    )
+                )
+            ),
+            None,
+        )
     for child in children:
         body.remove(child)
 
     started_chapters = 0
+    started_appendix = False
+    started_scan_sections = 0
+    front_scan_range_started = False
     for child in children:
-        if child in chapter_set:
+        if child in scan_heading_paragraphs:
+            if not front_scan_range_started:
+                break_paragraph = lxml.etree.Element(f'{{{ns_uri}}}p')
+                break_p_pr = lxml.etree.SubElement(
+                    break_paragraph,
+                    f'{{{ns_uri}}}pPr',
+                )
+                section_properties = copy.deepcopy(template)
+                _apply_page_number_section(
+                    section_properties,
+                    reference_ids,
+                    front=True,
+                    start=1,
+                    next_page=True,
+                    title_page=True,
+                )
+                break_p_pr.append(section_properties)
+                sort_element_children(break_p_pr, PPR_ORDER)
+                body.append(break_paragraph)
+                front_scan_range_started = True
+        elif child in scan_paragraphs:
+            if not front_scan_range_started:
+                break_paragraph = lxml.etree.Element(f'{{{ns_uri}}}p')
+                break_p_pr = lxml.etree.SubElement(
+                    break_paragraph,
+                    f'{{{ns_uri}}}pPr',
+                )
+                section_properties = copy.deepcopy(template)
+                _apply_page_number_section(
+                    section_properties,
+                    reference_ids,
+                    front=True,
+                    start=1,
+                    next_page=True,
+                    title_page=True,
+                )
+                break_p_pr.append(section_properties)
+                sort_element_children(break_p_pr, PPR_ORDER)
+                body.append(break_paragraph)
+                front_scan_range_started = True
+            scan_p_pr = child.find(f'{{{ns_uri}}}pPr')
+            if scan_p_pr is None:
+                scan_p_pr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+                child.insert(0, scan_p_pr)
+            scan_section = copy.deepcopy(template)
+            _apply_page_number_section(
+                scan_section,
+                reference_ids,
+                front=True,
+                start=None,
+                next_page=True,
+                front_scan=True,
+                title_page=False,
+            )
+            scan_p_pr.append(scan_section)
+            sort_element_children(scan_p_pr, PPR_ORDER)
+            started_scan_sections += 1
+        elif child in chapter_set:
             break_paragraph = lxml.etree.Element(f'{{{ns_uri}}}p')
             break_p_pr = lxml.etree.SubElement(
                 break_paragraph,
@@ -786,8 +1100,9 @@ def configure_report_sections(
                     section_properties,
                     reference_ids,
                     front=True,
-                    start=1,
+                    start=None if started_scan_sections else 1,
                     next_page=True,
+                    title_page=not started_scan_sections,
                 )
             else:
                 _apply_page_number_section(
@@ -801,6 +1116,24 @@ def configure_report_sections(
             sort_element_children(break_p_pr, PPR_ORDER)
             body.append(break_paragraph)
             started_chapters += 1
+        elif child is appendix_heading:
+            break_paragraph = lxml.etree.Element(f'{{{ns_uri}}}p')
+            break_p_pr = lxml.etree.SubElement(
+                break_paragraph,
+                f'{{{ns_uri}}}pPr',
+            )
+            section_properties = copy.deepcopy(template)
+            _apply_page_number_section(
+                section_properties,
+                reference_ids,
+                front=False,
+                start=None,
+                next_page=True,
+            )
+            break_p_pr.append(section_properties)
+            sort_element_children(break_p_pr, PPR_ORDER)
+            body.append(break_paragraph)
+            started_appendix = True
         body.append(child)
 
     final_section = copy.deepcopy(template)
@@ -810,13 +1143,14 @@ def configure_report_sections(
         front=False,
         start=1 if started_chapters == 1 else None,
         next_page=False,
+        appendix=started_appendix,
     )
     body.append(final_section)
-    return started_chapters + 1
+    return len(list(body.iter(f'{{{ns_uri}}}sectPr')))
 
 
 def apply_upnvj_page_layout(sect_pr):
-    """Apply the canonical A4 + 4/3/3/3 cm layout to one ``w:sectPr``.
+    """Apply the canonical A4 + 4/4/3/3 cm layout to one ``w:sectPr``.
 
     The helper is intentionally idempotent and preserves unrelated section
     properties such as header/footer references and page-numbering settings.
@@ -859,27 +1193,136 @@ def ensure_front_matter_heading_style(styles_root):
         style = lxml.etree.Element(f'{{{ns_uri}}}style')
         style.set(f'{{{ns_uri}}}type', 'paragraph')
         style.set(f'{{{ns_uri}}}styleId', 'FrontMatterHeading')
-        set_child_element(style, 'name', {'val': 'front matter heading'})
-        set_child_element(style, 'basedOn', {'val': 'Normal'})
-        set_child_element(style, 'next', {'val': 'Normal'})
-        set_child_element(style, 'qFormat', {})
-        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-        set_child_element(pPr, 'keepNext', {})
-        set_child_element(pPr, 'keepLines', {})
-        set_child_element(pPr, 'spacing', {'before': '480', 'after': '240'})
-        set_child_element(pPr, 'jc', {'val': 'center'})
-        set_child_element(pPr, 'outlineLvl', {'val': '0'})
-        sort_element_children(pPr, PPR_ORDER)
-        style.append(pPr)
-        rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
-        set_child_element(rPr, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
-        set_child_element(rPr, 'b', {})
-        set_child_element(rPr, 'bCs', {})
-        set_child_element(rPr, 'sz', {'val': '28'})
-        set_child_element(rPr, 'szCs', {'val': '28'})
-        style.append(rPr)
-        sort_element_children(style, STYLE_ORDER)
         styles_root.append(style)
+    set_child_element(style, 'name', {'val': 'front matter heading'})
+    set_child_element(style, 'basedOn', {'val': 'Normal'})
+    set_child_element(style, 'next', {'val': 'Normal'})
+    set_child_element(style, 'qFormat', {})
+    pPr = style.find('w:pPr', namespaces)
+    if pPr is None:
+        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+        style.append(pPr)
+    set_child_element(pPr, 'keepNext', {})
+    set_child_element(pPr, 'keepLines', {})
+    set_child_element(pPr, 'spacing', {
+        'before': '0', 'after': '240', 'line': '276', 'lineRule': 'auto',
+    })
+    set_child_element(pPr, 'jc', {'val': 'center'})
+    set_child_element(pPr, 'outlineLvl', {'val': '0'})
+    sort_element_children(pPr, PPR_ORDER)
+    rPr = style.find('w:rPr', namespaces)
+    if rPr is None:
+        rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+        style.append(rPr)
+    set_child_element(rPr, 'rFonts', {
+        'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman',
+        'eastAsia': 'Times New Roman', 'cs': 'Times New Roman',
+    })
+    set_child_element(rPr, 'b', {})
+    set_child_element(rPr, 'bCs', {})
+    set_child_element(rPr, 'sz', {'val': '24'})
+    set_child_element(rPr, 'szCs', {'val': '24'})
+    sort_element_children(style, STYLE_ORDER)
+
+
+def ensure_caption_style(styles_root):
+    """Define Caption as an explicit body-derived academic caption style."""
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    namespaces = {'w': ns_uri}
+    style = styles_root.find("w:style[@w:styleId='Caption']", namespaces)
+    if style is None:
+        style = lxml.etree.Element(f'{{{ns_uri}}}style')
+        style.set(f'{{{ns_uri}}}type', 'paragraph')
+        style.set(f'{{{ns_uri}}}styleId', 'Caption')
+        styles_root.append(style)
+
+    set_child_element(style, 'name', {'val': 'caption'})
+    set_child_element(style, 'basedOn', {'val': 'Normal'})
+    set_child_element(style, 'next', {'val': 'Normal'})
+
+    p_pr = style.find('w:pPr', namespaces)
+    if p_pr is None:
+        p_pr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+        style.append(p_pr)
+    set_child_element(p_pr, 'keepNext', {})
+    set_child_element(p_pr, 'keepLines', {})
+    set_child_element(p_pr, 'spacing', {
+        'before': '120',
+        'after': '120',
+        'line': '240',
+        'lineRule': 'auto',
+    })
+    set_child_element(p_pr, 'jc', {'val': 'center'})
+    set_child_element(p_pr, 'ind', {'firstLine': '0', 'left': '0'})
+    sort_element_children(p_pr, PPR_ORDER)
+
+    r_pr = style.find('w:rPr', namespaces)
+    if r_pr is None:
+        r_pr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+        style.append(r_pr)
+    set_child_element(r_pr, 'rFonts', {
+        'ascii': 'Times New Roman',
+        'hAnsi': 'Times New Roman',
+        'eastAsia': 'Times New Roman',
+        'cs': 'Times New Roman',
+    })
+    set_child_element(r_pr, 'color', {'val': '000000'})
+    set_child_element(r_pr, 'sz', {'val': '24'})
+    set_child_element(r_pr, 'szCs', {'val': '24'})
+    for tag_name in ('b', 'bCs', 'i', 'iCs'):
+        element = r_pr.find(f'w:{tag_name}', namespaces)
+        if element is not None:
+            r_pr.remove(element)
+    sort_element_children(style, STYLE_ORDER)
+    return style
+
+
+def ensure_code_block_style(styles_root):
+    """Define the deterministic style used only by fenced code blocks."""
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    namespaces = {'w': ns_uri}
+    style = styles_root.find("w:style[@w:styleId='CodeBlock']", namespaces)
+    if style is None:
+        style = lxml.etree.Element(f'{{{ns_uri}}}style')
+        style.set(f'{{{ns_uri}}}type', 'paragraph')
+        style.set(f'{{{ns_uri}}}styleId', 'CodeBlock')
+        styles_root.append(style)
+
+    set_child_element(style, 'name', {'val': 'Code Block'})
+    set_child_element(style, 'basedOn', {'val': 'Normal'})
+    set_child_element(style, 'next', {'val': 'CodeBlock'})
+
+    p_pr = style.find('w:pPr', namespaces)
+    if p_pr is None:
+        p_pr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+        style.append(p_pr)
+    set_child_element(p_pr, 'spacing', {
+        'before': '0', 'after': '0', 'line': '240', 'lineRule': 'auto'
+    })
+    set_child_element(p_pr, 'jc', {'val': 'left'})
+    set_child_element(p_pr, 'ind', {'left': '720', 'firstLine': '0'})
+    sort_element_children(p_pr, PPR_ORDER)
+
+    r_pr = style.find('w:rPr', namespaces)
+    if r_pr is None:
+        r_pr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
+        style.append(r_pr)
+    set_child_element(r_pr, 'rFonts', {
+        'ascii': 'Courier New',
+        'hAnsi': 'Courier New',
+        'eastAsia': 'Courier New',
+        'cs': 'Courier New',
+    })
+    set_child_element(r_pr, 'sz', {'val': '24'})
+    set_child_element(r_pr, 'szCs', {'val': '24'})
+    set_child_element(r_pr, 'i', {})
+    set_child_element(r_pr, 'iCs', {})
+    for tag_name in ('b', 'bCs'):
+        element = r_pr.find(f'w:{tag_name}', namespaces)
+        if element is not None:
+            r_pr.remove(element)
+    sort_element_children(style, STYLE_ORDER)
+    return style
 
 def ensure_appendix_heading_style(styles_root):
     ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
@@ -1034,16 +1477,70 @@ def clean_heading_text_and_add_num(p, level, num_id):
         
     sort_element_children(pPr, PPR_ORDER)
 
-def clean_bibliography_sdt(sdt_elem, entries=None, draft_path="Tugas_Akhir_Draft.md"):
+def format_bibliography_paragraph(paragraph, entry):
+    """Rewrite one bibliography paragraph using the canonical layout.
+
+    This helper is shared by the legacy Mendeley SDT path and the active
+    Markdown body path. Rebuilding the runs also prevents an organization name
+    such as ``UPNVJ.`` from retaining accidental list formatting produced by a
+    generic Markdown list parser.
+    """
+    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+    namespaces = {'w': ns_uri}
+
+    p_pr = paragraph.find('w:pPr', namespaces)
+    if p_pr is None:
+        p_pr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
+        paragraph.insert(0, p_pr)
+
+    set_child_element(p_pr, 'pStyle', {'val': 'Normal'})
+    num_pr = p_pr.find('w:numPr', namespaces)
+    if num_pr is not None:
+        p_pr.remove(num_pr)
+
+    ind = set_child_element(p_pr, 'ind', {'left': '567', 'hanging': '567'})
+    for stale_attr in ('firstLine', 'firstLineChars', 'hangingChars', 'right'):
+        ind.attrib.pop(f'{{{ns_uri}}}{stale_attr}', None)
+    set_child_element(
+        p_pr,
+        'spacing',
+        {'before': '0', 'after': '120', 'line': '240', 'lineRule': 'auto'},
+    )
+    set_child_element(p_pr, 'jc', {'val': 'left'})
+    sort_element_children(p_pr, PPR_ORDER)
+
+    for child in list(paragraph):
+        if child is not p_pr:
+            paragraph.remove(child)
+
+    for text, is_italic in entry.spans:
+        run = lxml.etree.SubElement(paragraph, f'{{{ns_uri}}}r')
+        set_run_typography(run, italic=is_italic, size='24')
+        text_element = lxml.etree.SubElement(run, f'{{{ns_uri}}}t')
+        text_element.text = text
+        text_element.set(
+            '{http://www.w3.org/XML/1998/namespace}space',
+            'preserve',
+        )
+    return paragraph
+
+
+def active_draft_path(draft_path=None):
+    return draft_path or os.environ.get('TA_DRAFT_PATH', 'Tugas_Akhir_Draft.md')
+
+
+def clean_bibliography_sdt(sdt_elem, entries=None, draft_path=None):
     """Fill the bibliography SDT from the draft '# DAFTAR PUSTAKA' (Option B, R1).
 
     The draft is the single source of truth: references are NO LONGER hardcoded
     (R1.1). ``entries`` may be a precomputed list of ReferenceEntry; when None
     they are parsed from ``draft_path`` via ``parse_bibliography_entries``.
 
-    Each entry is rendered with the baseline paragraph style (R1.3): pStyle
-    Normal; ind left=567 hanging=567; spacing before=0/after=120/line=240/
-    lineRule=auto; jc=both. Italic spans (``*...*`` in the draft) become
+    Each entry is rendered with the canonical bibliography paragraph style
+    (R1.3): pStyle Normal; ind left=567 hanging=567; spacing
+    before=0/after=120/line=240/lineRule=auto; jc=left. Rata kiri dipakai
+    agar Word tidak melebarkan jarak antarkata pada baris referensi yang
+    pendek. Italic spans (``*...*`` in the draft) become
     ``w:i``/``w:iCs`` runs (R1.2); entry order follows the draft (R1.4).
 
     If the section is missing or empty (R1.8) the function prints a non-fatal
@@ -1065,7 +1562,7 @@ def clean_bibliography_sdt(sdt_elem, entries=None, draft_path="Tugas_Akhir_Draft
             if _here not in sys.path:
                 sys.path.insert(0, _here)
             from merge_draft_to_docx import parse_bibliography_entries
-        result = parse_bibliography_entries(draft_path)
+        result = parse_bibliography_entries(active_draft_path(draft_path))
         entries = list(result)
         section_found = getattr(result, 'section_found', bool(entries))
 
@@ -1086,27 +1583,7 @@ def clean_bibliography_sdt(sdt_elem, entries=None, draft_path="Tugas_Akhir_Draft
 
     for entry in entries:
         p = lxml.etree.Element(f'{{{ns_uri}}}p')
-        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-        set_child_element(pPr, 'pStyle', {'val': 'Normal'})
-        set_child_element(pPr, 'ind', {'left': '567', 'hanging': '567'})
-        set_child_element(pPr, 'spacing', {'before': '0', 'after': '120', 'line': '240', 'lineRule': 'auto'})
-        set_child_element(pPr, 'jc', {'val': 'both'})
-        sort_element_children(pPr, PPR_ORDER)
-        p.append(pPr)
-
-        for text, is_italic in entry.spans:
-            r = lxml.etree.Element(f'{{{ns_uri}}}r')
-            if is_italic:
-                rPr = lxml.etree.Element(f'{{{ns_uri}}}rPr')
-                set_child_element(rPr, 'i', {})
-                set_child_element(rPr, 'iCs', {})
-                r.append(rPr)
-            t = lxml.etree.Element(f'{{{ns_uri}}}t')
-            t.text = text
-            t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-            r.append(t)
-            p.append(r)
-
+        format_bibliography_paragraph(p, entry)
         sdtContent.append(p)
     print(f"Replaced bibliography entries inside SDT from draft ({len(entries)} entries).")
 
@@ -1182,76 +1659,6 @@ def scale_cover_drawings(p, namespaces, unpacked_dir=None, rel_map=None):
                             elem.set('cx', str(int(cx * scale)))
                             elem.set('cy', str(int(cy * scale)))
                             print(f"  Scaled cover drawing to {scale * 100:.2f}% of original size")
-                    except ValueError:
-                        pass
-
-
-def scale_lembar_pengesahan(p, namespaces, unpacked_dir=None, rel_map=None):
-    ns_uri = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
-    drawings = p.findall('.//w:drawing', namespaces)
-    if not drawings:
-        return
-        
-    pPr = p.find('w:pPr', namespaces)
-    if pPr is None:
-        pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-        p.insert(0, pPr)
-    set_child_element(pPr, 'jc', {'val': 'center'})
-    set_child_element(pPr, 'ind', {'left': '0', 'firstLine': '0', 'right': '0'})
-    sort_element_children(pPr, PPR_ORDER)
-    
-    max_width_emu = 5040000   # 14.0cm in EMUs
-    max_height_emu = 8532000  # 23.7cm in EMUs
-    
-    for drawing in drawings:
-        # Remove all srcRect elements to disable cropping entirely
-        for src_rect in drawing.xpath('.//a:srcRect', namespaces={'a': 'http://schemas.openxmlformats.org/drawingml/2006/main'}):
-            src_rect.getparent().remove(src_rect)
-            
-        aspect_ratio = None
-        if unpacked_dir and rel_map:
-            blip = drawing.find('.//a:blip', {'a': 'http://schemas.openxmlformats.org/drawingml/2006/main'})
-            if blip is not None:
-                embed_id = blip.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
-                if embed_id and embed_id in rel_map:
-                    rel_target = rel_map[embed_id]
-                    img_path = os.path.join(unpacked_dir, 'word', rel_target)
-                    if os.path.exists(img_path):
-                        try:
-                            from PIL import Image
-                            with Image.open(img_path) as img:
-                                img_w, img_h = img.size
-                                if img_h > 0:
-                                    aspect_ratio = img_w / img_h
-                        except Exception as e:
-                            print(f"  Error reading image aspect ratio for Lembar Pengesahan: {e}")
-                            
-        for elem in drawing.iter():
-            tag_local = elem.tag.split('}')[-1]
-            if tag_local in ['extent', 'ext']:
-                cx_str = elem.get('cx')
-                cy_str = elem.get('cy')
-                if cx_str:
-                    try:
-                        cx = int(cx_str)
-                        if aspect_ratio is not None:
-                            cy = int(cx / aspect_ratio)
-                        elif cy_str:
-                            cy = int(cy_str)
-                        else:
-                            cy = cx
-                            
-                        # Scale to fit printable area exactly
-                        scale_x = max_width_emu / cx
-                        scale_y = max_height_emu / cy
-                        scale = min(scale_x, scale_y)
-                        
-                        cx = int(cx * scale)
-                        cy = int(cy * scale)
-                        
-                        elem.set('cx', str(cx))
-                        elem.set('cy', str(cy))
-                        print(f"  Scaled Lembar Pengesahan drawing to {cx}x{cy} EMUs (width 14.0cm)")
                     except ValueError:
                         pass
 
@@ -1455,6 +1862,15 @@ def format_all_tables(root, namespaces):
         if tblPr is None:
             tblPr = lxml.etree.Element(qn('tblPr'))
             tbl.insert(0, tblPr)
+        table_caption = tblPr.find('w:tblCaption', namespaces)
+        if (
+            table_caption is not None
+            and table_caption.get(qn('val')) == 'FRONT_MATTER_APPROVAL'
+        ):
+            # The latest Iman front matter uses a borderless editable approval
+            # table. It is not an academic data table and must not receive the
+            # body-table grid, header-row, or cell-padding treatment.
+            continue
 
         # Center table horizontally (preserved behavior).
         set_child_element(tblPr, 'jc', {'val': 'center'})
@@ -1581,10 +1997,10 @@ def center_and_scale_drawings(p, namespaces, unpacked_dir=None, rel_map=None):
     sort_element_children(pPr, PPR_ORDER)
     
     # Shared BODY-figure bounding box (MUST match inject_all_images.py):
-    #   BODY_MAX_W_EMU = 15 cm, BODY_MAX_H_EMU = 16 cm (1 cm = 360000 EMU).
+    #   BODY_MAX_W_EMU = 14 cm, BODY_MAX_H_EMU = 16 cm (1 cm = 360000 EMU).
     # Aspect ratio is preserved (cy recomputed from the PIL aspect), srcRect is
     # stripped (no crop), and a single min-scale fits the figure in the box.
-    max_width_emu = 5400000   # 15.0 cm in EMUs (BODY_MAX_W_EMU)
+    max_width_emu = 5040000   # 14.0 cm in EMUs (BODY_MAX_W_EMU)
     max_height_emu = 5760000  # 16.0 cm in EMUs (BODY_MAX_H_EMU)
     
     for drawing in drawings:
@@ -1780,13 +2196,7 @@ def format_caption_paragraph_clean(
             
     # Label prefix, e.g. "Gambar 2."
     r1 = lxml.etree.Element(f'{{{ns_uri}}}r')
-    rPr1 = lxml.etree.Element(f'{{{ns_uri}}}rPr')
-    set_child_element(rPr1, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
-    set_child_element(rPr1, 'b', {})
-    set_child_element(rPr1, 'bCs', {})
-    set_child_element(rPr1, 'sz', {'val': '24'})
-    set_child_element(rPr1, 'szCs', {'val': '24'})
-    r1.append(rPr1)
+    set_run_typography(r1, bold=True)
     
     t1 = lxml.etree.Element(f'{{{ns_uri}}}t')
     t1.text = f"{label} {prefix}"
@@ -1797,11 +2207,13 @@ def format_caption_paragraph_clean(
     
     # SEQ field
     r2 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    set_run_typography(r2, bold=True)
     fld2 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "begin"})
     r2.append(fld2)
     p.append(r2)
     
     r3 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    set_run_typography(r3, bold=True)
     ins3 = lxml.etree.Element(f'{{{ns_uri}}}instrText')
     if default_val == 1:
         ins3.text = f" SEQ {seq_name} \\r 1 \\* ARABIC "
@@ -1812,17 +2224,20 @@ def format_caption_paragraph_clean(
     p.append(r3)
     
     r4 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    set_run_typography(r4, bold=True)
     fld4 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "separate"})
     r4.append(fld4)
     p.append(r4)
     
     r5 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    set_run_typography(r5, bold=True)
     t5 = lxml.etree.Element(f'{{{ns_uri}}}t')
     t5.text = str(default_val)
     r5.append(t5)
     p.append(r5)
     
     r6 = lxml.etree.Element(f'{{{ns_uri}}}r')
+    set_run_typography(r6, bold=True)
     fld6 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "end"})
     r6.append(fld6)
     p.append(r6)
@@ -1837,11 +2252,7 @@ def format_caption_paragraph_clean(
     
     # Description
     r7 = lxml.etree.Element(f'{{{ns_uri}}}r')
-    rPr7 = lxml.etree.Element(f'{{{ns_uri}}}rPr')
-    set_child_element(rPr7, 'rFonts', {'ascii': 'Times New Roman', 'hAnsi': 'Times New Roman'})
-    set_child_element(rPr7, 'sz', {'val': '24'})
-    set_child_element(rPr7, 'szCs', {'val': '24'})
-    r7.append(rPr7)
+    set_run_typography(r7)
     
     t7 = lxml.etree.Element(f'{{{ns_uri}}}t')
     t7.text = f" {desc.strip()}"
@@ -1889,6 +2300,12 @@ def replace_semantic_references_in_paragraph(p, targets, namespaces):
         if source_rpr is not None:
             run.append(copy.deepcopy(source_rpr))
 
+    def _append_regular_reference_rpr(run, source_rpr):
+        """Keep REF display text regular even when Word refreshes the field."""
+        if source_rpr is not None:
+            run.append(copy.deepcopy(source_rpr))
+        set_run_typography(run, bold=False, italic=False, size='24')
+
     def _text_run(value, source_rpr):
         run = lxml.etree.Element(f'{{{ns_uri}}}r')
         _append_rpr(run, source_rpr)
@@ -1900,14 +2317,14 @@ def replace_semantic_references_in_paragraph(p, targets, namespaces):
 
     def _field_runs(bookmark, visible, source_rpr):
         begin_run = lxml.etree.Element(f'{{{ns_uri}}}r')
-        _append_rpr(begin_run, source_rpr)
+        _append_regular_reference_rpr(begin_run, source_rpr)
         lxml.etree.SubElement(
             begin_run, f'{{{ns_uri}}}fldChar',
             {f'{{{ns_uri}}}fldCharType': 'begin'},
         )
 
         instruction_run = lxml.etree.Element(f'{{{ns_uri}}}r')
-        _append_rpr(instruction_run, source_rpr)
+        _append_regular_reference_rpr(instruction_run, source_rpr)
         instruction = lxml.etree.SubElement(
             instruction_run, f'{{{ns_uri}}}instrText'
         )
@@ -1915,16 +2332,21 @@ def replace_semantic_references_in_paragraph(p, targets, namespaces):
         instruction.set(xml_space, 'preserve')
 
         separate_run = lxml.etree.Element(f'{{{ns_uri}}}r')
-        _append_rpr(separate_run, source_rpr)
+        _append_regular_reference_rpr(separate_run, source_rpr)
         lxml.etree.SubElement(
             separate_run, f'{{{ns_uri}}}fldChar',
             {f'{{{ns_uri}}}fldCharType': 'separate'},
         )
 
-        result_run = _text_run(visible, source_rpr)
+        result_run = lxml.etree.Element(f'{{{ns_uri}}}r')
+        _append_regular_reference_rpr(result_run, source_rpr)
+        result_text = lxml.etree.SubElement(result_run, f'{{{ns_uri}}}t')
+        result_text.text = visible
+        if visible.startswith(' ') or visible.endswith(' '):
+            result_text.set(xml_space, 'preserve')
 
         end_run = lxml.etree.Element(f'{{{ns_uri}}}r')
-        _append_rpr(end_run, source_rpr)
+        _append_regular_reference_rpr(end_run, source_rpr)
         lxml.etree.SubElement(
             end_run, f'{{{ns_uri}}}fldChar',
             {f'{{{ns_uri}}}fldCharType': 'end'},
@@ -2033,6 +2455,8 @@ def format_document_xmls(unpacked_dir):
         tree = lxml.etree.parse(styles_path, parser)
         root = tree.getroot()
         ensure_front_matter_heading_style(root)
+        ensure_caption_style(root)
+        ensure_code_block_style(root)
         ensure_appendix_heading_style(root)
         ensure_toc9_style(root)
         # ensure_hyperlink_style(root)
@@ -2256,6 +2680,7 @@ def format_document_xmls(unpacked_dir):
 
             # Label and prefix, e.g. "Gambar 2."
             r1 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            set_run_typography(r1, bold=True)
             t1 = lxml.etree.Element(f'{{{ns_uri}}}t')
             t1.text = f"{label} {prefix}"
             if t1.text.startswith(' ') or t1.text.endswith(' '):
@@ -2265,12 +2690,14 @@ def format_document_xmls(unpacked_dir):
             
             # fldChar begin
             r2 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            set_run_typography(r2, bold=True)
             fld2 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "begin"})
             r2.append(fld2)
             p.append(r2)
             
             # instrText
             r3 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            set_run_typography(r3, bold=True)
             ins3 = lxml.etree.Element(f'{{{ns_uri}}}instrText')
             if default_val == 1:
                 ins3.text = f" SEQ {seq_name} \\r 1 \\* ARABIC "
@@ -2282,12 +2709,14 @@ def format_document_xmls(unpacked_dir):
             
             # fldChar separate
             r4 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            set_run_typography(r4, bold=True)
             fld4 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "separate"})
             r4.append(fld4)
             p.append(r4)
             
             # default value run
             r5 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            set_run_typography(r5, bold=True)
             t5 = lxml.etree.Element(f'{{{ns_uri}}}t')
             t5.text = str(default_val)
             r5.append(t5)
@@ -2295,12 +2724,14 @@ def format_document_xmls(unpacked_dir):
             
             # fldChar end
             r6 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            set_run_typography(r6, bold=True)
             fld6 = lxml.etree.Element(f'{{{ns_uri}}}fldChar', **{f'{{{ns_uri}}}fldCharType': "end"})
             r6.append(fld6)
             p.append(r6)
             
             # description run
             r7 = lxml.etree.Element(f'{{{ns_uri}}}r')
+            set_run_typography(r7)
             t7 = lxml.etree.Element(f'{{{ns_uri}}}t')
             t7.text = f" {desc}"
             t7.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
@@ -2312,22 +2743,23 @@ def format_document_xmls(unpacked_dir):
             
             return p
 
-        # Find cover page end index (last paragraph before the SECOND drawing, which is Lembar Pengesahan)
+        # The cover ends immediately before the first explicit front-matter
+        # page break. Do not infer this boundary from a second drawing: the
+        # report no longer embeds a scanned approval/validation page.
         collected_captions = []
         estimated_page = 1
         para_count = 0
-        cover_end_idx = 0
-        drawing_count = 0
+        cover_end_idx = max(0, bab1_idx_orig - 1)
         for idx, child in enumerate(children):
-            if idx < bab1_idx_orig and child.tag.endswith('p'):
-                if child.find('.//w:drawing', namespaces) is not None:
-                    drawing_count += 1
-                    if drawing_count == 2:
-                        break
-                cover_end_idx = idx
+            if idx >= bab1_idx_orig:
+                break
+            if not child.tag.endswith('p'):
+                continue
+            p_pr = child.find('w:pPr', namespaces)
+            if p_pr is not None and p_pr.find('w:pageBreakBefore', namespaces) is not None:
+                cover_end_idx = max(0, idx - 1)
+                break
 
-        lembar_pengesahan_processed = False
-        need_page_break_after_lp = False
         for idx, child in enumerate(children):
             para_count += 1
             if para_count > 25:
@@ -2348,53 +2780,30 @@ def format_document_xmls(unpacked_dir):
                             sort_element_children(pPr, PPR_ORDER)
                     reconstructed_children.append(child)
                 else:
-                    # Transition zone: skip empty paragraphs to prevent blank pages
+                    # Front matter is authored explicitly. Keep content, field
+                    # containers, drawings, and deliberate page breaks; remove
+                    # only truly redundant empty paragraphs.
                     if child.tag.endswith('p'):
                         text = "".join(child.itertext()).strip()
                         has_drawing = child.find('.//w:drawing', namespaces) is not None
                         has_sectPr = child.find('.//w:sectPr', namespaces) is not None
                         has_fldChar = child.find('.//w:fldChar', namespaces) is not None
                         has_instr = child.find('.//w:instrText', namespaces) is not None
-                        if text or has_drawing or has_sectPr or has_fldChar or has_instr:
-                            if has_drawing and not lembar_pengesahan_processed:
-                                scale_lembar_pengesahan(child, namespaces, unpacked_dir, rel_map)
-                                pPr = child.find('w:pPr', namespaces)
-                                if pPr is None:
-                                    pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-                                    child.insert(0, pPr)
-                                set_child_element(pPr, 'pageBreakBefore', {})
-                                sort_element_children(pPr, PPR_ORDER)
-                                lembar_pengesahan_processed = True
-                                need_page_break_after_lp = True
-                                print(f"  Applied page break, margin scaling, and centering to Lembar Pengesahan at index {idx}")
-                            elif lembar_pengesahan_processed and need_page_break_after_lp:
-                                pPr = child.find('w:pPr', namespaces)
-                                if pPr is None:
-                                    pPr = lxml.etree.Element(f'{{{ns_uri}}}pPr')
-                                    child.insert(0, pPr)
-                                set_child_element(pPr, 'pageBreakBefore', {})
-                                sort_element_children(pPr, PPR_ORDER)
-                                need_page_break_after_lp = False
-                                print(f"  Applied page break after Lembar Pengesahan to paragraph at index {idx}")
+                        # A tab-only paragraph can be intentional form content.
+                        # In particular, the approval-page title lines consist of
+                        # a tab whose paragraph-level stop uses a dotted leader.
+                        has_tab = child.find('.//w:tab', namespaces) is not None
+                        pPr = child.find('w:pPr', namespaces)
+                        has_page_break = (
+                            pPr is not None
+                            and pPr.find('w:pageBreakBefore', namespaces) is not None
+                        ) or child.find('.//w:br[@w:type="page"]', namespaces) is not None
+                        if (text or has_drawing or has_sectPr or has_fldChar
+                                or has_instr or has_tab or has_page_break):
                             reconstructed_children.append(child)
                         else:
                             print(f"  Removing redundant empty paragraph in front-matter transition at index {idx}")
                     else:
-                        if (child.tag.endswith('sdt') and lembar_pengesahan_processed
-                                and need_page_break_after_lp):
-                            # Word regenerates TOC SDT paragraphs during COM
-                            # field update and may discard pageBreakBefore from
-                            # the heading itself. A standalone break before the
-                            # SDT prevents "DAFTAR ISI" leaking onto the approval
-                            # page and survives that regeneration.
-                            reconstructed_children.append(
-                                make_explicit_page_break_paragraph(namespaces)
-                            )
-                            need_page_break_after_lp = False
-                            print(
-                                "  Inserted durable page break before Daftar Isi "
-                                f"SDT at index {idx}"
-                            )
                         reconstructed_children.append(child)
                 continue
                 
@@ -2484,6 +2893,7 @@ def format_document_xmls(unpacked_dir):
         section1_last_p_idx = bab1_idx - 1
         
         daftar_pustaka_heading_idx = -1
+        bibliography_body_entries = {}
         for idx, child in enumerate(children):
             if child.tag.endswith('p'):
                 text = "".join([t.text for t in child.iter(f'{{{ns_uri}}}t') if t.text])
@@ -2493,6 +2903,52 @@ def format_document_xmls(unpacked_dir):
                     if pStyle is not None and pStyle.get(f'{{{ns_uri}}}val') == 'Heading1':
                         daftar_pustaka_heading_idx = idx
                         break
+
+        if daftar_pustaka_heading_idx != -1:
+            bibliography_end_idx = len(children)
+            for idx in range(daftar_pustaka_heading_idx + 1, len(children)):
+                child = children[idx]
+                if not child.tag.endswith('p'):
+                    continue
+                text = _paragraph_text(child, namespaces).strip()
+                style = _paragraph_style(child, namespaces) or 'Normal'
+                if style in ('Heading1', 'taappendixheading') and text.upper().startswith('LAMPIRAN'):
+                    bibliography_end_idx = idx
+                    break
+
+            try:
+                try:
+                    from merge_draft_to_docx import parse_bibliography_entries
+                except ImportError:
+                    _here = os.path.dirname(os.path.abspath(__file__))
+                    if _here not in sys.path:
+                        sys.path.insert(0, _here)
+                    from merge_draft_to_docx import parse_bibliography_entries
+                parsed_bibliography = list(
+                    parse_bibliography_entries(active_draft_path())
+                )
+                candidate_indices = [
+                    idx
+                    for idx in range(
+                        daftar_pustaka_heading_idx + 1,
+                        bibliography_end_idx,
+                    )
+                    if children[idx].tag.endswith('p')
+                    and _paragraph_text(children[idx], namespaces).strip()
+                ]
+                if len(candidate_indices) == len(parsed_bibliography):
+                    bibliography_body_entries = dict(
+                        zip(candidate_indices, parsed_bibliography)
+                    )
+                else:
+                    print(
+                        '  [WARNING] Bibliography body paragraph count '
+                        f'({len(candidate_indices)}) differs from draft entries '
+                        f'({len(parsed_bibliography)}); canonical body formatting '
+                        'was not applied.'
+                    )
+            except Exception as exc:
+                print(f'  [WARNING] Could not prepare bibliography body: {exc}')
                         
         # ---- Fase 1 (R1, R2, R3.1, R3.3): chapter-aware caption pass tunggal ----
         # Telusuri body dalam urutan baca SEKALI: lacak Nomor_Bab dari heading BAB
@@ -2641,6 +3097,12 @@ def format_document_xmls(unpacked_dir):
             if child.tag.endswith('p'):
                 p = child
                 if is_inside_table(p): continue
+
+                bibliography_entry = bibliography_body_entries.get(idx)
+                if bibliography_entry is not None:
+                    format_bibliography_paragraph(p, bibliography_entry)
+                    continue
+
                 pPr = p.find('w:pPr', namespaces)
                 pStyle_val = "Normal"
                 if pPr is not None:
@@ -2770,18 +3232,31 @@ def format_document_xmls(unpacked_dir):
                 
 
         if chapter_paragraphs:
-            page_number_reference_ids = ensure_page_number_parts(unpacked_dir)
+            identity_footer = None
+            front_matter_path = os.environ.get('TA_FRONT_MATTER_PATH')
+            if front_matter_path and os.path.isfile(front_matter_path):
+                with open(front_matter_path, 'r', encoding='utf-8') as stream:
+                    identity_footer = json.load(stream).get('identity_footer')
+            page_number_reference_ids = ensure_page_number_parts(
+                unpacked_dir,
+                identity_footer=identity_footer,
+            )
             section_count = configure_report_sections(
                 body,
                 namespaces,
                 original_sectPr,
                 page_number_reference_ids,
                 chapter_paragraphs,
+                split_appendix=bool(identity_footer),
             )
             print(
                 "Configured %d report section(s): Roman front matter at bottom-right; "
                 "BAB first pages at bottom-center; continuation pages at top-right; "
-                "Arabic numbering restarts at 1 on BAB I." % section_count
+                "Arabic numbering restarts at 1 on BAB I%s." % (
+                    section_count,
+                    "; UPNVJ identity footer ends before Lampiran"
+                    if identity_footer else "",
+                )
             )
         else:
             # Partial DOCX fixtures and reusable fragments may contain tables or
@@ -2997,6 +3472,25 @@ def fix_all_fonts_lxml(directory):
     parser = lxml.etree.XMLParser(remove_blank_text=False)
     
     print(f"Normalizing fonts in {directory} recursively...")
+
+    def is_code_context(element):
+        current = element
+        while current is not None:
+            local_name = current.tag.split('}')[-1]
+            if local_name == 'style':
+                style_id = current.get(f'{{{W_NS}}}styleId', '')
+                if style_id == 'CodeBlock':
+                    return True
+            if local_name == 'p':
+                p_style = current.find(
+                    f'{{{W_NS}}}pPr/{{{W_NS}}}pStyle'
+                )
+                if (p_style is not None and
+                        p_style.get(f'{{{W_NS}}}val') == 'CodeBlock'):
+                    return True
+            current = current.getparent()
+        return False
+
     for root_dir, dirs, files in os.walk(directory):
         for file in files:
             if not (file.endswith('.xml') or file.endswith('.rels')): continue
@@ -3011,11 +3505,14 @@ def fix_all_fonts_lxml(directory):
             for elem in root.iter():
                 tag_local = elem.tag.split('}')[-1]
                 if tag_local == 'rFonts':
+                    code_context = is_code_context(elem)
                     for attr in ['ascii', 'hAnsi', 'eastAsia', 'cs']:
                         full_attr = f'{{{W_NS}}}{attr}'
                         val = elem.get(full_attr)
-                        if val and val not in ['Symbol', 'Wingdings', 'Courier New', 'Times New Roman']:
-                            elem.set(full_attr, 'Times New Roman')
+                        target_font = 'Courier New' if code_context else 'Times New Roman'
+                        allowed = ['Symbol', 'Wingdings', target_font]
+                        if val and val not in allowed:
+                            elem.set(full_attr, target_font)
                             modified = True
                     theme_attrs = ['asciiTheme', 'hAnsiTheme', 'eastAsiaTheme', 'cstheme']
                     has_theme = False
@@ -3029,17 +3526,20 @@ def fix_all_fonts_lxml(directory):
                         for attr in ['ascii', 'hAnsi', 'eastAsia', 'cs']:
                             full_attr = f'{{{W_NS}}}{attr}'
                             val = elem.get(full_attr)
-                            if not val or val not in ['Symbol', 'Wingdings', 'Courier New']:
-                                elem.set(full_attr, 'Times New Roman')
+                            if not val or val not in ['Symbol', 'Wingdings']:
+                                elem.set(
+                                    full_attr,
+                                    'Courier New' if code_context else 'Times New Roman'
+                                )
                                 modified = True
                 elif tag_local in ['latin', 'ea', 'cs'] and elem.tag.startswith(f'{{{A_NS}}}'):
                     val = elem.get('typeface')
-                    if val and val not in ['Symbol', 'Wingdings', 'Courier New', 'Times New Roman']:
+                    if val and val not in ['Symbol', 'Wingdings', 'Times New Roman']:
                         elem.set('typeface', 'Times New Roman')
                         modified = True
                 elif 'typeface' in elem.attrib:
                     val = elem.attrib['typeface']
-                    if val and val not in ['Symbol', 'Wingdings', 'Courier New', 'Times New Roman']:
+                    if val and val not in ['Symbol', 'Wingdings', 'Times New Roman']:
                         elem.attrib['typeface'] = 'Times New Roman'
                         modified = True
                         

@@ -82,12 +82,10 @@ To automate the formatting of your `.docx` document:
    - Penomoran lampiran wajib menggunakan format angka Arab kapital dengan titik: **LAMPIRAN 1.**, **LAMPIRAN 2.**, dst.
    - Setiap lampiran wajib diawali pada halaman baru terpisah (Page Isolation/Page Split menggunakan `---` di Markdown) untuk meminimalkan kegagalan pemformatan dokumen.
    - Daftar lampiran wajib tercantum pada bagian awal dokumen setelah Daftar Tabel.
-   - Daftar lampiran harus terisolasi terpisah dari Daftar Isi, di mana lampiran individu (LAMPIRAN 1-4) dilarang muncul di Daftar Isi dengan menerapkan gaya paragraf kustom tanpa outline level.
+   - Daftar lampiran harus terisolasi terpisah dari Daftar Isi, sedangkan seluruh heading lampiran dilarang muncul di Daftar Isi dengan menerapkan gaya paragraf kustom tanpa outline level.
    - Lampiran wajib menyertakan bukti yang benar-benar tersedia. Judul minimal dapat berupa:
-     * LAMPIRAN 1. Surat Pernyataan Keaslian
-     * LAMPIRAN 2. Bukti mitra yang tersedia dan terverifikasi, misalnya dokumentasi penyerahan pakta integritas
-     * LAMPIRAN 3. Kode Sumber Utama (Source Code) sesuai ownership penulis
-     * LAMPIRAN 4. Panduan Pengguna (User Manual)
+     * Pernyataan keaslian dan pelimpahan hak cipta ditempatkan pada bagian awal, bukan sebagai lampiran.
+     * Penomoran lampiran dimulai dari bukti mitra yang tersedia dan terverifikasi, dilanjutkan kode sumber, panduan pengguna, instrumen pengujian, matriks artefak, dan dokumen administratif sesuai kebutuhan laporan.
    - Jangan membuat surat, nomor, tanggal, identitas penandatangan, status persetujuan, atau scan pengganti apabila artefak formalnya tidak tersedia.
 
 10. **Fact Verification & Registry Audit**:
@@ -132,7 +130,7 @@ The writing process uses the following files in the workspace parent directory (
 - **Muhammad Iman Nugraha** (NIM 2210511129)
   - **Role**: *Peran 1: Full Stack Web Developer, System Integrator, dan DevOps Engineer*
   - **Focus Areas**: React Frontend, Vercel Serverless API, Supabase Auth/CRUD integration, native React–Unity bridge, Vercel deployment, header/cache, health monitoring, analitik Supabase aktif, jalur Express/Umami opsional, dan pengujian web.
-- **Muammar Faiz Khairul Anam**
+- **Muammar Faiz Khairul Anam Setiawan**
   - **Role**: *Peran 2: 3D Simulator & Engine Developer*
   - **Focus Areas**: Unity WebGL Engine, NavMesh pathfinding, Catmull-Rom Centripetal curve, Building Culling, Pointer Lock, Virtual mobile joystick, Editor tools (WebGL Settings Optimizer, Database Sync Checker).
 - **Muhammad Dwikhi Deandra Purnianto**

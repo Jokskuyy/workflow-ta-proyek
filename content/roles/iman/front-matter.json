@@ -1,0 +1,174 @@
+{
+  "cover": {
+    "title": "Pengembangan Dashboard Web, Integrasi Unity WebGL, dan Deployment Sistem Denah Virtual UPNVJ Kampus Pondok Labu",
+    "author": "Muhammad Iman Nugraha",
+    "nim": "2210511129",
+    "year": "2026"
+  },
+  "report_title_page": {
+    "heading": "LAPORAN PROYEK",
+    "title": "Pengembangan Dashboard Web, Integrasi Unity WebGL, dan Deployment Sistem Denah Virtual UPNVJ Kampus Pondok Labu",
+    "author": "MUHAMMAD IMAN NUGRAHA",
+    "nim": "2210511129",
+    "program_study": "S1 INFORMATIKA",
+    "faculty": "FAKULTAS ILMU KOMPUTER",
+    "university": "UNIVERSITAS PEMBANGUNAN NASIONAL “VETERAN” JAKARTA",
+    "city": "JAKARTA",
+    "year": "2026"
+  },
+  "approval_page": {
+    "heading": "LEMBAR PENGESAHAN",
+    "scan": {
+      "image": "content/roles/iman/front-matter-assets/lembar-pengesahan-signed.jpeg",
+      "width_cm": 14.0,
+      "alt_text": "Lembar Pengesahan Muhammad Iman Nugraha yang telah ditandatangani",
+      "embedded_page_number": "iii"
+    },
+    "identity": {
+      "Judul": "Pengembangan Dashboard Web, Integrasi Unity WebGL, dan Deployment Sistem Denah Virtual UPNVJ Kampus Pondok Labu",
+      "Nama": "Muhammad Iman Nugraha",
+      "NIM": "2210511129",
+      "Program Studi": "S1 Informatika"
+    },
+    "approved_by": [
+      {
+        "role": "Penguji 1",
+        "name": "Dr. Widya Cholil, M.I.T"
+      },
+      {
+        "role": "Penguji 2",
+        "name": "Kharisma Wiati Gusti, M.T."
+      },
+      {
+        "role": "Pembimbing 1",
+        "name": "Dr. Ridwan Raafi’udin, S.Kom, M.Kom."
+      },
+      {
+        "role": "Pembimbing 2",
+        "name": "Novi Trisman Hadi, S.Pd., M.Kom."
+      }
+    ],
+    "known_by": [
+      {
+        "role": "Koordinator Program Studi",
+        "name": "Dr. Ridwan Raafi’udin, S.Kom, M.Kom.",
+        "employee_id": "NIP. 198805022021211001"
+      },
+      {
+        "role": "Dekan Fakultas Ilmu Komputer",
+        "name": "Prof. Dr. Ir. Supriyanto, M.Sc., IPM.",
+        "employee_id": "NIP. 197605082003121002"
+      }
+    ],
+    "signature_line": "_________________",
+    "exam_date_label": "Tanggal Ujian Tugas Akhir",
+    "exam_date": "24 Juli 2026"
+  },
+  "authenticity_statement": {
+    "heading": "SURAT PERNYATAAN KEASLIAN",
+    "scan": {
+      "image": "content/roles/iman/front-matter-assets/surat-pernyataan-keaslian-signed.jpeg",
+      "width_cm": 14.0,
+      "alt_text": "Surat Pernyataan Keaslian Muhammad Iman Nugraha yang telah ditandatangani dan bermeterai",
+      "embedded_page_number": "iv"
+    },
+    "intro": "Yang bertanda tangan di bawah ini:",
+    "identity": {
+      "Nama": "Muhammad Iman Nugraha",
+      "NIM": "2210511129",
+      "Program Studi": "S-1 Informatika",
+      "Judul Proyek": "Pengembangan Dashboard Web, Integrasi Unity WebGL, dan Deployment Sistem Denah Virtual UPNVJ Kampus Pondok Labu"
+    },
+    "paragraphs": [
+      "Menyatakan bahwa laporan tugas akhir proyek ini disusun oleh penulis berdasarkan hasil pekerjaan, pemikiran, dan pengembangan dalam lingkup kontribusi penulis sebagaimana dijelaskan di dalam laporan. Bagian yang merupakan hasil kolaborasi tim, kutipan, data, gambar, atau informasi dari pihak lain telah dinyatakan dan dirujuk dengan benar.",
+      "Demikian surat pernyataan ini dibuat dengan sebenar-benarnya. Apabila kemudian ditemukan penyimpangan atau ketidaksesuaian dalam pernyataan ini, penulis bersedia menerima konsekuensi dan diproses sesuai dengan aturan serta ketentuan yang berlaku."
+    ],
+    "date": "Jakarta, 24 Juli 2026",
+    "declarant_label": "Yang menyatakan,",
+    "signature_space_lines": 3,
+    "author": "Muhammad Iman Nugraha",
+    "requires_physical_stamp": true
+  },
+  "publication_permission": {
+    "heading": "PERNYATAAN PERSETUJUAN PUBLIKASI TUGAS AKHIR UNTUK KEPENTINGAN AKADEMIK",
+    "scan": {
+      "image": "content/roles/iman/front-matter-assets/pernyataan-persetujuan-publikasi-signed.jpeg",
+      "width_cm": 14.0,
+      "alt_text": "Pernyataan Persetujuan Publikasi Tugas Akhir Muhammad Iman Nugraha yang telah ditandatangani",
+      "embedded_page_number": "v"
+    },
+    "intro": "Sebagai civitas akademik Universitas Pembangunan Nasional Veteran Jakarta, saya yang bertanda tangan di bawah ini:",
+    "blank_identity_labels": [
+      "Nama",
+      "NIM",
+      "Program Studi",
+      "Fakultas"
+    ],
+    "paragraphs": [
+      "Demi pengembangan ilmu pengetahuan, menyetujui untuk memberikan kepada Universitas Pembangunan Nasional Veteran Jakarta Hak Bebas Royalti Non-eksklusif (Non-exclusive Royalty Free Right) atas tugas akhir yang berjudul:",
+      "Dengan Hak Bebas Royalti ini, Universitas Pembangunan Nasional Veteran Jakarta berhak menyimpan, mengalih media/memformatkan, mengelola dalam bentuk pangkalan data (basis data), merawat dan mempublikasikan tugas akhir saya selama tetap mencantumkan nama saya sebagai penulis dan sebagai pemilik Hak Cipta. Demikian pernyataan ini saya buat dengan sebenarnya."
+    ],
+    "title_blank_lines": 3,
+    "date": "Jakarta, 24 Juli 2026",
+    "signature_space_lines": 3,
+    "author": "Muhammad Iman Nugraha",
+    "nim": "2210511129"
+  },
+  "abstract_id": {
+    "heading": "ABSTRAK",
+    "body": "Kebutuhan informasi lokasi yang mudah diakses di lingkungan Universitas Pembangunan Nasional “Veteran” Jakarta Kampus Pondok Labu mendorong pengembangan sistem yang menghubungkan pencarian berbasis web, data kampus, Denah 2D, dan visualisasi Unity WebGL. Penelitian ini bertujuan mengembangkan dashboard web, layanan data, integrasi React–Unity, serta konfigurasi deployment sebagai bagian dari sistem denah virtual kampus. Pengembangan dilakukan menggunakan metode prototyping. Dashboard Publik dan Panel Admin dibangun dengan React dan Vite, sedangkan autentikasi serta operasi pengelolaan data memanfaatkan Supabase Auth dan Supabase SDK. Vercel Serverless Functions menyediakan API khusus pembacaan data untuk Unity dan alat bantu editor. Integrasi dengan Unity WebGL mencakup pengiriman tujuan navigasi dari React dan penerimaan notifikasi ketika pengguna tiba di lokasi yang dipilih. Deployment sistem dilakukan melalui Vercel dengan pengaturan variabel lingkungan, cache aset, endpoint status layanan, dan pencatatan analitik. Hasil pengujian menunjukkan 129 pengujian otomatis pada 13 file berhasil, sedangkan empat pemeriksaan manual API berjalan sesuai hasil yang diharapkan. Setelah perbaikan dan pengujian ulang, seluruh 24 skenario Black Box dinyatakan lulus. UAT tertutup yang melibatkan lima peserta menghasilkan nilai gabungan 81,50 persen. Audit Lighthouse menghasilkan skor Kinerja 86 pada simulasi smartphone dan 99 pada komputer desktop, sedangkan Aksesibilitas, Praktik Terbaik, dan SEO memperoleh skor 100 pada kedua mode. Hasil tersebut menunjukkan bahwa antarmuka web, layanan data, Denah 2D, Unity WebGL, dan proses deployment telah terintegrasi untuk mendukung penyampaian informasi serta navigasi kampus.",
+    "keywords_label": "Kata kunci:",
+    "keywords": [
+      "denah virtual",
+      "React",
+      "Unity WebGL",
+      "Supabase",
+      "integrasi sistem"
+    ]
+  },
+  "abstract_en": {
+    "heading": "ABSTRACT",
+    "body": "The need for accessible location information at the Universitas Pembangunan Nasional “Veteran” Jakarta Pondok Labu Campus motivated the development of a system that connects web-based search, campus data, a 2D map, and Unity WebGL visualization. This study aims to develop a web dashboard, data services, React–Unity integration, and deployment configuration as parts of a virtual campus map system. The system was developed using the prototyping method. The Public Dashboard and Admin Panel were built with React and Vite, while authentication and data management operations use Supabase Auth and the Supabase SDK. Read-only endpoints were provided through Vercel Serverless Functions to supply data for Unity and editor tools. The Unity WebGL integration supports sending navigation destinations from React and receiving a notification when the user reaches the selected location. The system was deployed on Vercel with environment variable configuration, asset caching, service health checks, and analytics logging. Verification results show that 129 automated tests across 13 files passed, while four manual API checks produced the expected results. Following improvement and retesting, all 24 Black Box scenarios passed. A closed UAT involving five participants achieved a combined score of 81.50 percent. The Lighthouse audit produced a Performance score of 86 on mobile and 99 on desktop, while Accessibility, Best Practices, and SEO each scored 100 in both modes. These results demonstrate that the web interface, data services, 2D map, Unity WebGL, and deployment process have been integrated to support campus information delivery and navigation.",
+    "keywords_label": "Keywords:",
+    "keywords": [
+      "virtual campus map",
+      "React",
+      "Unity WebGL",
+      "Supabase",
+      "system integration"
+    ]
+  },
+  "preface": {
+    "heading": "KATA PENGANTAR",
+    "opening": [
+      "Puji dan syukur penulis panjatkan kepada Tuhan Yang Maha Esa atas rahmat dan karunia-Nya sehingga skripsi yang berjudul “Pengembangan Dashboard Web, Integrasi Unity WebGL, dan Deployment Sistem Denah Virtual UPNVJ Kampus Pondok Labu” dapat diselesaikan. Skripsi ini disusun sebagai salah satu syarat untuk menyelesaikan pendidikan pada Program Studi Informatika, Fakultas Ilmu Komputer, Universitas Pembangunan Nasional “Veteran” Jakarta.",
+      "Penyelesaian proyek dan penyusunan skripsi ini tidak terlepas dari dukungan, arahan, serta bantuan berbagai pihak. Oleh karena itu, penulis menyampaikan terima kasih kepada:"
+    ],
+    "acknowledgements": [
+      "Mamah dan Bapak atas kasih sayang, doa, dukungan, serta pengorbanan yang senantiasa menguatkan penulis selama menjalani perkuliahan hingga menyelesaikan tugas akhir.",
+      "Ibu Erly Krisnanik, S.Kom., M.M. atas kepercayaan yang diberikan, kesabaran dalam mendampingi, serta dorongan yang membantu penulis melewati berbagai tahapan penyusunan tugas akhir.",
+      "Dr. Ridwan Raafi’udin, S.Kom., M.Kom. dan Novi Trisman Hadi, S.Pd., M.Kom. selaku dosen pembimbing yang telah memberikan arahan, masukan, dan evaluasi untuk penyempurnaan proyek serta penulisan skripsi.",
+      "Mochamad Fariz Satyawan, S.Kom., selaku Staf Program Studi yang telah membantu dan memfasilitasi kelancaran proses hingga pelaksanaan sidang.",
+      "Muhammad Dwikhi Deandra Purnianto dan Muammar Faiz Khairul Anam Setiawan selaku teman satu kelompok yang telah berjuang bersama menghadapi berbagai rintangan dan dinamika proyek, serta tetap saling mendukung dan bersabar hingga seluruh proses dapat diselesaikan.",
+      "Teman-teman Discord NYPD dan Dimari Aje Cuyy, terutama mtgim, Semua Baik, whychucksaysnah, dan marqui de natra666, yang telah menemani melalui percakapan suara serta berbagi informasi praktis mengenai format penulisan dan proses akademik.",
+      "Seluruh pihak yang tidak dapat disebutkan satu per satu, yang telah memberikan bantuan, dukungan, doa, serta kontribusi dalam proses pengembangan proyek dan penyusunan skripsi ini.",
+      "Terakhir, kepada diri sendiri yang telah memilih untuk terus bertahan, belajar, dan menyelesaikan setiap proses yang dihadapi. Terima kasih telah tetap berusaha di tengah berbagai keterbatasan, perubahan, dan tantangan selama perjalanan perkuliahan hingga tugas akhir ini dapat diselesaikan. Semoga seluruh pengalaman yang telah dilalui menjadi bekal untuk menghadapi perjalanan berikutnya dengan lebih baik."
+    ],
+    "closing": [
+      "Penulis menyadari bahwa penulisan skripsi ini masih memiliki kekurangan. Oleh karena itu, penulis terbuka terhadap kritik dan saran yang membangun untuk penyempurnaan penelitian pada masa mendatang. Penulis berharap skripsi ini dapat memberikan manfaat bagi pembaca, pengembang selanjutnya, serta Fakultas Ilmu Komputer Universitas Pembangunan Nasional “Veteran” Jakarta dalam mendukung penyediaan layanan informasi dan navigasi kampus yang lebih mudah diakses, terintegrasi, dan berkelanjutan."
+    ],
+    "date": "Jakarta, 24 Juli 2026",
+    "author": "Muhammad Iman Nugraha",
+    "nim": "2210511129"
+  },
+  "identity_footer": {
+    "author_year": "Muhammad Iman Nugraha, 2026",
+    "title": "PENGEMBANGAN DASHBOARD WEB, INTEGRASI UNITY WEBGL, DAN DEPLOYMENT SISTEM DENAH VIRTUAL UPNVJ KAMPUS PONDOK LABU",
+    "institution": "UPN Veteran Jakarta, Fakultas Ilmu Komputer, S1 Informatika",
+    "links": "[www.upnvj.ac.id-www.library.upnvj.ac.id-www.repository.upnvj.ac.id]",
+    "font": "Times New Roman",
+    "size_pt": 8,
+    "start": "BAB I",
+    "end": "DAFTAR PUSTAKA"
+  }
+}

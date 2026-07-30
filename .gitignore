@@ -7,5 +7,8 @@ scratch/*
 !scratch/test_tdd_formatting.py
 ~$*
 *.tmp
+.pytest_cache/
+.hypothesis/
+/tmp/
 Tugas_Akhir_Formatted_New.docx
 Tugas_Akhir_Formatted.docx

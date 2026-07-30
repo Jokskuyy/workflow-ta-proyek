@@ -301,7 +301,7 @@ def test_c2_natural_zero_match_entries_are_detected(base_entries, tmp_path):
     ``test_c2_synthetic_zero_match_is_detected`` (``diagram_tahap_pengembangan``)."""
     entries = dict(base_entries)
     doc = parse_doc(entries)
-    target = "Diagram Arsitektur Sistem"  # manifest entry: diagram_arsitektur
+    target = "Arsitektur Integrasi Dashboard Web, Supabase, dan Unity WebGL"
     assert caption_match_count(doc, target) == 1, (
         "precondition: entry diagram_arsitektur must resolve to exactly 1 caption "
         "in the captured baseline document"
@@ -334,7 +334,7 @@ def test_c2_synthetic_zero_match_is_detected(base_entries, tmp_path):
     entry resolves to 0; the validator must reject the document."""
     entries = dict(base_entries)
     doc = parse_doc(entries)
-    target = "Tahap Pengembangan"  # manifest entry: diagram_tahap_pengembangan
+    target = "Tahapan Metode Prototyping pada Pengembangan Sistem"
     assert caption_match_count(doc, target) == 1
     _edit_caption_descriptor(doc, target, "Bagan Yang Sudah Tidak Cocok")
     assert caption_match_count(doc, target) == 0
@@ -350,10 +350,13 @@ def test_c2_synthetic_multi_match_is_detected(base_entries, tmp_path):
     caption_match so it resolves to 2; the validator must reject the document."""
     entries = dict(base_entries)
     doc = parse_doc(entries)
-    target = "Tahap Pengembangan"  # manifest entry: diagram_tahap_pengembangan
+    target = "Tahapan Metode Prototyping pada Pengembangan Sistem"
     assert caption_match_count(doc, target) == 1
     # Repurpose a different existing Gambar caption to also read as the target.
-    _edit_caption_descriptor(doc, "Diagram Arsitektur Sistem", target)
+    _edit_caption_descriptor(
+        doc, "Arsitektur Integrasi Dashboard Web, Supabase, dan Unity WebGL",
+        target,
+    )
     assert caption_match_count(doc, target) == 2
     entries[DOC] = serialize_doc(doc)
     out = tmp_path / "c2_multi.docx"

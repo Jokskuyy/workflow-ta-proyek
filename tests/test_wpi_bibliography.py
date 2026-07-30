@@ -166,7 +166,51 @@ def test_property3_bibliography_paragraph_style_invariant(spans_list):
         assert sp.get(W('after')) == '120'
         assert sp.get(W('line')) == '240'
         assert sp.get(W('lineRule')) == 'auto'
-        assert pPr.find(W('jc')).get(W('val')) == 'both'
+        assert pPr.find(W('jc')).get(W('val')) == 'left'
+
+        for run in p.findall(W('r')):
+            r_pr = run.find(W('rPr'))
+            assert r_pr is not None
+            fonts = r_pr.find(W('rFonts'))
+            assert fonts is not None
+            assert fonts.get(W('ascii')) == 'Times New Roman'
+            assert fonts.get(W('hAnsi')) == 'Times New Roman'
+            assert fonts.get(W('eastAsia')) == 'Times New Roman'
+            assert fonts.get(W('cs')) == 'Times New Roman'
+            assert r_pr.find(W('sz')).get(W('val')) == '24'
+            assert r_pr.find(W('szCs')).get(W('val')) == '24'
+
+
+def test_markdown_body_bibliography_rewrites_accidental_list_formatting():
+    entry = mrg.ReferenceEntry(
+        raw="UPNVJ. (2026). Halaman resmi.",
+        spans=(("UPNVJ. (2026). Halaman resmi.", False),),
+        authors=("UPNVJ.",),
+        year="2026",
+    )
+    paragraph = lxml.etree.Element(W('p'))
+    p_pr = lxml.etree.SubElement(paragraph, W('pPr'))
+    lxml.etree.SubElement(p_pr, W('pStyle'), {W('val'): 'ListParagraph'})
+    lxml.etree.SubElement(p_pr, W('numPr'))
+    lxml.etree.SubElement(
+        p_pr,
+        W('ind'),
+        {W('left'): '360', W('firstLine'): '567'},
+    )
+    run = lxml.etree.SubElement(paragraph, W('r'))
+    lxml.etree.SubElement(run, W('t')).text = "UPNVJ.(2026). Halaman resmi."
+
+    fmt.format_bibliography_paragraph(paragraph, entry)
+
+    p_pr = paragraph.find(W('pPr'))
+    assert p_pr.find(W('pStyle')).get(W('val')) == 'Normal'
+    assert p_pr.find(W('numPr')) is None
+    ind = p_pr.find(W('ind'))
+    assert ind.get(W('left')) == '567'
+    assert ind.get(W('hanging')) == '567'
+    assert ind.get(W('firstLine')) is None
+    assert p_pr.find(W('jc')).get(W('val')) == 'left'
+    assert ''.join(paragraph.itertext()) == "UPNVJ. (2026). Halaman resmi."
 
 
 # =========================================================================== #
@@ -232,15 +276,26 @@ def test_unit_snapshot_draft_entries_match_baseline_spans():
     assert result.section_found is True
 
     baseline = _baseline_entry_spans()
-    assert len(result) == len(baseline) == 13
+    assert len(result) == len(baseline) == 18
 
     for entry, base_spans in zip(result, baseline):
         # Text + italic-span structure must match the captured baseline.
         assert list(entry.spans) == base_spans
         # Journal articles carry one italic container span, while official
         # UPNVJ web pages do not use an italic container title.
-        expected_italic_spans = 0 if entry.raw.startswith("UPNVJ.") else 1
+        expected_italic_spans = (
+            0 if entry.raw.startswith(("UPNVJ.", "W3C.")) else 1
+        )
         assert sum(1 for _, ital in entry.spans if ital) == expected_italic_spans
+
+
+def test_current_bibliography_uses_only_sources_from_2022_or_newer():
+    result = mrg.parse_bibliography_entries(str(DRAFT))
+    years = [int(entry.year[:4]) for entry in result if entry.year]
+
+    assert len(result) == 18
+    assert len(years) == len(result)
+    assert min(years) >= 2022
 
 
 def test_unit_reference_key_surname_and_year():

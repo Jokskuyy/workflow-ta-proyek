@@ -73,7 +73,7 @@ Jangan melakukan sinkronisasi sebelum seluruh langkah berikut berhasil.
 | --- | --- | --- | --- |
 | Muhammad Iman Nugraha | `laporan/iman` | Full Stack Web Developer, System Integrator, dan DevOps Engineer | React Public Dashboard dan Admin Panel, REST API Vercel, integrasi Supabase Auth/CRUD, bridge sisi React, deployment, operasional web, serta pengujian web/API |
 | Muhammad Dwikhi Deandra Purnianto | `laporan/dwikhi` | 3D Asset Designer dan Database Schema Designer | ERD, skema dan relasi database, RLS, rancangan trigger audit, data/mapping, aset 3D, prefab, dan hierarchy `Pointer` |
-| Muammar Faiz Khairul Anam | `laporan/faiz` | 3D Simulator dan Engine Developer | Runtime Unity, `BuildingDatabase`, `NavigationReceiver`, navigasi, label tujuan, minimap, spawn, tooling editor, optimasi, completion event, dan build WebGL |
+| Muammar Faiz Khairul Anam Setiawan | `laporan/faiz` | 3D Simulator dan Engine Developer | Runtime Unity, `BuildingDatabase`, `NavigationReceiver`, navigasi, label tujuan, minimap, spawn, tooling editor, optimasi, completion event, dan build WebGL |
 
 Ketergantungan antarkomponen tidak memindahkan ownership. Contoh: Iman menyediakan `/api/unity/data`, tetapi Faiz memiliki consumer runtime Unity. Iman mendeploy artefak WebGL, tetapi Faiz memiliki source, optimasi, dan proses build Unity. Dwikhi merancang skema/RLS, sedangkan Iman mengintegrasikan Supabase SDK dari aplikasi web.
 

@@ -24,6 +24,7 @@ the scoped-PBT convention used by the companion bug-condition suite.
 
 Validates: Requirements 3.1, 3.2, 3.3, 3.4 (and Correctness Properties 5-8).
 """
+import os
 import re
 import subprocess
 import sys
@@ -39,7 +40,9 @@ from hypothesis import strategies as st
 # Paths / namespaces (kept consistent with the companion bug-condition suite)
 # --------------------------------------------------------------------------- #
 ROOT = Path(__file__).resolve().parents[1]
-CAPTURED_DOCX = ROOT / "Tugas_Akhir_Formatted.docx"
+CAPTURED_DOCX = Path(
+    os.environ.get("TA_DOCX_PATH", ROOT / "Tugas_Akhir_Formatted.docx")
+)
 VALIDATOR = ROOT / "skills" / "scripts" / "validate_docx_structure.py"
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -50,7 +53,7 @@ NS = {"w": W, "r": R, "a": A, "wp": WP}
 
 DOC = "word/document.xml"
 STYLES = "word/styles.xml"
-MAX_WIDTH_EMU = 5400000  # ~15 cm printable content width
+MAX_WIDTH_EMU = 5040000  # 14 cm printable content width
 
 
 # --------------------------------------------------------------------------- #
@@ -79,6 +82,11 @@ def para_style(p) -> str:
         return ""
     s = pPr.find("w:pStyle", NS)
     return s.get(f"{{{W}}}val") if s is not None else ""
+
+
+def effective_para_style(p) -> str:
+    """Treat Word's implicit paragraph style as the semantic Normal style."""
+    return para_style(p) or "Normal"
 
 
 def para_instr(p) -> str:
@@ -153,38 +161,53 @@ PRESERVE_PBT = settings(
 # --- Property 5: captions present that NO manifest entry targets ----------- #
 # (text, style, seq_instr, prev_style, prev_has_drawing, next_style, next_has_drawing)
 NON_MANIFEST_CAPTIONS = [
-    ("Tabel 1.1 Peran dan Tanggung Jawab", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "Heading2", False),
-    ("Tabel 1.2 Jadwal Kegiatan", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 3.1 Hubungan Mitra dengan Proyek", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "", False, "Heading2", False),
-    ("Tabel 3.2 Logbook Implementasi Proyek", "Caption", "SEQ Tabel \\* ARABIC", "", False, "Heading3", False),
-    ("Tabel 3.3 Hasil Pengujian Black Box Testing", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
-    ("Tabel 3.4 Perbandingan Metrik Performa Lighthouse", "Caption", "SEQ Tabel \\* ARABIC", "", False, "", False),
+    ("Tabel 1.1 Peran dan Tanggung Jawab", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "Normal", False, "Heading2", False),
+    ("Tabel 1.2 Jadwal Kegiatan", "Caption", "SEQ Tabel \\* ARABIC", "Normal", False, "Normal", False),
+    ("Tabel 3.1 Hubungan Pemangku Kepentingan dengan Proyek", "Caption", "SEQ Tabel \\r 1 \\* ARABIC", "Normal", False, "Heading2", False),
+    ("Tabel 3.4 Catatan Pelaksanaan Proyek", "Caption", "SEQ Tabel \\* ARABIC", "Normal", False, "Heading3", False),
+    ("Tabel 3.8 Hasil Pengujian Black Box", "Caption", "SEQ Tabel \\* ARABIC", "Normal", False, "Normal", False),
+    ("Tabel 3.9 Hasil Audit Lighthouse pada Smartphone dan Komputer Desktop", "Caption", "SEQ Tabel \\* ARABIC", "Normal", False, "Normal", False),
 ]
 
 # --- Property 6: every SEQ caption and its field --------------------------- #
 # Captions that legitimately carry the "\r 1" numbering-restart switch.
 RESTART_CAPTIONS = {
-    "Gambar 2.1 Hasil Kuesioner: Profil Status Akademik Responden",
-    "Gambar 3.1 Hierarki Prefab Gedung dengan Child Pointer di Unity",
+    "Gambar 2.1 Distribusi Status Akademik Responden",
+    "Gambar 3.1 Respons Endpoint Data untuk Unity pada Lingkungan Produksi",
+    "Gambar 4.1 Dokumentasi Penyerahan Pakta Integritas kepada UPA TIK",
     "Tabel 1.1 Peran dan Tanggung Jawab",
-    "Tabel 3.1 Hubungan Mitra dengan Proyek",
+    "Tabel 2.1 Analisis Sistem yang Berjalan dan Implikasi Kebutuhan",
+    "Tabel 3.1 Hubungan Pemangku Kepentingan dengan Proyek",
+    "Tabel 4.1 Pemetaan Cuplikan Kode terhadap Kontribusi Penulis",
 }
-EXPECTED_SEQ_GAMBAR_COUNT = 31
-EXPECTED_SEQ_TABEL_COUNT = 9
+EXPECTED_SEQ_GAMBAR_COUNT = 57
+EXPECTED_SEQ_TABEL_COUNT = 22
 
 # --- Property 7: scaled extents of every injected figure (noChangeAspect) -- #
 # Recorded (cx, cy) EMU extents; all within width and aspect-locked. Updated
 # when the invalid legacy diagrams were replaced by their canonical PlantUML
 # renders and survey assets were referenced from images/surveys/.
 FIGURE_EXTENTS = [
-    (3842685, 5760000), (3953357, 5760000), (3954550, 5759999), (4229083, 5760000),
-    (4231729, 5759999), (4333875, 3009900), (4599104, 5760000), (4609756, 5760000),
-    (4622006, 5760000), (4969589, 5760000), (5400000, 2298033), (5400000, 2334146),
-    (5400000, 2342074), (5400000, 2392239), (5400000, 2443764), (5400000, 2529799),
-    (5400000, 2580599), (5400000, 2729916), (5400000, 2755891), (5400000, 2766043),
-    (5400000, 3037499), (5400000, 3195305), (5400000, 3977713), (5400000, 4056750),
-    (5400000, 4072771), (5400000, 4194174), (5400000, 4248693), (5400000, 4477215),
-    (5400000, 4673280), (5400000, 5189678), (5400000, 5373996),
+    (5040000, 2178536), (5040000, 2361146), (5040000, 2408559),
+    (5040000, 2144831), (5040000, 2581640), (5040000, 2185936),
+    (5040000, 2547922), (5040000, 2835000), (5040000, 2903478),
+    (4585878, 5760000), (4143375, 5438775), (5040000, 3234823),
+    (3969614, 5760000), (5040000, 3677560), (5040000, 3796554),
+    (5040000, 4208768), (5040000, 2836981), (5040000, 2836981),
+    (5040000, 2836981), (5040000, 2836981), (5040000, 4077818),
+    (5040000, 3326707), (5040000, 3401609), (5040000, 4136746),
+    (5040000, 3624574), (5040000, 3622499), (5040000, 5108372),
+    (5040000, 3187800), (5040000, 2459551), (3381375, 962025),
+    (5040000, 3780000), (4550400, 5760000),
+    (4075347, 5760000), (4075347, 5760000), (4075347, 5760000),
+    (4075347, 5760000), (4075347, 5760000), (4075347, 5760000),
+    (4075347, 5760000), (4075347, 5760000), (4075347, 5760000),
+    (4075347, 5760000), (4075347, 5760000), (4075347, 5760000),
+    (4075347, 5760000), (4075347, 5760000), (4075347, 5760000),
+    (4075347, 5760000), (4075347, 5760000), (4075347, 5760000),
+    (4070879, 5760000), (4052490, 5760000), (4075347, 5760000),
+    (4069743, 5760000), (3801600, 5760000), (4069565, 5760000),
+    (4058331, 5760000),
 ]
 
 # --- Property 8: structural invariants ------------------------------------- #
@@ -210,9 +233,9 @@ def test_p5_all_non_manifest_captions_preserved():
         assert not has_drawing(p), f"{text!r} unexpectedly contains a drawing (should be untouched)"
         assert para_instr(p) == seq, f"{text!r} SEQ field changed: {para_instr(p)!r} != {seq!r}"
         # surrounding content untouched
-        assert para_style(paras[i - 1]) == prev_style, f"{text!r} preceding paragraph style changed"
+        assert effective_para_style(paras[i - 1]) == prev_style, f"{text!r} preceding paragraph style changed"
         assert has_drawing(paras[i - 1]) == prev_dr, f"{text!r} preceding paragraph drawing-state changed"
-        assert para_style(paras[i + 1]) == next_style, f"{text!r} following paragraph style changed"
+        assert effective_para_style(paras[i + 1]) == next_style, f"{text!r} following paragraph style changed"
         assert has_drawing(paras[i + 1]) == next_dr, f"{text!r} following paragraph drawing-state changed"
 
 
@@ -233,9 +256,9 @@ def test_p5_non_manifest_caption_preserved_pbt(case):
     assert para_style(paras[i]) == style
     assert not has_drawing(paras[i])
     assert para_instr(paras[i]) == seq
-    assert para_style(paras[i - 1]) == prev_style
+    assert effective_para_style(paras[i - 1]) == prev_style
     assert has_drawing(paras[i - 1]) == prev_dr
-    assert para_style(paras[i + 1]) == next_style
+    assert effective_para_style(paras[i + 1]) == next_style
     assert has_drawing(paras[i + 1]) == next_dr
 
 
@@ -296,6 +319,14 @@ def _injected_figure_extents(doc):
     """(cx, cy) extents of every aspect-locked injected figure (noChangeAspect=1)."""
     extents = []
     for p in drawing_paragraphs(doc):
+        drawing_name = p.find(".//wp:docPr", NS)
+        name = drawing_name.get("name") if drawing_name is not None else ""
+        if name.startswith((
+            "DECLARATION_SIGNATURE:",
+            "APPROVAL_SCAN:",
+            "FRONT_MATTER_SCAN:",
+        )):
+            continue
         wp, ae, nca = drawing_extent(p)
         if nca == "1":
             extents.append((wp, ae))
@@ -375,22 +406,7 @@ def test_p8_daftar_lampiran_toc_field_preserved():
 
 
 def test_p8_existing_structural_validation_still_passes():
-    """The canonical validator's STRUCTURAL checks (Sections A-J) remain preserved
-    on the captured artifact -- the structural baseline the fix must not regress.
-
-    Property 8 scope: Preservation only applies to inputs where the bug condition
-    does NOT hold. The captured artifact ``Tugas_Akhir_Formatted.docx`` LEGITIMATELY
-    holds bug condition C2 -- 7 ``survey_*`` post_com manifest entries resolve to
-    ZERO caption paragraphs (their captions are absent from the document). The fixed
-    validator now CORRECTLY rejects the captured doc for those content-level C2
-    errors, and the companion natural C2 exploration test
-    (``test_c2_natural_zero_match_entries_are_detected``) REQUIRES that rejection.
-
-    Therefore Property 8 must NOT assert overall validator exit 0 here. Instead it
-    asserts the STRUCTURAL Sections A-J are preserved: NO structural/Section A-J
-    error lines appear. C1-C4 findings are content-integrity checks against the
-    current manifest and may legitimately flag this intentionally stale artifact.
-    """
+    """The selected canonical output passes structural and content validation."""
     result = run_validator(CAPTURED_DOCX)
     combined = (result.stdout or "") + "\n" + (result.stderr or "")
 
@@ -409,20 +425,8 @@ def test_p8_existing_structural_validation_still_passes():
     error_lines = [
         ln.strip() for ln in combined.splitlines() if ln.strip().startswith("- ")
     ]
-    # C1-C4 belong to the separate content-integrity layer, not Sections A-J.
-    # Do not enumerate manifest IDs here: the captured DOCX is intentionally stale
-    # and the current manifest can gain valid figures without changing its structure.
-    structural_errors = [
-        ln for ln in error_lines
-        if not any(f"[C{number}]" in ln for number in range(1, 5))
-    ]
-    assert not structural_errors, (
-        "structural/Section A-J validation regressed -- unexpected non-C1-C4 "
-        f"error lines present:\n" + "\n".join(structural_errors)
-    )
-    assert any("[C2]" in ln for ln in error_lines), (
-        "stale captured DOCX should still expose content-integrity drift"
-    )
+    assert result.returncode == 0, combined[-2000:]
+    assert error_lines == []
     assert all(
         any(f"[C{number}]" in ln for number in range(1, 5))
         for ln in error_lines

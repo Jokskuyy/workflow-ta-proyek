@@ -1,7 +1,9 @@
 {
   "istilah_teknis": {
     "dashboard": "dashboard",
-    "user interface": "user interface",
+    "public dashboard": "Dashboard Publik",
+    "admin panel": "Panel Admin",
+    "user interface": "antarmuka pengguna",
     "backend": "backend",
     "frontend": "frontend",
     "database": "database",
@@ -14,7 +16,8 @@
     "rls": "RLS",
     "use case": "use case",
     "black box": "Black Box",
-    "user acceptance testing": "User Acceptance Testing",
+    "user acceptance test": "User Acceptance Test",
+    "user acceptance testing": "User Acceptance Test",
     "uat": "UAT",
     "entity relationship diagram": "Entity Relationship Diagram",
     "erd": "ERD",
@@ -28,7 +31,31 @@
     "response": "respons",
     "credential": "kredensial",
     "stakeholder": "pemangku kepentingan",
-    "consumer": "konsumen"
+    "consumer": "pengguna layanan",
+    "mobile device": "smartphone",
+    "web browser": "browser",
+    "deployment": "deployment",
+    "asset cache": "cache aset",
+    "build artifact": "file hasil build"
   },
-  "catatan": "Registry ini menjaga konsistensi istilah di seluruh laporan TA."
+  "italic_terms": [
+    "activity diagram",
+    "backend",
+    "Black Box Testing",
+    "browser",
+    "build",
+    "cache",
+    "deployment",
+    "filter",
+    "frontend",
+    "hosting",
+    "integration test",
+    "loader",
+    "pagination",
+    "sequence diagram",
+    "smartphone",
+    "unit test",
+    "use case"
+  ],
+  "catatan": "Registry ini menjaga konsistensi istilah di seluruh laporan TA. Nama fitur Dashboard Publik dan Panel Admin tidak dicetak miring. Istilah teknis asing pada italic_terms diformat miring secara otomatis pada keluaran DOCX. Kepanjangan asing ketika memperkenalkan singkatan ditulis miring secara eksplisit, misalnya *User Acceptance Test* (UAT), lalu penyebutan berikutnya cukup memakai singkatannya."
 }

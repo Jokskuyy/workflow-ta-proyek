@@ -74,12 +74,16 @@ def test_layout_validator_accepts_every_compliant_section():
 
 def test_layout_validator_reports_wrong_margin_and_orientation():
     document = _document_with_sections([
-        {"orientation": "landscape", "margins": {"left": 1701}},
+        {
+            "orientation": "landscape",
+            "margins": {"left": 1701, "top": 2268},
+        },
     ])
     findings = validator.validate_page_layout(document)
     assert any("orientation='landscape'" in finding for finding in findings)
     assert any("margin left='1701'" in finding for finding in findings)
-    assert any("expected 2268 twips (4 cm)" in finding for finding in findings)
+    assert any("margin top='2268'" in finding for finding in findings)
+    assert any("expected 1701 twips (3 cm)" in finding for finding in findings)
 
 
 def test_layout_validator_rejects_document_without_sections():
@@ -105,6 +109,36 @@ def _numbered_chapter(text):
     return paragraph
 
 
+def _signed_scan(key):
+    paragraph = LET.Element(qn("p"))
+    p_pr = LET.SubElement(paragraph, qn("pPr"))
+    LET.SubElement(p_pr, qn("jc")).set(qn("val"), "center")
+    run = LET.SubElement(paragraph, qn("r"))
+    drawing = LET.SubElement(run, qn("drawing"))
+    inline = LET.SubElement(
+        drawing,
+        "{http://schemas.openxmlformats.org/drawingml/2006/"
+        "wordprocessingDrawing}inline",
+    )
+    doc_pr = LET.SubElement(
+        inline,
+        "{http://schemas.openxmlformats.org/drawingml/2006/"
+        "wordprocessingDrawing}docPr",
+    )
+    doc_pr.set("name", f"FRONT_MATTER_SCAN:iman:{key}")
+    return paragraph
+
+
+def _scan_anchor(text):
+    paragraph = LET.Element(qn("p"))
+    p_pr = LET.SubElement(paragraph, qn("pPr"))
+    p_style = LET.SubElement(p_pr, qn("pStyle"))
+    p_style.set(qn("val"), "FrontMatterHeading")
+    run = LET.SubElement(paragraph, qn("r"))
+    LET.SubElement(run, qn("t")).text = text
+    return paragraph
+
+
 def _page_number_relationships(reference_ids):
     targets = {
         "body_default_header": "ta-header-body-default.xml",
@@ -112,6 +146,8 @@ def _page_number_relationships(reference_ids):
         "front_default_footer": "ta-footer-front-default.xml",
         "body_first_footer": "ta-footer-body-first.xml",
         "blank_footer": "ta-footer-blank.xml",
+        "body_identity_footer": "ta-footer-body-identity.xml",
+        "body_first_identity_footer": "ta-footer-body-first-identity.xml",
     }
     root = LET.Element(f"{{{PR}}}Relationships")
     for role, rid in reference_ids.items():
@@ -121,8 +157,8 @@ def _page_number_relationships(reference_ids):
     return root
 
 
-def _page_number_parts():
-    return {
+def _page_number_parts(identity_footer=None):
+    parts = {
         "word/ta-header-body-default.xml": formatter.build_page_number_part(
             "header", "right", True
         ),
@@ -139,6 +175,20 @@ def _page_number_parts():
             "footer", "center", False
         ),
     }
+    if identity_footer:
+        parts["word/ta-footer-body-identity.xml"] = (
+            formatter.build_identity_footer_part(
+                identity_footer,
+                include_page=False,
+            )
+        )
+        parts["word/ta-footer-body-first-identity.xml"] = (
+            formatter.build_identity_footer_part(
+                identity_footer,
+                include_page=True,
+            )
+        )
+    return parts
 
 
 def test_page_numbering_creates_front_and_one_section_per_bab():
@@ -177,6 +227,117 @@ def test_page_numbering_creates_front_and_one_section_per_bab():
         _page_number_parts(),
     )
     assert findings == []
+
+
+def test_signed_scan_pages_hide_word_footer_without_restarting_roman_numbers():
+    document = LET.Element(qn("document"))
+    body = LET.SubElement(document, qn("body"))
+    body.append(LET.Element(qn("p")))
+    for key in ("approval", "authenticity", "publication"):
+        body.append(_scan_anchor(key))
+        body.append(_signed_scan(key))
+    body.append(LET.Element(qn("p")))
+    body.append(_numbered_chapter("BAB I"))
+    body.append(LET.Element(qn("p")))
+    original = LET.SubElement(body, qn("sectPr"))
+    reference_ids = {
+        "body_default_header": "rId401",
+        "blank_header": "rId402",
+        "front_default_footer": "rId403",
+        "body_first_footer": "rId404",
+        "blank_footer": "rId405",
+    }
+
+    section_count = formatter.configure_report_sections(
+        body,
+        {"w": W},
+        original,
+        reference_ids,
+    )
+
+    sections = list(body.iter(qn("sectPr")))
+    assert section_count == 6
+    assert len(sections) == 6
+    for section in sections[1:4]:
+        pg_num = section.find(qn("pgNumType"))
+        assert pg_num.get(qn("fmt")) == "lowerRoman"
+        assert pg_num.get(qn("start")) is None
+        assert section.find(qn("titlePg")) is None
+    trailing_front_num = sections[4].find(qn("pgNumType"))
+    assert trailing_front_num.get(qn("fmt")) == "lowerRoman"
+    assert trailing_front_num.get(qn("start")) is None
+    assert sections[4].find(qn("titlePg")) is None
+    assert sections[5].find(qn("pgNumType")).get(qn("start")) == "1"
+
+    assert validator.validate_page_numbering(
+        document,
+        _page_number_relationships(reference_ids),
+        _page_number_parts(),
+    ) == []
+
+
+def test_identity_footer_stops_before_appendix_and_keeps_page_numbering():
+    identity_footer = {
+        "author_year": "Muhammad Iman Nugraha, 2026",
+        "title": (
+            "PENGEMBANGAN DASHBOARD WEB, INTEGRASI UNITY WEBGL, DAN "
+            "DEPLOYMENT SISTEM DENAH VIRTUAL UPNVJ KAMPUS PONDOK LABU"
+        ),
+        "institution": (
+            "UPN Veteran Jakarta, Fakultas Ilmu Komputer, S1 Informatika"
+        ),
+        "links": (
+            "[www.upnvj.ac.id-www.library.upnvj.ac.id-"
+            "www.repository.upnvj.ac.id]"
+        ),
+        "font": "Times New Roman",
+        "size_pt": 8,
+    }
+    document = LET.Element(qn("document"))
+    body = LET.SubElement(document, qn("body"))
+    body.append(LET.Element(qn("p")))
+    for number in range(1, 3):
+        body.append(_numbered_chapter(f"BAB {number}"))
+        body.append(LET.Element(qn("p")))
+    appendix = LET.Element(qn("p"))
+    appendix_p_pr = LET.SubElement(appendix, qn("pPr"))
+    appendix_style = LET.SubElement(appendix_p_pr, qn("pStyle"))
+    appendix_style.set(qn("val"), "taappendixheading")
+    appendix_run = LET.SubElement(appendix, qn("r"))
+    LET.SubElement(appendix_run, qn("t")).text = "LAMPIRAN 1. Bukti"
+    body.append(appendix)
+    original = LET.SubElement(body, qn("sectPr"))
+    reference_ids = {
+        "body_default_header": "rId301",
+        "blank_header": "rId302",
+        "front_default_footer": "rId303",
+        "body_first_footer": "rId304",
+        "blank_footer": "rId305",
+        "body_identity_footer": "rId306",
+        "body_first_identity_footer": "rId307",
+    }
+
+    section_count = formatter.configure_report_sections(
+        body,
+        {"w": W},
+        original,
+        reference_ids,
+        split_appendix=True,
+    )
+    sections = list(body.iter(qn("sectPr")))
+    assert section_count == 4
+    assert len(sections) == 4
+    assert sections[-1].find(qn("titlePg")) is None
+
+    rels = _page_number_relationships(reference_ids)
+    parts = _page_number_parts(identity_footer)
+    assert validator.validate_page_numbering(document, rels, parts) == []
+    assert validator.validate_identity_footer(
+        document,
+        rels,
+        parts,
+        identity_footer,
+    ) == []
 
 
 def test_page_numbering_validator_reports_restart_and_wrong_position():

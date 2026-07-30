@@ -1,10 +1,10 @@
 @startwbs gambar-3-1-hierarki-prefab-unity
-' Gambar 3.1 - Hierarki Prefab Gedung dengan Child Pointer di Unity
+' Hierarki Prefab Gedung dengan Child Pointer di Unity
 ' Sumber: PRD - Konvensi Struktur Scene Unity
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
+skinparam defaultFontName "Times New Roman"
 skinparam defaultFontSize 13
 skinparam wbsDiagram {
   BackgroundColor #F2F2F2

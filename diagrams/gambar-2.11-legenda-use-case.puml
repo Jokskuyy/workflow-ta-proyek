@@ -1,13 +1,12 @@
 @startuml gambar-2-11-legenda-use-case
-' Gambar 2.11 - Legenda Use Case Diagram
+' Legenda Simbol pada Use Case Diagram
 ' Sumber: BAB II - 2.3.3 (legenda simbol use case)
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
+skinparam defaultFontName "Times New Roman"
 skinparam defaultFontSize 13
 skinparam ArrowColor #444444
-skinparam actorStyle awesome
 skinparam usecase {
   BackgroundColor #F2F2F2
   BorderColor #555555
@@ -23,20 +22,20 @@ skinparam rectangle {
 
 
 actor "Aktor" as A
-usecase "Use Case" as U
-rectangle "Batas Sistem\n(System Boundary)" as Bnd
+usecase "Fungsi Sistem\n(Use Case)" as U
+rectangle "Batas Sistem" as Bnd
 
 A -[hidden]down- U
 U -[hidden]down- Bnd
 
 legend right
   | Simbol | Notasi | Keterangan |
-  | Aktor | Stick figure (gambar orang) | Entitas (pengguna/sistem) yang berinteraksi dengan sistem |
-  | Use Case | Elips | Fungsi atau layanan yang disediakan sistem |
+  | Aktor | Gambar orang | Pengguna atau sistem lain yang berinteraksi dengan sistem |
+  | Use Case | Elips | Fungsi atau layanan yang tersedia pada sistem |
   | Batas Sistem | Persegi panjang | Ruang lingkup / batas cakupan sistem |
-  | —————— | Garis lurus (association) | Hubungan interaksi antara aktor dan use case |
-  | ----▷ <<include>> | Garis putus + panah | Use case wajib memanggil use case lain |
-  | ----▷ <<extend>> | Garis putus + panah | Use case opsional yang memperluas use case dasar |
+  | Hubungan aktor | Garis lurus | Hubungan interaksi antara aktor dan fungsi sistem |
+  | Relasi include | Garis putus dan panah | Fungsi sistem selalu menyertakan fungsi lain |
+  | Relasi extend | Garis putus dan panah | Fungsi tambahan memperluas fungsi dasar pada kondisi tertentu |
 endlegend
 
 @enduml

@@ -3,56 +3,56 @@
     {
       "id": "diagram_arsitektur",
       "file": "diagram_arsitektur.png",
-      "caption_match": "Diagram Arsitektur Sistem",
+      "caption_match": "Arsitektur Integrasi Dashboard Web, Supabase, dan Unity WebGL",
       "source": "diagrams/gambar-2-09-arsitektur-sistem.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_tahap_pengembangan",
       "file": "diagram_tahap_pengembangan.png",
-      "caption_match": "Tahap Pengembangan",
+      "caption_match": "Tahapan Metode Prototyping pada Pengembangan Sistem",
       "source": "diagrams/gambar-2-10-tahap-pengembangan.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_use_case_legenda",
       "file": "diagram_use_case_legenda.png",
-      "caption_match": "Legenda Use Case Diagram",
-      "source": "diagrams/gambar-2-11-legenda-use-case.png",
+      "caption_match": "Legenda Simbol pada Use Case Diagram",
+      "source": "images/diagram_use_case_legenda.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_use_case",
       "file": "diagram_use_case.png",
-      "caption_match": "Use Case Diagram",
+      "caption_match": "Use Case Diagram Sistem Denah Virtual UPNVJ",
       "source": "diagrams/gambar-2-12-use-case-diagram.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_activity_kelola_data",
       "file": "diagram_activity_kelola_data.png",
-      "caption_match": "Activity Diagram: Pengelolaan Data oleh Admin",
+      "caption_match": "Activity Diagram Pengelolaan Data oleh Administrator",
       "source": "diagrams/gambar-2-13-activity-pengelolaan-data-admin.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_activity_integrasi",
       "file": "diagram_activity_integrasi.png",
-      "caption_match": "Activity Diagram: Integrasi Data Denah",
+      "caption_match": "Activity Diagram Integrasi Denah 2D dan 3D",
       "source": "diagrams/gambar-2-14-activity-integrasi-data-denah.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_sequence_autentikasi",
       "file": "diagram_sequence_autentikasi.png",
-      "caption_match": "Sequence Diagram: Autentikasi Administrator",
+      "caption_match": "Sequence Diagram Autentikasi Administrator",
       "source": "diagrams/gambar-2-15-sequence-autentikasi-admin.png",
       "inject_method": "post_com"
     },
     {
       "id": "diagram_sequence_sinkronisasi",
       "file": "diagram_sequence_sinkronisasi.png",
-      "caption_match": "Sequence Diagram: Sinkronisasi Data Gedung dan Unity",
+      "caption_match": "Sequence Diagram Sinkronisasi Data Gedung dan Fasilitas dengan Unity",
       "source": "diagrams/gambar-2-16-sequence-sinkronisasi-data-unity.png",
       "inject_method": "post_com"
     },
@@ -66,7 +66,7 @@
     {
       "id": "ui_webgl_canvas",
       "file": "ui_webgl_canvas.png",
-      "caption_match": "Canvas Unity WebGL pada Build Aktif dengan Bantuan dan Bilah Pencarian React",
+      "caption_match": "Antarmuka Denah 3D dengan Pencarian, Minimap, dan Tombol Bantuan",
       "source": "dokumentasi/frontend-terbaru/canvas-webgl-3d.png",
       "inject_method": "post_com"
     },
@@ -80,35 +80,35 @@
     {
       "id": "mockup_dashboard_admin",
       "file": "mockup_dashboard_admin.png",
-      "caption_match": "Halaman Pengelolaan Fasilitas pada Admin Panel",
+      "caption_match": "Halaman Pengelolaan Fasilitas pada Panel Admin",
       "source": "dokumentasi/frontend-terbaru/admin-fasilitas.png",
       "inject_method": "post_com"
     },
     {
       "id": "api_test_health",
       "file": "api_test_health.png",
-      "caption_match": "Respons Health Check pada Deployment",
+      "caption_match": "Hasil Pemeriksaan Endpoint Kesehatan Layanan pada Lingkungan Produksi",
       "source": "dokumentasi/TEST API/GET_apihealth.png",
       "inject_method": "post_com"
     },
     {
       "id": "api_test_unity_data",
       "file": "api_test_unity_data.png",
-      "caption_match": "Respons Data Runtime Unity dari Vercel Serverless Function",
+      "caption_match": "Respons Endpoint Data untuk Unity pada Lingkungan Produksi",
       "source": "dokumentasi/TEST API/GET_apiunitydata.png",
       "inject_method": "post_com"
     },
     {
       "id": "api_test_unity_names",
       "file": "api_test_unity_names.png",
-      "caption_match": "Respons Daftar Identifier untuk Tooling Unity Editor",
+      "caption_match": "Respons Endpoint Daftar Kode Lokasi untuk Unity Editor",
       "source": "dokumentasi/TEST API/GET_apiunitynames.png",
       "inject_method": "post_com"
     },
     {
       "id": "api_test_rls_unauthorized",
       "file": "api_test_rls_unauthorized.png",
-      "caption_match": "Penolakan Mutasi Tanpa Otorisasi oleh Supabase RLS",
+      "caption_match": "Penolakan Perubahan Data Tanpa Autentikasi oleh Supabase RLS",
       "source": "dokumentasi/TEST API/POST_aaysacqsibquiulpdzwzsupabasecorestv1fasilitas.png",
       "inject_method": "post_com"
     },
@@ -131,20 +131,6 @@
       "file": "uat_revisi_map_2d.png",
       "caption_match": "Denah 2D dengan Titik Awal dan Label Lokasi",
       "source": "Hasil UAT/dokumentasi revisi/RR03_tampilan_2d.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "uat_revisi_spawn_3d",
-      "file": "uat_revisi_spawn_3d.png",
-      "caption_match": "Pemilihan Titik Awal pada Denah 3D",
-      "source": "Hasil UAT/dokumentasi revisi/RR03_pilih_spawn_3d.png",
-      "inject_method": "post_com"
-    },
-    {
-      "id": "uat_revisi_minimap_3d",
-      "file": "uat_revisi_minimap_3d.png",
-      "caption_match": "Tampilan Denah 3D dengan Minimap dan Tombol Bantuan",
-      "source": "Hasil UAT/dokumentasi revisi/RR03_tampilan_ingame_3d_pov(jadi3rdperson)_minimap.png",
       "inject_method": "post_com"
     },
     {
@@ -183,52 +169,234 @@
       "inject_method": "post_com"
     },
     {
+      "id": "contoh_pakta_integritas_anggota_tim",
+      "file": "contoh_pakta_integritas_anggota_tim.jpeg",
+      "caption_match": "Contoh Pakta Integritas Penelitian Anggota Tim",
+      "source": "lampiran tambahan/Surat Riset, Diposisi, dll (surat resmi dari atau ke kampus)/surat_pakta_integritas_mahasiswa.jpeg",
+      "inject_method": "post_com"
+    },
+    {
       "id": "survey_01_profil",
       "file": "surveys/survey_01_profil.png",
-      "caption_match": "Hasil Kuesioner: Profil Status Akademik Responden",
+      "caption_match": "Distribusi Status Akademik Responden",
       "source": "archive/Tugas Akhir.docx#word/media/image3.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_02_efektivitas",
       "file": "surveys/survey_02_efektivitas.png",
-      "caption_match": "Hasil Kuesioner: Efektivitas Media Navigasi Kampus Saat Ini",
+      "caption_match": "Penilaian Responden terhadap Efektivitas Media Navigasi Kampus",
       "source": "archive/Tugas Akhir.docx#word/media/image4.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_03_frekuensi",
       "file": "surveys/survey_03_frekuensi.png",
-      "caption_match": "Hasil Kuesioner: Frekuensi Kesulitan Menemukan Lokasi",
+      "caption_match": "Frekuensi Kesulitan Responden dalam Menemukan Lokasi",
       "source": "archive/Tugas Akhir.docx#word/media/image5.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_04_perilaku",
       "file": "surveys/survey_04_perilaku.png",
-      "caption_match": "Hasil Kuesioner: Perilaku Pengguna Saat Mencari Lokasi",
+      "caption_match": "Sumber Informasi yang Digunakan Responden Saat Mencari Lokasi",
       "source": "archive/Tugas Akhir.docx#word/media/image6.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_05_urgensi",
       "file": "surveys/survey_05_urgensi.png",
-      "caption_match": "Hasil Kuesioner: Urgensi Kebutuhan Peta Virtual 3D",
+      "caption_match": "Penilaian Responden terhadap Kebutuhan Denah Virtual 3D",
       "source": "archive/Tugas Akhir.docx#word/media/image7.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_06_adopsi",
       "file": "surveys/survey_06_adopsi.png",
-      "caption_match": "Hasil Kuesioner: Potensi Adopsi Denah Virtual 3D",
+      "caption_match": "Minat Responden Menggunakan Denah Virtual 3D",
       "source": "archive/Tugas Akhir.docx#word/media/image8.png",
       "inject_method": "post_com"
     },
     {
       "id": "survey_07_prioritas",
       "file": "surveys/survey_07_prioritas.png",
-      "caption_match": "Hasil Kuesioner: Prioritas Informasi Fasilitas Kampus",
+      "caption_match": "Prioritas Informasi Fasilitas Menurut Responden",
       "source": "archive/Tugas Akhir.docx#word/media/image9.png",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_penguji_2_p1",
+      "file": "uat_closed_penguji_2_p1.png",
+      "caption_match": "Form UAT Tertutup Dosen Penguji II, Lembar 1",
+      "source": "lampiran tambahan/Hasil Form UAT/Kharisma_Gusti_Wiati.pdf#page=1",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_penguji_2_p2",
+      "file": "uat_closed_penguji_2_p2.png",
+      "caption_match": "Form UAT Tertutup Dosen Penguji II, Lembar 2",
+      "source": "lampiran tambahan/Hasil Form UAT/Kharisma_Gusti_Wiati.pdf#page=2",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_pembimbing_2_p1",
+      "file": "uat_closed_pembimbing_2_p1.png",
+      "caption_match": "Form UAT Tertutup Dosen Pembimbing II, Lembar 1",
+      "source": "lampiran tambahan/Hasil Form UAT/Novi_Trisman_Hadi.pdf#page=1",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_pembimbing_2_p2",
+      "file": "uat_closed_pembimbing_2_p2.png",
+      "caption_match": "Form UAT Tertutup Dosen Pembimbing II, Lembar 2",
+      "source": "lampiran tambahan/Hasil Form UAT/Novi_Trisman_Hadi.pdf#page=2",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_pembimbing_2_p3",
+      "file": "uat_closed_pembimbing_2_p3.png",
+      "caption_match": "Form UAT Tertutup Dosen Pembimbing II, Lembar 3",
+      "source": "lampiran tambahan/Hasil Form UAT/Novi_Trisman_Hadi.pdf#page=3",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_pembimbing_2_p4",
+      "file": "uat_closed_pembimbing_2_p4.png",
+      "caption_match": "Form UAT Tertutup Dosen Pembimbing II, Lembar 4",
+      "source": "lampiran tambahan/Hasil Form UAT/Novi_Trisman_Hadi.pdf#page=4",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_pembimbing_1_p1",
+      "file": "uat_closed_pembimbing_1_p1.png",
+      "caption_match": "Form UAT Tertutup Dosen Pembimbing I, Lembar 1",
+      "source": "lampiran tambahan/Hasil Form UAT/Ridwan_Raafiudin.pdf#page=1",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_pembimbing_1_p2",
+      "file": "uat_closed_pembimbing_1_p2.png",
+      "caption_match": "Form UAT Tertutup Dosen Pembimbing I, Lembar 2",
+      "source": "lampiran tambahan/Hasil Form UAT/Ridwan_Raafiudin.pdf#page=2",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_pembimbing_1_p3",
+      "file": "uat_closed_pembimbing_1_p3.png",
+      "caption_match": "Form UAT Tertutup Dosen Pembimbing I, Lembar 3",
+      "source": "lampiran tambahan/Hasil Form UAT/Ridwan_Raafiudin.pdf#page=3",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_pembimbing_1_p4",
+      "file": "uat_closed_pembimbing_1_p4.png",
+      "caption_match": "Form UAT Tertutup Dosen Pembimbing I, Lembar 4",
+      "source": "lampiran tambahan/Hasil Form UAT/Ridwan_Raafiudin.pdf#page=4",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_humas_p1",
+      "file": "uat_closed_humas_p1.png",
+      "caption_match": "Form UAT Tertutup Perwakilan Humas UPNVJ, Lembar 1",
+      "source": "lampiran tambahan/Hasil Form UAT/User_Humas.pdf#page=1",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_humas_p2",
+      "file": "uat_closed_humas_p2.png",
+      "caption_match": "Form UAT Tertutup Perwakilan Humas UPNVJ, Lembar 2",
+      "source": "lampiran tambahan/Hasil Form UAT/User_Humas.pdf#page=2",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_humas_p3",
+      "file": "uat_closed_humas_p3.png",
+      "caption_match": "Form UAT Tertutup Perwakilan Humas UPNVJ, Lembar 3",
+      "source": "lampiran tambahan/Hasil Form UAT/User_Humas.pdf#page=3",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_humas_p4",
+      "file": "uat_closed_humas_p4.png",
+      "caption_match": "Form UAT Tertutup Perwakilan Humas UPNVJ, Lembar 4",
+      "source": "lampiran tambahan/Hasil Form UAT/User_Humas.pdf#page=4",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_penguji_1_p1",
+      "file": "uat_closed_penguji_1_p1.png",
+      "caption_match": "Form UAT Tertutup Dosen Penguji I, Lembar 1",
+      "source": "lampiran tambahan/Hasil Form UAT/Widya_Cholil.pdf#page=1",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_penguji_1_p2",
+      "file": "uat_closed_penguji_1_p2.png",
+      "caption_match": "Form UAT Tertutup Dosen Penguji I, Lembar 2",
+      "source": "lampiran tambahan/Hasil Form UAT/Widya_Cholil.pdf#page=2",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_penguji_1_p3",
+      "file": "uat_closed_penguji_1_p3.png",
+      "caption_match": "Form UAT Tertutup Dosen Penguji I, Lembar 3",
+      "source": "lampiran tambahan/Hasil Form UAT/Widya_Cholil.pdf#page=3",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "uat_closed_penguji_1_p4",
+      "file": "uat_closed_penguji_1_p4.png",
+      "caption_match": "Form UAT Tertutup Dosen Penguji I, Lembar 4",
+      "source": "lampiran tambahan/Hasil Form UAT/Widya_Cholil.pdf#page=4",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "admin_research_request_jan_2026",
+      "file": "admin_research_request_jan_2026.jpg",
+      "caption_match": "Surat Permohonan Riset Tim, 22 Januari 2026",
+      "source": "lampiran tambahan/Surat Riset, Diposisi, dll (surat resmi dari atau ke kampus)/permohonan_riset_mahasiswa_page_0002.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "admin_research_disposition_feb_2026",
+      "file": "admin_research_disposition_feb_2026.jpg",
+      "caption_match": "Lembar Disposisi Permohonan Riset, 4 Februari 2026",
+      "source": "lampiran tambahan/Surat Riset, Diposisi, dll (surat resmi dari atau ke kampus)/permohonan_riset_mahasiswa_page_0001.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "admin_research_request_jul_2026",
+      "file": "admin_research_request_jul_2026.jpg",
+      "caption_match": "Surat Permohonan Riset Lanjutan, 16 Juli 2026",
+      "source": "lampiran tambahan/Surat Riset, Diposisi, dll (surat resmi dari atau ke kampus)/S.Riset_Muhammad_Iman_Nugraha_Dwiki_dan_Faiz_.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "admin_research_disposition_jul_2026",
+      "file": "admin_research_disposition_jul_2026.jpg",
+      "caption_match": "Lembar Disposisi Permohonan Riset Lanjutan, 16 Juli 2026",
+      "source": "lampiran tambahan/Surat Riset, Diposisi, dll (surat resmi dari atau ke kampus)/lembar_disposisi_halaman_1.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "admin_uat_request_jul_2026",
+      "file": "admin_uat_request_jul_2026.jpeg",
+      "caption_match": "Surat Permohonan Pelaksanaan UAT, 9 Juli 2026",
+      "source": "lampiran tambahan/Surat Riset, Diposisi, dll (surat resmi dari atau ke kampus)/Surat_Pengajuan_UAT.jpeg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "admin_uat_invitation_jul_2026_p1",
+      "file": "admin_uat_invitation_jul_2026_p1.jpg",
+      "caption_match": "Surat Undangan Pelaksanaan UAT, 13 Juli 2026",
+      "source": "lampiran tambahan/Surat Riset, Diposisi, dll (surat resmi dari atau ke kampus)/Surat_respon_UAT_Iman_Dwikhi_Faiz_page_0001.jpg",
+      "inject_method": "post_com"
+    },
+    {
+      "id": "admin_uat_invitation_jul_2026_p2",
+      "file": "admin_uat_invitation_jul_2026_p2.jpg",
+      "caption_match": "Daftar Undangan UAT Tertutup, 15 Juli 2026",
+      "source": "lampiran tambahan/Surat Riset, Diposisi, dll (surat resmi dari atau ke kampus)/Surat_respon_UAT_Iman_Dwikhi_Faiz_page_0002.jpg",
       "inject_method": "post_com"
     }
   ]

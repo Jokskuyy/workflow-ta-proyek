@@ -25,6 +25,7 @@ manifest / reconcile file) so no real repo file is mutated.
 Validates: Requirements 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4.
 """
 import hashlib
+import os
 import json
 import os
 import re
@@ -43,7 +44,9 @@ from PIL import Image
 # --------------------------------------------------------------------------- #
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "skills" / "scripts"
-CAPTURED_DOCX = ROOT / "Tugas_Akhir_Formatted.docx"
+CAPTURED_DOCX = Path(
+    os.environ.get("TA_DOCX_PATH", ROOT / "Tugas_Akhir_Formatted.docx")
+)
 VALIDATOR = SCRIPTS / "validate_docx_structure.py"
 MANIFEST = ROOT / "images" / "manifest.json"
 
@@ -430,7 +433,7 @@ def test_unit_resolve_caption_indices_zero_one_multiple():
     """inj.resolve_caption_indices returns ALL matching body indices: 0, 1, or
     many, per the pStyle=='Caption' + contains + remainder rule."""
     ns = {"w": W}
-    match = "Diagram Arsitektur Sistem"
+    match = "Arsitektur Integrasi Dashboard Web, Supabase, dan Unity WebGL"
 
     # Zero matches: no caption mentions the target descriptor.
     body0 = _body_from_captions(["Gambar 2.1 Sesuatu Yang Lain",
@@ -705,7 +708,7 @@ def test_validator_c2_wrong_resolution_count_rejected(reconciled_project):
     """C2: an entry that no longer resolves to exactly one caption is rejected."""
     entries = read_all(reconciled_project / "captured.docx")
     doc = parse_doc(entries)
-    target = "Tahap Pengembangan"  # manifest entry diagram_tahap_pengembangan
+    target = "Tahapan Metode Prototyping pada Pengembangan Sistem"
     assert caption_match_count(doc, target) == 1
     _edit_caption_descriptor(doc, target, "Bagan Yang Sudah Tidak Cocok")
     assert caption_match_count(doc, target) == 0
@@ -722,7 +725,9 @@ def test_validator_c3_content_mismatch_rejected(reconciled_project):
     """C3: a packed media whose bytes no longer match its injected images/<file>
     (simulated recompression) is rejected."""
     entries = read_all(reconciled_project / "captured.docx")
-    victim = _media_before_caption(entries, "Tahap Pengembangan")
+    victim = _media_before_caption(
+        entries, "Tahapan Metode Prototyping pada Pengembangan Sistem"
+    )
     assert victim is not None, "expected a packed media preceding the development-stage caption"
     original = _md5_bytes(entries[victim])
     entries[victim] = entries[victim] + b"\x00recompressed-drift"
@@ -741,8 +746,8 @@ def test_validator_c4_oversized_without_pagebreak_rejected(reconciled_project):
     entries = read_all(reconciled_project / "captured.docx")
     doc = parse_doc(entries)
     threshold = _printable_height(doc)
-    p = _drawing_p_before_caption(doc, "Sequence Diagram: Autentikasi Administrator")
-    assert p is not None, "expected a drawing before the autentikasi sequence caption"
+    p = _drawing_p_before_caption(doc, "Use Case Diagram")
+    assert p is not None, "expected a drawing before the use-case caption"
     _make_tall_strip_pbb(p, threshold + 2_000_000)
     entries[DOC] = serialize_doc(doc)
     out_docx = reconciled_project / "c4.docx"
@@ -786,16 +791,31 @@ def test_integration_negative_all_four_defects(reconciled_project):
 
     # Document-level defects: C2 (zero match) + C4 (tall, no pageBreakBefore).
     doc = parse_doc(entries)
-    _edit_caption_descriptor(doc, "Tahap Pengembangan", "Bagan Rusak Tak Cocok")
+    _edit_caption_descriptor(
+        doc, "Tahapan Metode Prototyping pada Pengembangan Sistem",
+        "Bagan Rusak Tak Cocok",
+    )
     threshold = _printable_height(doc)
-    tall_p = _drawing_p_before_caption(doc, "Sequence Diagram: Autentikasi Administrator")
+    tall_p = _drawing_p_before_caption(doc, "Use Case Diagram")
     assert tall_p is not None
     _make_tall_strip_pbb(tall_p, threshold + 2_500_000)
     entries[DOC] = serialize_doc(doc)
 
     # Media-level defects: C1 (duplicate) + C3 (content drift on a third figure).
-    entries, (src, dst) = _make_duplicate_media(entries, 5, 12)
-    victim = _media_before_caption(entries, "Sequence Diagram: Sinkronisasi Data Gedung dan Unity")
+    victim = _media_before_caption(
+        entries, "Arsitektur Integrasi Dashboard Web, Supabase, dan Unity WebGL"
+    )
+    distinct_media = _distinct_referenced_media(entries)
+    duplicate_candidates = [
+        index for index, media in enumerate(distinct_media)
+        if media != victim
+    ]
+    assert len(duplicate_candidates) >= 2
+    entries, (src, dst) = _make_duplicate_media(
+        entries,
+        duplicate_candidates[0],
+        duplicate_candidates[1],
+    )
     assert victim is not None and victim not in (src, dst)
     entries[victim] = entries[victim] + b"\x00drift-bytes"
 

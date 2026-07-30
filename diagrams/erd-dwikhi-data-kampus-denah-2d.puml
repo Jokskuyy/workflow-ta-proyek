@@ -1,0 +1,137 @@
+@startuml
+title ERD Data Kampus dan Denah 2D
+top to bottom direction
+skinparam backgroundColor white
+skinparam defaultFontName "Arial"
+skinparam defaultFontSize 17
+skinparam linetype ortho
+skinparam shadowing false
+skinparam nodesep 30
+skinparam ranksep 45
+skinparam entity {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  FontColor #0F172A
+}
+
+entity "gedung" as gedung {
+  * id : SERIAL <<PK>>
+  --
+  * nama_gedung : VARCHAR(255) <<UQ>>
+  o deskripsi_gedung : TEXT
+  o lokasi : TEXT
+  o jumlah_lantai : INT = 1
+  o foto_url : VARCHAR(255)
+  o unity_object_name : TEXT <<UQ>>
+}
+
+entity "fakultas" as fakultas {
+  * id : SERIAL <<PK>>
+  --
+  * nama_fakultas : VARCHAR(255) <<UQ>>
+  o deskripsi_fakultas : TEXT
+  o email : VARCHAR(255)
+  o website : VARCHAR(255)
+  o id_gedung_utama : INT <<FK / SET NULL>>
+}
+
+entity "fasilitas" as fasilitas {
+  * id : SERIAL <<PK>>
+  --
+  * nama_fasilitas : VARCHAR(255)
+  o deskripsi_fasilitas : TEXT
+  o tipe_fasilitas : VARCHAR(100)
+  o color : VARCHAR(50) = 'gray'
+  o lantai : INT = 1
+  o foto_url : TEXT
+  o id_gedung : INT <<FK / SET NULL>>
+  o unity_object_name : TEXT <<UQ>>
+}
+
+entity "program_studi" as program_studi {
+  * id : SERIAL <<PK>>
+  --
+  * nama_prodi : VARCHAR(255)
+  * jenjang : VARCHAR(10)
+  * id_fakultas : INT <<FK / CASCADE>>
+  o akreditasi : VARCHAR(50)
+  --
+  UQ(nama_prodi, jenjang, id_fakultas)
+}
+
+entity "campus_maps" as campus_maps {
+  * id : BIGSERIAL <<PK>>
+  --
+  * slug : TEXT <<UQ>>
+  * nama : TEXT
+  * image_url : TEXT
+  * image_width : INT {> 0}
+  * image_height : INT {> 0}
+  * is_active : BOOLEAN = FALSE
+  * created_at : TIMESTAMPTZ = NOW()
+  * updated_at : TIMESTAMPTZ = NOW()
+  --
+  UQ partial: satu is_active = TRUE
+}
+
+entity "campus_map_nodes" as campus_map_nodes {
+  * id : BIGSERIAL <<PK>>
+  --
+  * map_id : BIGINT <<FK / CASCADE>>
+  o label : TEXT
+  * node_type : TEXT
+  * x : DOUBLE PRECISION {0..1}
+  * y : DOUBLE PRECISION {0..1}
+  * created_at : TIMESTAMPTZ = NOW()
+  --
+  node_type IN (path, building_entrance, gate)
+}
+
+entity "campus_map_edges" as campus_map_edges {
+  * id : BIGSERIAL <<PK>>
+  --
+  * map_id : BIGINT <<FK / CASCADE>>
+  * from_node_id : BIGINT <<FK / CASCADE>>
+  * to_node_id : BIGINT <<FK / CASCADE>>
+  * bidirectional : BOOLEAN = TRUE
+  * accessible : BOOLEAN = TRUE
+  o weight : DOUBLE PRECISION {NULL atau > 0}
+  --
+  CHECK(from_node_id <> to_node_id)
+  UQ(map_id, from_node_id, to_node_id)
+}
+
+entity "campus_map_building_points" as campus_map_building_points {
+  * id : BIGSERIAL <<PK>>
+  --
+  * map_id : BIGINT <<FK / CASCADE>>
+  * gedung_id : INT <<FK / CASCADE>>
+  * marker_x : DOUBLE PRECISION {0..1}
+  * marker_y : DOUBLE PRECISION {0..1}
+  o entrance_node_id : BIGINT <<FK / SET NULL>>
+  * created_at : TIMESTAMPTZ = NOW()
+  * updated_at : TIMESTAMPTZ = NOW()
+  --
+  UQ(map_id, gedung_id)
+}
+
+gedung -[hidden]down- fasilitas
+fasilitas -[hidden]down- fakultas
+fakultas -[hidden]down- program_studi
+campus_maps -[hidden]down- campus_map_nodes
+campus_map_nodes -[hidden]down- campus_map_edges
+campus_map_edges -[hidden]down- campus_map_building_points
+gedung -[hidden]right- campus_maps
+
+gedung ||--o{ fakultas
+gedung ||--o{ fasilitas
+fakultas ||--o{ program_studi
+campus_maps ||--o{ campus_map_nodes
+campus_maps ||--o{ campus_map_edges
+campus_map_nodes ||--o{ campus_map_edges : from
+campus_map_nodes ||--o{ campus_map_edges : to
+campus_maps ||--o{ campus_map_building_points
+gedung ||--o{ campus_map_building_points
+campus_map_nodes ||--o{ campus_map_building_points
+
+@enduml

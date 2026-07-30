@@ -1,19 +1,22 @@
 # Laporan TA — Muhammad Dwikhi Deandra Purnianto (3D Asset Designer & Database Schema Designer)
 
-**Branch:** `laporan/dwikhi` — tulis laporan di `Tugas_Akhir_Draft.md` (root repo) saat berada di branch ini.
+**Build aktif:** pada branch `laporan/iman` gunakan profil `dwikhi` dengan
+sumber `Tugas_Akhir_Dwikhi_Draft.md`. Draf dan aset profil Iman tetap terpisah.
 
 ## Fokus / Lingkup Laporan
 Berdasarkan pembagian peran (BAB II — Wawancara Stakeholder), kontribusi:
 1. **Pemodelan & Penataan Aset 3D Gedung** langsung di **Unity Editor** (tanpa Blender).
 2. **Konvensi Hierarki Prefab** — prefab gedung dengan child `Pointer` berisi GameObject `unity_object_name`.
-3. **Perancangan Skema Database** Supabase PostgreSQL — `gedung`, `fasilitas`, `fakultas`, `program_studi`, `admin_users`, `audit_logs` beserta relasinya (ERD).
-4. **Row Level Security (RLS)** — kebijakan akses (`anon` = SELECT, `authenticated` = CRUD).
-5. **Trigger Audit Logs** — pencatatan otomatis setiap mutasi data.
+3. **Perancangan Skema Database** Supabase PostgreSQL — 11 tabel untuk data kampus, Denah 2D, administrasi, audit, dan analitik beserta 10 foreign key.
+4. **Row Level Security (RLS)** — rancangan kebijakan akses untuk seluruh 11 tabel; status deployment setiap kebijakan memerlukan bukti terpisah.
+5. **Audit Logs** — rancangan tabel `audit_logs`. SQL lengkap tidak memuat `CREATE TRIGGER` sehingga trigger audit tidak diklaim aktif.
 
 > Ruang lingkup: persimpangan aset 3D dan struktur data. Logika navigasi/engine = Faiz; API/integrasi web = Iman.
 
 ## Diagram Relevan
-- **2.17 Entity-Relationship Diagram** — inti perancangan database.
+- **ERD Data Kampus dan Denah 2D** — delapan tabel yang saling berelasi.
+- **ERD Tabel Pendukung dan Hubungan Akses Logis Administrator** — tiga tabel pendukung, koneksi CRUD administrator ke tabel data, serta pembeda eksplisit antara hubungan akses dan foreign key.
+- **Use Case Pengelolaan Database melalui Panel Admin** dan **Activity Diagram CRUD Data melalui Panel Admin** — menunjukkan fungsi serta alur manipulasi data oleh administrator.
 - **3.1 Hierarki Prefab Gedung dengan Child Pointer** — inti penataan aset.
 - **2.9 Arsitektur**, **2.12 Use Case**, **2.13 Activity Pengelolaan Data**, **2.16 Sequence Sinkronisasi** — konteks bersama.
 - Sumber diagram: `../../diagrams/`.
@@ -21,7 +24,7 @@ Berdasarkan pembagian peran (BAB II — Wawancara Stakeholder), kontribusi:
 ## Yang Perlu Ditambahkan Sendiri
 - Tangkapan layar proses pemodelan aset di Unity Editor.
 - Workflow aset → prefab → penamaan `unity_object_name`.
-- SQL DDL skema, contoh policy RLS, dan kode trigger audit log.
+- Bukti penerapan DDL/RLS pada Supabase aktif dan hasil pengujian constraint yang belum tercakup oleh tangkapan kueri katalog serta hasil `SELECT` relasi Gedung Dewi Sartika–fasilitas.
 
 ## Acuan
 - Kontrak konten bersama dan include: `../../content/README.md`

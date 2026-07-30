@@ -14,13 +14,16 @@
 - 2.1 Observasi *(bersama)* — 2.1.1 Observasi Lapangan; 2.1.2 Analisis Sistem Berjalan; 2.1.3 Wawancara Stakeholder
 - 2.2 Usulan Solusi
   - 2.2.1 Kebutuhan Fungsional *(data gedung/fasilitas, akurasi aset, audit)*
-  - 2.2.2 Kebutuhan Teknis *(Unity Editor, PostgreSQL/Supabase, RLS, trigger)*
+  - 2.2.2 Kebutuhan Teknis *(Unity Editor, PostgreSQL/Supabase, dan rancangan RLS; trigger tidak diklaim karena tidak ada pada SQL)*
   - 2.2.3 Kebutuhan Non-Fungsional *(integritas data, keamanan, keterpeliharaan aset)*
 - 2.3 Rancangan Proyek
   - 2.3.1 Rencana Pengembangan *(prototyping)*
-  - 2.3.2 Perancangan Aset & Konvensi Scene 3D *(prefab gedung, child Pointer, penamaan)*
-  - 2.3.3 Perancangan Database & Keamanan *(ERD, normalisasi, RLS, trigger audit)*
-  - 2.3.4 Perancangan unity_object_name sebagai Jembatan Data
+  - 2.3.2 Perancangan Aset 3D Gedung dan Fasilitas
+  - 2.3.3 Perancangan Hierarki Prefab dan Konvensi Penamaan
+  - 2.3.4 Perancangan Interaksi Administrator dengan Database *(use case dan activity CRUD)*
+  - 2.3.5 Perancangan ERD dan Struktur Data *(11 tabel, 10 foreign key, constraint, RLS, dan hubungan akses logis administrator)*
+  - 2.3.6 Perancangan Pengelolaan Data Awal dan Kualitas Data
+  - 2.3.7 Perancangan Pemetaan dan Pemeriksaan Kode Lokasi Unity
 - 2.4 Rencana Pengujian Proyek *(integritas data, RLS, konsistensi aset–DB)*
 
 ## BAB III IMPLEMENTASI PROYEK
@@ -29,7 +32,7 @@
   - 3.2.1 Pemodelan & Penataan Aset 3D di Unity Editor
   - 3.2.2 Hierarki Prefab & Penamaan unity_object_name
   - 3.2.3 Skema Database (SQL DDL) di Supabase
-  - 3.2.4 Row Level Security & Trigger Audit Logs
+  - 3.2.4 Rancangan Row Level Security & Batas Pencatatan Audit
 - 3.3 Konfigurasi & Metadata (3.3.1 Struktur Basis Data & Relasi; 3.3.2 Aset & Konvensi Penamaan)
 - 3.4 Laporan Implementasi (3.4.1 Logbook; 3.4.2 Hasil & Bukti Aset 3D; 3.4.3 Hasil & Bukti Database)
 - 3.5 Hasil Pengujian (3.5.1 Integritas & Relasi; 3.5.2 RLS; 3.5.3 Konsistensi Aset–DB via Database Sync Checker)
@@ -42,10 +45,12 @@
 
 ### Gambar Direkomendasikan
 - Arsitektur Sistem (`../../diagrams/gambar-2.09-*`)
-- ERD (`../../diagrams/gambar-2.17-erd`)
+- Use Case Pengelolaan Database (`../../diagrams/dwikhi-use-case-pengelolaan-database.puml`)
+- Activity Pengelolaan Data Administrator (`../../diagrams/gambar-2.13-*`)
+- ERD data kampus/Denah 2D (`../../diagrams/erd-dwikhi-data-kampus-denah-2d.puml`) dan tabel pendukung (`../../diagrams/erd-dwikhi-tabel-pendukung.puml`)
 - Hierarki Prefab Gedung (`../../diagrams/gambar-3.1-hierarki-prefab-unity`)
 - Sequence Sinkronisasi (`../../diagrams/gambar-2.16-*`)
-- (buat sendiri) Screenshot pemodelan Unity, workflow aset→prefab, SQL DDL/RLS/trigger
+- (buat sendiri) Screenshot pemodelan Unity, workflow aset→prefab, serta bukti deployment DDL/RLS
 
 ### Acuan
 - PRD bagian "Skema Database" & "Konvensi Struktur Scene Unity": `../../PRD_Konsolidasi_TA.md`

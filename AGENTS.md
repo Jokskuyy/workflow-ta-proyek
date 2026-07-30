@@ -12,7 +12,7 @@ Ada tiga tahap yang tetap terpisah:
 
 1. `skills/scripts/generate_content.py` dapat meminta proposal konten dari AI/provider secara opsional. Default-nya hanya suggest + diff; draf baru ditulis dengan `--apply` eksplisit.
 2. `skills/scripts/alur_penulisan/` memproses dan menjaga kualitas Markdown secara deterministik. Workflow ini hanya berjalan jika `run_alur()` dipanggil secara eksplisit.
-3. `skills/scripts/build_pipeline.py` mengomposisikan `Tugas_Akhir_Draft.md` dengan fragment `content/shared/`, mengubah hasilnya bersama template menjadi `Tugas_Akhir_Formatted.docx`, lalu memvalidasinya. Komposisi berlangsung di memori dan build tidak pernah memanggil provider AI.
+3. `skills/scripts/build_pipeline.py` mengomposisikan draf profil aktif dengan fragment `content/shared/`, mengubah hasilnya bersama template menjadi DOCX profil, lalu memvalidasinya. Profil default `iman` tetap memakai `Tugas_Akhir_Draft.md` dan `Tugas_Akhir_Formatted.docx`; profil `dwikhi` memakai sumber serta aset terpisah yang didefinisikan pada `content/report-profiles.json`. Komposisi berlangsung di memori dan build tidak pernah memanggil provider AI.
 
 Alur DOCX:
 
@@ -91,12 +91,16 @@ Jika implementasi menyimpang dari sumber dengan prioritas lebih tinggi, laporkan
 - Margin kiri 4 cm = 2268 twips.
 - Margin atas, kanan, dan bawah 3 cm = 1701 twips.
 - Semua section harus memakai ukuran dan margin yang sama.
-- Font utama Times New Roman.
+- Font utama Times New Roman untuk seluruh teks, termasuk inline code. Fenced code block merupakan satu-satunya pengecualian dan memakai Courier New 12 pt miring.
 - Body 12 pt, justify, spasi 1,15, first-line indent 1 cm.
 - Caption spasi 1,0 dan center.
+- Style `Caption` berbasis `Normal` dan menetapkan Times New Roman 12 pt secara eksplisit. Label serta nomor lengkap `Gambar X.Y`/`Tabel X.Y` tebal; deskripsinya regular, kecuali istilah asing yang memang terdaftar.
+- Field `REF` pada narasi selalu regular dan tidak mewarisi tebal atau miring dari caption.
 - Bibliografi spasi 1,0 dengan hanging indent 1 cm.
 - Front matter memakai nomor Romawi di kanan bawah (sampul tanpa nomor).
 - Body restart nomor Arab dari `1` pada BAB I; pembuka setiap BAB di tengah bawah dan halaman lanjutannya di kanan atas.
+- Footer identitas berlaku dari BAB I sampai Daftar Pustaka dan berhenti sebelum Lampiran. Baris nama penulis dan tahun memakai Times New Roman 8 pt tebal; baris judul utama memakai Times New Roman 8 pt tebal-miring dengan huruf kapital; baris identitas institusi/program studi dan daftar alamat situs memakai Times New Roman 8 pt regular.
+- Seluruh heading halaman awal laporan Iman setelah sampul masuk Daftar Isi sebagai level 1 tanpa numbering BAB.
 
 ### 5.2 Gambar dan narasi
 
@@ -144,6 +148,11 @@ Jika implementasi menyimpang dari sumber dengan prioritas lebih tinggi, laporkan
 ### 5.6 Penulisan akademik
 
 - Jangan gunakan bullet untuk daftar laporan. Hirarki: `1.` -> `a.` -> `1)` -> `a)` dengan tiga spasi per level di Markdown.
+- Istilah teknis asing pada `term_registry.json` dan identifier inline dirender italic dengan Times New Roman. Fenced code block tetap italic tetapi memakai Courier New sesuai pengecualian tipografi kode.
+- Kepanjangan asing ketika memperkenalkan singkatan ditulis miring, sedangkan singkatannya tetap regular, misalnya *User Acceptance Test* (UAT). Penyebutan selanjutnya cukup memakai singkatan.
+- Narasi Indonesia memakai bentuk kanonik Dashboard Publik, Panel Admin, pemangku kepentingan, database, smartphone, browser, deployment, hosting, cache aset, file hasil build, kode lokasi Unity, dan notifikasi kedatangan. Jangan menambahkan terjemahan Inggris dalam kurung jika istilah Indonesia sudah jelas.
+- Fenced code block memakai Courier New 12 pt miring, spasi tunggal, tanpa warna sintaks, latar, bingkai, atau nomor baris.
+- Bold manual tidak digunakan pada kalimat penjelasan biasa; penebalan dibatasi pada struktur yang diwajibkan template.
 - Subbab teori dimulai dengan definisi dan minimal satu sitasi formal.
 - Klaim eksternal harus memiliki sumber.
 - Latar Belakang tanpa sitasi substantif adalah warning, bukan fatal.
@@ -177,6 +186,7 @@ Jika implementasi menyimpang dari sumber dengan prioritas lebih tinggi, laporkan
 | `merge_config.json` | Config opsional path `draft` dan `xml`; prioritas CLI > config > default |
 | `TA_DRAFT_PATH` | Override lokasi draf untuk writing guard validator |
 | `TA_CITATION_FATAL` | `1`, `true`, `yes`, atau `on` membuat cross-check sitasi fatal |
+| `content/report-profiles.json` | Memetakan draf, front matter, root aset, manifest, rekonsiliasi, dan output untuk profil build `iman` serta `dwikhi` |
 
 ## 7. Kontrak parser Markdown
 
@@ -219,6 +229,12 @@ Jalankan dari root repository.
 
 ```powershell
 C:\Python312\python.exe skills/scripts/build_pipeline.py
+```
+
+Build profil Dwikhi tanpa mengubah draf atau output default Iman:
+
+```powershell
+C:\Python312\python.exe skills/scripts/build_pipeline.py --profile dwikhi --output Tugas_Akhir_Dwikhi_Formatted.docx
 ```
 
 Build melakukan hal berikut yang harus diketahui agent:
@@ -302,7 +318,7 @@ C:\Python312\python.exe -m pytest -q tests/test_table_formatting_integration.py
 ### Fatal
 
 - DOCX/XML inti tidak valid.
-- Section bukan A4/margin 4-3-3-3.
+- Section bukan A4 dengan margin kiri 4 cm serta atas, kanan, dan bawah 3 cm.
 - Style/field appendix dan TOC9 salah.
 - Caption/SEQ numbering rusak.
 - Drawing-caption adjacency atau keep properties rusak.

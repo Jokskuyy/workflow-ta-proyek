@@ -109,7 +109,7 @@
             ]
         },
         {
-            "name": "Muammar Faiz Khairul Anam",
+            "name": "Muammar Faiz Khairul Anam Setiawan",
             "nim": "TBD",
             "role": "Peran 2: 3D Simulator & Engine Developer",
             "focus": [
@@ -409,12 +409,12 @@
     },
     "integration_pointer_and_sync": {
         "pointer_mechanism": {
-            "description": "Muhammad Dwikhi Deandra Purnianto menata hierarchy prefab dan child empty GameObject pointer di Unity agar namanya sesuai dengan unity_object_name pada database Supabase. Muhammad Iman Nugraha menggunakan kontrak unity_object_name tersebut pada Admin Dashboard, REST API, dan bridge React-Unity, sedangkan pemetaan runtime di Unity dikelola Muammar Faiz Khairul Anam.",
+            "description": "Muhammad Dwikhi Deandra Purnianto menata hierarchy prefab dan child empty GameObject pointer di Unity agar namanya sesuai dengan unity_object_name pada database Supabase. Muhammad Iman Nugraha menggunakan kontrak unity_object_name tersebut pada Admin Dashboard, REST API, dan bridge React-Unity, sedangkan pemetaan runtime di Unity dikelola Muammar Faiz Khairul Anam Setiawan.",
             "hierarchy_screenshot": "dokumentasi/contoh_pointer.png"
         },
         "database_sync_checker": {
             "script_path": "src/unity-scripts/Editor/DatabaseSyncChecker.cs",
-            "description": "Script editor Unity yang dikembangkan Muammar Faiz Khairul Anam untuk memeriksa sinkronisasi antara objek-objek di Unity Hierarchy dan data di database Supabase melalui endpoint /api/unity/names yang disediakan Muhammad Iman Nugraha.",
+            "description": "Script editor Unity yang dikembangkan Muammar Faiz Khairul Anam Setiawan untuk memeriksa sinkronisasi antara objek-objek di Unity Hierarchy dan data di database Supabase melalui endpoint /api/unity/names yang disediakan Muhammad Iman Nugraha.",
             "ui_screenshot": "dokumentasi/contoh_sync_db.png"
         }
     },

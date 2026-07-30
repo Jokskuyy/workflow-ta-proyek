@@ -2,7 +2,7 @@
 
 Dokumen ini adalah panduan teknis dan operasional terpadu untuk repository laporan Tugas Akhir Proyek UPNVJ FIK 2025. Isinya mencakup sumber data, aturan penulisan, format kampus, workflow penulisan otomatis, konversi Markdown ke DOCX, pengelolaan gambar dan tabel, validasi, pengujian, serta troubleshooting.
 
-> Status dokumentasi: diselaraskan dengan codebase pada 19 Juli 2026.
+> Status dokumentasi: diselaraskan dengan codebase pada 28 Juli 2026.
 >
 > Jika terdapat perbedaan, sumber kanonik pada bagian [Urutan sumber acuan](#urutan-sumber-acuan) harus didahulukan. Dokumentasi ini menjelaskan perilaku implementasi yang aktif, tetapi tidak menggantikan aturan kampus resmi.
 
@@ -56,10 +56,12 @@ Empat script di `scratch/` disalin ulang dari `skills/scripts/` setiap build: `m
 
 | Berkas/direktori | Keterangan |
 |---|---|
-| `Tugas_Akhir_Draft.md` | Sumber isi utama mulai BAB I; front matter dipertahankan dari template |
+| `Tugas_Akhir_Draft.md` | Sumber isi utama mulai BAB I; front matter dibangun dari template dan konfigurasi profil |
 | `content/README.md` | Kontrak shared content, role content, keamanan identitas, dan penggunaan include |
 | `content/shared/` | Sumber kanonik bagian laporan yang identik pada semua branch |
 | `content/roles/` | Lokasi opsional narasi khusus peran; tidak boleh menduplikasi shared content |
+| `content/roles/*/front-matter.json` | Konfigurasi identitas, teks, dan halaman scan front matter per profil |
+| `content/roles/*/front-matter-assets/` | Aset scan bertanda tangan untuk halaman front matter yang dikonfigurasi |
 | `archive/Tugas Akhir.docx` | Template Word sumber |
 | `Tugas_Akhir_Formatted.docx` | Output build final |
 | `project_facts.json` | Basis fakta untuk mencegah klaim yang belum terverifikasi |
@@ -167,7 +169,7 @@ Sebelum menulis angka, status implementasi, atau hasil pengujian, periksa `proje
 
 ### Konsistensi istilah
 
-`term_registry.json` menyimpan bentuk kanonik istilah seperti dashboard, user interface, back-end, front-end, database, model 3D, virtual reality, Smart Campus, API, REST API, RLS, use case, Black Box Testing, UAT, ERD, pointer, dan prefab.
+`term_registry.json` menyimpan bentuk kanonik istilah seperti dashboard, user interface, back-end, front-end, database, model 3D, virtual reality, Smart Campus, API, REST API, RLS, use case, Black Box Testing, UAT, ERD, pointer, dan prefab. Daftar `italic_terms` pada registry yang sama menentukan istilah teknis asing yang dirender miring secara konsisten.
 
 Pemeriksa istilah:
 
@@ -185,7 +187,7 @@ Pemeriksa istilah:
 
 ## Kontrak Markdown yang didukung
 
-`merge_draft_to_docx.py` membaca isi mulai heading `# BAB I` atau `# BAB 1`. Konten sebelum itu tidak dimasukkan karena cover dan front matter berasal dari template.
+`merge_draft_to_docx.py` membaca isi mulai heading `# BAB I` atau `# BAB 1`. Konten sebelum itu tidak dimasukkan karena cover dan front matter dibangun dari template serta konfigurasi profil.
 
 | Sintaks | Hasil |
 |---|---|
@@ -431,6 +433,21 @@ Jalankan dari root repository:
 C:\Python312\python.exe skills/scripts/build_pipeline.py
 ```
 
+Nama keluaran dapat diubah untuk membuat build pemeriksaan yang tidak menimpa DOCX utama atau hasil edit manual:
+
+```powershell
+C:\Python312\python.exe skills/scripts/build_pipeline.py --output Tugas_Akhir_Formatted_QA.docx
+```
+
+Pipeline juga mendukung profil laporan yang terisolasi melalui
+`content/report-profiles.json`. Tanpa `--profile`, profil `iman` tetap
+digunakan dan menghasilkan `Tugas_Akhir_Formatted.docx`. Laporan Dwikhi
+dibangun dari Markdown, front matter, manifest, dan root aset yang terpisah:
+
+```powershell
+C:\Python312\python.exe skills/scripts/build_pipeline.py --profile dwikhi --output Tugas_Akhir_Dwikhi_Formatted.docx
+```
+
 ### Urutan build
 
 | Langkah | Script | Fungsi |
@@ -438,11 +455,11 @@ C:\Python312\python.exe skills/scripts/build_pipeline.py
 | 0 | `build_pipeline.py` | Menghentikan Word, memeriksa lock output, dan menyinkronkan script runtime ke `scratch/` |
 | 1 | `unpack.py` | Mengekstrak template secara aman ke `unpacked_ta/` |
 | 2 | `merge_draft_to_docx.py` | Memperluas include, mem-parse Markdown, dan mengganti isi laporan pada `document.xml` |
-| 3 | `patch_template.py` | Menerapkan patch khusus proyek untuk diskrepansi database/CRUD BAB II |
+| 3 | `patch_template.py` | Menerapkan patch khusus proyek dan memasang halaman scan front matter dari profil |
 | 4 | `add_numbering_preset.py` | Menambahkan preset numbering ke package Word |
 | 5 | `format_ta_proyek.py` | Menerapkan format halaman, style, caption, daftar, tabel, gambar, dan penomoran |
 | 6 | `pack.py` | Membungkus ulang XML menjadi DOCX dan meminta Word memperbarui field |
-| 7 | `inject_all_images.py` | Menyuntikkan gambar berdasarkan manifest setelah proses COM |
+| 7 | `inject_all_images.py` | Menyuntikkan gambar berdasarkan manifest dan menegakkan ulang italic istilah teknis setelah proses COM |
 | 8 | `validate_docx_structure.py` | Menjalankan seluruh pemeriksaan fatal dan warning |
 | 9 | `build_pipeline.py` | Menghapus `unpacked_ta/` dan melaporkan output final |
 
@@ -488,24 +505,31 @@ Perintah tersebut membaca draf dan fragment, mem-parse hasil komposisi, serta me
 | Margin kanan | 3 cm |
 | Margin bawah | 3 cm |
 | Jarak header/footer | 720 twips |
-| Font utama | Times New Roman pada body, style, tabel, caption, header, dan footer |
+| Font utama | Times New Roman pada body, style, tabel, caption, header, footer, dan inline code; fenced code block memakai Courier New |
 | Body | 12 pt, justify, spasi 1,15, first-line indent 1 cm |
+| Istilah teknis | Hanya span istilah pada `italic_terms`, identifier inline, dan fenced code block yang dirender italic; teks lain dalam run yang sama tetap regular |
 | Heading | 12 pt bold, spasi 1,15 |
 | Judul bab | 14 pt bold, center |
-| Abstrak | 11 pt |
-| Caption | 12 pt, center, spasi 1,0, tanpa first-line indent |
+| Abstrak | 12 pt |
+| Caption | Style berbasis `Normal`, Times New Roman 12 pt, hitam, center, spasi 1,0, tanpa first-line indent; label dan nomor lengkap tebal, deskripsi regular |
+| Blok kode | Courier New 12 pt miring, rata kiri, spasi tunggal, tanpa warna sintaks, latar, bingkai, atau nomor baris |
 | Bibliografi | Spasi 1,0, hanging indent 1 cm |
 
-Font simbol/kode seperti Symbol, Wingdings, dan Courier New dipertahankan agar glyph dan blok kode tidak rusak.
+Font simbol internal seperti Symbol dan Wingdings dipertahankan jika diperlukan oleh penomoran Word. Seluruh teks laporan dinormalisasi ke Times New Roman, kecuali paragraf `CodeBlock` yang secara eksplisit memakai Courier New.
 
 Seluruh `sectPr` yang tersisa dipaksa kembali ke A4 dan margin yang sama, sehingga section tambahan dari template tidak boleh membawa margin berbeda.
 
 ### Nomor halaman dan daftar otomatis
 
 - Front matter memakai angka Romawi di kanan bawah; sampul tidak menampilkan nomor.
+- Profil Iman memakai scan bertanda tangan yang dikonfigurasi untuk Lembar Pengesahan, Surat Pernyataan Keaslian, dan Pernyataan Persetujuan Publikasi. Ketiganya ditempatkan satu scan per section dengan footer Word kosong, sehingga nomor Romawi `iii`–`v` yang sudah tercetak pada scan menjadi satu-satunya nomor yang terlihat dan hitungan section berikutnya tetap berlanjut.
+- Setiap halaman scan didahului anchor heading putih berukuran 1 pt pada paragraf terpisah agar judul halaman tetap masuk Daftar Isi tanpa menyalin drawing scan ke dalam field TOC.
 - Body memakai angka Arab dan restart dari `1` pada BAB I.
 - Halaman pembuka setiap BAB menampilkan nomor di tengah bawah; halaman lanjutan BAB menampilkannya di kanan atas.
-- Cover, halaman pengesahan, dan daftar utama diisolasi agar tidak bercampur pada halaman yang sama.
+- Profil yang memiliki `identity_footer` menampilkan identitas karya ilmiah mulai BAB I sampai Daftar Pustaka: nama penulis dan tahun dalam Times New Roman 8 pt tebal; judul utama huruf kapital dalam Times New Roman 8 pt tebal-miring; lalu identitas institusi/program studi dan daftar alamat situs dalam Times New Roman 8 pt regular. Pipeline membuat section baru sebelum Lampiran agar footer berhenti tepat setelah Daftar Pustaka tanpa merestart nomor halaman.
+- Seluruh heading halaman awal laporan Iman setelah sampul—mulai `LAPORAN PROYEK`, Lembar Pengesahan, surat pernyataan, abstrak, Kata Pengantar, hingga daftar utama—menggunakan outline level 1 agar masuk ke Daftar Isi tanpa memperoleh nomor BAB.
+- Setelah seluruh gambar diinjeksi, pipeline memperbarui kembali field Word agar nomor halaman Daftar Isi, Daftar Gambar, Daftar Tabel, dan `PAGEREF` mengikuti pagination final. Pass `--repair-only` kemudian mengembalikan format pasca-COM tanpa menggandakan gambar.
+- Cover, ketiga halaman scan front matter, dan daftar utama diisolasi agar tidak bercampur pada halaman yang sama.
 - Daftar Isi, Daftar Gambar, Daftar Tabel, dan Daftar Lampiran dibuat sebagai field Word dinamis.
 - Daftar Lampiran hanya mengambil heading lampiran pada TOC level 9.
 - Opsi `updateFields` yang memicu popup saat dokumen dibuka dihapus; field diperbarui secara eksplisit melalui Word COM.
@@ -517,9 +541,11 @@ Seluruh `sectPr` yang tersisa dipaksa kembali ke A4 dan margin yang sama, sehing
 - counter gambar dan tabel terpisah;
 - counter restart per bab;
 - nomor dibuat sebagai field `SEQ` Word;
+- label dan seluruh hasil nomor `SEQ` diformat langsung sebagai Times New Roman 12 pt tebal;
+- deskripsi caption diformat regular, lalu hanya span istilah asing yang terdaftar yang dimiringkan;
 - item pertama dalam bab memakai switch restart `\r 1`;
 - caption ID-based diberi bookmark stabil `fig_*`/`tbl_*` yang mencakup label dan nomor;
-- `[FIGREF:id]`/`[TABREF:id]` diubah menjadi field `REF` dengan nilai terlihat yang dicache untuk renderer headless;
+- `[FIGREF:id]`/`[TABREF:id]` diubah menjadi field `REF` regular dengan nilai terlihat yang dicache untuk renderer headless;
 - referensi nomor lama tetap dipetakan ke nomor baru jika tidak ambigu sebagai kompatibilitas legacy.
 
 Deskripsi caption diambil dari `[FIGCAPTION:Deskripsi]` atau `[TABLECAPTION:Deskripsi]`; Daftar Gambar/Tabel dan nomor tidak ditulis hard-coded di draf.
@@ -556,7 +582,7 @@ Nilai A | Nilai B
 
 - Gambar ditengahkan dan tidak di-upscale.
 - Rasio aspek asli dipertahankan; gambar tidak dicrop atau didistorsi.
-- Batas body bersama adalah sekitar 15 cm × 16 cm.
+- Batas body bersama adalah 14 cm × 16 cm agar gambar tidak melampaui area cetak A4 dengan margin kiri 4 cm dan margin kanan 3 cm.
 - Paragraf drawing dan caption diberi `keepNext` serta `keepLines`.
 - Drawing dan caption wajib berada pada halaman yang sama. Injector menyisakan cadangan tinggi 3 cm untuk caption dan Word memindahkan pasangan tersebut bersama ke halaman berikutnya bila ruang tersisa tidak cukup.
 - Susunan final yang dijaga adalah drawing lalu caption. Jika pola awalnya `[drawing][narasi][caption]`, formatter memindahkan caption menjadi `[drawing][caption][narasi]` agar drawing dan caption tetap berdekatan; narasi tetap valid selama berada pada bab yang sama.
@@ -623,7 +649,7 @@ Build gagal jika ditemukan salah satu kondisi berikut:
 - style `taappendixheading` hilang, memiliki outline salah, atau lampiran masih memiliki numbering;
 - style `TOC9` atau indent khusus Daftar Lampiran salah;
 - field Word berisi error;
-- salah satu section bukan A4 portrait atau marginnya bukan 4-3-3-3 cm;
+- salah satu section bukan A4 portrait atau margin kiri bukan 4 cm maupun margin atas, kanan, dan bawah bukan 3 cm;
 - caption tidak memiliki field `SEQ` yang benar atau counter bab tidak direstart;
 - token sumber ID-based tersisa, bookmark caption duplikat/hilang, atau field `REF` menunjuk bookmark yang tidak ada;
 - Daftar Lampiran tidak menargetkan level 9–9;
@@ -704,7 +730,7 @@ Property-based tests memakai Hypothesis untuk mengeksplorasi variasi input, seda
 
 Validator struktural tidak menggantikan pemeriksaan visual. Buka output di Microsoft Word dan periksa:
 
-1. Margin 4 cm kiri dan 3 cm pada atas, kanan, bawah.
+1. Margin 4 cm pada kiri serta 3 cm pada atas, kanan, dan bawah.
 2. Cover dan pengesahan tidak meluber.
 3. Peralihan nomor Romawi ke Arab tepat pada BAB I.
 4. Daftar Isi/Gambar/Tabel/Lampiran memiliki nomor halaman terbaru.

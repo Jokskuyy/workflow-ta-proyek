@@ -1,0 +1,7 @@
+{
+  "_comment": "Reconciliation allow-lists for exceptional, documented placement only. Shared Markdown now provides explicit markers for all survey charts. The interview photo remains placed outside the ID-based caption flow.",
+  "duplicate_content_allow": [],
+  "unresolved_allow": [
+    "foto_wawancara_warek"
+  ]
+}

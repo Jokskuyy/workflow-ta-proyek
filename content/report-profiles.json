@@ -1,0 +1,18 @@
+{
+  "iman": {
+    "draft": "Tugas_Akhir_Draft.md",
+    "front_matter": "content/roles/iman/front-matter.json",
+    "image_root": "images",
+    "manifest": "images/manifest.json",
+    "reconcile": "images/manifest_reconcile.json",
+    "output": "Tugas_Akhir_Formatted.docx"
+  },
+  "dwikhi": {
+    "draft": "Tugas_Akhir_Dwikhi_Draft.md",
+    "front_matter": "content/roles/dwikhi/front-matter.json",
+    "image_root": "images/dwikhi",
+    "manifest": "images/dwikhi/manifest.json",
+    "reconcile": "images/dwikhi/manifest_reconcile.json",
+    "output": "Tugas_Akhir_Dwikhi_Formatted.docx"
+  }
+}

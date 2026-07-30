@@ -1,10 +1,10 @@
 @startuml gambar-2-09-arsitektur-sistem
-' Gambar 2.9 - Diagram Arsitektur Sistem (versi terkini, mengacu PRD)
+' Arsitektur Integrasi Dashboard Web, Supabase, dan Unity WebGL
 ' Menggantikan arsitektur lama (BuildingDataReceiver/BuildingClickHandler - deprecated)
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
+skinparam defaultFontName "Times New Roman"
 skinparam defaultFontSize 12
 skinparam ArrowColor #444444
 skinparam componentStyle rectangle
@@ -29,41 +29,41 @@ skinparam actor {
 actor "Pengguna Publik" as User
 actor "Administrator" as Admin
 
-rectangle "Browser (Klien)" as Browser {
-  component "React SPA\n(Vite)\n- Dashboard Publik\n- Admin Panel\n- Denah 2D + Pencarian\n- Multi-bahasa" as React
-  component "Unity WebGL Canvas\n- Scene 3D Kampus\n- NavMesh Pathfinding\n- First-person Control" as UnityCanvas
-  React -right-> UnityCanvas : SendMessage\n(NavigationReceiver, NavigateTo)\n+ unity_object_name
-  UnityCanvas -left-> React : OnNavigationCompleted\nJSON unity_object_name\n(validasi tujuan aktif)
+rectangle "Browser" as Browser {
+  component "Antarmuka Web React\n- Dashboard Publik\n- Panel Admin\n- Denah 2D dan Pencarian\n- Pilihan Bahasa" as React
+  component "Denah 3D Unity WebGL\n- Lingkungan Kampus\n- Pencarian Rute NavMesh\n- Kontrol Karakter" as UnityCanvas
+  React -right-> UnityCanvas : Perintah navigasi\n(kode lokasi Unity)
+  UnityCanvas -left-> React : Notifikasi kedatangan\n(kode lokasi Unity)
 }
 
 rectangle "Vercel" as Vercel {
-  component "Static Hosting\n(dist/, unity-builds/)" as Static
-  component "Serverless Functions\n/api/unity/data\n/api/unity/names\n/api/buildings, /api/rooms\n/api/health" as Serverless
+  component "Hosting Aplikasi Web dan\nFile Hasil Build Unity WebGL" as Static
+  component "Fungsi API Vercel\n/api/unity/data\n/api/unity/names\n/api/buildings dan /api/rooms\n/api/health" as Serverless
 }
 
-rectangle "Layanan Operasional Opsional" as OptionalServices {
-  component "Express.js (:3001)\n- Proxy API Umami\n- Rate limiter" as Express
-  component "Umami Analytics\n(Self-hosted Docker)" as Umami
-  Express -right-> Umami : proxy analitik
+rectangle "Layanan Opsional" as OptionalServices {
+  component "Layanan Express\n- Perantara Analitik\n- Pembatasan Permintaan" as Express
+  component "Layanan Analitik Umami\n(Dikelola Mandiri)" as Umami
+  Express -right-> Umami : Teruskan data analitik
 }
 
-database "Supabase Cloud\n- PostgreSQL\n- Auth (JWT)\n- Row Level Security" as Supabase
+database "Supabase\n- Database PostgreSQL\n- Autentikasi\n- Kebijakan Akses Data" as Supabase
 
 ' Alur pengguna
-User --> React : Akses dashboard & denah
-Admin --> React : Login & CRUD data
+User --> React : Buka dashboard dan denah
+Admin --> React : Masuk dan kelola data
 
 ' Frontend ke layanan
-React --> Static : Muat aset (SPA + WebGL)
-React --> Supabase : Auth, query, CRUD, analitik\n(dibatasi RLS)
+React --> Static : Muat aplikasi dan aset denah 3D
+React --> Supabase : Autentikasi dan pengelolaan data\n(dibatasi kebijakan akses)
 
 ' Unity menarik data sendiri (runtime)
-UnityCanvas --> Serverless : HTTP GET /api/unity/data
+UnityCanvas --> Serverless : Ambil data lokasi\nGET /api/unity/data
 
 ' Serverless ke database
-Serverless --> Supabase : Query data
+Serverless --> Supabase : Ambil data gedung dan fasilitas
 
 ' Jalur analitik alternatif, bukan dependensi UI aktif
-React ..> Express : jalur analitik opsional\n(jika diaktifkan)
+React ..> Express : Jalur analitik opsional\n(jika diaktifkan)
 
 @enduml

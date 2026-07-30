@@ -53,6 +53,18 @@ Yang **tidak perlu** sitasi eksternal:
   dengan `[BUTUH SITASI]` agar mudah ditelusuri, jangan dibiarkan seolah sudah
   tervalidasi.
 
+## Format Daftar Pustaka
+
+- Entri disusun menurut abjad nama penulis atau nama organisasi dan ditulis
+  sebagai satu paragraf untuk setiap sumber.
+- Paragraf memakai Times New Roman 12 pt, spasi 1,0, rata kiri, dan inden
+  gantung 1 cm. Rata kiri digunakan agar Word tidak melebarkan jarak
+  antarkata pada baris yang pendek.
+- Judul jurnal dicetak miring, sedangkan nama penulis, tahun, judul artikel,
+  volume, nomor, halaman, DOI, dan URL ditulis biasa.
+- DOI ditulis satu kali dalam bentuk URL `https://doi.org/...`; awalan DOI atau
+  URL yang berulang harus dibersihkan.
+
 ## Catatan integrasi pipeline (opsional)
 
 Pola yang sama seperti guard "wajib narasi gambar" bisa diterapkan: validator

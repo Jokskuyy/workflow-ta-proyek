@@ -40,7 +40,7 @@ Sumber kebenaran tunggal tiap branch adalah **`Tugas_Akhir_Draft.md`** di root. 
 1. **Tanpa bullet** (`-`, `*`, `+`). Gunakan hierarki: `1.` → `a.` → `1)` → `a)`.
 2. **Setiap sub-bab teori diawali definisi + minimal satu sitasi.**
 3. **Jangan menaruh rujukan gambar/tabel di awal kalimat.** Gunakan ID di tengah kalimat, misalnya `...seperti pada [FIGREF:diagram_arsitektur].` atau `...dirinci pada [TABREF:hasil_uji].`.
-4. **Konsistensi istilah** (mis. pakai "database" terus, jangan ganti "basis data").
+4. **Konsistensi istilah** (mis. pakai "database" terus, jangan ganti "basis data"). Istilah teknis asing pada `term_registry.json` serta identifier di dalam backtick dirender *italic* dengan Times New Roman.
 5. **Jangan mengarang fakta/angka.** Verifikasi ke `project_facts.json`. Bila `completed: false`/`null`, tulis placeholder `[TBD: ...]`.
 6. **Lampiran**: format `LAMPIRAN 1.`, tiap lampiran pisah halaman (`---`), tidak muncul di Daftar Isi.
 
@@ -64,6 +64,12 @@ Detail di `.kiro/steering/aturan-sitasi.md`. Inti: gaya author-year tanpa koma s
 Dari root repo, di branch yang benar:
 ```bash
 C:\Python312\python.exe skills/scripts/build_pipeline.py
+```
+
+Untuk menghasilkan berkas pemeriksaan tanpa menimpa keluaran utama atau hasil edit manual, gunakan nama keluaran terpisah:
+
+```powershell
+C:\Python312\python.exe skills/scripts/build_pipeline.py --output Tugas_Akhir_Formatted_QA.docx
 ```
 Output: **`Tugas_Akhir_Formatted.docx`** (di-*ignore* git; tiap anggota generate sendiri).
 
@@ -97,9 +103,10 @@ Karena pergeseran halaman, buka `.docx` di Word → klik kanan tabel **DAFTAR IS
 | Elemen | Nilai |
 |---|---|
 | Kertas / Margin | A4 / Atas 3cm, Bawah 3cm, **Kiri 4cm**, Kanan 3cm |
-| Font | Times New Roman — Body 12pt (1.15), Judul Bab 14pt Bold Center, Caption 12pt (1.0) |
-| Caption Tabel | **di atas** tabel, center, "Tabel 1.1 ..." (tanpa titik setelah nomor) |
-| Caption Gambar | **di bawah** gambar, center, "Gambar 2.3 ..." |
+| Font | Times New Roman untuk seluruh teks laporan dan kode inline — Body 12pt (1.15), Judul Bab 14pt Bold Center, Caption 12pt (1.0); blok kode memakai Courier New |
+| Caption Tabel | **di atas** tabel, center; label dan nomor `Tabel 1.1` tebal, deskripsi regular |
+| Caption Gambar | **di bawah** gambar, center; label dan nomor `Gambar 2.3` tebal, deskripsi regular |
+| Blok kode | Courier New 9 pt miring, spasi tunggal, tanpa warna sintaks, latar, bingkai, atau nomor baris |
 | Nomor halaman | Romawi di kanan bawah untuk front matter; Arab restart dari 1 pada BAB I; pembuka BAB di tengah bawah dan halaman lanjutan di kanan atas |
 | Page split | Daftar Isi/Gambar/Tabel/Lampiran di halaman terpisah; cover sendiri |
 | Gambar | Pertahankan rasio aspek (tidak distorsi); gambar dan caption wajib satu halaman |

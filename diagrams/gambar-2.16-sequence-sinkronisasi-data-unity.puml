@@ -1,14 +1,17 @@
 @startuml gambar-2-16-sequence-sinkronisasi-data-unity
-' Gambar 2.16 - Sequence Diagram: Sinkronisasi Data Gedung dan Unity
+' Sequence Diagram Sinkronisasi Data Gedung dan Fasilitas dengan Unity
 ' Sumber: BAB II - 2.3.3 Sequence Diagram (b) + PRD (alur unity_object_name)
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam defaultFontName "Segoe UI"
-skinparam defaultFontSize 13
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
 skinparam sequenceArrowColor #444444
 skinparam sequenceLifeLineBorderColor #555555
 skinparam sequenceLifeLineBackgroundColor #F2F2F2
+skinparam ParticipantPadding 8
+skinparam BoxPadding 4
+skinparam Padding 4
 skinparam participant {
   BackgroundColor #F2F2F2
   BorderColor #555555
@@ -18,42 +21,43 @@ skinparam actor {
   BorderColor #555555
 }
 
+hide footbox
 
 actor "Administrator" as Admin
-participant "Admin Dashboard\n(React)" as FE
-participant "Backend API\n(/api/unity/data)" as API
+participant "Panel Admin\n(React)" as FE
+participant "Fungsi API Vercel\n(/api/unity/data)" as API
 database "Supabase\n(PostgreSQL)" as DB
-participant "Unity WebGL\nBuildingDatabase" as Unity
-participant "Scene 3D\n(GameObject)" as Scene
+participant "Unity WebGL" as Unity
+participant "Lingkungan 3D\nUnity" as Scene
 
 == Tahap 1: Pembaruan Data oleh Admin ==
-Admin -> FE : Memperbarui field unity_object_name\n(data gedung/fasilitas)
+Admin -> FE : Memperbarui kode lokasi Unity\npada data gedung atau fasilitas
 activate FE
-FE -> DB : Simpan perubahan (UPDATE)
+FE -> DB : Menyimpan perubahan
 activate DB
 DB -->> FE : Konfirmasi tersimpan
 deactivate DB
 FE -->> Admin : Notifikasi berhasil
 deactivate FE
 
-== Tahap 2: Penarikan Data oleh Unity (saat game start) ==
-Unity -> API : HTTP GET /api/unity/data
+== Tahap 2: Pengambilan Data ketika Unity Dijalankan ==
+Unity -> API : Meminta data lokasi\nGET /api/unity/data
 activate Unity
 activate API
-API -> DB : Query data gedung & fasilitas\n(+ unity_object_name)
+API -> DB : Mengambil data gedung dan fasilitas\nbeserta kode lokasinya
 activate DB
-DB -->> API : Result set
+DB -->> API : Data hasil permintaan
 deactivate DB
-API -->> Unity : Response JSON\n{ gedung[], fasilitas[] }
+API -->> Unity : Data gedung dan fasilitas\ndalam format JSON
 deactivate API
-Unity -> Unity : Cache realNames &\nunityObjectNames (isLoaded = true)
+Unity -> Unity : Menyimpan data lokasi\nuntuk proses navigasi
 
-== Tahap 3: Pencocokan GameObject di Scene ==
-Unity -> Scene : Lookup Transform berdasarkan\nunity_object_name (case-insensitive)
+== Tahap 3: Pencocokan Objek Tujuan ==
+Unity -> Scene : Mencocokkan kode lokasi\ndengan objek tujuan
 activate Scene
-Scene -->> Unity : Referensi GameObject target
+Scene -->> Unity : Objek tujuan yang sesuai
 deactivate Scene
-Unity -> Unity : Siap untuk navigasi\n(NavigationReceiver)
+Unity -> Unity : Menyiapkan navigasi menuju tujuan
 deactivate Unity
 
 @enduml
